@@ -23,7 +23,7 @@ class SettingsPage extends StatelessWidget {
         children: <Widget>[
           BlocBuilder<WeatherCubit, WeatherState>(
             buildWhen: (WeatherState previous, WeatherState current) =>
-            previous.temperatureUnits != current.temperatureUnits,
+                previous.temperatureUnits != current.temperatureUnits,
             builder: (BuildContext context, WeatherState state) {
               return ListTile(
                 title: const Text('Temperature Units'),
