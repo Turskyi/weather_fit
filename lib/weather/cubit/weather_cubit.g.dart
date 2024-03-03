@@ -16,7 +16,7 @@ WeatherState _$WeatherStateFromJson(Map<String, dynamic> json) =>
               'status',
               (v) =>
                   $enumDecodeNullable(_$WeatherStatusEnumMap, v) ??
-                  WeatherStatus.initial),
+                  WeatherStatus.loading),
           temperatureUnits: $checkedConvert(
               'temperature_units',
               (v) =>

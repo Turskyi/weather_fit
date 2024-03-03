@@ -11,6 +11,7 @@ import 'package:weather_fit/weather/cubit/weather_cubit.dart';
 import 'package:weather_fit/weather/models/weather.dart';
 import 'package:weather_fit/weather/ui/weather.dart';
 import 'package:weather_fit/weather/ui/weather_page.dart';
+import 'package:weather_fit/weather/ui/weather_view.dart';
 import 'package:weather_repository/weather_repository.dart' hide WeatherDomain;
 
 import 'helpers/hydrated_bloc.dart';
@@ -58,7 +59,7 @@ void main() {
       weatherCubit = MockWeatherCubit();
     });
 
-    testWidgets('renders WeatherEmpty for WeatherStatus.initial',
+    testWidgets('renders WeatherLoading for WeatherStatus.initial',
         (WidgetTester tester) async {
       when(() => weatherCubit.state).thenReturn(WeatherState());
       await tester.pumpWidget(
@@ -67,7 +68,7 @@ void main() {
           child: const MaterialApp(home: WeatherView()),
         ),
       );
-      expect(find.byType(WeatherEmpty), findsOneWidget);
+      expect(find.byType(WeatherLoading), findsOneWidget);
     });
 
     testWidgets('renders WeatherLoading for WeatherStatus.loading',
@@ -216,7 +217,8 @@ void main() {
     });
 
     testWidgets('triggers fetch on search pop', (WidgetTester tester) async {
-      when(() => weatherCubit.state).thenReturn(WeatherState());
+      when(() => weatherCubit.state)
+          .thenReturn(WeatherState(status: WeatherStatus.success));
       when(() => weatherCubit.fetchWeather(any())).thenAnswer((_) async {});
       await tester.pumpWidget(
         BlocProvider<WeatherCubit>.value(
@@ -226,10 +228,10 @@ void main() {
       );
       await tester.tap(find.byType(FloatingActionButton));
       await tester.pumpAndSettle();
-      await tester.enterText(find.byType(TextField), 'Chicago');
+      await tester.enterText(find.byType(TextField), 'Toronto');
       await tester.tap(find.byKey(const Key('searchPage_search_iconButton')));
       await tester.pumpAndSettle();
-      verify(() => weatherCubit.fetchWeather('Chicago')).called(1);
+      verify(() => weatherCubit.fetchWeather('Toronto')).called(1);
     });
   });
 }
