@@ -25,7 +25,8 @@ if (flutterVersionName == null) {
 android {
     namespace "com.turskyi.weather_fit"
     compileSdkVersion flutter.compileSdkVersion
-    ndkVersion flutter.ndkVersion
+    //TODO: replace with "ndkVersion flutter.ndkVersion" when the error "One or more plugins require a higher Android NDK version." is gone.
+    ndkVersion "25.1.8937393"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8

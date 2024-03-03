@@ -11,6 +11,7 @@ import 'package:weather_fit/weather/cubit/weather_cubit.dart';
 import 'package:weather_fit/weather/models/weather.dart';
 import 'package:weather_fit/weather/ui/weather.dart';
 import 'package:weather_fit/weather/ui/weather_page.dart';
+import 'package:weather_fit/weather/ui/weather_view.dart';
 import 'package:weather_repository/weather_repository.dart' hide WeatherDomain;
 
 import 'helpers/hydrated_bloc.dart';

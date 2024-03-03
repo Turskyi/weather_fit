@@ -52,7 +52,7 @@ class Weather extends Equatable {
     condition: WeatherCondition.unknown,
     lastUpdated: DateTime(0),
     temperature: const Temperature(value: 0),
-    location: '--',
+    location: '',
   );
 
   final WeatherCondition condition;
