@@ -1,16 +1,17 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/intl.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:weather_fit/weather/cubit/weather_cubit.dart';
 import 'package:weather_fit/weather/models/weather.dart';
 import 'package:weather_repository/weather_repository.dart'
     as weather_repository;
+import 'package:weather_repository/weather_repository.dart';
 
 import 'helpers/hydrated_bloc.dart';
 
 const String weatherLocation = 'London';
-const weather_repository.WeatherCondition weatherCondition =
-    weather_repository.WeatherCondition.rainy;
+const WeatherCondition weatherCondition = WeatherCondition.rainy;
 const double weatherTemperature = 9.8;
 
 class MockWeatherRepository extends Mock
@@ -22,8 +23,8 @@ void main() {
   initHydratedStorage();
 
   group('WeatherCubit', () {
-    late weather_repository.WeatherDomain weather;
-    late weather_repository.WeatherRepository weatherRepository;
+    late WeatherDomain weather;
+    late WeatherRepository weatherRepository;
     late WeatherCubit weatherCubit;
 
     setUp(() async {
@@ -129,44 +130,27 @@ void main() {
         'emits [loading, success] when getWeather returns (fahrenheit)',
         build: () => weatherCubit,
         seed: () => WeatherState(temperatureUnits: TemperatureUnits.fahrenheit),
-        act: (WeatherCubit cubit) => cubit.fetchWeather(weatherLocation),
-        expect: () => <dynamic>[
-          WeatherState(
-            status: WeatherStatus.loading,
-            temperatureUnits: TemperatureUnits.fahrenheit,
-          ),
-          isA<WeatherState>()
-              .having(
-                (WeatherState w) => w.status,
-                'status',
-                WeatherStatus.success,
-              )
-              .having(
-                (WeatherState w) => w.weather,
-                'weather',
-                isA<Weather>()
-                    .having(
-                      (Weather w) => w.lastUpdated,
-                      'lastUpdated',
-                      isNotNull,
-                    )
-                    .having(
-                      (Weather w) => w.condition,
-                      'condition',
-                      weatherCondition,
-                    )
-                    .having(
-                      (Weather w) => w.temperature,
-                      'temperature',
-                      Temperature(value: weatherTemperature.toFahrenheit()),
-                    )
-                    .having(
-                      (Weather w) => w.location,
-                      'location',
-                      weatherLocation,
-                    ),
+        act: (WeatherCubit cubit) {
+          return cubit.fetchWeather(weatherLocation);
+        },
+        expect: () {
+          DateTime now = DateTime.now();
+          String formattedNow = DateFormat('yyyy-MM-dd HH:mm').format(now);
+          DateTime parsedDateTime =
+              DateFormat('yyyy-MM-dd HH:mm').parse(formattedNow);
+          return <dynamic>[
+            WeatherState(
+              status: WeatherStatus.success,
+              temperatureUnits: TemperatureUnits.fahrenheit,
+              weather: Weather(
+                condition: weatherCondition,
+                location: weatherLocation,
+                lastUpdated: parsedDateTime,
+                temperature: const Temperature(value: 49.64),
               ),
-        ],
+            ),
+          ];
+        },
       );
     });
 

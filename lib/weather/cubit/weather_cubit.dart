@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
-import 'package:weather_fit/weather/models/weather.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:weather_fit/weather/models/weather.dart';
 import 'package:weather_repository/weather_repository.dart'
     show WeatherRepository;
 
@@ -15,9 +15,7 @@ class WeatherCubit extends HydratedCubit<WeatherState> {
 
   Future<void> fetchWeather(String city) async {
     if (city.isEmpty) return;
-
     emit(state.copyWith(status: WeatherStatus.loading));
-
     try {
       final Weather weather = Weather.fromRepository(
         await _weatherRepository.getWeather(city),
