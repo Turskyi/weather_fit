@@ -11,6 +11,14 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Write google-services.json file
+        run: |
+          cd android/app
+          echo $GOOGLE_SERVICES | base64 -d > google-services.json
+        shell: bash
+        env:
+          ENV: ${{ secrets.GOOGLE_SERVICES }}
+
       - name: Write .env file
         run: |
           echo $ENV | base64 -d > .env
