@@ -17,7 +17,7 @@ jobs:
           echo $GOOGLE_SERVICES | base64 -d > google-services.json
         shell: bash
         env:
-          ENV: ${{ secrets.GOOGLE_SERVICES }}
+          GOOGLE_SERVICES: ${{ secrets.GOOGLE_SERVICES }}
 
       - name: Write .env file
         run: |
