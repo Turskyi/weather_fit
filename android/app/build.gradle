@@ -62,8 +62,7 @@ android {
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         //TODO: replace with "minSdkVersion flutter.minSdkVersion" when the error "uses-sdk:minSdkVersion 16 cannot be smaller than version 19 declared in library [com.google.android.gms:play-services-location:21.1.0] " is gone.
-//        minSdkVersion flutter.minSdkVersion
-        minSdkVersion 19
+        minSdkVersion flutter.minSdkVersion
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName

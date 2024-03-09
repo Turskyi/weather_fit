@@ -1,3 +1,4 @@
+//file:noinspection GrDeprecatedAPIUsage
 buildscript {
     ext {
         kotlin_version = '1.9.22'
@@ -23,12 +24,12 @@ allprojects {
 
 rootProject.layout.buildDirectory = '../build'
 subprojects {
-    project.layout.buildDirectory = "${rootProject.layout.buildDirectory}/${project.name}"
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
 }
 subprojects {
     project.evaluationDependsOn(':app')
 }
 
 tasks.register("clean", Delete) {
-    delete rootProject.layout.buildDirectory
+    delete rootProject.buildDir
 }
