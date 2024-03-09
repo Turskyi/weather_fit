@@ -11,9 +11,14 @@ class WeatherEmpty extends StatelessWidget {
       children: <Widget>[
         const Text('🏙️', style: TextStyle(fontSize: 64)),
         Text(
-          'Please Select a City!',
-          style: theme.textTheme.headlineSmall,
+          'Let\'s explore the weather! ',
+          style: theme.textTheme.headlineMedium,
         ),
+        Text(
+          'Tap here to search for a city.',
+          style: theme.textTheme.titleSmall,
+        ),
+        const SizedBox(height: 16.0),
       ],
     );
   }

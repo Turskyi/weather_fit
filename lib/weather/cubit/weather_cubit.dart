@@ -1,7 +1,11 @@
 import 'package:equatable/equatable.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:weather_fit/weather/models/weather.dart';
+import 'package:weather_fit/data/repositories/ai_repository.dart';
+import 'package:weather_fit/entities/enums/temperature_units.dart';
+import 'package:weather_fit/entities/enums/weather_status.dart';
+import 'package:weather_fit/entities/temperature.dart';
+import 'package:weather_fit/entities/weather.dart';
 import 'package:weather_repository/weather_repository.dart'
     show WeatherRepository;
 
@@ -9,9 +13,11 @@ part 'weather_cubit.g.dart';
 part 'weather_state.dart';
 
 class WeatherCubit extends HydratedCubit<WeatherState> {
-  WeatherCubit(this._weatherRepository) : super(WeatherState());
+  WeatherCubit(this._weatherRepository, this._aiRepository)
+      : super(WeatherState());
 
   final WeatherRepository _weatherRepository;
+  final AiRepository _aiRepository;
 
   Future<void> fetchWeather(String city) async {
     if (city.isEmpty) return;
@@ -20,7 +26,7 @@ class WeatherCubit extends HydratedCubit<WeatherState> {
       final Weather weather = Weather.fromRepository(
         await _weatherRepository.getWeather(city),
       );
-      final TemperatureUnits units = state.temperatureUnits;
+      final TemperatureUnits units = state.weather.temperatureUnits;
       final double value = units.isFahrenheit
           ? weather.temperature.value.toFahrenheit()
           : weather.temperature.value;
@@ -28,9 +34,16 @@ class WeatherCubit extends HydratedCubit<WeatherState> {
       emit(
         state.copyWith(
           status: WeatherStatus.success,
-          temperatureUnits: units,
-          weather: weather.copyWith(temperature: Temperature(value: value)),
+          weather: weather.copyWith(
+            temperature: Temperature(value: value),
+            temperatureUnits: units,
+          ),
         ),
+      );
+      String imageUrl =
+          await _aiRepository.getImageUrlFromAiAsFuture(state.weather);
+      emit(
+        state.copyWith(outfitImageUrl: imageUrl),
       );
     } on Exception {
       emit(state.copyWith(status: WeatherStatus.failure));
@@ -44,7 +57,7 @@ class WeatherCubit extends HydratedCubit<WeatherState> {
       final Weather weather = Weather.fromRepository(
         await _weatherRepository.getWeather(state.weather.location),
       );
-      final TemperatureUnits units = state.temperatureUnits;
+      final TemperatureUnits units = state.weather.temperatureUnits;
       final double value = units.isFahrenheit
           ? weather.temperature.value.toFahrenheit()
           : weather.temperature.value;
@@ -52,8 +65,10 @@ class WeatherCubit extends HydratedCubit<WeatherState> {
       emit(
         state.copyWith(
           status: WeatherStatus.success,
-          temperatureUnits: units,
-          weather: weather.copyWith(temperature: Temperature(value: value)),
+          weather: weather.copyWith(
+            temperature: Temperature(value: value),
+            temperatureUnits: units,
+          ),
         ),
       );
     } on Exception {
@@ -62,25 +77,33 @@ class WeatherCubit extends HydratedCubit<WeatherState> {
   }
 
   void toggleUnits() {
-    final TemperatureUnits units = state.temperatureUnits.isFahrenheit
+    final TemperatureUnits units = state.weather.temperatureUnits.isFahrenheit
         ? TemperatureUnits.celsius
         : TemperatureUnits.fahrenheit;
 
     if (!state.status.isSuccess) {
-      emit(state.copyWith(temperatureUnits: units));
+      emit(
+        state.copyWith(
+          weather: state.weather.copyWith(temperatureUnits: units),
+        ),
+      );
       return;
     }
 
     final Weather weather = state.weather;
+
     if (weather != Weather.empty) {
       final Temperature temperature = weather.temperature;
       final double value = units.isCelsius
           ? temperature.value.toCelsius()
           : temperature.value.toFahrenheit();
+
       emit(
         state.copyWith(
-          temperatureUnits: units,
-          weather: weather.copyWith(temperature: Temperature(value: value)),
+          weather: weather.copyWith(
+            temperature: Temperature(value: value),
+            temperatureUnits: units,
+          ),
         ),
       );
     }
@@ -96,5 +119,6 @@ class WeatherCubit extends HydratedCubit<WeatherState> {
 
 extension on double {
   double toFahrenheit() => (this * 9 / 5) + 32;
+
   double toCelsius() => (this - 32) * 5 / 9;
 }

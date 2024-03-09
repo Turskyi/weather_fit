@@ -1,32 +1,11 @@
 import 'package:equatable/equatable.dart';
 import 'package:intl/intl.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:weather_fit/entities/enums/temperature_units.dart';
+import 'package:weather_fit/entities/temperature.dart';
 import 'package:weather_repository/weather_repository.dart';
 
 part 'weather.g.dart';
-
-enum TemperatureUnits { fahrenheit, celsius }
-
-extension TemperatureUnitsX on TemperatureUnits {
-  bool get isFahrenheit => this == TemperatureUnits.fahrenheit;
-
-  bool get isCelsius => this == TemperatureUnits.celsius;
-}
-
-@JsonSerializable()
-class Temperature extends Equatable {
-  const Temperature({required this.value});
-
-  factory Temperature.fromJson(Map<String, dynamic> json) =>
-      _$TemperatureFromJson(json);
-
-  final double value;
-
-  Map<String, dynamic> toJson() => _$TemperatureToJson(this);
-
-  @override
-  List<Object> get props => <Object>[value];
-}
 
 @JsonSerializable()
 class Weather extends Equatable {
@@ -35,6 +14,7 @@ class Weather extends Equatable {
     required this.lastUpdated,
     required this.location,
     required this.temperature,
+    required this.temperatureUnits,
   });
 
   factory Weather.fromJson(Map<String, dynamic> json) =>
@@ -50,6 +30,7 @@ class Weather extends Equatable {
       lastUpdated: parsedDateTime,
       location: weather.location,
       temperature: Temperature(value: weather.temperature),
+      temperatureUnits: TemperatureUnits.celsius,
     );
   }
 
@@ -58,16 +39,18 @@ class Weather extends Equatable {
     lastUpdated: DateTime(0),
     temperature: const Temperature(value: 0),
     location: '',
+    temperatureUnits: TemperatureUnits.celsius,
   );
 
   final WeatherCondition condition;
   final DateTime lastUpdated;
   final String location;
   final Temperature temperature;
+  final TemperatureUnits temperatureUnits;
 
   @override
   List<Object> get props =>
-      <Object>[condition, lastUpdated, location, temperature];
+      <Object>[condition, lastUpdated, location, temperature, temperatureUnits];
 
   Map<String, dynamic> toJson() => _$WeatherToJson(this);
 
@@ -76,11 +59,19 @@ class Weather extends Equatable {
     DateTime? lastUpdated,
     String? location,
     Temperature? temperature,
+    TemperatureUnits? temperatureUnits,
   }) =>
       Weather(
         condition: condition ?? this.condition,
         lastUpdated: lastUpdated ?? this.lastUpdated,
         location: location ?? this.location,
         temperature: temperature ?? this.temperature,
+        temperatureUnits: temperatureUnits ?? this.temperatureUnits,
       );
+
+  String get formattedTemperature {
+    return '''${temperature.value.toStringAsPrecision(2)}°${temperatureUnits.isCelsius ? 'C' : 'F'}''';
+  }
+
+  String get emoji => condition.toEmoji;
 }

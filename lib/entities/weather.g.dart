@@ -6,22 +6,6 @@ part of 'weather.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-Temperature _$TemperatureFromJson(Map<String, dynamic> json) => $checkedCreate(
-      'Temperature',
-      json,
-      ($checkedConvert) {
-        final val = Temperature(
-          value: $checkedConvert('value', (v) => (v as num).toDouble()),
-        );
-        return val;
-      },
-    );
-
-Map<String, dynamic> _$TemperatureToJson(Temperature instance) =>
-    <String, dynamic>{
-      'value': instance.value,
-    };
-
 Weather _$WeatherFromJson(Map<String, dynamic> json) => $checkedCreate(
       'Weather',
       json,
@@ -34,10 +18,15 @@ Weather _$WeatherFromJson(Map<String, dynamic> json) => $checkedCreate(
           location: $checkedConvert('location', (v) => v as String),
           temperature: $checkedConvert('temperature',
               (v) => Temperature.fromJson(v as Map<String, dynamic>)),
+          temperatureUnits: $checkedConvert('temperature_units',
+              (v) => $enumDecode(_$TemperatureUnitsEnumMap, v)),
         );
         return val;
       },
-      fieldKeyMap: const {'lastUpdated': 'last_updated'},
+      fieldKeyMap: const {
+        'lastUpdated': 'last_updated',
+        'temperatureUnits': 'temperature_units'
+      },
     );
 
 Map<String, dynamic> _$WeatherToJson(Weather instance) => <String, dynamic>{
@@ -45,6 +34,8 @@ Map<String, dynamic> _$WeatherToJson(Weather instance) => <String, dynamic>{
       'last_updated': instance.lastUpdated.toIso8601String(),
       'location': instance.location,
       'temperature': instance.temperature.toJson(),
+      'temperature_units':
+          _$TemperatureUnitsEnumMap[instance.temperatureUnits]!,
     };
 
 const _$WeatherConditionEnumMap = {
@@ -53,4 +44,9 @@ const _$WeatherConditionEnumMap = {
   WeatherCondition.cloudy: 'cloudy',
   WeatherCondition.snowy: 'snowy',
   WeatherCondition.unknown: 'unknown',
+};
+
+const _$TemperatureUnitsEnumMap = {
+  TemperatureUnits.fahrenheit: 'fahrenheit',
+  TemperatureUnits.celsius: 'celsius',
 };

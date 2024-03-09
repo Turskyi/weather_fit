@@ -1,19 +1,61 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    style="@style/Widget.Android.AppWidget.Container"
+<?xml version="1.0" encoding="utf-8"?><!--suppress AndroidDomInspection -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/widget_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:theme="@style/Theme.Android.AppWidgetContainer">
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:padding="16dp">
 
+    <!-- Add a TextView for the emoji with top padding -->
     <TextView
-        android:id="@+id/appwidget_text"
-        style="@style/Widget.Android.AppWidget.InnerView"
-        android:layout_width="wrap_content"
+        android:id="@+id/text_emoji"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:layout_margin="8dp"
-        android:contentDescription="@string/appwidget_text"
-        android:text="@string/appwidget_text"
-        android:textSize="24sp"
-        android:textStyle="bold|italic" />
-</RelativeLayout>
+        android:layout_marginTop="32dp"
+        android:gravity="center_horizontal"
+        android:textSize="64sp" />
+
+    <!-- Add a TextView for the location -->
+    <TextView
+        android:id="@+id/text_location"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:textSize="24sp" />
+
+    <!-- Add a TextView for the temperature -->
+    <TextView
+        android:id="@+id/text_temperature"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:textSize="18sp" />
+
+    <!-- Add a TextView for the last updated time -->
+    <TextView
+        android:id="@+id/text_last_updated"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:textSize="14sp" />
+
+    <!-- Add an ImageView for the image -->
+    <ImageView
+        android:id="@+id/image_weather"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginBottom="-134dp"
+        android:adjustViewBounds="true"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/outfit_image"
+        android:gravity="center_horizontal"
+        android:scaleType="centerCrop"
+        android:src="@mipmap/ic_launcher_round"
+        android:visibility="visible"
+        tools:visibility="visible" />
+
+</LinearLayout>
