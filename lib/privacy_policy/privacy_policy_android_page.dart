@@ -9,7 +9,9 @@ class PrivacyPolicyAndroidPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Privacy Policy'),
+        title: const Text(
+          'Privacy Policy for Android Mobile Application "WeatherFit"',
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -48,7 +50,6 @@ class PrivacyPolicyAndroidPage extends StatelessWidget {
               'our products and services.',
               style: TextStyle(fontSize: 16),
             ),
-            // ... Add more sections as needed ...
             const SizedBox(height: 20),
             const Text(
               'Contact Us',
