@@ -125,21 +125,73 @@ void main() {
 
     group('refreshWeather', () {
       blocTest<WeatherCubit, WeatherState>(
-        'emits nothing when status is not success',
+        'emits initial when status is not success',
         build: () => weatherCubit,
         act: (WeatherCubit cubit) => cubit.refreshWeather(),
-        expect: () => <WeatherState>[],
-        verify: (_) {
-          verifyNever(() => weatherRepository.getWeather(any()));
-        },
+        expect: () => <Matcher>[
+          isA<WeatherState>()
+              .having(
+                (WeatherState w) => w.status,
+                'status',
+                WeatherStatus.initial,
+              )
+              .having(
+                (WeatherState w) => w.weather,
+                'weather',
+                isA<Weather>()
+                    .having(
+                      (Weather w) => w.lastUpdated,
+                      'lastUpdated',
+                      isNotNull,
+                    )
+                    .having(
+                      (Weather w) => w.condition,
+                      'condition',
+                      WeatherCondition.unknown,
+                    )
+                    .having(
+                      (Weather w) => w.temperature,
+                      'temperature',
+                      const Temperature(value: 0.0),
+                    ),
+              ),
+        ],
+        verify: (_) => verifyNever(() => weatherRepository.getWeather(any())),
       );
 
       blocTest<WeatherCubit, WeatherState>(
-        'emits nothing when location is null',
+        'emits initial when location is empty',
         build: () => weatherCubit,
         seed: () => WeatherState(status: WeatherStatus.success),
         act: (WeatherCubit cubit) => cubit.refreshWeather(),
-        expect: () => <WeatherState>[],
+        expect: () => <Matcher>[
+          isA<WeatherState>()
+              .having(
+                (WeatherState w) => w.status,
+                'status',
+                WeatherStatus.initial,
+              )
+              .having(
+                (WeatherState w) => w.weather,
+                'weather',
+                isA<Weather>()
+                    .having(
+                      (Weather w) => w.lastUpdated,
+                      'lastUpdated',
+                      isNotNull,
+                    )
+                    .having(
+                      (Weather w) => w.condition,
+                      'condition',
+                      WeatherCondition.unknown,
+                    )
+                    .having(
+                      (Weather w) => w.temperature,
+                      'temperature',
+                      const Temperature(value: 0.0),
+                    ),
+              ),
+        ],
         verify: (_) {
           verifyNever(() => weatherRepository.getWeather(any()));
         },
