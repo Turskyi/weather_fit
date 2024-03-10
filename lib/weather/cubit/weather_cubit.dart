@@ -15,7 +15,11 @@ part 'weather_state.dart';
 
 class WeatherCubit extends HydratedCubit<WeatherState> {
   WeatherCubit(this._weatherRepository, this._aiRepository)
-      : super(WeatherState());
+      : super(
+          WeatherState(
+            status: kIsWeb ? WeatherStatus.initial : WeatherStatus.loading,
+          ),
+        );
 
   final WeatherRepository _weatherRepository;
   final AiRepository _aiRepository;

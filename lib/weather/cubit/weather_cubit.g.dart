@@ -15,10 +15,7 @@ WeatherState _$WeatherStateFromJson(Map<String, dynamic> json) =>
           outfitImageUrl:
               $checkedConvert('outfit_image_url', (v) => v as String? ?? ''),
           status: $checkedConvert(
-              'status',
-              (v) => $enumDecodeNullable(_$WeatherStatusEnumMap, v) ?? kIsWeb
-                  ? WeatherStatus.initial
-                  : WeatherStatus.loading),
+              'status', (v) => $enumDecode(_$WeatherStatusEnumMap, v)),
           weather: $checkedConvert(
               'weather',
               (v) => v == null

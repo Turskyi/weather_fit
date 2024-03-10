@@ -67,7 +67,8 @@ void main() {
 
     testWidgets('renders WeatherLoading for WeatherStatus.initial',
         (WidgetTester tester) async {
-      when(() => weatherCubit.state).thenReturn(WeatherState());
+      when(() => weatherCubit.state)
+          .thenReturn(WeatherState(status: WeatherStatus.loading));
       await tester.pumpWidget(
         BlocProvider<WeatherCubit>.value(
           value: weatherCubit,
@@ -154,7 +155,11 @@ void main() {
 
     testWidgets('navigates to SettingsPage when settings icon is tapped',
         (WidgetTester tester) async {
-      when(() => weatherCubit.state).thenReturn(WeatherState());
+      when(() => weatherCubit.state).thenReturn(
+        WeatherState(
+          status: WeatherStatus.loading,
+        ),
+      );
       await tester.pumpWidget(
         RepositoryProvider<WeatherRepository>.value(
           value: weatherRepository,
@@ -174,7 +179,11 @@ void main() {
 
     testWidgets('navigates to SearchPage when search button is tapped',
         (WidgetTester tester) async {
-      when(() => weatherCubit.state).thenReturn(WeatherState());
+      when(() => weatherCubit.state).thenReturn(
+        WeatherState(
+          status: WeatherStatus.loading,
+        ),
+      );
       await tester.pumpWidget(
         RepositoryProvider<WeatherRepository>.value(
           value: weatherRepository,

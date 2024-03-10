@@ -1,4 +1,5 @@
 import 'package:bloc_test/bloc_test.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:weather_fit/data/repositories/ai_repository.dart';
@@ -48,7 +49,12 @@ void main() {
     test('initial state is correct', () {
       final WeatherCubit weatherCubit =
           WeatherCubit(weatherRepository, aiRepository);
-      expect(weatherCubit.state, WeatherState());
+      expect(
+        weatherCubit.state,
+        WeatherState(
+          status: kIsWeb ? WeatherStatus.initial : WeatherStatus.loading,
+        ),
+      );
     });
 
     group('toJson/fromJson', () {
@@ -108,6 +114,7 @@ void main() {
         seed: () => WeatherState(
           weather: Weather.fromRepository(weather)
               .copyWith(temperatureUnits: TemperatureUnits.fahrenheit),
+          status: WeatherStatus.success,
         ),
         act: (WeatherCubit cubit) => Null,
         expect: () {
@@ -287,6 +294,7 @@ void main() {
           WeatherState(
             weather: Weather.fromRepository(weather)
                 .copyWith(temperatureUnits: TemperatureUnits.fahrenheit),
+            status: kIsWeb ? WeatherStatus.initial : WeatherStatus.loading,
           ),
         ],
       );
