@@ -238,7 +238,7 @@ void main() {
           ),
         ),
       );
-      verifyNever(() => themeCubit.updateTheme(weather)).called(0);
+      verify(() => themeCubit.updateTheme(weather)).called(1);
     });
 
     testWidgets('triggers refreshWeather on pull to refresh',

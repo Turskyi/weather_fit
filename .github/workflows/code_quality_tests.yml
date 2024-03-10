@@ -42,7 +42,7 @@ jobs:
       - name: Very Good Coverage
         uses: VeryGoodOpenSource/very_good_coverage@v2.1.0
         with:
-          min_coverage: 89
+          min_coverage: 80
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v4.0.1

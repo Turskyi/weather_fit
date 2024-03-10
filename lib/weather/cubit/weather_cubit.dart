@@ -25,7 +25,10 @@ class WeatherCubit extends HydratedCubit<WeatherState> {
   final AiRepository _aiRepository;
 
   Future<void> fetchWeather(String city) async {
-    if (city.isEmpty) return;
+    if (city.isEmpty) {
+      emit(state.copyWith(status: WeatherStatus.initial));
+      return;
+    }
     emit(state.copyWith(status: WeatherStatus.loading));
     try {
       final Weather weather = Weather.fromRepository(
@@ -56,8 +59,14 @@ class WeatherCubit extends HydratedCubit<WeatherState> {
   }
 
   Future<void> refreshWeather() async {
-    if (!state.status.isSuccess) return;
-    if (state.weather == Weather.empty) return;
+    if (!state.status.isSuccess) {
+      emit(state.copyWith(status: WeatherStatus.initial));
+      return;
+    }
+    if (state.weather == Weather.empty) {
+      emit(state.copyWith(status: WeatherStatus.initial));
+      return;
+    }
     try {
       final Weather weather = Weather.fromRepository(
         await _weatherRepository.getWeather(state.weather.location),

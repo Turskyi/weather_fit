@@ -76,6 +76,7 @@ class _WeatherPageState extends State<WeatherPage> {
             ),
           ),
         );
+        context.read<WeatherCubit>().refreshWeather();
       }
     });
   }
