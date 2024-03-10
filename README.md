@@ -4,6 +4,7 @@
 [![Code Quality](https://github.com/Turskyi/weather_fit/actions/workflows/code-quality-tests.yml/badge.svg?branch=master&event=push)](https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo)
 [![style: flutter lints](https://img.shields.io/badge/style-flutter__lints-blue)](https://pub.dev/packages/flutter_lints)
 [![codecov](https://codecov.io/gh/Turskyi/weather_fit/graph/badge.svg?token=X9R15N3WP3)](https://codecov.io/gh/Turskyi/weather_fit)
+[![Codemagic build status](https://api.codemagic.io/apps/65ee103d67c09b754e5d3451/65ee103d67c09b754e5d3450/status_badge.svg)](https://codemagic.io/apps/65ee103d67c09b754e5d3451/65ee103d67c09b754e5d3450/latest_build)
 <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/m/Turskyi/weather_fit">
 
 # Weather Fit

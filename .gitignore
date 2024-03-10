@@ -59,3 +59,4 @@ android/app/property(org.gradle.api.file.Directory, fixed(class org.gradle.api.i
 /android/app/property(org.gradle.api.file.Directory, fixed(class org.gradle.api.internal.file.DefaultFilePropertyFactory$FixedDirectory, /
 *.apk
 *.so
+/.firebase/

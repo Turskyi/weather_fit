@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+      - dev_two
 
 jobs:
   build_web:

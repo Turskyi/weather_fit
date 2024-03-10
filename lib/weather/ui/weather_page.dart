@@ -65,7 +65,7 @@ class _WeatherPageState extends State<WeatherPage> {
         });
       } else {
         // Permission is denied, handle accordingly
-        // Show a snackbar with a message and a button
+        // Show a snackbar with a message and a button.
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content:
