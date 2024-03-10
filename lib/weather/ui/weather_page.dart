@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geocoding/geocoding.dart';
@@ -34,19 +35,32 @@ class _WeatherPageState extends State<WeatherPage> {
       if (status.isGranted) {
         // Get the current position of the device.
         Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
-            .then((Position position) {
-          // Geocode the coordinates and get a `Placemark` object.
-          try {
-            placemarkFromCoordinates(position.latitude, position.longitude)
-                .then((List<Placemark> placemarks) {
-              if (placemarks.isNotEmpty && placemarks.first.locality != null) {
-                // Assign the city name to the variable.
-                String city = placemarks.first.locality!;
-                context.read<WeatherCubit>().fetchWeather(city);
-              }
-            });
-          } catch (err) {
-            throw Exception(err);
+            .then((Position position) async {
+          double latitude = position.latitude;
+          double longitude = position.longitude;
+          if (!kIsWeb) {
+            // Geocode the coordinates and get a `Placemark` object.
+            try {
+              placemarkFromCoordinates(latitude, longitude)
+                  .then((List<Placemark> placemarks) {
+                if (placemarks.isNotEmpty &&
+                    placemarks.first.locality != null) {
+                  // Assign the city name to the variable.
+                  String city = placemarks.first.locality!;
+                  context.read<WeatherCubit>().fetchWeather(city);
+                }
+              });
+            } catch (err, stacktrace) {
+              debugPrint(
+                'Warning: got an error: $err in $runtimeType\nStacktrace: '
+                '$stacktrace',
+              );
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Error: $err. Cannot get current location.'),
+                ),
+              );
+            }
           }
         });
       } else {
@@ -120,7 +134,7 @@ class _WeatherPageState extends State<WeatherPage> {
                     decoration: const BoxDecoration(
                       boxShadow: <BoxShadow>[
                         BoxShadow(
-                          color: Colors.transparent,
+                          color: kIsWeb ? Colors.black54 : Colors.transparent,
                           blurRadius: 10,
                           offset: Offset(5, 5),
                         ),
@@ -198,6 +212,7 @@ class _WeatherPageState extends State<WeatherPage> {
   }
 
   bool get _shouldUpdate {
+    if (kIsWeb) return false;
     bool needsRefresh = _needsRefresh;
     if (needsRefresh) {
       _oldestTimestamp = DateTime.now().millisecondsSinceEpoch;

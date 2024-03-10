@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class OutfitWidget extends StatelessWidget {
@@ -12,7 +13,7 @@ class OutfitWidget extends StatelessWidget {
       width: 400,
       height: 400,
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(2),
+        borderRadius: BorderRadius.circular(kIsWeb ? 20 : 2),
         child: Image.network(
           url,
           fit: BoxFit.cover,
@@ -49,6 +50,12 @@ class OutfitWidget extends StatelessWidget {
             Object error,
             StackTrace? stackTrace,
           ) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content:
+                    Text('Error: $error. Cannot display image with outfit.'),
+              ),
+            );
             // Handle error case
             return const SizedBox();
           },

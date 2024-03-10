@@ -4,7 +4,7 @@ part of 'weather_cubit.dart';
 final class WeatherState extends Equatable {
   WeatherState({
     this.outfitImageUrl = '',
-    this.status = WeatherStatus.loading,
+    this.status = kIsWeb ? WeatherStatus.initial : WeatherStatus.loading,
     Weather? weather,
   }) : weather = weather ?? Weather.empty;
 
