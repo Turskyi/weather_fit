@@ -289,11 +289,23 @@ void main() {
       blocTest<WeatherCubit, WeatherState>(
         'emits updated units when status is not success',
         build: () => weatherCubit,
+        seed: () => WeatherState(
+          status: WeatherStatus.loading,
+          weather: Weather(
+            condition: weather_repository.WeatherCondition.rainy,
+            lastUpdated: DateTime(2025),
+            location: weatherLocation,
+            temperature: const Temperature(value: weatherTemperature),
+            temperatureUnits: TemperatureUnits.celsius,
+          ),
+        ),
         act: (WeatherCubit cubit) => cubit.toggleUnits(),
         expect: () => <WeatherState>[
           WeatherState(
-            weather: Weather.fromRepository(weather)
-                .copyWith(temperatureUnits: TemperatureUnits.fahrenheit),
+            weather: Weather.fromRepository(weather).copyWith(
+              temperatureUnits: TemperatureUnits.fahrenheit,
+              lastUpdated: DateTime(2025),
+            ),
             status: kIsWeb ? WeatherStatus.initial : WeatherStatus.loading,
           ),
         ],
