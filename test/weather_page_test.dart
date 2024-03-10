@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:nested/nested.dart';
+import 'package:weather_fit/data/repositories/ai_repository.dart';
 import 'package:weather_fit/entities/enums/temperature_units.dart';
 import 'package:weather_fit/entities/enums/weather_status.dart';
 import 'package:weather_fit/entities/temperature.dart';
@@ -19,9 +20,10 @@ import 'package:weather_fit/weather/ui/weather_page.dart';
 import 'package:weather_repository/weather_repository.dart';
 
 import 'helpers/hydrated_bloc.dart';
-import 'weather_cubit_test.dart';
 
 class MockWeatherRepository extends Mock implements WeatherRepository {}
+
+class MockAiRepository extends Mock implements AiRepository {}
 
 class MockThemeCubit extends MockCubit<Color> implements ThemeCubit {}
 
@@ -31,17 +33,22 @@ class MockWeatherCubit extends MockCubit<WeatherState>
 void main() {
   initHydratedStorage();
   late WeatherRepository weatherRepository;
+  late AiRepository aiRepository;
   setUp(() {
     weatherRepository = MockWeatherRepository();
+    aiRepository = MockAiRepository();
   });
   group('WeatherPage', () {
     testWidgets('renders AppBar', (WidgetTester tester) async {
       await tester.pumpWidget(
         RepositoryProvider<WeatherRepository>.value(
           value: weatherRepository,
-          child: MaterialApp(
-            initialRoute: AppRoute.weather.path,
-            routes: routes.routeMap,
+          child: BlocProvider<WeatherCubit>(
+            create: (_) => WeatherCubit(weatherRepository, aiRepository),
+            child: MaterialApp(
+              initialRoute: AppRoute.weather.path,
+              routes: routes.routeMap,
+            ),
           ),
         ),
       );
