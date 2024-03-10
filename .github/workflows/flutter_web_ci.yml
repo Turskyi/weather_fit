@@ -1,8 +1,8 @@
-name: Build & deploy
+name: Deploy web build.
 on:
   push:
     branches:
-      - dev_two
+      - master
 
 jobs:
   build_web:

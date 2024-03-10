@@ -70,10 +70,37 @@ void main() {
 
     group('fetchWeather', () {
       blocTest<WeatherCubit, WeatherState>(
-        'emits nothing when city is empty',
+        'emits initial when city is empty',
         build: () => weatherCubit,
         act: (WeatherCubit cubit) => cubit.fetchWeather(''),
-        expect: () => <WeatherState>[],
+        expect: () => <Matcher>[
+          isA<WeatherState>()
+              .having(
+                (WeatherState w) => w.status,
+                'status',
+                WeatherStatus.initial,
+              )
+              .having(
+                (WeatherState w) => w.weather,
+                'weather',
+                isA<Weather>()
+                    .having(
+                      (Weather w) => w.lastUpdated,
+                      'lastUpdated',
+                      isNotNull,
+                    )
+                    .having(
+                      (Weather w) => w.condition,
+                      'condition',
+                      WeatherCondition.unknown,
+                    )
+                    .having(
+                      (Weather w) => w.temperature,
+                      'temperature',
+                      const Temperature(value: 0.0),
+                    ),
+              ),
+        ],
       );
 
       blocTest<WeatherCubit, WeatherState>(

@@ -1,5 +1,6 @@
 [![Stand With Ukraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner-direct-single.svg)](https://stand-with-ukraine.pp.ua)
-[![Build & upload to Firebase App Distribution](https://github.com/Turskyi/weather_fit/actions/workflows/flutter_ci.yml/badge.svg?branch=dev&event=push)](https://appdistribution.firebase.dev/i/350faded06826d7b)
+[![Upload Android build to App Tester.](https://github.com/Turskyi/weather_fit/actions/workflows/flutter_ci.yml/badge.svg?branch=master&event=pull_request)](https://github.com/Turskyi/weather_fit/actions/workflows/flutter_ci.yml)
+[![Deploy web build.](https://github.com/Turskyi/weather_fit/actions/workflows/flutter_web_ci.yml/badge.svg?branch=master&event=pull_request)](https://github.com/Turskyi/weather_fit/actions/workflows/flutter_web_ci.yml)
 [![Code Quality](https://github.com/Turskyi/weather_fit/actions/workflows/code-quality-tests.yml/badge.svg?branch=master&event=push)](https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo)
 [![style: flutter lints](https://img.shields.io/badge/style-flutter__lints-blue)](https://pub.dev/packages/flutter_lints)
 [![codecov](https://codecov.io/gh/Turskyi/weather_fit/graph/badge.svg?token=X9R15N3WP3)](https://codecov.io/gh/Turskyi/weather_fit)
