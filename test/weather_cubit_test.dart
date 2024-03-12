@@ -124,7 +124,10 @@ void main() {
         act: (WeatherCubit cubit) => cubit.fetchWeather(weatherLocation),
         expect: () => <WeatherState>[
           WeatherState(status: WeatherStatus.loading),
-          WeatherState(status: WeatherStatus.failure),
+          WeatherState(
+            status: WeatherStatus.failure,
+            message: '${Exception('oops')}',
+          ),
         ],
       );
 
