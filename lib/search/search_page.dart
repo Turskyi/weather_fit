@@ -16,44 +16,47 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(title: const Text('City Search')),
-      body: Stack(
-        children: <Widget>[
-          const Background(),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                const WeatherEmpty(),
-                TextField(
-                  controller: _textController,
-                  decoration: InputDecoration(
-                    labelText: 'City',
-                    hintText: 'Enter city name',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
+    return Semantics(
+      label: 'City search page',
+      child: Scaffold(
+        extendBodyBehindAppBar: true,
+        appBar: AppBar(title: const Text('City Search')),
+        body: Stack(
+          children: <Widget>[
+            const Background(),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  const WeatherEmpty(),
+                  TextField(
+                    controller: _textController,
+                    decoration: InputDecoration(
+                      labelText: 'City',
+                      hintText: 'Enter city name',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      contentPadding: const EdgeInsets.all(12.0),
                     ),
-                    contentPadding: const EdgeInsets.all(12.0),
                   ),
-                ),
-                const SizedBox(height: 16.0),
-                ElevatedButton(
-                  key: const Key('searchPage_search_iconButton'),
-                  child: const Text('Search', semanticsLabel: 'Submit'),
-                  onPressed: () {
-                    if (_text.isNotEmpty) {
-                      Navigator.of(context).pop(_text);
-                    }
-                  },
-                ),
-              ],
+                  const SizedBox(height: 16.0),
+                  ElevatedButton(
+                    key: const Key('searchPage_search_iconButton'),
+                    child: const Text('Search', semanticsLabel: 'Submit'),
+                    onPressed: () {
+                      if (_text.isNotEmpty) {
+                        Navigator.of(context).pop(_text);
+                      }
+                    },
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

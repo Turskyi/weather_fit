@@ -53,8 +53,8 @@ class WeatherCubit extends HydratedCubit<WeatherState> {
       emit(
         state.copyWith(outfitImageUrl: imageUrl),
       );
-    } on Exception {
-      emit(state.copyWith(status: WeatherStatus.failure));
+    } on Exception catch (e) {
+      emit(state.copyWith(status: WeatherStatus.failure, message: '$e'));
     }
   }
 

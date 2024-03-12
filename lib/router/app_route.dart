@@ -2,7 +2,8 @@ enum AppRoute {
   weather('/'),
   search('/search'),
   settings('/settings'),
-  privacyPolicyAndroid('/privacy-policy-android');
+  privacyPolicyAndroid('/privacy-policy-android'),
+  privacyPolicy('/privacy-policy');
 
   const AppRoute(this.path);
 

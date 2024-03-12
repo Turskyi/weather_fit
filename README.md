@@ -11,7 +11,7 @@
 
 **WeatherFit** is more than just a weather app, it’s a personal stylist that
 helps you dress well and stay comfortable. Whether you’re going to work,
-school, or a party, *WeatherFit* will show you the best outfit for any weather
+school, or a party, _WeatherFit_ will show you the best outfit for any weather
 condition. Just enter your location or use GPS, and **WeatherFit** will display
 the current weather and a full-height image of a person wearing a suitable
 outfit. You can customize the image according to your preferences
@@ -417,6 +417,29 @@ have methods and fields. This makes them very powerful tools that allow much
 more expression and flexibility.
 
 </details>
+
+• Screenshots:
+
+<!--suppress CheckImageSize -->
+<img src="screenshots/Web-Screenshot-2024-03-11.png" width="400"  alt="screenshot">
+<!--suppress CheckImageSize -->
+<img src="screenshots/Android-Pixel2-Screenshot_20240311.png" width="400"  alt="screenshot">
+<!--suppress CheckImageSize -->
+<img src="screenshots/Pixel_XL_Screenshot_20240311.png" width="400"  alt="screenshot">
+<!--suppress CheckImageSize -->
+<img src="screenshots/Search_Screenshot_20240311.png" width="400"  alt="screenshot">
+<!--suppress CheckImageSize -->
+<img src="screenshots/Settings_Screenshot_20240311.png" width="400"  alt="screenshot">
+<!--suppress CheckImageSize -->
+<img src="screenshots/Privacy_Screenshot_20240311.png" width="400"  alt="screenshot">
+<!--suppress CheckImageSize -->
+<img src="screenshots/Home_widget_Screenshot_20240311.png" width="400"  alt="screenshot">
+
+## Download
+
+<a href="https://play.google.com/store/apps/details?id=com.turskyi.weather_fit" target="_blank">
+<img src="https://play.google.com/intl/en_gb/badges/static/images/badges/en_badge_web_generic.png" width=240  alt="google play badge"/>
+</a>
 
 ## Credits
 

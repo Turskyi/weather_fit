@@ -26,6 +26,10 @@ ${weather.condition == WeatherCondition.clear ? 'light and '
         debugPrint(
           'Warning: an error occured in $this: $e;\nStackTrace: $stackTrace',
         );
-        return '';
+        if (e is RequestFailedException) {
+          throw Exception(e.message);
+        } else {
+          return '';
+        }
       });
 }

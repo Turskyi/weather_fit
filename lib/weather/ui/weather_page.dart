@@ -147,7 +147,7 @@ class _WeatherPageState extends State<WeatherPage> {
                       context.read<WeatherCubit>().refreshWeather(),
                 );
               case WeatherStatus.failure:
-                return const WeatherError();
+                return WeatherError(state.message);
             }
           },
         ),

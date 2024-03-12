@@ -50,12 +50,14 @@ class OutfitWidget extends StatelessWidget {
             Object error,
             StackTrace? stackTrace,
           ) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content:
-                    Text('Error: $error. Cannot display image with outfit.'),
-              ),
-            );
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content:
+                      Text('Error: $error. Cannot display image with outfit.'),
+                ),
+              );
+            });
             // Handle error case
             return const SizedBox();
           },

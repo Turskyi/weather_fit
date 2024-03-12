@@ -1,19 +1,15 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:weather_fit/privacy_policy/email_text.dart';
 
-class PrivacyPolicyAndroidPage extends StatelessWidget {
-  const PrivacyPolicyAndroidPage({super.key});
+class PrivacyPolicyPage extends StatelessWidget {
+  const PrivacyPolicyPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Privacy Policy ${kIsWeb ? 'for Android Mobile Application '
-              '"WeatherFit"' : ''}',
-        ),
+        title: const Text('Privacy Policy'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),

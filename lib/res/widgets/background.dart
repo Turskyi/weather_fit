@@ -26,7 +26,7 @@ class Background extends StatelessWidget {
   }
 }
 
-extension on Color {
+extension BackgroundColorExtension on Color {
   Color brighten([int percent = 10]) {
     assert(
       1 <= percent && percent <= 100,
