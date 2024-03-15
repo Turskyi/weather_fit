@@ -22,7 +22,7 @@ class PrivacyPolicyPage extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              'Last updated: ${_formatDate(DateTime(2024, 3, 11))}',
+              'Last updated: ${_formatDate(DateTime(2024, 3, 15))}',
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 20),
@@ -46,6 +46,19 @@ class PrivacyPolicyPage extends StatelessWidget {
               'of our services and promotions, and any information '
               'automatically sent by your devices in the course of accessing '
               'our products and services.',
+              style: TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'Crashlytics',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              'WeatherFit uses Firebase Crashlytics, a service by Google, to '
+              'collect crash reports anonymously to help us improve app '
+              'stability and fix bugs. The data collected by Crashlytics does '
+              'not include any personal information.',
               style: TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 20),

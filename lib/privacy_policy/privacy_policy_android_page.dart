@@ -11,8 +11,8 @@ class PrivacyPolicyAndroidPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Privacy Policy ${kIsWeb ? 'for Android Mobile Application '
-              '"WeatherFit"' : ''}',
+          'Privacy Policy ${kIsWeb ? 'for "WeatherFit" Android '
+              'Application' : ''}',
         ),
       ),
       body: SingleChildScrollView(
@@ -26,7 +26,9 @@ class PrivacyPolicyAndroidPage extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              'Last updated: ${_formatDate(DateTime(2024, 3, 11))}',
+              'Last updated: ${_formatDate(
+                DateTime(2024, DateTime.march, 15),
+              )}',
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 20),
@@ -45,11 +47,65 @@ class PrivacyPolicyAndroidPage extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             const Text(
-              'Information we collect includes both information you knowingly '
-              'and actively provide us when using or participating in any '
-              'of our services and promotions, and any information '
-              'automatically sent by your devices in the course of accessing '
-              'our products and services.',
+              'We do not collect any personal information such as name, email '
+              'address, or phone number. However, to provide weather '
+              'information for your current location, we do request access to '
+              'your device\'s location data.',
+              style: TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'Data Usage and Retention',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              'The location data you allow us to access is used solely to '
+              'display the weather forecast relevant to your city. This data '
+              'is not used for any other purpose and is not stored on our '
+              'servers.',
+              style: TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'Permissions',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              'WeatherFit requires the following permissions to function '
+              'properly:\n\u2022 Location (ACCESS_FINE_LOCATION and '
+              'ACCESS_COARSE_LOCATION): This permission is necessary to '
+              'determine your current location and display the most relevant '
+              'weather forecast.\n\u2022 Background Location '
+              '(ACCESS_BACKGROUND_LOCATION): This permission is used to '
+              'refresh the weather information on the home widget even when '
+              'the app is not actively running.',
+              style: TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'Crashlytics',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              'WeatherFit uses Firebase Crashlytics, a service by Google, to '
+              'collect crash reports anonymously to help us improve app '
+              'stability and fix bugs. The data collected by Crashlytics does '
+              'not include any personal information.',
+              style: TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'Updates and Notification',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              'This privacy policy may be updated periodically. Any changes '
+              'to the policy will be communicated to you through app updates '
+              'or notifications.',
               style: TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 20),

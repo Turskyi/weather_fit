@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -68,7 +66,7 @@ class SettingsPage extends StatelessWidget {
                     trailing: const Icon(Icons.privacy_tip),
                     onTap: () => Navigator.pushNamed(
                       context,
-                      Platform.isAndroid
+                      defaultTargetPlatform == TargetPlatform.android
                           ? AppRoute.privacyPolicyAndroid.path
                           : AppRoute.privacyPolicy.path,
                     ),
