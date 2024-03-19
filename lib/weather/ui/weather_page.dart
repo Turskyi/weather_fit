@@ -48,10 +48,10 @@ class _WeatherPageState extends State<WeatherPage> {
                   _requestLocationPermission();
                 }
               });
+            } else {
+              _handleCitySelectionAndFetchWeather();
             }
           });
-        } else {
-          _requestLocationPermission();
         }
       });
     });
@@ -129,21 +129,25 @@ class _WeatherPageState extends State<WeatherPage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        onPressed: _handleCitySelectionAndFetchWeather,
         child: const Icon(Icons.search, semanticLabel: 'Search'),
-        onPressed: () async {
-          final String? city = await Navigator.pushNamed<dynamic>(
-            context,
-            AppRoute.search.path,
-          );
-
-          if (context.mounted && city is String) {
-            await context.read<WeatherCubit>().fetchWeather(city);
-          } else {
-            return;
-          }
-        },
       ),
     );
+  }
+
+  Future<void> _handleCitySelectionAndFetchWeather() async {
+    final String? city = await Navigator.pushNamed<dynamic>(
+      context,
+      AppRoute.search.path,
+    );
+
+    if (mounted && city is String) {
+      await context.read<WeatherCubit>().fetchWeather(city);
+    } else if (mounted) {
+      context.read<WeatherCubit>().refreshWeather();
+    } else {
+      return;
+    }
   }
 
   void _requestLocationPermission() {
@@ -202,7 +206,7 @@ class _WeatherPageState extends State<WeatherPage> {
             ),
           ),
         );
-        context.read<WeatherCubit>().refreshWeather();
+        _handleCitySelectionAndFetchWeather();
       }
     });
   }

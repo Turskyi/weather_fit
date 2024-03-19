@@ -27,7 +27,7 @@ class PrivacyPolicyAndroidPage extends StatelessWidget {
             const SizedBox(height: 10),
             Text(
               'Last updated: ${_formatDate(
-                DateTime(2024, DateTime.march, 15),
+                DateTime(2024, DateTime.march, 19),
               )}',
               style: const TextStyle(fontSize: 16),
             ),
@@ -74,11 +74,10 @@ class PrivacyPolicyAndroidPage extends StatelessWidget {
             const SizedBox(height: 10),
             const Text(
               'WeatherFit requires the following permissions to function '
-              'properly:\n\u2022 Location (ACCESS_FINE_LOCATION and '
-              'ACCESS_COARSE_LOCATION): This permission is necessary to '
+              'properly:\n\u2022 Location: This permission is necessary to '
               'determine your current location and display the most relevant '
-              'weather forecast.\n\u2022 Background Location '
-              '(ACCESS_BACKGROUND_LOCATION): This permission is used to '
+              'weather forecast.\n\u2022 Background Location: This permission '
+              'is used to '
               'refresh the weather information on the home widget even when '
               'the app is not actively running.',
               style: TextStyle(fontSize: 16),

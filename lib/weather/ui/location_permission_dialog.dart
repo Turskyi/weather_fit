@@ -18,8 +18,7 @@ class _LocationPermissionDialogState extends State<LocationPermissionDialog> {
           children: <Widget>[
             Text(
                 'WeatherFit collects location data to enable "weather updates" '
-                'and "outfit recommendations" even when the app is closed or '
-                'not in use.'),
+                'and "outfit recommendations".'),
             // Include any other details necessary to make it clear to the user.
           ],
         ),

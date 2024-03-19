@@ -14,10 +14,10 @@ ${weather.condition == WeatherCondition.clear ? 'light and '
                 'breezy' : weather.condition == WeatherCondition.cloudy ? 'casual '
                 'and cozy' : weather.condition == WeatherCondition.rainy ? 'waterproof '
                 'and warm' : 'stylish and comfortable'} outfit for the weather 
-                in ${weather.location}, where the temperature is 
+                 with the temperature is 
                 ${weather.formattedTemperature}''',
         n: 1,
-        size: OpenAIImageSize.size1024,
+        size: OpenAIImageSize.size512,
         responseFormat: OpenAIImageResponseFormat.url,
       ).then((OpenAIImageModel aiImage) {
         String? imageUrl = aiImage.data.firstOrNull?.url;
