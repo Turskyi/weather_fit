@@ -22,7 +22,9 @@ class PrivacyPolicyPage extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              'Last updated: ${_formatDate(DateTime(2024, 3, 15))}',
+              'Last updated: ${_formatDate(
+                DateTime(2024, DateTime.march, 21),
+              )}',
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 20),

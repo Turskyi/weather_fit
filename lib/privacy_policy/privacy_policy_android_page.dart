@@ -27,7 +27,7 @@ class PrivacyPolicyAndroidPage extends StatelessWidget {
             const SizedBox(height: 10),
             Text(
               'Last updated: ${_formatDate(
-                DateTime(2024, DateTime.march, 19),
+                DateTime(2024, DateTime.march, 21),
               )}',
               style: const TextStyle(fontSize: 16),
             ),
@@ -48,38 +48,7 @@ class PrivacyPolicyAndroidPage extends StatelessWidget {
             const SizedBox(height: 10),
             const Text(
               'We do not collect any personal information such as name, email '
-              'address, or phone number. However, to provide weather '
-              'information for your current location, we do request access to '
-              'your device\'s location data.',
-              style: TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'Data Usage and Retention',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            const Text(
-              'The location data you allow us to access is used solely to '
-              'display the weather forecast relevant to your city. This data '
-              'is not used for any other purpose and is not stored on our '
-              'servers.',
-              style: TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'Permissions',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            const Text(
-              'WeatherFit requires the following permissions to function '
-              'properly:\n\u2022 Location: This permission is necessary to '
-              'determine your current location and display the most relevant '
-              'weather forecast.\n\u2022 Background Location: This permission '
-              'is used to '
-              'refresh the weather information on the home widget even when '
-              'the app is not actively running.',
+              'address, or phone number.',
               style: TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 20),

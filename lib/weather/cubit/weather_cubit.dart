@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:weather_fit/data/repositories/ai_repository.dart';
@@ -15,11 +14,7 @@ part 'weather_state.dart';
 
 class WeatherCubit extends HydratedCubit<WeatherState> {
   WeatherCubit(this._weatherRepository, this._aiRepository)
-      : super(
-          WeatherState(
-            status: kIsWeb ? WeatherStatus.initial : WeatherStatus.loading,
-          ),
-        );
+      : super(WeatherState(status: WeatherStatus.initial));
 
   final WeatherRepository _weatherRepository;
   final AiRepository _aiRepository;
