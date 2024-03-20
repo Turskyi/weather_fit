@@ -51,9 +51,7 @@ void main() {
           WeatherCubit(weatherRepository, aiRepository);
       expect(
         weatherCubit.state,
-        WeatherState(
-          status: kIsWeb ? WeatherStatus.initial : WeatherStatus.loading,
-        ),
+        WeatherState(status: WeatherStatus.initial),
       );
     });
 
