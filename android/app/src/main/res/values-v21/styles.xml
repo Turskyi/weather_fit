@@ -1,5 +1,6 @@
 <resources>
 
+    <!--suppress AndroidDomInspection, AndroidDomInspection -->
     <style name="Widget.Android.AppWidget.Container" parent="android:Widget">
         <item name="android:id">@android:id/background</item>
         <!--suppress AndroidDomInspection -->

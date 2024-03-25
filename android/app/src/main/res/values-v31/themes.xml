@@ -7,6 +7,7 @@
     <style name="Theme.Android.AppWidgetContainerParent" parent="@android:style/Theme.DeviceDefault.DayNight">
         <!--suppress AndroidDomInspection -->
         <item name="appWidgetRadius">@android:dimen/system_app_widget_background_radius</item>
+        <!--suppress AndroidDomInspection -->
         <item name="appWidgetInnerRadius">@android:dimen/system_app_widget_inner_radius</item>
     </style>
 </resources>
