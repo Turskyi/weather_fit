@@ -5,14 +5,19 @@
         <item name="android:id">@android:id/background</item>
         <!--suppress AndroidDomInspection -->
         <item name="android:padding">?attr/appWidgetPadding</item>
+        <!--suppress AndroidDomInspection -->
         <item name="android:background">@drawable/app_widget_background</item>
+        <!--suppress AndroidDomInspection -->
         <item name="android:clipToOutline">true</item>
     </style>
 
     <style name="Widget.Android.AppWidget.InnerView" parent="android:Widget">
+        <!--suppress AndroidDomInspection -->
         <item name="android:padding">?attr/appWidgetPadding</item>
+        <!--suppress AndroidDomInspection -->
         <item name="android:background">@drawable/app_widget_inner_view_background</item>
         <item name="android:textColor">?android:attr/textColorPrimary</item>
+        <!--suppress AndroidDomInspection -->
         <item name="android:clipToOutline">true</item>
     </style>
 </resources>

@@ -45,22 +45,7 @@ class OutfitWidget extends StatelessWidget {
               );
             }
           },
-          errorBuilder: (
-            BuildContext context,
-            Object error,
-            StackTrace? stackTrace,
-          ) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content:
-                      Text('Error: $error. Cannot display image with outfit.'),
-                ),
-              );
-            });
-            // Handle error case
-            return const SizedBox();
-          },
+          errorBuilder: (_, __, ___) => const SizedBox(),
         ),
       ),
     );
