@@ -1,0 +1,67 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:nested/nested.dart';
+import 'package:weather_fit/data/repositories/ai_repository.dart';
+import 'package:weather_fit/res/theme/cubit/theme_cubit.dart';
+import 'package:weather_fit/router/app_route.dart';
+import 'package:weather_fit/router/routes.dart' as routes;
+import 'package:weather_fit/weather/cubit/weather_cubit.dart';
+import 'package:weather_repository/weather_repository.dart';
+
+class WeatherApp extends StatelessWidget {
+  const WeatherApp({
+    required WeatherRepository weatherRepository,
+    required AiRepository aiRepository,
+    super.key,
+  })  : _weatherRepository = weatherRepository,
+        _aiRepository = aiRepository;
+
+  final WeatherRepository _weatherRepository;
+  final AiRepository _aiRepository;
+
+  @override
+  Widget build(BuildContext context) {
+    // Use the `MultiRepositoryProvider` widget to provide two repositories.
+    return MultiRepositoryProvider(
+      providers: <SingleChildWidget>[
+        // Provide the weather repository.
+        RepositoryProvider<WeatherRepository>.value(
+          value: _weatherRepository,
+        ),
+        // Provide the AI repository.
+        RepositoryProvider<AiRepository>.value(
+          value: _aiRepository,
+        ),
+      ],
+      // Provide the theme cubit.
+      child: MultiBlocProvider(
+        providers: <SingleChildWidget>[
+          BlocProvider<ThemeCubit>(
+            create: (_) => ThemeCubit(),
+          ),
+          BlocProvider<WeatherCubit>(
+            create: (_) => WeatherCubit(_weatherRepository, _aiRepository),
+          ),
+        ],
+        child: BlocBuilder<ThemeCubit, Color>(
+          builder: (_, Color color) {
+            return MaterialApp(
+              title: 'WeatherFit',
+              initialRoute: AppRoute.weather.path,
+              routes: routes.routeMap,
+              theme: ThemeData(
+                appBarTheme: const AppBarTheme(
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                ),
+                colorScheme: ColorScheme.fromSeed(seedColor: color),
+                textTheme: GoogleFonts.rajdhaniTextTheme(),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}

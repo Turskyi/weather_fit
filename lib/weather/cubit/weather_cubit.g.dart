@@ -12,16 +12,10 @@ WeatherState _$WeatherStateFromJson(Map<String, dynamic> json) =>
       json,
       ($checkedConvert) {
         final val = WeatherState(
+          outfitImageUrl:
+              $checkedConvert('outfit_image_url', (v) => v as String? ?? ''),
           status: $checkedConvert(
-              'status',
-              (v) =>
-                  $enumDecodeNullable(_$WeatherStatusEnumMap, v) ??
-                  WeatherStatus.loading),
-          temperatureUnits: $checkedConvert(
-              'temperature_units',
-              (v) =>
-                  $enumDecodeNullable(_$TemperatureUnitsEnumMap, v) ??
-                  TemperatureUnits.celsius),
+              'status', (v) => $enumDecode(_$WeatherStatusEnumMap, v)),
           weather: $checkedConvert(
               'weather',
               (v) => v == null
@@ -30,15 +24,14 @@ WeatherState _$WeatherStateFromJson(Map<String, dynamic> json) =>
         );
         return val;
       },
-      fieldKeyMap: const {'temperatureUnits': 'temperature_units'},
+      fieldKeyMap: const {'outfitImageUrl': 'outfit_image_url'},
     );
 
 Map<String, dynamic> _$WeatherStateToJson(WeatherState instance) =>
     <String, dynamic>{
       'status': _$WeatherStatusEnumMap[instance.status]!,
       'weather': instance.weather.toJson(),
-      'temperature_units':
-          _$TemperatureUnitsEnumMap[instance.temperatureUnits]!,
+      'outfit_image_url': instance.outfitImageUrl,
     };
 
 const _$WeatherStatusEnumMap = {
@@ -46,9 +39,4 @@ const _$WeatherStatusEnumMap = {
   WeatherStatus.loading: 'loading',
   WeatherStatus.success: 'success',
   WeatherStatus.failure: 'failure',
-};
-
-const _$TemperatureUnitsEnumMap = {
-  TemperatureUnits.fahrenheit: 'fahrenheit',
-  TemperatureUnits.celsius: 'celsius',
 };

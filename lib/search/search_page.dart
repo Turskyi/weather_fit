@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:weather_fit/weather/ui/weather.dart';
+import 'package:weather_fit/res/widgets/background.dart';
 
 class SearchPage extends StatefulWidget {
-  const SearchPage._();
-
-  static Route<String> route() {
-    return MaterialPageRoute<String>(builder: (_) => const SearchPage._());
-  }
+  const SearchPage({super.key});
 
   @override
   State<SearchPage> createState() => _SearchPageState();
@@ -19,34 +15,57 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('City Search')),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: <Widget>[
-          Row(
-            children: <Widget>[
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: TextField(
+    final ThemeData theme = Theme.of(context);
+    return Semantics(
+      label: 'City search page',
+      child: Scaffold(
+        extendBodyBehindAppBar: true,
+        appBar: AppBar(title: const Text('City Search')),
+        body: Stack(
+          children: <Widget>[
+            const Background(),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  const Text('🏙️', style: TextStyle(fontSize: 64)),
+                  Text(
+                    'Let\'s explore the weather! ',
+                    style: theme.textTheme.headlineMedium,
+                  ),
+                  Text(
+                    'Type the city name and tap "Submit" to see the weather.',
+                    style: theme.textTheme.titleSmall,
+                  ),
+                  const SizedBox(height: 16.0),
+                  TextField(
                     controller: _textController,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'City',
-                      hintText: 'Toronto',
+                      hintText: 'Enter city name',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      contentPadding: const EdgeInsets.all(12.0),
                     ),
                   ),
-                ),
+                  const SizedBox(height: 16.0),
+                  ElevatedButton(
+                    key: const Key('searchPage_search_iconButton'),
+                    child: const Text('Submit', semanticsLabel: 'Submit'),
+                    onPressed: () {
+                      if (_text.isNotEmpty) {
+                        Navigator.of(context).pop(_text);
+                      }
+                    },
+                  ),
+                ],
               ),
-              IconButton(
-                key: const Key('searchPage_search_iconButton'),
-                icon: const Icon(Icons.search, semanticLabel: 'Submit'),
-                onPressed: () => Navigator.of(context).pop(_text),
-              ),
-            ],
-          ),
-          const WeatherEmpty(),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }

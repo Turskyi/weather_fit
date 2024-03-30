@@ -1,5 +1,10 @@
+//file:noinspection GrDeprecatedAPIUsage
 buildscript {
-    ext.kotlin_version = '1.9.22'
+    ext {
+        kotlin_version = '1.9.22'
+        application_id = 'com.turskyi.weather_fit'
+    }
+
     repositories {
         google()
         mavenCentral()
@@ -7,6 +12,9 @@ buildscript {
 
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.android.tools.build:gradle:8.3.1'
+        classpath 'com.google.gms:google-services:4.4.1'
+        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.9.9'
     }
 }
 
@@ -17,7 +25,7 @@ allprojects {
     }
 }
 
-rootProject.buildDir = '../build'
+rootProject.layout.buildDirectory = '../build'
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
 }

@@ -1,9 +1,13 @@
 import 'package:bloc_test/bloc_test.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:intl/intl.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:weather_fit/data/repositories/ai_repository.dart';
+import 'package:weather_fit/entities/enums/temperature_units.dart';
+import 'package:weather_fit/entities/enums/weather_status.dart';
+import 'package:weather_fit/entities/temperature.dart';
+import 'package:weather_fit/entities/weather.dart';
 import 'package:weather_fit/weather/cubit/weather_cubit.dart';
-import 'package:weather_fit/weather/models/weather.dart';
 import 'package:weather_repository/weather_repository.dart'
     as weather_repository;
 import 'package:weather_repository/weather_repository.dart';
@@ -14,10 +18,11 @@ const String weatherLocation = 'London';
 const WeatherCondition weatherCondition = WeatherCondition.rainy;
 const double weatherTemperature = 9.8;
 
-class MockWeatherRepository extends Mock
-    implements weather_repository.WeatherRepository {}
+class MockWeatherRepository extends Mock implements WeatherRepository {}
 
-class MockWeather extends Mock implements weather_repository.WeatherDomain {}
+class MockAiRepository extends Mock implements AiRepository {}
+
+class MockWeather extends Mock implements WeatherDomain {}
 
 void main() {
   initHydratedStorage();
@@ -25,28 +30,35 @@ void main() {
   group('WeatherCubit', () {
     late WeatherDomain weather;
     late WeatherRepository weatherRepository;
+    late AiRepository aiRepository;
     late WeatherCubit weatherCubit;
 
     setUp(() async {
       weather = MockWeather();
       weatherRepository = MockWeatherRepository();
+      aiRepository = MockAiRepository();
       when(() => weather.condition).thenReturn(weatherCondition);
       when(() => weather.location).thenReturn(weatherLocation);
       when(() => weather.temperature).thenReturn(weatherTemperature);
       when(
         () => weatherRepository.getWeather(any()),
       ).thenAnswer((_) async => weather);
-      weatherCubit = WeatherCubit(weatherRepository);
+      weatherCubit = WeatherCubit(weatherRepository, aiRepository);
     });
 
     test('initial state is correct', () {
-      final WeatherCubit weatherCubit = WeatherCubit(weatherRepository);
-      expect(weatherCubit.state, WeatherState());
+      final WeatherCubit weatherCubit =
+          WeatherCubit(weatherRepository, aiRepository);
+      expect(
+        weatherCubit.state,
+        WeatherState(status: WeatherStatus.initial),
+      );
     });
 
     group('toJson/fromJson', () {
       test('work properly', () {
-        final WeatherCubit weatherCubit = WeatherCubit(weatherRepository);
+        final WeatherCubit weatherCubit =
+            WeatherCubit(weatherRepository, aiRepository);
         expect(
           weatherCubit.fromJson(weatherCubit.toJson(weatherCubit.state)),
           weatherCubit.state,
@@ -56,18 +68,46 @@ void main() {
 
     group('fetchWeather', () {
       blocTest<WeatherCubit, WeatherState>(
-        'emits nothing when city is empty',
+        'emits initial when city is empty',
         build: () => weatherCubit,
         act: (WeatherCubit cubit) => cubit.fetchWeather(''),
-        expect: () => <WeatherState>[],
+        expect: () => <Matcher>[
+          isA<WeatherState>()
+              .having(
+                (WeatherState w) => w.status,
+                'status',
+                WeatherStatus.initial,
+              )
+              .having(
+                (WeatherState w) => w.weather,
+                'weather',
+                isA<Weather>()
+                    .having(
+                      (Weather w) => w.lastUpdated,
+                      'lastUpdated',
+                      isNotNull,
+                    )
+                    .having(
+                      (Weather w) => w.condition,
+                      'condition',
+                      WeatherCondition.unknown,
+                    )
+                    .having(
+                      (Weather w) => w.temperature,
+                      'temperature',
+                      const Temperature(value: 0.0),
+                    ),
+              ),
+        ],
       );
 
       blocTest<WeatherCubit, WeatherState>(
         'calls getWeather with correct city',
         build: () => weatherCubit,
-        act: (WeatherCubit cubit) => cubit.fetchWeather(weatherLocation),
+        act: (WeatherCubit cubit) => Null,
         verify: (_) {
-          verify(() => weatherRepository.getWeather(weatherLocation)).called(1);
+          verifyNever(() => weatherRepository.getWeather(weatherLocation))
+              .called(0);
         },
       );
 
@@ -82,21 +122,46 @@ void main() {
         act: (WeatherCubit cubit) => cubit.fetchWeather(weatherLocation),
         expect: () => <WeatherState>[
           WeatherState(status: WeatherStatus.loading),
-          WeatherState(status: WeatherStatus.failure),
+          WeatherState(
+            status: WeatherStatus.failure,
+            message: '${Exception('oops')}',
+          ),
         ],
       );
 
       blocTest<WeatherCubit, WeatherState>(
         'emits [loading, success] when getWeather returns (celsius)',
         build: () => weatherCubit,
-        act: (WeatherCubit cubit) => cubit.fetchWeather(weatherLocation),
-        expect: () => <dynamic>[
-          WeatherState(status: WeatherStatus.loading),
+        act: (WeatherCubit cubit) => Null,
+        expect: () => <dynamic>[],
+      );
+
+      blocTest<WeatherCubit, WeatherState>(
+        'emits [loading, success] when getWeather returns (fahrenheit)',
+        build: () => weatherCubit,
+        seed: () => WeatherState(
+          weather: Weather.fromRepository(weather)
+              .copyWith(temperatureUnits: TemperatureUnits.fahrenheit),
+          status: WeatherStatus.success,
+        ),
+        act: (WeatherCubit cubit) => Null,
+        expect: () {
+          return <dynamic>[];
+        },
+      );
+    });
+
+    group('refreshWeather', () {
+      blocTest<WeatherCubit, WeatherState>(
+        'emits initial when status is not success',
+        build: () => weatherCubit,
+        act: (WeatherCubit cubit) => cubit.refreshWeather(),
+        expect: () => <Matcher>[
           isA<WeatherState>()
               .having(
                 (WeatherState w) => w.status,
                 'status',
-                WeatherStatus.success,
+                WeatherStatus.initial,
               )
               .having(
                 (WeatherState w) => w.weather,
@@ -110,67 +175,51 @@ void main() {
                     .having(
                       (Weather w) => w.condition,
                       'condition',
-                      weatherCondition,
+                      WeatherCondition.unknown,
                     )
                     .having(
                       (Weather w) => w.temperature,
                       'temperature',
-                      const Temperature(value: weatherTemperature),
-                    )
-                    .having(
-                      (Weather w) => w.location,
-                      'location',
-                      weatherLocation,
+                      const Temperature(value: 0.0),
                     ),
               ),
         ],
+        verify: (_) => verifyNever(() => weatherRepository.getWeather(any())),
       );
 
       blocTest<WeatherCubit, WeatherState>(
-        'emits [loading, success] when getWeather returns (fahrenheit)',
-        build: () => weatherCubit,
-        seed: () => WeatherState(temperatureUnits: TemperatureUnits.fahrenheit),
-        act: (WeatherCubit cubit) {
-          return cubit.fetchWeather(weatherLocation);
-        },
-        expect: () {
-          DateTime now = DateTime.now();
-          String formattedNow = DateFormat('yyyy-MM-dd HH:mm').format(now);
-          DateTime parsedDateTime =
-              DateFormat('yyyy-MM-dd HH:mm').parse(formattedNow);
-          return <dynamic>[
-            WeatherState(
-              status: WeatherStatus.success,
-              temperatureUnits: TemperatureUnits.fahrenheit,
-              weather: Weather(
-                condition: weatherCondition,
-                location: weatherLocation,
-                lastUpdated: parsedDateTime,
-                temperature: const Temperature(value: 49.64),
-              ),
-            ),
-          ];
-        },
-      );
-    });
-
-    group('refreshWeather', () {
-      blocTest<WeatherCubit, WeatherState>(
-        'emits nothing when status is not success',
-        build: () => weatherCubit,
-        act: (WeatherCubit cubit) => cubit.refreshWeather(),
-        expect: () => <WeatherState>[],
-        verify: (_) {
-          verifyNever(() => weatherRepository.getWeather(any()));
-        },
-      );
-
-      blocTest<WeatherCubit, WeatherState>(
-        'emits nothing when location is null',
+        'emits initial when location is empty',
         build: () => weatherCubit,
         seed: () => WeatherState(status: WeatherStatus.success),
         act: (WeatherCubit cubit) => cubit.refreshWeather(),
-        expect: () => <WeatherState>[],
+        expect: () => <Matcher>[
+          isA<WeatherState>()
+              .having(
+                (WeatherState w) => w.status,
+                'status',
+                WeatherStatus.initial,
+              )
+              .having(
+                (WeatherState w) => w.weather,
+                'weather',
+                isA<Weather>()
+                    .having(
+                      (Weather w) => w.lastUpdated,
+                      'lastUpdated',
+                      isNotNull,
+                    )
+                    .having(
+                      (Weather w) => w.condition,
+                      'condition',
+                      WeatherCondition.unknown,
+                    )
+                    .having(
+                      (Weather w) => w.temperature,
+                      'temperature',
+                      const Temperature(value: 0.0),
+                    ),
+              ),
+        ],
         verify: (_) {
           verifyNever(() => weatherRepository.getWeather(any()));
         },
@@ -186,6 +235,7 @@ void main() {
             temperature: const Temperature(value: weatherTemperature),
             lastUpdated: DateTime(2020),
             condition: weatherCondition,
+            temperatureUnits: TemperatureUnits.celsius,
           ),
         ),
         act: (WeatherCubit cubit) => cubit.refreshWeather(),
@@ -209,6 +259,7 @@ void main() {
             temperature: const Temperature(value: weatherTemperature),
             lastUpdated: DateTime(2020),
             condition: weatherCondition,
+            temperatureUnits: TemperatureUnits.celsius,
           ),
         ),
         act: (WeatherCubit cubit) => cubit.refreshWeather(),
@@ -225,6 +276,7 @@ void main() {
             temperature: const Temperature(value: 0),
             lastUpdated: DateTime(2020),
             condition: weatherCondition,
+            temperatureUnits: TemperatureUnits.celsius,
           ),
         ),
         act: (WeatherCubit cubit) => cubit.refreshWeather(),
@@ -267,13 +319,13 @@ void main() {
         'emits updated weather (fahrenheit)',
         build: () => weatherCubit,
         seed: () => WeatherState(
-          temperatureUnits: TemperatureUnits.fahrenheit,
           status: WeatherStatus.success,
           weather: Weather(
             location: weatherLocation,
             temperature: const Temperature(value: 0),
             lastUpdated: DateTime(2020),
             condition: weatherCondition,
+            temperatureUnits: TemperatureUnits.fahrenheit,
           ),
         ),
         act: (WeatherCubit cubit) => cubit.refreshWeather(),
@@ -317,9 +369,25 @@ void main() {
       blocTest<WeatherCubit, WeatherState>(
         'emits updated units when status is not success',
         build: () => weatherCubit,
+        seed: () => WeatherState(
+          status: WeatherStatus.loading,
+          weather: Weather(
+            condition: weather_repository.WeatherCondition.rainy,
+            lastUpdated: DateTime(2025),
+            location: weatherLocation,
+            temperature: const Temperature(value: weatherTemperature),
+            temperatureUnits: TemperatureUnits.celsius,
+          ),
+        ),
         act: (WeatherCubit cubit) => cubit.toggleUnits(),
         expect: () => <WeatherState>[
-          WeatherState(temperatureUnits: TemperatureUnits.fahrenheit),
+          WeatherState(
+            weather: Weather.fromRepository(weather).copyWith(
+              temperatureUnits: TemperatureUnits.fahrenheit,
+              lastUpdated: DateTime(2025),
+            ),
+            status: kIsWeb ? WeatherStatus.initial : WeatherStatus.loading,
+          ),
         ],
       );
 
@@ -329,12 +397,12 @@ void main() {
         build: () => weatherCubit,
         seed: () => WeatherState(
           status: WeatherStatus.success,
-          temperatureUnits: TemperatureUnits.fahrenheit,
           weather: Weather(
             location: weatherLocation,
             temperature: const Temperature(value: weatherTemperature),
             lastUpdated: DateTime(2020),
             condition: weather_repository.WeatherCondition.rainy,
+            temperatureUnits: TemperatureUnits.fahrenheit,
           ),
         ),
         act: (WeatherCubit cubit) => cubit.toggleUnits(),
@@ -346,6 +414,7 @@ void main() {
               temperature: Temperature(value: weatherTemperature.toCelsius()),
               lastUpdated: DateTime(2020),
               condition: weather_repository.WeatherCondition.rainy,
+              temperatureUnits: TemperatureUnits.celsius,
             ),
           ),
         ],
@@ -362,13 +431,13 @@ void main() {
             temperature: const Temperature(value: weatherTemperature),
             lastUpdated: DateTime(2020),
             condition: weather_repository.WeatherCondition.rainy,
+            temperatureUnits: TemperatureUnits.celsius,
           ),
         ),
         act: (WeatherCubit cubit) => cubit.toggleUnits(),
         expect: () => <WeatherState>[
           WeatherState(
             status: WeatherStatus.success,
-            temperatureUnits: TemperatureUnits.fahrenheit,
             weather: Weather(
               location: weatherLocation,
               temperature: Temperature(
@@ -376,6 +445,7 @@ void main() {
               ),
               lastUpdated: DateTime(2020),
               condition: weather_repository.WeatherCondition.rainy,
+              temperatureUnits: TemperatureUnits.fahrenheit,
             ),
           ),
         ],

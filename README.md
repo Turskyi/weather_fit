@@ -1,24 +1,27 @@
 [![Stand With Ukraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner-direct-single.svg)](https://stand-with-ukraine.pp.ua)
+[![Upload Android build to App Tester.](https://github.com/Turskyi/weather_fit/actions/workflows/flutter_ci.yml/badge.svg?branch=master&event=pull_request)](https://github.com/Turskyi/weather_fit/actions/workflows/flutter_ci.yml)
+[![Deploy web build.](https://github.com/Turskyi/weather_fit/actions/workflows/flutter_web_ci.yml/badge.svg?branch=master&event=pull_request)](https://github.com/Turskyi/weather_fit/actions/workflows/flutter_web_ci.yml)
 [![Code Quality](https://github.com/Turskyi/weather_fit/actions/workflows/code-quality-tests.yml/badge.svg?branch=master&event=push)](https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo)
 [![style: flutter lints](https://img.shields.io/badge/style-flutter__lints-blue)](https://pub.dev/packages/flutter_lints)
 [![codecov](https://codecov.io/gh/Turskyi/weather_fit/graph/badge.svg?token=X9R15N3WP3)](https://codecov.io/gh/Turskyi/weather_fit)
+[![Codemagic build status](https://api.codemagic.io/apps/65ee103d67c09b754e5d3451/65ee103d67c09b754e5d3450/status_badge.svg)](https://codemagic.io/apps/65ee103d67c09b754e5d3451/65ee103d67c09b754e5d3450/latest_build)
 <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/m/Turskyi/weather_fit">
 
 # Weather Fit
 
-**WeatherFit** is more than just a weather app, it’s a personal stylist that 
-helps you dress well and stay comfortable. Whether you’re going to work, 
-school, or a party, *WeatherFit* will show you the best outfit for any weather 
-condition. Just enter your location or use GPS, and **WeatherFit** will display 
-the current weather and a full-height image of a person wearing a suitable 
-outfit. You can customize the image according to your preferences 
-(in development!), such as age, gender, skin tone, hair color, etc. This way, 
-the image will be more personalized and relevant to you.  You can also see the 
-forecast for the next few days and get outfit recommendations for each day. You 
-can choose from different styles and categories of outfits, such as casual, 
-formal, sporty, etc. **WeatherFit** will also give you tips and advice on how 
-to accessorize and layer your clothes. WeatherFit is your smart and stylish 
-weather companion. Download it now and never worry about what to wear again. 
+**WeatherFit** is more than just a weather app, it’s a personal stylist that
+helps you dress well and stay comfortable. Whether you’re going to work,
+school, or a party, _WeatherFit_ will show you the best outfit for any weather
+condition. Just enter your location or use GPS, and **WeatherFit** will display
+the current weather and a full-height image of a person wearing a suitable
+outfit. You can customize the image according to your preferences
+(in development!), such as age, gender, skin tone, hair color, etc. This way,
+the image will be more personalized and relevant to you. You can also see the
+forecast for the next few days and get outfit recommendations for each day. You
+can choose from different styles and categories of outfits, such as casual,
+formal, sporty, etc. **WeatherFit** will also give you tips and advice on how
+to accessorize and layer your clothes. WeatherFit is your smart and stylish
+weather companion. Download it now and never worry about what to wear again.
 🌤️👕👖👞
 
 ## PROJECT SPECIFICATION
@@ -102,6 +105,56 @@ flutter test --coverage
 genhtml coverage/lcov.info -o coverage
 open coverage/index.html
 ```
+
+<details style="border: 1px solid #aaa; border-radius: 4px; padding: 0.5em 0.5em 0;">
+  <summary style="font-weight: bold; margin: -0.5em -0.5em 0; padding: 0.5em; border-bottom: 1px solid #aaa;">Architectural pattern:
+
+[Hexagonal architecture](https://alistair.cockburn.us/hexagonal-architecture/)
+
+  </summary>
+<a href="https://alistair.cockburn.us/hexagonal-architecture/">
+<!--suppress CheckImageSize -->
+<img src="assets/images/hexagonal_architecture.jpeg" width="800" title="Flutter Hexagonal Architecture" alt="Image of the Flutter Hexagonal Architecture Pattern">
+</a>
+
+## Layers
+
+### Application/Core - `core`
+
+The Application (core) is the heart of the architecture. It houses the business logic and domain
+objects, which are the kernel of value in the software. This core of the application should be
+designed as a set of interfaces or ports that define the behavior of the system, without any
+implementation details. It is independent of external systems and concerns. The core of the
+application is designed to work without either a UI or a database. This allows the application to
+be driven by users, programs, automated tests, or batch scripts, and to be developed and tested in
+isolation from its eventual run-time devices and databases. The application core remains detached
+from external influences, thus preserving the integrity of the business logic and the domain model.
+
+#### Enterprise Business Rules - `entities`
+
+An **Entity** is an object within our computer system that embodies a small set of critical
+business rules operating on Critical Business Data. Entities are a way to implement and enforce
+application-independent business rules.
+
+#### Interactors - `interactors`
+
+The `interactors` module defines the business logic of the app. It is a part that is independent of
+the development platform, in other words, it is written purely in the programming language and
+doesn't contain any elements from the platform. In the case of `Flutter`, `interactors` would be
+written purely in `Dart` without any `Flutter` elements. The reason for that is that `interactors`
+should only be concerned with the business logic of the app, not with the implementation details.
+
+#### Adapters - `adapters`
+
+`adapters` is the layer outside Application Business Rules. `Adapters` crosses the boundaries of
+the layers to communicate with `Application Business Rules`, however, the **Dependency Rule** is
+never violated. Using `polymorphism`, `Adapters` communicates with
+`Application Business Rules` using inherited classes: classes that implement or extend the
+`Interactor`s presented in the `Application Business Rules` layer. Since `polymorphism` is used,
+the `Repositories` passed to `Adapters` still adhere to the **Dependency Rule** since as far as
+`Adapters` is concerned, they are abstract. The implementation is hidden behind the `polymorphism`.
+
+</details>
 
 <details style="border: 1px solid #aaa; border-radius: 4px; padding: 0.5em 0.5em 0;">
   <summary style="font-weight: bold; margin: -0.5em -0.5em 0; padding: 0.5em; border-bottom: 1px solid #aaa;">Style guides:
@@ -364,6 +417,29 @@ have methods and fields. This makes them very powerful tools that allow much
 more expression and flexibility.
 
 </details>
+
+• Screenshots:
+
+<!--suppress CheckImageSize -->
+<img src="screenshots/Web-Screenshot-2024-03-11.png" width="400"  alt="screenshot">
+<!--suppress CheckImageSize -->
+<img src="screenshots/Android-Pixel2-Screenshot_20240311.png" width="400"  alt="screenshot">
+<!--suppress CheckImageSize -->
+<img src="screenshots/Pixel_XL_Screenshot_20240311.png" width="400"  alt="screenshot">
+<!--suppress CheckImageSize -->
+<img src="screenshots/Search_Screenshot_20240311.png" width="400"  alt="screenshot">
+<!--suppress CheckImageSize -->
+<img src="screenshots/Settings_Screenshot_20240311.png" width="400"  alt="screenshot">
+<!--suppress CheckImageSize -->
+<img src="screenshots/Privacy_Screenshot_20240311.png" width="400"  alt="screenshot">
+<!--suppress CheckImageSize -->
+<img src="screenshots/Home_widget_Screenshot_20240311.png" width="400"  alt="screenshot">
+
+## Download
+
+<a href="https://play.google.com/store/apps/details?id=com.turskyi.weather_fit" target="_blank">
+<img src="https://play.google.com/intl/en_gb/badges/static/images/badges/en_badge_web_generic.png" width=240  alt="google play badge"/>
+</a>
 
 ## Credits
 

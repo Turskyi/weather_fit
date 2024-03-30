@@ -7,16 +7,29 @@ class WeatherLoading extends StatelessWidget {
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     return Column(
-      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        const Text('⛅', style: TextStyle(fontSize: 64)),
+        Container(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: theme.primaryColor.withAlpha(99),
+          ),
+          padding: const EdgeInsets.all(16.0),
+          child: const Icon(
+            Icons.cloud,
+            size: 64,
+            color: Colors.white,
+          ),
+        ),
+        const SizedBox(height: 16.0),
         Text(
           'Loading Weather',
-          style: theme.textTheme.headlineSmall,
+          style:
+              theme.textTheme.titleLarge!.copyWith(fontWeight: FontWeight.bold),
         ),
-        const Padding(
-          padding: EdgeInsets.all(16),
-          child: CircularProgressIndicator(),
+        const SizedBox(height: 8.0),
+        CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(theme.primaryColor),
         ),
       ],
     );

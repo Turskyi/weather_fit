@@ -4,6 +4,8 @@ PODS:
     - Flutter
   - geolocator_apple (1.2.0):
     - Flutter
+  - home_widget (0.0.1):
+    - Flutter
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
@@ -14,6 +16,7 @@ DEPENDENCIES:
   - Flutter (from `Flutter`)
   - geocoding_ios (from `.symlinks/plugins/geocoding_ios/ios`)
   - geolocator_apple (from `.symlinks/plugins/geolocator_apple/ios`)
+  - home_widget (from `.symlinks/plugins/home_widget/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
 
@@ -24,6 +27,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/geocoding_ios/ios"
   geolocator_apple:
     :path: ".symlinks/plugins/geolocator_apple/ios"
+  home_widget:
+    :path: ".symlinks/plugins/home_widget/ios"
   path_provider_foundation:
     :path: ".symlinks/plugins/path_provider_foundation/darwin"
   permission_handler_apple:
@@ -33,6 +38,7 @@ SPEC CHECKSUMS:
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   geocoding_ios: a389ea40f6f548de6e63006a2e31bf66ff80769a
   geolocator_apple: 9157311f654584b9bb72686c55fc02a97b73f461
+  home_widget: 0434835a4c9a75704264feff6be17ea40e0f0d57
   path_provider_foundation: 3784922295ac71e43754bd15e0653ccfd36a147c
   permission_handler_apple: 036b856153a2b1f61f21030ff725f3e6fece2b78
 

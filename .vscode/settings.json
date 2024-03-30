@@ -1,0 +1,21 @@
+{
+  "spellright.language": [
+    "en"
+  ],
+  "spellright.documentTypes": [
+    "markdown",
+    "latex",
+    "plaintext",
+    "jsonc",
+    "Log",
+    "dart"
+  ],
+  "spellright.parserByClass": {
+    "Log": {
+      "parser": "code"
+    },
+    "dart": {
+      "parser": "code"
+    }
+  }
+}
