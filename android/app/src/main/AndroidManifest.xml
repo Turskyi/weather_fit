@@ -1,48 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools"
-          android:versionCode="10"
-          android:versionName="0.1.0">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:versionCode="11"
+    android:versionName="0.1.1">
 
     <queries>
         <intent>
-            <action android:name="android.intent.action.SENDTO"/>
-            <data android:scheme="mailto"/>
+            <action android:name="android.intent.action.SENDTO" />
+            <data android:scheme="mailto" />
         </intent>
     </queries>
 
-    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <!--suppress AndroidDomInspection -->
     <application
-            android:name="${applicationName}"
-            android:icon="@mipmap/ic_launcher"
-            android:label="Weather Fit">
+        android:name="${applicationName}"
+        android:icon="@mipmap/ic_launcher"
+        android:label="Weather Fit">
         <!--suppress AndroidDomInspection -->
         <receiver
-                android:name=".WeatherWidget"
-                android:exported="false">
+            android:name=".WeatherWidget"
+            android:exported="false">
             <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
 
             <!--suppress AndroidDomInspection -->
             <meta-data
-                    android:name="android.appwidget.provider"
-                    android:resource="@xml/weather_widget_info"/>
+                android:name="android.appwidget.provider"
+                android:resource="@xml/weather_widget_info" />
         </receiver>
 
         <!--suppress AndroidDomInspection -->
         <activity
-                android:name=".MainActivity"
-                android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
-                android:exported="true"
-                android:hardwareAccelerated="true"
-                android:launchMode="singleTop"
-                android:theme="@style/LaunchTheme"
-                android:windowSoftInputMode="adjustResize"
-                tools:ignore="ObsoleteSdkInt"
-                tools:targetApi="honeycomb">
+            android:name=".MainActivity"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+            android:exported="true"
+            android:hardwareAccelerated="true"
+            android:launchMode="singleTop"
+            android:theme="@style/LaunchTheme"
+            android:windowSoftInputMode="adjustResize"
+            tools:ignore="ObsoleteSdkInt"
+            tools:targetApi="honeycomb">
 
             <!--
                  Specifies an Android theme to apply to this Activity as soon as
@@ -52,13 +52,13 @@
             -->
             <!--suppress AndroidDomInspection -->
             <meta-data
-                    android:name="io.flutter.embedding.android.NormalTheme"
-                    android:resource="@style/NormalTheme"/>
+                android:name="io.flutter.embedding.android.NormalTheme"
+                android:resource="@style/NormalTheme" />
 
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <!--
@@ -66,8 +66,8 @@
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java
         -->
         <meta-data
-                android:name="flutterEmbedding"
-                android:value="2"/>
+            android:name="flutterEmbedding"
+            android:value="2" />
     </application>
 
 </manifest>

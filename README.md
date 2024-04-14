@@ -1,10 +1,10 @@
 [![Stand With Ukraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner-direct-single.svg)](https://stand-with-ukraine.pp.ua)
-[![Upload Android build to App Tester.](https://github.com/Turskyi/weather_fit/actions/workflows/flutter_ci.yml/badge.svg?branch=master&event=pull_request)](https://github.com/Turskyi/weather_fit/actions/workflows/flutter_ci.yml)
-[![Deploy web build.](https://github.com/Turskyi/weather_fit/actions/workflows/flutter_web_ci.yml/badge.svg?branch=master&event=pull_request)](https://github.com/Turskyi/weather_fit/actions/workflows/flutter_web_ci.yml)
+[![Upload Android build to App Tester.](https://github.com/Turskyi/weather_fit/actions/workflows/flutter_android_ci.yml/badge.svg?branch=master&event=push)](https://appdistribution.firebase.dev/i/350faded06826d7b)
+[![Deploy web build.](https://github.com/Turskyi/weather_fit/actions/workflows/flutter_web_ci.yml/badge.svg?branch=master&event=push)](https://weather-fit-ai.web.app)
 [![Code Quality](https://github.com/Turskyi/weather_fit/actions/workflows/code_quality_tests.yml/badge.svg?branch=master&event=push)](https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo)
 [![style: flutter lints](https://img.shields.io/badge/style-flutter__lints-blue)](https://pub.dev/packages/flutter_lints)
 [![codecov](https://codecov.io/gh/Turskyi/weather_fit/graph/badge.svg?token=X9R15N3WP3)](https://codecov.io/gh/Turskyi/weather_fit)
-[![Codemagic build status](https://api.codemagic.io/apps/65ee103d67c09b754e5d3451/65ee103d67c09b754e5d3450/status_badge.svg)](https://codemagic.io/apps/65ee103d67c09b754e5d3451/65ee103d67c09b754e5d3450/latest_build)
+[![Codemagic build status](https://api.codemagic.io/apps/65ee103d67c09b754e5d3451/65ee103d67c09b754e5d3450/status_badge.svg)](https://play.google.com/store/apps/details?id=com.turskyi.weather_fit)
 <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/m/Turskyi/weather_fit">
 
 # Weather Fit
