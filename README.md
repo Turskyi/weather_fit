@@ -1,5 +1,5 @@
 [![Stand With Ukraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner-direct-single.svg)](https://stand-with-ukraine.pp.ua)
-[![Upload Android build to App Tester.](https://github.com/Turskyi/weather_fit/actions/workflows/flutter_android_ci.yml/badge.svg?branch=master&event=push)](https://appdistribution.firebase.dev/i/350faded06826d7b)
+[![Upload Android build to App Tester.](https://github.com/Turskyi/weather_fit/actions/workflows/flutter_android_ci.yml/badge.svg?branch=master)](https://appdistribution.firebase.dev/i/350faded06826d7b)
 [![Deploy web build.](https://github.com/Turskyi/weather_fit/actions/workflows/flutter_web_ci.yml/badge.svg?branch=master&event=push)](https://weather-fit-ai.web.app)
 [![Code Quality](https://github.com/Turskyi/weather_fit/actions/workflows/code_quality_tests.yml/badge.svg?branch=master&event=push)](https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo)
 [![style: flutter lints](https://img.shields.io/badge/style-flutter__lints-blue)](https://pub.dev/packages/flutter_lints)
