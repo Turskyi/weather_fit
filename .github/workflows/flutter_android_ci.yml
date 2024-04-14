@@ -1,8 +1,5 @@
 name: Upload Android build to App Tester.
-on:
-  push:
-    branches-ignore:
-      - master
+on: [ push ]
 
 jobs:
   build_apk:
