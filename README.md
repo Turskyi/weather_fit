@@ -1,7 +1,7 @@
 [![Stand With Ukraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner-direct-single.svg)](https://stand-with-ukraine.pp.ua)
 [![Upload Android build to App Tester.](https://github.com/Turskyi/weather_fit/actions/workflows/flutter_ci.yml/badge.svg?branch=master&event=pull_request)](https://github.com/Turskyi/weather_fit/actions/workflows/flutter_ci.yml)
 [![Deploy web build.](https://github.com/Turskyi/weather_fit/actions/workflows/flutter_web_ci.yml/badge.svg?branch=master&event=pull_request)](https://github.com/Turskyi/weather_fit/actions/workflows/flutter_web_ci.yml)
-[![Code Quality](https://github.com/Turskyi/weather_fit/actions/workflows/code-quality-tests.yml/badge.svg?branch=master&event=push)](https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo)
+[![Code Quality](https://github.com/Turskyi/weather_fit/actions/workflows/code_quality_tests.yml/badge.svg?branch=master&event=push)](https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo)
 [![style: flutter lints](https://img.shields.io/badge/style-flutter__lints-blue)](https://pub.dev/packages/flutter_lints)
 [![codecov](https://codecov.io/gh/Turskyi/weather_fit/graph/badge.svg?token=X9R15N3WP3)](https://codecov.io/gh/Turskyi/weather_fit)
 [![Codemagic build status](https://api.codemagic.io/apps/65ee103d67c09b754e5d3451/65ee103d67c09b754e5d3450/status_badge.svg)](https://codemagic.io/apps/65ee103d67c09b754e5d3451/65ee103d67c09b754e5d3450/latest_build)
@@ -12,7 +12,7 @@
 **WeatherFit** is more than just a weather app, it’s a personal stylist that
 helps you dress well and stay comfortable. Whether you’re going to work,
 school, or a party, _WeatherFit_ will show you the best outfit for any weather
-condition. Just enter your location or use GPS, and **WeatherFit** will display
+condition. Enter your location or use GPS, and **WeatherFit** will display
 the current weather and a full-height image of a person wearing a suitable
 outfit. You can customize the image according to your preferences
 (in development!), such as age, gender, skin tone, hair color, etc. This way,
@@ -121,38 +121,51 @@ open coverage/index.html
 
 ### Application/Core - `core`
 
-The Application (core) is the heart of the architecture. It houses the business logic and domain
-objects, which are the kernel of value in the software. This core of the application should be
-designed as a set of interfaces or ports that define the behavior of the system, without any
-implementation details. It is independent of external systems and concerns. The core of the
-application is designed to work without either a UI or a database. This allows the application to
-be driven by users, programs, automated tests, or batch scripts, and to be developed and tested in
-isolation from its eventual run-time devices and databases. The application core remains detached
-from external influences, thus preserving the integrity of the business logic and the domain model.
+The Application (core) is the heart of the architecture.
+It houses the business logic and domain objects, which are the kernel of value
+in the software.
+This core of the application should be designed as a set of interfaces or ports
+that define the behavior of the system, without any implementation details.
+It is independent of external systems and concerns.
+The core of the application is designed to work without either a UI or a
+database.
+This allows the application to be driven by users, programs, automated tests,
+or batch scripts, and to be developed and tested in isolation from its eventual
+run-time devices and databases.
+The application core remains detached from external influences, thus preserving
+the integrity of the business logic and the domain model.
 
 #### Enterprise Business Rules - `entities`
 
-An **Entity** is an object within our computer system that embodies a small set of critical
-business rules operating on Critical Business Data. Entities are a way to implement and enforce
-application-independent business rules.
+An **Entity** is an object within our computer system that embodies a small set
+of critical business rules operating on Critical Business Data.
+Entities are a way to implement and enforce application-independent business
+rules.
 
 #### Interactors - `interactors`
 
-The `interactors` module defines the business logic of the app. It is a part that is independent of
-the development platform, in other words, it is written purely in the programming language and
-doesn't contain any elements from the platform. In the case of `Flutter`, `interactors` would be
-written purely in `Dart` without any `Flutter` elements. The reason for that is that `interactors`
-should only be concerned with the business logic of the app, not with the implementation details.
+The `interactors` module defines the business logic of the app.
+It is a part that is independent of the development platform, in other words,
+it is written purely in the programming language and doesn't contain any
+elements from the platform.
+In the case of `Flutter`, `interactors` would be written purely in `Dart`
+without any `Flutter` elements.
+The reason for that is that `interactors` should only be concerned with the
+business logic of the app, not with the implementation details.
 
 #### Adapters - `adapters`
 
-`adapters` is the layer outside Application Business Rules. `Adapters` crosses the boundaries of
-the layers to communicate with `Application Business Rules`, however, the **Dependency Rule** is
-never violated. Using `polymorphism`, `Adapters` communicates with
-`Application Business Rules` using inherited classes: classes that implement or extend the
-`Interactor`s presented in the `Application Business Rules` layer. Since `polymorphism` is used,
-the `Repositories` passed to `Adapters` still adhere to the **Dependency Rule** since as far as
-`Adapters` is concerned, they are abstract. The implementation is hidden behind the `polymorphism`.
+`adapters` is the layer outside Application Business Rules.
+`Adapters` crosses the boundaries of the layers to communicate with
+`Application Business Rules`, however, the **Dependency Rule** is never
+violated.
+Using `polymorphism`, `Adapters` communicates with `Application Business Rules`
+using inherited classes: classes that implement or
+extend the `Interactor`s presented in the `Application Business Rules` layer.
+Since `polymorphism` is used, the `Repositories` passed to `Adapters` still
+adhere to the **Dependency Rule** since as far as `Adapters` is concerned, they
+are abstract.
+The implementation is hidden behind the `polymorphism`.
 
 </details>
 

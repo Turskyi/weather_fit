@@ -1,24 +1,36 @@
 //file:noinspection GrDeprecatedAPIUsage
+//noinspection GrUnresolvedAccess
 buildscript {
+    //noinspection GrUnresolvedAccess
     ext {
         kotlin_version = '1.9.22'
         application_id = 'com.turskyi.weather_fit'
     }
 
+    //noinspection GrUnresolvedAccess
     repositories {
+        //noinspection GrUnresolvedAccess
         google()
+        //noinspection GrUnresolvedAccess
         mavenCentral()
     }
 
+    //noinspection GrUnresolvedAccess
     dependencies {
+        //noinspection GrUnresolvedAccess
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'com.android.tools.build:gradle:8.3.1'
+        //noinspection GrUnresolvedAccess
+        classpath 'com.android.tools.build:gradle:8.3.2'
+        //noinspection GrUnresolvedAccess
         classpath 'com.google.gms:google-services:4.4.1'
+        //noinspection GrUnresolvedAccess
         classpath 'com.google.firebase:firebase-crashlytics-gradle:2.9.9'
     }
 }
 
+//noinspection GrUnresolvedAccess
 allprojects {
+    //noinspection GrUnresolvedAccess
     repositories {
         google()
         mavenCentral()
