@@ -1,9 +1,5 @@
 name: Deploy web build.
-on:
-  push:
-    branches:
-      - master
-      - dev_two
+on: [ push ]
 
 jobs:
   build_web:

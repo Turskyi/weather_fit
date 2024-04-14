@@ -71,7 +71,7 @@ internal fun updateAppWidget(
         val lastUpdated: String? = widgetData.getString("text_last_updated", null)
         setTextViewText(R.id.text_last_updated, lastUpdated ?: "Last updated not set")
 
-        // Get chart image and put it in the widget, if it exists
+        // Get chart image and put it in the widget if it exists
         val imagePath: String? = widgetData.getString("image_weather", null)
         if (imagePath != null) {
             val imageFile = File(imagePath)
