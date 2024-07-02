@@ -11,7 +11,7 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
   final TextEditingController _textController = TextEditingController();
 
-  String get _text => _textController.text;
+  String get _text => _textController.text.trim();
 
   @override
   Widget build(BuildContext context) {
@@ -52,13 +52,21 @@ class _SearchPageState extends State<SearchPage> {
                     ),
                   ),
                   const SizedBox(height: 16.0),
-                  ElevatedButton(
-                    key: const Key('searchPage_search_iconButton'),
+                  ValueListenableBuilder<TextEditingValue>(
+                    valueListenable: _textController,
                     child: const Text('Submit', semanticsLabel: 'Submit'),
-                    onPressed: () {
-                      if (_text.isNotEmpty) {
-                        Navigator.of(context).pop(_text);
-                      }
+                    builder: (
+                      BuildContext context,
+                      TextEditingValue value,
+                      Widget? textSubmit,
+                    ) {
+                      return ElevatedButton(
+                        key: const Key('searchPage_search_iconButton'),
+                        onPressed: value.text.trim().isNotEmpty
+                            ? () => Navigator.of(context).pop(_text)
+                            : null,
+                        child: textSubmit,
+                      );
                     },
                   ),
                 ],

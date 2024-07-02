@@ -9,6 +9,7 @@ class LocationResponse {
     required this.name,
     required this.latitude,
     required this.longitude,
+    required this.countryCode,
   });
 
   factory LocationResponse.fromJson(Map<String, dynamic> json) =>
@@ -18,4 +19,12 @@ class LocationResponse {
   final String name;
   final double latitude;
   final double longitude;
+  @JsonKey(name: 'country_code')
+  final String countryCode;
+
+  @override
+  String toString() {
+    return 'LocationResponse{id: $id, name: $name, latitude: $latitude, '
+        'longitude: $longitude, countryCode: $countryCode}';
+  }
 }

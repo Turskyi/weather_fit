@@ -10,6 +10,8 @@ class MockLocation extends Mock implements open_meteo_api.LocationResponse {}
 
 class MockWeather extends Mock implements open_meteo_api.WeatherResponse {}
 
+const String countryCode = 'us';
+
 void main() {
   group('WeatherRepository', () {
     late open_meteo_api.OpenMeteoApiClient weatherApiClient;
@@ -111,6 +113,7 @@ void main() {
             temperature: 42.42,
             location: city,
             condition: WeatherCondition.clear,
+            countryCode: countryCode,
           ),
         );
       });
@@ -139,6 +142,7 @@ void main() {
             temperature: 42.42,
             location: city,
             condition: WeatherCondition.cloudy,
+            countryCode: countryCode,
           ),
         );
       });
@@ -167,6 +171,7 @@ void main() {
             temperature: 42.42,
             location: city,
             condition: WeatherCondition.rainy,
+            countryCode: countryCode,
           ),
         );
       });
@@ -195,6 +200,7 @@ void main() {
             temperature: 42.42,
             location: city,
             condition: WeatherCondition.snowy,
+            countryCode: countryCode,
           ),
         );
       });
@@ -223,6 +229,7 @@ void main() {
             temperature: 42.42,
             location: city,
             condition: WeatherCondition.unknown,
+            countryCode: countryCode,
           ),
         );
       });

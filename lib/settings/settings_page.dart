@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:weather_fit/res/widgets/background.dart';
 import 'package:weather_fit/router/app_route.dart';
 import 'package:weather_fit/settings/google_play_badge.dart';
-import 'package:weather_fit/weather/cubit/weather_cubit.dart';
+import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -21,7 +21,7 @@ class SettingsPage extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: ListView(
               children: <Widget>[
-                BlocBuilder<WeatherCubit, WeatherState>(
+                BlocBuilder<WeatherBloc, WeatherState>(
                   buildWhen: (WeatherState previous, WeatherState current) =>
                       previous.weather.temperatureUnits !=
                       current.weather.temperatureUnits,
@@ -41,8 +41,9 @@ class SettingsPage extends StatelessWidget {
                         ),
                         trailing: Switch(
                           value: state.weather.temperatureUnits.isCelsius,
-                          onChanged: (_) =>
-                              context.read<WeatherCubit>().toggleUnits(),
+                          onChanged: (_) => context
+                              .read<WeatherBloc>()
+                              .add(const ToggleUnits()),
                         ),
                       ),
                     );

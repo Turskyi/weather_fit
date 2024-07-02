@@ -24,7 +24,7 @@ ${weather.condition == WeatherCondition.clear ? 'light and '
         return imageUrl ?? '';
       }).onError((Object? e, StackTrace stackTrace) {
         debugPrint(
-          'Warning: an error occured in $this: $e;\nStackTrace: $stackTrace',
+          'Warning: an error occurred in $this: $e;\nStackTrace: $stackTrace',
         );
         if (e is RequestFailedException) {
           throw Exception(e.message);

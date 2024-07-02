@@ -18,7 +18,9 @@ LocationResponse _$LocationResponseFromJson(Map<String, dynamic> json) =>
           name: $checkedConvert('name', (v) => v as String),
           latitude: $checkedConvert('latitude', (v) => (v as num).toDouble()),
           longitude: $checkedConvert('longitude', (v) => (v as num).toDouble()),
+          countryCode: $checkedConvert('country_code', (v) => v as String),
         );
         return val;
       },
+      fieldKeyMap: const {'countryCode': 'country_code'},
     );

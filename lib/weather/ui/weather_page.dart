@@ -2,12 +2,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:home_widget/home_widget.dart';
-import 'package:weather_fit/entities/enums/weather_status.dart';
 import 'package:weather_fit/entities/weather.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
 import 'package:weather_fit/res/theme/cubit/theme_cubit.dart';
 import 'package:weather_fit/router/app_route.dart';
-import 'package:weather_fit/weather/cubit/weather_cubit.dart';
+import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 import 'package:weather_fit/weather/ui/outfit_widget.dart';
 import 'package:weather_fit/weather/ui/weather.dart';
 
@@ -45,33 +44,35 @@ class _WeatherPageState extends State<WeatherPage> {
         ],
       ),
       body: Center(
-        child: BlocConsumer<WeatherCubit, WeatherState>(
+        child: BlocConsumer<WeatherBloc, WeatherState>(
           listener: (BuildContext context, WeatherState state) {
-            if (state.status.isSuccess) {
+            if (state is WeatherSuccess) {
               context.read<ThemeCubit>().updateTheme(state.weather);
             }
           },
           builder: (BuildContext context, WeatherState state) {
-            switch (state.status) {
-              case WeatherStatus.initial:
+            switch (state) {
+              case WeatherInitial():
                 return const WeatherEmpty();
-              case WeatherStatus.loading:
-                if (state.weather.location.isEmpty) {
-                  return const WeatherLoading();
+              case WeatherLoadingState():
+                if (state.weather.city.isEmpty) {
+                  return const WeatherLoadingWidget();
                 } else {
                   return WeatherPopulated(
                     weather: state.weather,
-                    child: const WeatherLoading(),
-                    onRefresh: () =>
-                        context.read<WeatherCubit>().refreshWeather(),
+                    onRefresh: _refresh,
+                    child: const WeatherLoadingWidget(),
                   );
                 }
-              case WeatherStatus.success:
+              case WeatherSuccess():
+                if (state.weather.isUnknown) {
+                  return const WeatherEmpty();
+                }
                 Widget outfitImageWidget = const SizedBox();
                 if (state.outfitImageUrl.isNotEmpty) {
                   outfitImageWidget = OutfitWidget(
-                    url: state.outfitImageUrl,
-                    onLoaded: () => _updateWeatherHomeWidget(
+                    imageUrl: state.outfitImageUrl,
+                    onLoaded: () => _updateWeatherOnHomeScreen(
                       weather: state.weather,
                       outfitImageWidget: outfitImageWidget,
                     ),
@@ -79,6 +80,7 @@ class _WeatherPageState extends State<WeatherPage> {
                 }
                 return WeatherPopulated(
                   weather: state.weather,
+                  onRefresh: _refresh,
                   child: DecoratedBox(
                     decoration: const BoxDecoration(
                       boxShadow: <BoxShadow>[
@@ -91,10 +93,8 @@ class _WeatherPageState extends State<WeatherPage> {
                     ),
                     child: outfitImageWidget,
                   ),
-                  onRefresh: () =>
-                      context.read<WeatherCubit>().refreshWeather(),
                 );
-              case WeatherStatus.failure:
+              case WeatherFailure():
                 return WeatherError(state.message);
             }
           },
@@ -114,26 +114,24 @@ class _WeatherPageState extends State<WeatherPage> {
     );
 
     if (mounted && city is String) {
-      await context.read<WeatherCubit>().fetchWeather(city);
-    } else if (mounted) {
-      context.read<WeatherCubit>().refreshWeather();
+      context.read<WeatherBloc>().add(FetchWeather(city: city));
     } else {
       return;
     }
   }
 
-  Future<void> _updateWeatherHomeWidget({
+  Future<void> _updateWeatherOnHomeScreen({
     required Weather weather,
     required Widget outfitImageWidget,
   }) async {
     if (_shouldUpdate) {
-      // Set the group ID
+      // Set the group ID.
       HomeWidget.setAppGroupId(constants.appGroupId);
 
       // Save the weather widget data to the widget
       HomeWidget.saveWidgetData<String>('text_emoji', weather.emoji);
 
-      HomeWidget.saveWidgetData<String>('text_location', weather.location);
+      HomeWidget.saveWidgetData<String>('text_location', weather.city);
 
       HomeWidget.saveWidgetData<String>(
         'text_temperature',
@@ -142,7 +140,7 @@ class _WeatherPageState extends State<WeatherPage> {
 
       HomeWidget.saveWidgetData<String>(
         'text_last_updated',
-        '''Last Updated at ${TimeOfDay.fromDateTime(weather.lastUpdated).format(context)}''',
+        '''Last Updated at ${TimeOfDay.fromDateTime(weather.lastUpdated ?? DateTime(0)).format(context)}''',
       );
 
       dynamic imagePath = await HomeWidget.renderFlutterWidget(
@@ -178,4 +176,9 @@ class _WeatherPageState extends State<WeatherPage> {
         DateTime.now().millisecondsSinceEpoch - _defaultWeatherRefreshDelay;
     return needsRefresh;
   }
+
+  Future<void> _refresh() => Future<void>.delayed(
+        Duration.zero,
+        () => context.read<WeatherBloc>().add(const RefreshWeather()),
+      );
 }

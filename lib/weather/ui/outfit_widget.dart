@@ -1,11 +1,21 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 
 class OutfitWidget extends StatelessWidget {
-  const OutfitWidget({super.key, required this.url, required this.onLoaded});
+  const OutfitWidget({
+    super.key,
+    required this.imageUrl,
+    required this.onLoaded,
+  });
 
-  final String url;
+  final String imageUrl;
   final VoidCallback onLoaded;
+
+  double get _cornerRadius => kIsWeb ? 20 : 2;
 
   @override
   Widget build(BuildContext context) {
@@ -13,9 +23,9 @@ class OutfitWidget extends StatelessWidget {
       width: 400,
       height: 400,
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(kIsWeb ? 20 : 2),
+        borderRadius: BorderRadius.circular(_cornerRadius),
         child: Image.network(
-          url,
+          imageUrl,
           fit: BoxFit.cover,
           loadingBuilder: (
             BuildContext context,
@@ -45,7 +55,22 @@ class OutfitWidget extends StatelessWidget {
               );
             }
           },
-          errorBuilder: (_, __, ___) => const SizedBox(),
+          errorBuilder: (BuildContext _, Object exception, StackTrace? ___) {
+            if (exception is NetworkImageLoadException &&
+                exception.statusCode == HttpStatus.forbidden) {
+              return Column(
+                children: <Widget>[
+                  ElevatedButton(
+                    onPressed: () =>
+                        context.read<WeatherBloc>().add(const RefreshWeather()),
+                    child: const Text('Get Outfit Suggestion'),
+                  ),
+                ],
+              );
+            } else {
+              return const SizedBox();
+            }
+          },
         ),
       ),
     );
