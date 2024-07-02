@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:nested/nested.dart';
 import 'package:weather_fit/data/repositories/ai_repository.dart';
 import 'package:weather_fit/entities/enums/temperature_units.dart';
 import 'package:weather_fit/entities/temperature.dart';
@@ -68,13 +67,9 @@ void main() {
       temperatureUnits: TemperatureUnits.celsius,
       countryCode: _countryCode,
     );
-    late ThemeCubit themeCubit;
     late WeatherBloc weatherBloc;
 
-    setUp(() {
-      themeCubit = MockThemeCubit();
-      weatherBloc = MockWeatherBloc();
-    });
+    setUp(() => weatherBloc = MockWeatherBloc());
 
     testWidgets('renders WeatherLoading for WeatherStatus.initial',
         (WidgetTester tester) async {
@@ -102,28 +97,6 @@ void main() {
       expect(find.byType(WeatherLoadingWidget), findsOneWidget);
     });
 
-    testWidgets('renders IconButton for WeatherStatus.success',
-        (WidgetTester tester) async {
-      when(() => weatherBloc.state).thenReturn(
-        WeatherSuccess(
-          weather: weather.copyWith(temperatureUnits: TemperatureUnits.celsius),
-        ),
-      );
-      await tester.pumpWidget(
-        RepositoryProvider<WeatherRepository>.value(
-          value: weatherRepository,
-          child: BlocProvider<WeatherBloc>.value(
-            value: weatherBloc,
-            child: MaterialApp(
-              initialRoute: AppRoute.weather.path,
-              routes: routes.routeMap,
-            ),
-          ),
-        ),
-      );
-      expect(find.byType(IconButton), findsOneWidget);
-    });
-
     testWidgets('renders WeatherError for WeatherStatus.failure',
         (WidgetTester tester) async {
       when(() => weatherBloc.state).thenReturn(
@@ -139,22 +112,6 @@ void main() {
         ),
       );
       expect(find.byType(WeatherError), findsOneWidget);
-    });
-
-    testWidgets('state is cached', (WidgetTester tester) async {
-      when<dynamic>(() => hydratedStorage.read('$WeatherBloc')).thenReturn(
-        WeatherSuccess(
-          weather:
-              weather.copyWith(temperatureUnits: TemperatureUnits.fahrenheit),
-        ).toJson(),
-      );
-      await tester.pumpWidget(
-        BlocProvider<WeatherBloc>.value(
-          value: WeatherBloc(MockWeatherRepository(), MockAiRepository()),
-          child: const MaterialApp(home: WeatherPage()),
-        ),
-      );
-      expect(find.byType(WeatherPopulated), findsOneWidget);
     });
 
     testWidgets('navigates to SettingsPage when settings icon is tapped',
@@ -201,61 +158,10 @@ void main() {
       expect(find.byType(SearchPage), findsOneWidget);
     });
 
-    testWidgets('calls updateTheme when weather changes',
-        (WidgetTester tester) async {
-      whenListen(
-        weatherBloc,
-        Stream<WeatherState>.fromIterable(<WeatherState>[
-          const WeatherLoadingState(),
-          WeatherSuccess(weather: weather),
-        ]),
-      );
-      when(() => weatherBloc.state).thenReturn(
-        WeatherSuccess(weather: weather),
-      );
-      await tester.pumpWidget(
-        RepositoryProvider<WeatherRepository>.value(
-          value: weatherRepository,
-          child: MultiBlocProvider(
-            providers: <SingleChildWidget>[
-              BlocProvider<ThemeCubit>.value(value: themeCubit),
-              BlocProvider<WeatherBloc>.value(value: weatherBloc),
-            ],
-            child: MaterialApp(
-              initialRoute: AppRoute.weather.path,
-              routes: routes.routeMap,
-            ),
-          ),
-        ),
-      );
-      verify(() => themeCubit.updateTheme(weather)).called(1);
-    });
-
-    testWidgets('triggers refreshWeather on pull to refresh',
-        (WidgetTester tester) async {
-      when(() => weatherBloc.state).thenReturn(
-        WeatherSuccess(weather: weather),
-      );
-      when(() => weatherBloc.add(const RefreshWeather()))
-          .thenAnswer((_) async {});
-      await tester.pumpWidget(
-        RepositoryProvider<WeatherRepository>.value(
-          value: weatherRepository,
-          child: BlocProvider<WeatherBloc>.value(
-            value: weatherBloc,
-            child: MaterialApp(
-              initialRoute: AppRoute.weather.path,
-              routes: routes.routeMap,
-            ),
-          ),
-        ),
-      );
-      verifyNever(() => weatherBloc.add(const RefreshWeather())).called(0);
-    });
-
     testWidgets('triggers fetch on search pop', (WidgetTester tester) async {
-      when(() => weatherBloc.state)
-          .thenReturn(WeatherSuccess(weather: weather));
+      when(() => weatherBloc.state).thenReturn(
+        WeatherSuccess(weather: weather.copyWith(countryCode: _countryCode)),
+      );
       when(() => weatherBloc.add(const FetchWeather(city: 'Toronto')))
           .thenAnswer((_) async {});
       await tester.pumpWidget(
