@@ -24,5 +24,10 @@ class WeatherDomain extends Equatable {
   final String countryCode;
 
   @override
-  List<Object> get props => <Object>[location, temperature, condition];
+  List<Object> get props => <Object>[
+        location,
+        temperature,
+        condition,
+        countryCode,
+      ];
 }

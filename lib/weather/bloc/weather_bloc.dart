@@ -56,8 +56,9 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
       );
 
       emit(WeatherSuccess(weather: updatedWeather));
-      String imageUrl =
-          await _aiRepository.getImageUrlFromAiAsFuture(state.weather);
+      String imageUrl = await _aiRepository.getImageUrlFromAiAsFuture(
+        state.weather,
+      );
 
       if (state is WeatherSuccess) {
         emit((state as WeatherSuccess).copyWith(outfitImageUrl: imageUrl));
