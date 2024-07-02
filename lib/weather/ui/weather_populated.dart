@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:weather_fit/entities/weather.dart';
 import 'package:weather_fit/res/widgets/background.dart';
+import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 import 'package:weather_fit/weather/ui/weather_icon.dart';
 
 class WeatherPopulated extends StatelessWidget {
@@ -62,6 +64,19 @@ class WeatherPopulated extends StatelessWidget {
                   ),
                   const SizedBox(height: 24),
                   child,
+                  const SizedBox(height: 24),
+                  BlocBuilder<WeatherBloc, WeatherState>(
+                    builder: (_, WeatherState state) {
+                      if (state is! WeatherLoadingState && _needsRefresh) {
+                        return ElevatedButton(
+                          onPressed: onRefresh,
+                          child: const Text('Refresh'),
+                        );
+                      } else {
+                        return const SizedBox();
+                      }
+                    },
+                  ),
                 ],
               ),
             ),
@@ -79,5 +94,12 @@ class WeatherPopulated extends StatelessWidget {
     } else {
       return 'Never updated';
     }
+  }
+
+  bool get _needsRefresh {
+    const int fiveMinutes = 5;
+    final int difference =
+        DateTime.now().difference(weather.lastUpdated ?? DateTime(0)).inMinutes;
+    return difference > fiveMinutes;
   }
 }

@@ -165,7 +165,7 @@ class _WeatherPageState extends State<WeatherPage> {
 
   bool get _shouldUpdate {
     if (kIsWeb) return false;
-    bool needsRefresh = _needsRefresh;
+    final bool needsRefresh = _needsRefresh;
     if (needsRefresh) {
       _oldestTimestamp = DateTime.now().millisecondsSinceEpoch;
     }
@@ -173,7 +173,7 @@ class _WeatherPageState extends State<WeatherPage> {
   }
 
   bool get _needsRefresh {
-    bool needsRefresh = _oldestTimestamp <
+    final bool needsRefresh = _oldestTimestamp <
         DateTime.now().millisecondsSinceEpoch - _defaultWeatherRefreshDelay;
     return needsRefresh;
   }
