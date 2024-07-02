@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:home_widget/home_widget.dart';
+import 'package:intl/intl.dart';
 import 'package:weather_fit/entities/weather.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
 import 'package:weather_fit/res/theme/cubit/theme_cubit.dart';
@@ -140,7 +141,7 @@ class _WeatherPageState extends State<WeatherPage> {
 
       HomeWidget.saveWidgetData<String>(
         'text_last_updated',
-        '''Last Updated at ${TimeOfDay.fromDateTime(weather.lastUpdated ?? DateTime(0)).format(context)}''',
+        'Last Updated on ${_formatDateTime(weather.lastUpdated)}',
       );
 
       dynamic imagePath = await HomeWidget.renderFlutterWidget(
@@ -181,4 +182,14 @@ class _WeatherPageState extends State<WeatherPage> {
         Duration.zero,
         () => context.read<WeatherBloc>().add(const RefreshWeather()),
       );
+
+  /// Output: e.g., "Dec 12, Monday at 03:45 PM"
+  String _formatDateTime(DateTime? lastUpdated) {
+    if (lastUpdated != null) {
+      final DateFormat formatter = DateFormat('MMM dd, EEEE \'at\' hh:mm a');
+      return formatter.format(lastUpdated);
+    } else {
+      return 'Never updated';
+    }
+  }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
 import 'package:weather_fit/entities/weather.dart';
 import 'package:weather_fit/res/widgets/background.dart';
 import 'package:weather_fit/weather/ui/weather_icon.dart';
@@ -57,7 +58,7 @@ class WeatherPopulated extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    '''Last Updated at ${TimeOfDay.fromDateTime(weather.lastUpdated ?? DateTime(0)).format(context)}''',
+                    'Last Updated on ${_formatDateTime(weather.lastUpdated)}',
                   ),
                   const SizedBox(height: 24),
                   child,
@@ -68,5 +69,15 @@ class WeatherPopulated extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  /// Output: e.g., "Dec 12, Monday at 03:45 PM"
+  String _formatDateTime(DateTime? lastUpdated) {
+    if (lastUpdated != null) {
+      final DateFormat formatter = DateFormat('MMM dd, EEEE \'at\' hh:mm a');
+      return formatter.format(lastUpdated);
+    } else {
+      return 'Never updated';
+    }
   }
 }
