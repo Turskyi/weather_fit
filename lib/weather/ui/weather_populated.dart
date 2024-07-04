@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:intl/intl.dart';
 import 'package:weather_fit/entities/weather.dart';
 import 'package:weather_fit/res/widgets/background.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
@@ -36,7 +35,8 @@ class WeatherPopulated extends StatelessWidget {
               child: Column(
                 children: <Widget>[
                   const SizedBox(height: 48),
-                  WeatherIcon(condition: weather.condition),
+                  if (!weather.neverUpdated)
+                    WeatherIcon(condition: weather.condition),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
@@ -53,24 +53,34 @@ class WeatherPopulated extends StatelessWidget {
                       ),
                     ],
                   ),
-                  Text(
-                    weather.formattedTemperature,
-                    style: theme.textTheme.displaySmall?.copyWith(
-                      fontWeight: FontWeight.bold,
+                  if (!weather.neverUpdated)
+                    Text(
+                      weather.formattedTemperature,
+                      style: theme.textTheme.displaySmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  Text(
-                    'Last Updated on ${_formatDateTime(weather.lastUpdated)}',
-                  ),
+                  if (weather.neverUpdated)
+                    Text(weather.formattedLastUpdatedDateTime)
+                  else
+                    Text(
+                      'Last Updated on ${weather.formattedLastUpdatedDateTime}',
+                    ),
                   const SizedBox(height: 24),
-                  child,
+                  if (!weather.neverUpdated) child,
                   const SizedBox(height: 24),
                   BlocBuilder<WeatherBloc, WeatherState>(
                     builder: (_, WeatherState state) {
-                      if (state is! WeatherLoadingState && _needsRefresh) {
+                      if (state is! LoadingOutfitState &&
+                          state is! WeatherLoadingState &&
+                          weather.needsRefresh) {
                         return ElevatedButton(
                           onPressed: onRefresh,
-                          child: const Text('Refresh'),
+                          child: Text(
+                            state.outfitImageUrl.isEmpty
+                                ? 'Get Outfit Suggestion'
+                                : 'Refresh',
+                          ),
                         );
                       } else {
                         return const SizedBox();
@@ -84,22 +94,5 @@ class WeatherPopulated extends StatelessWidget {
         ),
       ],
     );
-  }
-
-  /// Output: e.g., "Dec 12, Monday at 03:45 PM"
-  String _formatDateTime(DateTime? lastUpdated) {
-    if (lastUpdated != null) {
-      final DateFormat formatter = DateFormat('MMM dd, EEEE \'at\' hh:mm a');
-      return formatter.format(lastUpdated);
-    } else {
-      return 'Never updated';
-    }
-  }
-
-  bool get _needsRefresh {
-    const int fiveMinutes = 5;
-    final int difference =
-        DateTime.now().difference(weather.lastUpdated ?? DateTime(0)).inMinutes;
-    return difference > fiveMinutes;
   }
 }

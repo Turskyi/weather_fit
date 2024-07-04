@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:home_widget/home_widget.dart';
-import 'package:intl/intl.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:weather_fit/entities/weather.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
 import 'package:weather_fit/res/theme/cubit/theme_cubit.dart';
@@ -11,23 +11,8 @@ import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 import 'package:weather_fit/weather/ui/outfit_widget.dart';
 import 'package:weather_fit/weather/ui/weather.dart';
 
-class WeatherPage extends StatefulWidget {
+class WeatherPage extends StatelessWidget {
   const WeatherPage({super.key});
-
-  @override
-  State<WeatherPage> createState() => _WeatherPageState();
-}
-
-class _WeatherPageState extends State<WeatherPage> {
-  int _oldestTimestamp = 0;
-  final int _tenSeconds = 10;
-  late int _defaultWeatherRefreshDelay;
-
-  @override
-  void initState() {
-    super.initState();
-    _defaultWeatherRefreshDelay = Duration(seconds: _tenSeconds).inMilliseconds;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +46,7 @@ class _WeatherPageState extends State<WeatherPage> {
                 } else {
                   return WeatherPopulated(
                     weather: state.weather,
-                    onRefresh: _refresh,
+                    onRefresh: () => _refresh(context),
                     child: const WeatherLoadingWidget(),
                   );
                 }
@@ -73,15 +58,26 @@ class _WeatherPageState extends State<WeatherPage> {
                 if (state.outfitImageUrl.isNotEmpty) {
                   outfitImageWidget = OutfitWidget(
                     imageUrl: state.outfitImageUrl,
-                    onLoaded: () => _updateWeatherOnHomeScreen(
+                    onLoaded: () => _updateWeatherOnPhoneScreen(
                       weather: state.weather,
                       outfitImageWidget: outfitImageWidget,
+                    ),
+                  );
+                } else if (state is LoadingOutfitState) {
+                  // Image is still loading
+                  outfitImageWidget = SizedBox(
+                    width: 400,
+                    height: 400,
+                    child: Shimmer.fromColors(
+                      baseColor: Colors.grey.shade300,
+                      highlightColor: Colors.grey.shade100,
+                      child: Container(color: Colors.white),
                     ),
                   );
                 }
                 return WeatherPopulated(
                   weather: state.weather,
-                  onRefresh: _refresh,
+                  onRefresh: () => _refresh(context),
                   child: DecoratedBox(
                     decoration: const BoxDecoration(
                       boxShadow: <BoxShadow>[
@@ -102,30 +98,30 @@ class _WeatherPageState extends State<WeatherPage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _handleCitySelectionAndFetchWeather,
+        onPressed: () => _handleCitySelectionAndFetchWeather(context),
         child: const Icon(Icons.search, semanticLabel: 'Search'),
       ),
     );
   }
 
-  Future<void> _handleCitySelectionAndFetchWeather() async {
+  Future<void> _handleCitySelectionAndFetchWeather(BuildContext context) async {
     final String? city = await Navigator.pushNamed<dynamic>(
       context,
       AppRoute.search.path,
     );
 
-    if (mounted && city is String) {
+    if (context.mounted && city is String) {
       context.read<WeatherBloc>().add(FetchWeather(city: city));
     } else {
       return;
     }
   }
 
-  Future<void> _updateWeatherOnHomeScreen({
+  Future<void> _updateWeatherOnPhoneScreen({
     required Weather weather,
     required Widget outfitImageWidget,
   }) async {
-    if (_shouldUpdate) {
+    if (weather.needsRefresh) {
       // Set the group ID.
       HomeWidget.setAppGroupId(constants.appGroupId);
 
@@ -141,10 +137,10 @@ class _WeatherPageState extends State<WeatherPage> {
 
       HomeWidget.saveWidgetData<String>(
         'text_last_updated',
-        'Last Updated on ${_formatDateTime(weather.lastUpdated)}',
+        'Last Updated on ${weather.formattedLastUpdatedDateTime}',
       );
 
-      dynamic imagePath = await HomeWidget.renderFlutterWidget(
+      final dynamic imagePath = await HomeWidget.renderFlutterWidget(
         outfitImageWidget,
         key: 'image_weather',
         logicalSize: const Size(400, 400),
@@ -163,33 +159,8 @@ class _WeatherPageState extends State<WeatherPage> {
     }
   }
 
-  bool get _shouldUpdate {
-    if (kIsWeb) return false;
-    final bool needsRefresh = _needsRefresh;
-    if (needsRefresh) {
-      _oldestTimestamp = DateTime.now().millisecondsSinceEpoch;
-    }
-    return needsRefresh;
-  }
-
-  bool get _needsRefresh {
-    final bool needsRefresh = _oldestTimestamp <
-        DateTime.now().millisecondsSinceEpoch - _defaultWeatherRefreshDelay;
-    return needsRefresh;
-  }
-
-  Future<void> _refresh() => Future<void>.delayed(
+  Future<void> _refresh(BuildContext context) => Future<void>.delayed(
         Duration.zero,
         () => context.read<WeatherBloc>().add(const RefreshWeather()),
       );
-
-  /// Output: e.g., "Dec 12, Monday at 03:45 PM"
-  String _formatDateTime(DateTime? lastUpdated) {
-    if (lastUpdated != null) {
-      final DateFormat formatter = DateFormat('MMM dd, EEEE \'at\' hh:mm a');
-      return formatter.format(lastUpdated);
-    } else {
-      return 'Never updated';
-    }
-  }
 }

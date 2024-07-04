@@ -141,7 +141,7 @@ void main() {
           weather: Weather(
             city: _weatherLocation,
             temperature: const Temperature(value: _weatherTemperature),
-            lastUpdated: DateTime(2020),
+            lastUpdatedDateTime: DateTime(2020),
             condition: _weatherCondition,
             temperatureUnits: TemperatureUnits.celsius,
             countryCode: _countryCode,
@@ -153,7 +153,7 @@ void main() {
             weather: Weather(
               city: _weatherLocation,
               temperature: const Temperature(value: _weatherTemperature),
-              lastUpdated: DateTime(2020),
+              lastUpdatedDateTime: DateTime(2020),
               condition: _weatherCondition,
               temperatureUnits: TemperatureUnits.celsius,
               countryCode: _countryCode,
@@ -171,7 +171,7 @@ void main() {
         seed: () => WeatherLoadingState(
           weather: Weather(
             condition: WeatherCondition.rainy,
-            lastUpdated: DateTime(2025),
+            lastUpdatedDateTime: DateTime(2025),
             city: _weatherLocation,
             temperature: const Temperature(value: _weatherTemperature),
             temperatureUnits: TemperatureUnits.celsius,
@@ -190,7 +190,7 @@ void main() {
           weather: Weather(
             city: _weatherLocation,
             temperature: const Temperature(value: _weatherTemperature),
-            lastUpdated: DateTime(2020),
+            lastUpdatedDateTime: DateTime(2020),
             condition: WeatherCondition.rainy,
             temperatureUnits: TemperatureUnits.fahrenheit,
             countryCode: _countryCode,
@@ -202,7 +202,7 @@ void main() {
             weather: Weather(
               city: _weatherLocation,
               temperature: Temperature(value: _weatherTemperature.toCelsius()),
-              lastUpdated: DateTime(2020),
+              lastUpdatedDateTime: DateTime(2020),
               condition: WeatherCondition.rainy,
               temperatureUnits: TemperatureUnits.celsius,
               countryCode: _countryCode,
@@ -219,7 +219,7 @@ void main() {
           weather: Weather(
             city: _weatherLocation,
             temperature: const Temperature(value: _weatherTemperature),
-            lastUpdated: DateTime(2020),
+            lastUpdatedDateTime: DateTime(2020),
             condition: WeatherCondition.rainy,
             temperatureUnits: TemperatureUnits.celsius,
             countryCode: _countryCode,
@@ -233,7 +233,7 @@ void main() {
               temperature: Temperature(
                 value: _weatherTemperature.toFahrenheit(),
               ),
-              lastUpdated: DateTime(2020),
+              lastUpdatedDateTime: DateTime(2020),
               condition: WeatherCondition.rainy,
               temperatureUnits: TemperatureUnits.fahrenheit,
               countryCode: _countryCode,

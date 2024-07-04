@@ -73,7 +73,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     Emitter<WeatherState> emit,
   ) async {
     if (state is! WeatherSuccess) {
-      emit(const WeatherInitial());
+      emit(WeatherInitial(weather: state.weather));
       return;
     }
 
@@ -100,7 +100,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           : weather.temperature.value;
 
       emit(
-        WeatherSuccess(
+        LoadingOutfitState(
           weather: weather.copyWith(
             temperature: Temperature(value: value),
             temperatureUnits: units,

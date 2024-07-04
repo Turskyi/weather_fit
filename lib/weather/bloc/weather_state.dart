@@ -18,15 +18,15 @@ sealed class WeatherState extends Equatable {
 
 @JsonSerializable()
 final class WeatherInitial extends WeatherState {
-  const WeatherInitial();
+  const WeatherInitial({super.weather});
 
   factory WeatherInitial.fromJson(Map<String, dynamic> json) =>
       _$WeatherInitialFromJson(json);
 
   Map<String, dynamic> toJson() => _$WeatherInitialToJson(this);
 
-  WeatherSuccess copyWith({Weather? weather}) =>
-      WeatherSuccess(weather: weather ?? this.weather);
+  WeatherInitial copyWith({Weather? weather}) =>
+      WeatherInitial(weather: weather ?? this.weather);
 }
 
 @JsonSerializable()
@@ -71,6 +71,14 @@ class WeatherSuccess extends WeatherState {
 
   @override
   List<Object> get props => <Object>[weather, outfitImageUrl];
+}
+
+@JsonSerializable()
+final class LoadingOutfitState extends WeatherSuccess {
+  const LoadingOutfitState({super.weather, super.outfitImageUrl = ''});
+
+  factory LoadingOutfitState.fromJson(Map<String, dynamic> json) =>
+      _$LoadingOutfitStateFromJson(json);
 }
 
 @JsonSerializable()

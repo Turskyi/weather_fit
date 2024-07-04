@@ -62,7 +62,7 @@ void main() {
     final Weather weather = Weather(
       temperature: const Temperature(value: 4.2),
       condition: WeatherCondition.cloudy,
-      lastUpdated: DateTime(2020),
+      lastUpdatedDateTime: DateTime(2020),
       city: _city,
       temperatureUnits: TemperatureUnits.celsius,
       countryCode: _countryCode,

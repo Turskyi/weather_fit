@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:weather_fit/entities/enums/temperature_units.dart';
 import 'package:weather_fit/entities/temperature.dart';
+import 'package:weather_fit/res/constants.dart' as constants;
 import 'package:weather_repository/weather_repository.dart';
 
 part 'weather.g.dart';
@@ -11,7 +12,7 @@ part 'weather.g.dart';
 class Weather extends Equatable {
   const Weather({
     required this.condition,
-    this.lastUpdated,
+    this.lastUpdatedDateTime,
     required this.city,
     required this.temperature,
     required this.temperatureUnits,
@@ -29,7 +30,7 @@ class Weather extends Equatable {
 
     return Weather(
       condition: weather.condition,
-      lastUpdated: parsedDateTime,
+      lastUpdatedDateTime: parsedDateTime,
       city: weather.location,
       temperature: Temperature(value: weather.temperature),
       temperatureUnits: TemperatureUnits.celsius,
@@ -38,7 +39,7 @@ class Weather extends Equatable {
   }
 
   final WeatherCondition condition;
-  final DateTime? lastUpdated;
+  final DateTime? lastUpdatedDateTime;
   final String city;
   final Temperature temperature;
   final TemperatureUnits temperatureUnits;
@@ -55,7 +56,7 @@ class Weather extends Equatable {
   @override
   List<Object?> get props => <Object?>[
         condition,
-        lastUpdated,
+        lastUpdatedDateTime,
         city,
         temperature,
         temperatureUnits,
@@ -64,7 +65,7 @@ class Weather extends Equatable {
 
   @override
   String toString() {
-    return 'Weather{condition: $condition, lastUpdated: $lastUpdated, '
+    return 'Weather{condition: $condition, lastUpdated: $lastUpdatedDateTime, '
         'city: $city, temperature: $temperature, '
         'temperatureUnits: $temperatureUnits}';
   }
@@ -73,7 +74,7 @@ class Weather extends Equatable {
 
   Weather copyWith({
     WeatherCondition? condition,
-    DateTime? lastUpdated,
+    DateTime? lastUpdatedDateTime,
     String? city,
     Temperature? temperature,
     TemperatureUnits? temperatureUnits,
@@ -81,7 +82,7 @@ class Weather extends Equatable {
   }) =>
       Weather(
         condition: condition ?? this.condition,
-        lastUpdated: lastUpdated ?? this.lastUpdated,
+        lastUpdatedDateTime: lastUpdatedDateTime ?? this.lastUpdatedDateTime,
         city: city ?? this.city,
         temperature: temperature ?? this.temperature,
         temperatureUnits: temperatureUnits ?? this.temperatureUnits,
@@ -94,4 +95,25 @@ class Weather extends Equatable {
   String get emoji => condition.toEmoji;
 
   bool get isUnknown => condition == WeatherCondition.unknown || city.isEmpty;
+
+  bool get needsRefresh {
+    final int difference = DateTime.now()
+        .difference(
+          lastUpdatedDateTime ?? DateTime(0),
+        )
+        .inMinutes;
+    return difference > constants.weatherRefreshDelayMinutes;
+  }
+
+  /// Output: e.g., "Dec 12, Monday at 03:45 PM"
+  String get formattedLastUpdatedDateTime {
+    if (lastUpdatedDateTime != null) {
+      final DateFormat formatter = DateFormat('MMM dd, EEEE \'at\' hh:mm a');
+      return formatter.format(lastUpdatedDateTime ?? DateTime(0));
+    } else {
+      return 'Never updated';
+    }
+  }
+
+  bool get neverUpdated => lastUpdatedDateTime == null;
 }

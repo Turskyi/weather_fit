@@ -2,3 +2,4 @@
 const String appGroupId = '<APP GROUP>';
 const String iOSWidgetName = 'WeatherWidgets';
 const String androidWidgetName = 'WeatherWidget';
+const int weatherRefreshDelayMinutes = 5;
