@@ -46,17 +46,21 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
       final Weather weather = Weather.fromRepository(
         await _weatherRepository.getWeather(event.city),
       );
+
       final TemperatureUnits units = state.weather.temperatureUnits;
+
       final double value = units.isFahrenheit
           ? weather.temperature.value.toFahrenheit()
           : weather.temperature.value;
+
       final Weather updatedWeather = weather.copyWith(
         temperature: Temperature(value: value),
         temperatureUnits: units,
       );
 
-      emit(WeatherSuccess(weather: updatedWeather));
-      String imageUrl = await _aiRepository.getImageUrlFromAiAsFuture(
+      emit(LoadingOutfitState(weather: updatedWeather));
+
+      final String imageUrl = await _aiRepository.getImageUrlFromAiAsFuture(
         state.weather,
       );
 

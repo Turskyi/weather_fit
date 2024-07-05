@@ -17,9 +17,13 @@ class WeatherError extends StatelessWidget {
           style: theme.textTheme.headlineMedium,
         ),
         const SizedBox(height: 20),
-        Text(
-          message,
-          style: theme.textTheme.headlineSmall,
+        Container(
+          alignment: Alignment.center,
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Text(
+            message,
+            style: theme.textTheme.headlineSmall,
+          ),
         ),
       ],
     );

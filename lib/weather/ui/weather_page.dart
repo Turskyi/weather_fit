@@ -57,6 +57,7 @@ class WeatherPage extends StatelessWidget {
                 Widget outfitImageWidget = const SizedBox();
                 if (state.outfitImageUrl.isNotEmpty) {
                   outfitImageWidget = OutfitWidget(
+                    needsRefresh: state.weather.needsRefresh,
                     imageUrl: state.outfitImageUrl,
                     onLoaded: () => _updateWeatherOnPhoneScreen(
                       weather: state.weather,

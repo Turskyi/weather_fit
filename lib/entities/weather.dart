@@ -65,9 +65,9 @@ class Weather extends Equatable {
 
   @override
   String toString() {
-    return 'Weather{condition: $condition, lastUpdated: $lastUpdatedDateTime, '
-        'city: $city, temperature: $temperature, '
-        'temperatureUnits: $temperatureUnits}';
+    return 'Weather{condition: $condition, city: $city, '
+        'temperature: $temperature, temperatureUnits: $temperatureUnits, '
+        'countryCode: $countryCode}';
   }
 
   Map<String, dynamic> toJson() => _$WeatherToJson(this);

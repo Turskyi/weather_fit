@@ -8,10 +8,12 @@ import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 class OutfitWidget extends StatelessWidget {
   const OutfitWidget({
     super.key,
+    required this.needsRefresh,
     required this.imageUrl,
     required this.onLoaded,
   });
 
+  final bool needsRefresh;
   final String imageUrl;
   final VoidCallback onLoaded;
 
@@ -55,21 +57,17 @@ class OutfitWidget extends StatelessWidget {
               );
             }
           },
-          errorBuilder: (BuildContext _, Object exception, StackTrace? ___) {
+          errorBuilder: (
+            BuildContext context,
+            Object exception,
+            StackTrace? ___,
+          ) {
             if (exception is NetworkImageLoadException &&
-                exception.statusCode == HttpStatus.forbidden) {
-              return Column(
-                children: <Widget>[
-                  ElevatedButton(
-                    onPressed: () =>
-                        context.read<WeatherBloc>().add(const RefreshWeather()),
-                    child: const Text('Get Outfit Suggestion'),
-                  ),
-                ],
-              );
-            } else {
-              return const SizedBox();
+                exception.statusCode == HttpStatus.forbidden &&
+                needsRefresh) {
+              context.read<WeatherBloc>().add(const RefreshWeather());
             }
+            return const SizedBox();
           },
         ),
       ),

@@ -76,11 +76,7 @@ class WeatherPopulated extends StatelessWidget {
                           weather.needsRefresh) {
                         return ElevatedButton(
                           onPressed: onRefresh,
-                          child: Text(
-                            state.outfitImageUrl.isEmpty
-                                ? 'Get Outfit Suggestion'
-                                : 'Refresh',
-                          ),
+                          child: const Text('Get New Outfit Suggestion'),
                         );
                       } else {
                         return const SizedBox();
