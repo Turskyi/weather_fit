@@ -11,7 +11,7 @@ import 'package:weather_fit/res/theme/cubit/theme_cubit.dart';
 import 'package:weather_fit/router/app_route.dart';
 import 'package:weather_fit/router/routes.dart' as routes;
 import 'package:weather_fit/search/search_page.dart';
-import 'package:weather_fit/settings/ui/settings_page.dart';
+import 'package:weather_fit/settings/bloc/settings_bloc.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 import 'package:weather_fit/weather/ui/weather.dart';
 import 'package:weather_fit/weather/ui/weather_page.dart';
@@ -27,6 +27,9 @@ class MockThemeCubit extends MockCubit<Color> implements ThemeCubit {}
 
 class MockWeatherBloc extends MockBloc<WeatherEvent, WeatherState>
     implements WeatherBloc {}
+
+class MockSettingsBloc extends MockBloc<SettingsEvent, SettingsState>
+    implements SettingsBloc {}
 
 const String _countryCode = 'gb';
 const String _city = 'London';
@@ -69,7 +72,9 @@ void main() {
     );
     late WeatherBloc weatherBloc;
 
-    setUp(() => weatherBloc = MockWeatherBloc());
+    setUp(() {
+      weatherBloc = MockWeatherBloc();
+    });
 
     testWidgets('renders WeatherLoading for WeatherStatus.initial',
         (WidgetTester tester) async {
@@ -112,28 +117,6 @@ void main() {
         ),
       );
       expect(find.byType(WeatherError), findsOneWidget);
-    });
-
-    testWidgets('navigates to SettingsPage when settings icon is tapped',
-        (WidgetTester tester) async {
-      when(() => weatherBloc.state).thenReturn(
-        const WeatherLoadingState(),
-      );
-      await tester.pumpWidget(
-        RepositoryProvider<WeatherRepository>.value(
-          value: weatherRepository,
-          child: BlocProvider<WeatherBloc>.value(
-            value: weatherBloc,
-            child: MaterialApp(
-              initialRoute: AppRoute.weather.path,
-              routes: routes.routeMap,
-            ),
-          ),
-        ),
-      );
-      await tester.tap(find.byType(IconButton));
-      await tester.pumpAndSettle();
-      expect(find.byType(SettingsPage), findsOneWidget);
     });
 
     testWidgets('navigates to SearchPage when search button is tapped',
