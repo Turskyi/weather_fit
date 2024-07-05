@@ -6,10 +6,9 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:meta/meta.dart';
 import 'package:weather_fit/data/repositories/ai_repository.dart';
 import 'package:weather_fit/entities/enums/temperature_units.dart';
-import 'package:weather_fit/entities/temperature.dart';
+import 'package:weather_fit/entities/models/temperature/temperature.dart';
+import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_repository/weather_repository.dart';
-
-import '../../entities/weather.dart';
 
 part 'weather_bloc.g.dart';
 part 'weather_event.dart';

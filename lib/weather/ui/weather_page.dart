@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:weather_fit/entities/weather.dart';
+import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
 import 'package:weather_fit/res/theme/cubit/theme_cubit.dart';
 import 'package:weather_fit/router/app_route.dart';

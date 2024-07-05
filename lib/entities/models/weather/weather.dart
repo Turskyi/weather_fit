@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:intl/intl.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:weather_fit/entities/enums/temperature_units.dart';
-import 'package:weather_fit/entities/temperature.dart';
+import 'package:weather_fit/entities/models/temperature/temperature.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
 import 'package:weather_repository/weather_repository.dart';
 

@@ -3,8 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:weather_fit/data/repositories/ai_repository.dart';
 import 'package:weather_fit/entities/enums/temperature_units.dart';
-import 'package:weather_fit/entities/temperature.dart';
-import 'package:weather_fit/entities/weather.dart';
+import 'package:weather_fit/entities/models/temperature/temperature.dart';
+import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 import 'package:weather_repository/weather_repository.dart';
 

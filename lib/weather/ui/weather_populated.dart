@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:weather_fit/entities/weather.dart';
+import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/res/widgets/background.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 import 'package:weather_fit/weather/ui/weather_icon.dart';

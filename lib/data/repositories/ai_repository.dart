@@ -1,5 +1,5 @@
 import 'package:weather_fit/data/data_sources/remote/remote_data_source.dart';
-import 'package:weather_fit/entities/weather.dart';
+import 'package:weather_fit/entities/models/weather/weather.dart';
 
 class AiRepository {
   const AiRepository(this._remoteDataSource);
