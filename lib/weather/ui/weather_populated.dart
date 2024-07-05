@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:weather_fit/entities/weather.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/res/widgets/background.dart';
+import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 import 'package:weather_fit/weather/ui/weather_icon.dart';
 
 class WeatherPopulated extends StatelessWidget {
@@ -12,12 +15,13 @@ class WeatherPopulated extends StatelessWidget {
   });
 
   final Weather weather;
-  final ValueGetter<Future<void>> onRefresh;
+  final RefreshCallback onRefresh;
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
+    final TextStyle? cityTextStyle = theme.textTheme.displayMedium;
     return Stack(
       children: <Widget>[
         const Background(),
@@ -31,24 +35,54 @@ class WeatherPopulated extends StatelessWidget {
               child: Column(
                 children: <Widget>[
                   const SizedBox(height: 48),
-                  WeatherIcon(condition: weather.condition),
-                  Text(
-                    weather.location,
-                    style: theme.textTheme.displayMedium?.copyWith(
-                      fontWeight: FontWeight.w200,
+                  if (!weather.neverUpdated)
+                    WeatherIcon(condition: weather.condition),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      SvgPicture.network(
+                        'https://open-meteo.com/images/country-flags/${weather.countryCode}.svg',
+                        height: cityTextStyle?.fontSize ?? 24,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        weather.city,
+                        style: cityTextStyle?.copyWith(
+                          fontWeight: FontWeight.w200,
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (!weather.neverUpdated)
+                    Text(
+                      weather.formattedTemperature,
+                      style: theme.textTheme.displaySmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  Text(
-                    weather.formattedTemperature,
-                    style: theme.textTheme.displaySmall?.copyWith(
-                      fontWeight: FontWeight.bold,
+                  if (weather.neverUpdated)
+                    Text(weather.formattedLastUpdatedDateTime)
+                  else
+                    Text(
+                      'Last Updated on ${weather.formattedLastUpdatedDateTime}',
                     ),
-                  ),
-                  Text(
-                    '''Last Updated at ${TimeOfDay.fromDateTime(weather.lastUpdated).format(context)}''',
-                  ),
                   const SizedBox(height: 24),
-                  child,
+                  if (!weather.neverUpdated) child,
+                  const SizedBox(height: 24),
+                  BlocBuilder<WeatherBloc, WeatherState>(
+                    builder: (_, WeatherState state) {
+                      if (state is! LoadingOutfitState &&
+                          state is! WeatherLoadingState &&
+                          weather.needsRefresh) {
+                        return ElevatedButton(
+                          onPressed: onRefresh,
+                          child: const Text('Get New Outfit Suggestion'),
+                        );
+                      } else {
+                        return const SizedBox();
+                      }
+                    },
+                  ),
                 ],
               ),
             ),

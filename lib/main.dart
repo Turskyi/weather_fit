@@ -1,7 +1,9 @@
+import 'package:feedback/feedback.dart';
 import 'package:flutter/material.dart';
 import 'package:weather_fit/data/data_sources/remote/remote_data_source.dart';
 import 'package:weather_fit/data/repositories/ai_repository.dart';
 import 'package:weather_fit/di/injector.dart';
+import 'package:weather_fit/feedback/feedback_form.dart';
 import 'package:weather_fit/weather_app.dart';
 import 'package:weather_repository/weather_repository.dart';
 
@@ -19,9 +21,21 @@ import 'package:weather_repository/weather_repository.dart';
 void main() async {
   await injectDependencies();
   runApp(
-    WeatherApp(
-      weatherRepository: WeatherRepository(),
-      aiRepository: const AiRepository(RemoteDataSource()),
+    BetterFeedback(
+      feedbackBuilder: (
+        BuildContext context,
+        OnSubmit onSubmit,
+        ScrollController? scrollController,
+      ) =>
+          FeedbackForm(
+        onSubmit: onSubmit,
+        scrollController: scrollController,
+      ),
+      theme: FeedbackThemeData(feedbackSheetColor: Colors.grey.shade50),
+      child: WeatherApp(
+        weatherRepository: WeatherRepository(),
+        aiRepository: const AiRepository(RemoteDataSource()),
+      ),
     ),
   );
 }

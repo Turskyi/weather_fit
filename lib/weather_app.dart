@@ -6,7 +6,8 @@ import 'package:weather_fit/data/repositories/ai_repository.dart';
 import 'package:weather_fit/res/theme/cubit/theme_cubit.dart';
 import 'package:weather_fit/router/app_route.dart';
 import 'package:weather_fit/router/routes.dart' as routes;
-import 'package:weather_fit/weather/cubit/weather_cubit.dart';
+import 'package:weather_fit/settings/bloc/settings_bloc.dart';
+import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 import 'package:weather_repository/weather_repository.dart';
 
 class WeatherApp extends StatelessWidget {
@@ -37,12 +38,11 @@ class WeatherApp extends StatelessWidget {
       // Provide the theme cubit.
       child: MultiBlocProvider(
         providers: <SingleChildWidget>[
-          BlocProvider<ThemeCubit>(
-            create: (_) => ThemeCubit(),
+          BlocProvider<ThemeCubit>(create: (_) => ThemeCubit()),
+          BlocProvider<WeatherBloc>(
+            create: (_) => WeatherBloc(_weatherRepository, _aiRepository),
           ),
-          BlocProvider<WeatherCubit>(
-            create: (_) => WeatherCubit(_weatherRepository, _aiRepository),
-          ),
+          BlocProvider<SettingsBloc>(create: (_) => SettingsBloc()),
         ],
         child: BlocBuilder<ThemeCubit, Color>(
           builder: (_, Color color) {

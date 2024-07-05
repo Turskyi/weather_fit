@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class WeatherLoading extends StatelessWidget {
-  const WeatherLoading({super.key});
+class WeatherLoadingWidget extends StatelessWidget {
+  const WeatherLoadingWidget({super.key});
 
   @override
   Widget build(BuildContext context) {

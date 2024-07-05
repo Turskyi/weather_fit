@@ -2,7 +2,7 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:weather_fit/entities/weather.dart';
+import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/res/theme/cubit/theme_cubit.dart';
 import 'package:weather_repository/weather_repository.dart' hide WeatherDomain;
 
