@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -26,7 +26,8 @@ jobs:
         env:
           ENV: ${{ secrets.ENV }}
 
-      - run: >-
+      - name: Install dependencies and Build web project
+        run: >-
           flutter pub get && dart run
           build_runner build --delete-conflicting-outputs && flutter build web
 
