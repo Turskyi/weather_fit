@@ -55,14 +55,17 @@ class WeatherPage extends StatelessWidget {
                   return const WeatherEmpty();
                 }
                 Widget outfitImageWidget = const SizedBox();
+
                 if (state.outfitImageUrl.isNotEmpty) {
                   outfitImageWidget = OutfitWidget(
                     needsRefresh: state.weather.needsRefresh,
                     imageUrl: state.outfitImageUrl,
-                    onLoaded: () => _updateWeatherOnPhoneScreen(
-                      weather: state.weather,
-                      outfitImageWidget: outfitImageWidget,
-                    ),
+                    onLoaded: kIsWeb
+                        ? null
+                        : () => _updateWeatherOnMobileHomeScreenWidget(
+                              weather: state.weather,
+                              outfitImageWidget: outfitImageWidget,
+                            ),
                   );
                 } else if (state is LoadingOutfitState) {
                   // Image is still loading
@@ -76,6 +79,7 @@ class WeatherPage extends StatelessWidget {
                     ),
                   );
                 }
+
                 return WeatherPopulated(
                   weather: state.weather,
                   onRefresh: () => _refresh(context),
@@ -118,15 +122,15 @@ class WeatherPage extends StatelessWidget {
     }
   }
 
-  Future<void> _updateWeatherOnPhoneScreen({
+  Future<void> _updateWeatherOnMobileHomeScreenWidget({
     required Weather weather,
     required Widget outfitImageWidget,
   }) async {
-    if (weather.needsRefresh) {
+    if (!kIsWeb && weather.needsRefresh) {
       // Set the group ID.
       HomeWidget.setAppGroupId(constants.appGroupId);
 
-      // Save the weather widget data to the widget
+      // Save the weather widget data to the widget.
       HomeWidget.saveWidgetData<String>('text_emoji', weather.emoji);
 
       HomeWidget.saveWidgetData<String>('text_location', weather.city);
@@ -147,12 +151,12 @@ class WeatherPage extends StatelessWidget {
         logicalSize: const Size(400, 400),
       );
 
-      // Save the image path if it exists
+      // Save the image path if it exists.
       if (imagePath is String && imagePath.isNotEmpty) {
         HomeWidget.saveWidgetData<String>('image_weather', imagePath);
       }
 
-      // Update the widget
+      // Update the widget.
       HomeWidget.updateWidget(
         iOSName: constants.iOSWidgetName,
         androidName: constants.androidWidgetName,
@@ -162,6 +166,10 @@ class WeatherPage extends StatelessWidget {
 
   Future<void> _refresh(BuildContext context) => Future<void>.delayed(
         Duration.zero,
-        () => context.read<WeatherBloc>().add(const RefreshWeather()),
+        () {
+          if (context.mounted) {
+            context.read<WeatherBloc>().add(const RefreshWeather());
+          }
+        },
       );
 }

@@ -15,7 +15,7 @@ Future<void> injectDependencies() async {
   Bloc.observer = const WeatherBlocObserver();
   HydratedBloc.storage = await HydratedStorage.build(
     storageDirectory: kIsWeb
-        ? HydratedStorage.webStorageDirectory
-        : await getTemporaryDirectory(),
+        ? HydratedStorageDirectory.web
+        : HydratedStorageDirectory((await getTemporaryDirectory()).path),
   );
 }

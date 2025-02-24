@@ -2,6 +2,8 @@ import 'package:feedback/feedback.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:weather_fit/res/constants.dart' as constants;
+import 'package:weather_fit/res/extensions/color_extensions.dart';
 import 'package:weather_fit/res/widgets/background.dart';
 import 'package:weather_fit/router/app_route.dart';
 import 'package:weather_fit/settings/bloc/settings_bloc.dart';
@@ -137,8 +139,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ? const GooglePlayBadge(
                 url:
                     'https://play.google.com/store/apps/details?id=com.turskyi.weather_fit',
-                assetPath:
-                    'https://play.google.com/intl/en_gb/badges/static/images/badges/en_badge_web_generic.png',
+                assetPath: '${constants.imagePath}play_store_badge.png',
               )
             : null,
       ),

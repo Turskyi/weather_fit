@@ -62,3 +62,16 @@ android/app/property(org.gradle.api.file.Directory, fixed(class org.gradle.api.i
 /.firebase/
 .firebase
 .firebase/hosting.YnVpbGQvd2Vi.cache
+/web/build/
+/android/app/.cxx/
+/ios/app_store_connect.json
+/ios/fastlane/screenshots
+/android/google-play-store.json
+/android/fastlane/metadata/android/en-US/images/
+/android/fastlane/metadata/android/fr-FR/images/
+ios/Runner/GoogleService-Info.plist
+/ios/Runner/GoogleService-Info.plist
+coverage
+coverage/lcov.info
+/coverage/
+/ios/Podfile.lock

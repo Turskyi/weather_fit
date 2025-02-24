@@ -1,4 +1,16 @@
 {
+  "editor.formatOnSave": true,
+  "prettier.singleQuote": true,
+  "editor.wordWrap": "wordWrapColumn",
+  "editor.wordWrapColumn": 80,
+  "prettier.printWidth": 80,
+  "editor.rulers": [
+    80
+  ],
+  "prettier.trailingComma": "all",
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
   "spellright.language": [
     "en"
   ],
@@ -8,7 +20,9 @@
     "plaintext",
     "jsonc",
     "Log",
-    "dart"
+    "dart",
+    "typescriptreact",
+    "typescript"
   ],
   "spellright.parserByClass": {
     "Log": {
