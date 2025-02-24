@@ -75,3 +75,7 @@ coverage
 coverage/lcov.info
 /coverage/
 /ios/Podfile.lock
+/android/app/.cxx/Debug/
+/android/app/.cxx/Debug/k3b33222/
+/android/app/.cxx/Debug/k3b33222/arm64-v8a/
+android/app/.cxx

@@ -20,3 +20,7 @@ key.properties
 
 # Files with environment variables.
 /key.properties
+/app/.cxx/
+/app/.cxx/Debug/
+/app/.cxx/Debug/k3b33222/
+/app/.cxx/Debug/k3b33222/arm64-v8a/
