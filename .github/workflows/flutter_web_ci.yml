@@ -1,4 +1,5 @@
 name: Deploy web build.
+
 on: [ push ]
 
 jobs:
@@ -64,22 +65,34 @@ jobs:
         with:
           name: web-build
           path: build/web
+
   deploy_web:
     name: Deploy Web to Firebase Hosting
     needs: build_web
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repo
-        uses: actions/checkout@master
-      - name: Download Artifact
-        uses: actions/download-artifact@master
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
         with:
-          name: web-build
-          path: web-build
+          flutter-version: '3.29.0'
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build web project
+        run: flutter build web
+
       - name: Deploy to Firebase
-        uses: w9jds/firebase-action@master
+        uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           args: deploy --public web-build
+
         env:
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-          PROJECT_ID: weather-fit-ai
+          channelId: 'live'
+          projectId: weather-fit-ai
+          FIREBASE_CLI_PREVIEWS: hostingchannels
