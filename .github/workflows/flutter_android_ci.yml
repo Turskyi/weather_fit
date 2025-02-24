@@ -2,8 +2,7 @@ name: Upload Android build to App Tester.
 
 on:
   workflow_run:
-    workflows:
-      - Code Quality and Tests
+    workflows: [ "Code Quality and Tests" ]
     types:
       - completed
 
