@@ -17,3 +17,10 @@ key.properties
 /app/property(org.gradle.api.file.Directory, fixed(class org.gradle.api.internal.file.DefaultFilePropertyFactory$FixedDirectory, /
 *.apk
 *.so
+
+# Files with environment variables.
+/key.properties
+/app/.cxx/
+/app/.cxx/Debug/
+/app/.cxx/Debug/k3b33222/
+/app/.cxx/Debug/k3b33222/arm64-v8a/

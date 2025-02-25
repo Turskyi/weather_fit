@@ -3,27 +3,6 @@ plugins {
     id "com.android.application"
     id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
-    id 'com.google.gms.google-services'
-    id 'com.google.firebase.crashlytics'
-}
-
-def localProperties = new Properties()
-def localPropertiesFile = rootProject.file('local.properties')
-if (localPropertiesFile.exists()) {
-    localPropertiesFile.withReader('UTF-8') { reader ->
-        //noinspection GroovyAssignabilityCheck
-        localProperties.load(reader)
-    }
-}
-
-def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
-if (flutterVersionCode == null) {
-    flutterVersionCode = '1'
-}
-
-def flutterVersionName = localProperties.getProperty('flutter.versionName')
-if (flutterVersionName == null) {
-    flutterVersionName = '1.0.0'
 }
 
 def keyProperties = new Properties()
@@ -34,47 +13,50 @@ if (keyPropertiesFile.exists()) {
     }
 }
 
-def SIGNING_KEY_DEBUG_PATH = keyProperties.getProperty('SIGNING_KEY_DEBUG_PATH')
-def SIGNING_KEY_DEBUG_PASSWORD = keyProperties.getProperty('SIGNING_KEY_DEBUG_PASSWORD')
-def SIGNING_KEY_DEBUG_KEY = keyProperties.getProperty('SIGNING_KEY_DEBUG_KEY')
-def SIGNING_KEY_DEBUG_KEY_PASSWORD = keyProperties.getProperty('SIGNING_KEY_DEBUG_KEY_PASSWORD')
-def SIGNING_KEY_RELEASE_PATH = keyProperties.getProperty('SIGNING_KEY_RELEASE_PATH')
-def SIGNING_KEY_RELEASE_PASSWORD = keyProperties.getProperty('SIGNING_KEY_RELEASE_PASSWORD')
-def SIGNING_KEY_RELEASE_KEY = keyProperties.getProperty('SIGNING_KEY_RELEASE_KEY')
-def SIGNING_KEY_RELEASE_KEY_PASSWORD = keyProperties.getProperty('SIGNING_KEY_RELEASE_KEY_PASSWORD')
+// Debug environment variables.
+def signingKeyDebugPath = keyProperties.getProperty('SIGNING_KEY_DEBUG_PATH') ?: rootProject.SIGNING_KEY_DEBUG_PATH
+def signingKeyDebugPassword = keyProperties.getProperty('SIGNING_KEY_DEBUG_PASSWORD') ?: rootProject.SIGNING_KEY_DEBUG_PASSWORD
+def signingKeyDebugKey = keyProperties.getProperty('SIGNING_KEY_DEBUG_KEY') ?: rootProject.SIGNING_KEY_DEBUG_KEY
+def signingKeyDebugKeyPassword = keyProperties.getProperty('SIGNING_KEY_DEBUG_KEY_PASSWORD') ?: rootProject.SIGNING_KEY_DEBUG_KEY_PASSWORD
+
+// Release environment variables.
+def signingKeyReleasePath = keyProperties.getProperty('SIGNING_KEY_RELEASE_PATH') ?: rootProject.SIGNING_KEY_RELEASE_PATH
+def signingKeyReleasePassword = keyProperties.getProperty('SIGNING_KEY_RELEASE_PASSWORD') ?: rootProject.SIGNING_KEY_RELEASE_PASSWORD
+def signingKeyReleaseKey = keyProperties.getProperty('SIGNING_KEY_RELEASE_KEY') ?: rootProject.SIGNING_KEY_RELEASE_KEY
+def signingKeyReleaseKeyPassword = keyProperties.getProperty('SIGNING_KEY_RELEASE_KEY_PASSWORD') ?: rootProject.SIGNING_KEY_RELEASE_KEY_PASSWORD
 
 android {
-    namespace rootProject.application_id
-    compileSdk flutter.compileSdkVersion
+    namespace = rootProject.application_id
+    compileSdk = flutter.compileSdkVersion
     //TODO: replace with "ndkVersion flutter.ndkVersion" when the error "One or more plugins require a higher Android NDK version." is gone.
-    ndkVersion "25.1.8937393"
+    ndkVersion = "27.0.12077973"
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
 
     kotlinOptions {
         jvmTarget = '1.8'
     }
 
-    sourceSets {
-        main.java.srcDirs += 'src/main/kotlin'
-    }
-
     defaultConfig {
-        applicationId rootProject.application_id
+        applicationId = rootProject.application_id
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        //TODO: replace with "minSdkVersion flutter.minSdkVersion" when the error "uses-sdk:minSdkVersion 19 cannot be smaller than version 21 declared in library [androidx.glance:glance:1.0.0] " is gone.
-        minSdkVersion 21
-        targetSdkVersion flutter.targetSdkVersion
-        versionCode flutterVersionCode.toInteger()
-        versionName flutterVersionName
+        minSdk = flutter.minSdkVersion
+        targetSdk = flutter.targetSdkVersion
+        versionCode = flutter.versionCode
+        versionName = flutter.versionName
+
+        ndk {
+            abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86_64'
+        }
     }
+
     signingConfigs {
         production {
-            // FCI_BUILD_ID is exported by Codemagic
+            // FCI_BUILD_ID is exported by Codemagic.
             //noinspection GroovyAssignabilityCheck
             if (System.getenv()["FCI_BUILD_ID"] != null) {
                 //noinspection GroovyAssignabilityCheck
@@ -86,14 +68,15 @@ android {
                 //noinspection GroovyAssignabilityCheck
                 keyPassword System.getenv()["CM_KEY_PASSWORD"]
             } else {
-                storeFile file(SIGNING_KEY_RELEASE_PATH)
-                storePassword SIGNING_KEY_RELEASE_PASSWORD
-                keyAlias SIGNING_KEY_RELEASE_KEY
-                keyPassword SIGNING_KEY_RELEASE_KEY_PASSWORD
+                storeFile file(signingKeyReleasePath)
+                storePassword signingKeyReleasePassword
+                keyAlias signingKeyReleaseKey
+                keyPassword signingKeyReleaseKeyPassword
             }
         }
+
         dev {
-            // FCI_BUILD_ID is exported by Codemagic
+            // FCI_BUILD_ID is exported by Codemagic.
             //noinspection GroovyAssignabilityCheck
             if (System.getenv()["FCI_BUILD_ID"] != null) {
                 //noinspection GroovyAssignabilityCheck
@@ -105,34 +88,32 @@ android {
                 //noinspection GroovyAssignabilityCheck
                 keyPassword System.getenv()["CM_KEY_PASSWORD"]
             } else {
-                storeFile file(SIGNING_KEY_DEBUG_PATH)
-                storePassword SIGNING_KEY_DEBUG_PASSWORD
-                keyAlias SIGNING_KEY_DEBUG_KEY
-                keyPassword SIGNING_KEY_DEBUG_KEY_PASSWORD
+                storeFile file(signingKeyDebugPath)
+                storePassword signingKeyDebugPassword
+                keyAlias signingKeyDebugKey
+                keyPassword signingKeyDebugKeyPassword
             }
         }
     }
+
     buildTypes {
         release {
+            // Enabling minification to obfuscate code, shrink APK size, and
+            // optimize performance.
+            // This helps protect the code from reverse engineering and
+            // improves the app's efficiency.
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),
                     'proguard-rules.pro'
-            signingConfig signingConfigs.production
+            signingConfig = signingConfigs.production
         }
         debug {
-            signingConfig signingConfigs.dev
+            signingConfig = signingConfigs.dev
         }
     }
-    buildFeatures {
-        viewBinding true
-        buildConfig = true
-    }
+
 }
 
 flutter {
-    source '../..'
-}
-
-dependencies {
-    implementation 'com.google.firebase:firebase-crashlytics:18.6.4'
+    source = "../.."
 }

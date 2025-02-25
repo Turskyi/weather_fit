@@ -23,7 +23,7 @@ class GooglePlayBadge extends StatelessWidget {
           );
         }
       },
-      child: Image.network(assetPath, width: 240, height: 100),
+      child: Image.asset(assetPath, width: 240, height: 100),
     );
   }
 }

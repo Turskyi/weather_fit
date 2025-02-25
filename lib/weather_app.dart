@@ -57,6 +57,10 @@ class WeatherApp extends StatelessWidget {
                 ),
                 colorScheme: ColorScheme.fromSeed(seedColor: color),
                 textTheme: GoogleFonts.rajdhaniTextTheme(),
+                // This font is probably not needed, I added it to avoid a
+                // "Could not find a set of Noto fonts to display all missing
+                // characters" error, but it still did not help.
+                fontFamily: 'NotoSans',
               ),
             );
           },

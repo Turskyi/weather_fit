@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:weather_fit/res/extensions/color_extensions.dart';
 
 class Background extends StatelessWidget {
   const Background({super.key});
@@ -22,22 +23,6 @@ class Background extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-extension BackgroundColorExtension on Color {
-  Color brighten([int percent = 10]) {
-    assert(
-      1 <= percent && percent <= 100,
-      'percentage must be between 1 and 100',
-    );
-    final double p = percent / 100;
-    return Color.fromARGB(
-      alpha,
-      red + ((255 - red) * p).round(),
-      green + ((255 - green) * p).round(),
-      blue + ((255 - blue) * p).round(),
     );
   }
 }

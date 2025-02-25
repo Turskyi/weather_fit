@@ -22,6 +22,7 @@ class WeatherPopulated extends StatelessWidget {
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final TextStyle? cityTextStyle = theme.textTheme.displayMedium;
+
     return Stack(
       children: <Widget>[
         const Background(),
@@ -41,7 +42,8 @@ class WeatherPopulated extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       SvgPicture.network(
-                        'https://open-meteo.com/images/country-flags/${weather.countryCode}.svg',
+                        'https://open-meteo.com/images/country-flags/'
+                        '${weather.countryCode.toLowerCase()}.svg',
                         height: cityTextStyle?.fontSize ?? 24,
                       ),
                       const SizedBox(width: 8),

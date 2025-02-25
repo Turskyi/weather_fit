@@ -1,4 +1,4 @@
-library open_meteo_api;
+library;
 
 export 'src/models/models.dart';
 export 'src/open_meteo_api_client.dart';
