@@ -8,6 +8,7 @@ class PrivacyPolicyAndroidPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final int age = 6;
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -27,7 +28,7 @@ class PrivacyPolicyAndroidPage extends StatelessWidget {
             const SizedBox(height: 10),
             Text(
               'Last updated: ${_formatDate(
-                DateTime(2024, DateTime.march, 21),
+                DateTime(2025, DateTime.february, 26),
               )}',
               style: const TextStyle(fontSize: 16),
             ),
@@ -53,6 +54,57 @@ class PrivacyPolicyAndroidPage extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             const Text(
+              'Third-Party Services',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              'WeatherFit uses third-party services that may collect '
+              'information used to identify you. These services include '
+              'Firebase Crashlytics and Google Analytics. The data collected '
+              'by these services is used to improve app stability and user '
+              'experience. You can find more information about their privacy '
+              'practices at their respective websites.',
+              style: TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'Consent',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              'By using our services, you consent to the collection and use of '
+              'your information as described in this privacy policy.',
+              style: TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'Security Measures',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              'We take reasonable measures to protect your information from '
+              'unauthorized access, disclosure, or modification.',
+              style: TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'Children\'s Privacy',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'Our services are not directed towards children under the age of '
+              '$age. We do not knowingly collect personal information from '
+              'children under $age. If we become aware that a child under '
+              '$age has provided us with personal information, we will take '
+              'steps to delete such information.',
+              style: TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 20),
+            const Text(
               'Crashlytics',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
@@ -62,6 +114,20 @@ class PrivacyPolicyAndroidPage extends StatelessWidget {
               'collect crash reports anonymously to help us improve app '
               'stability and fix bugs. The data collected by Crashlytics does '
               'not include any personal information.',
+              style: TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'AI-Generated Content',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              'WeatherFit uses artificial intelligence (AI) to generate images '
+              'with suitable outfits for the weather. If you encounter any '
+              'issues or have concerns regarding the AI-generated content, you '
+              'can report the problem through the "Feedback" section in the '
+              'settings page.',
               style: TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 20),
