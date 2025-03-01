@@ -472,3 +472,10 @@ more expression and flexibility.
 This project is based on the
 [Flutter Weather Tutorial](https://bloclibrary.dev/tutorials/flutter-weather/)
 by [the Bloc Community](https://github.com/felangel/bloc/graphs/contributors).
+
+Additionally, this project also references the tutorial
+[Flutter Home Screen Widgets](https://codelabs.developers.google.com/flutter-home-screen-widgets)
+by the
+[Flutter Community](https://github.com/flutter/codelabs/graphs/contributors),
+available on
+[GitHub](https://github.com/flutter/codelabs/tree/main/homescreen_codelab/step_06).

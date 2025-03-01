@@ -1,10 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:home_widget/home_widget.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:weather_fit/entities/models/weather/weather.dart';
-import 'package:weather_fit/res/constants.dart' as constants;
 import 'package:weather_fit/res/theme/cubit/theme_cubit.dart';
 import 'package:weather_fit/router/app_route.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
@@ -60,12 +57,7 @@ class WeatherPage extends StatelessWidget {
                   outfitImageWidget = OutfitWidget(
                     needsRefresh: state.weather.needsRefresh,
                     imageUrl: state.outfitImageUrl,
-                    onLoaded: kIsWeb
-                        ? null
-                        : () => _updateWeatherOnMobileHomeScreenWidget(
-                              weather: state.weather,
-                              outfitImageWidget: outfitImageWidget,
-                            ),
+                    imagePath: state.outfitImagePath,
                   );
                 } else if (state is LoadingOutfitState) {
                   // Image is still loading
@@ -110,7 +102,8 @@ class WeatherPage extends StatelessWidget {
   }
 
   Future<void> _handleCitySelectionAndFetchWeather(BuildContext context) async {
-    final String? city = await Navigator.pushNamed<dynamic>(
+    // We cannot set generic String here, because will be an error.
+    final Object? city = await Navigator.pushNamed<Object>(
       context,
       AppRoute.search.path,
     );
@@ -119,48 +112,6 @@ class WeatherPage extends StatelessWidget {
       context.read<WeatherBloc>().add(FetchWeather(city: city));
     } else {
       return;
-    }
-  }
-
-  Future<void> _updateWeatherOnMobileHomeScreenWidget({
-    required Weather weather,
-    required Widget outfitImageWidget,
-  }) async {
-    if (!kIsWeb && weather.needsRefresh) {
-      // Set the group ID.
-      HomeWidget.setAppGroupId(constants.appGroupId);
-
-      // Save the weather widget data to the widget.
-      HomeWidget.saveWidgetData<String>('text_emoji', weather.emoji);
-
-      HomeWidget.saveWidgetData<String>('text_location', weather.city);
-
-      HomeWidget.saveWidgetData<String>(
-        'text_temperature',
-        weather.formattedTemperature,
-      );
-
-      HomeWidget.saveWidgetData<String>(
-        'text_last_updated',
-        'Last Updated on ${weather.formattedLastUpdatedDateTime}',
-      );
-
-      final dynamic imagePath = await HomeWidget.renderFlutterWidget(
-        outfitImageWidget,
-        key: 'image_weather',
-        logicalSize: const Size(400, 400),
-      );
-
-      // Save the image path if it exists.
-      if (imagePath is String && imagePath.isNotEmpty) {
-        HomeWidget.saveWidgetData<String>('image_weather', imagePath);
-      }
-
-      // Update the widget.
-      HomeWidget.updateWidget(
-        iOSName: constants.iOSWidgetName,
-        androidName: constants.androidWidgetName,
-      );
     }
   }
 

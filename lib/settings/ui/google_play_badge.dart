@@ -3,9 +3,9 @@ import 'package:url_launcher/url_launcher.dart';
 
 class GooglePlayBadge extends StatelessWidget {
   const GooglePlayBadge({
-    super.key,
     required this.url,
     required this.assetPath,
+    super.key,
   });
 
   final String url;

@@ -15,12 +15,12 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
+    final TextTheme textTheme = Theme.of(context).textTheme;
     return Semantics(
-      label: 'City search page',
+      label: 'City or country search page',
       child: Scaffold(
         extendBodyBehindAppBar: true,
-        appBar: AppBar(title: const Text('City Search')),
+        appBar: AppBar(title: const Text('City or country search')),
         body: Stack(
           children: <Widget>[
             const Background(),
@@ -33,18 +33,19 @@ class _SearchPageState extends State<SearchPage> {
                   const Text('🏙️', style: TextStyle(fontSize: 64)),
                   Text(
                     'Let\'s explore the weather! ',
-                    style: theme.textTheme.headlineMedium,
+                    style: textTheme.headlineMedium,
                   ),
                   Text(
-                    'Type the city name and tap "Submit" to see the weather.',
-                    style: theme.textTheme.titleSmall,
+                    'Type the city or country name and tap "Submit"\nto see the'
+                    ' weather.',
+                    style: textTheme.titleSmall,
                   ),
                   const SizedBox(height: 16.0),
                   TextField(
                     controller: _textController,
                     decoration: InputDecoration(
-                      labelText: 'City',
-                      hintText: 'Enter city name',
+                      labelText: 'City or country',
+                      hintText: 'Enter city or country name',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8.0),
                       ),

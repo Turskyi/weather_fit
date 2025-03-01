@@ -1,13 +1,18 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
+import 'package:home_widget/home_widget.dart';
+import 'package:http/http.dart' as http;
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:meta/meta.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:weather_fit/data/repositories/ai_repository.dart';
 import 'package:weather_fit/entities/enums/temperature_units.dart';
 import 'package:weather_fit/entities/models/temperature/temperature.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
+import 'package:weather_fit/res/constants.dart' as constants;
 import 'package:weather_repository/weather_repository.dart';
 
 part 'weather_bloc.g.dart';
@@ -20,6 +25,9 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     on<FetchWeather>(_onFetchWeather);
     on<RefreshWeather>(_onRefreshWeather);
     on<ToggleUnits>(_onToggleUnits);
+    on<UpdateWeatherOnMobileHomeScreenEvent>(
+      _onUpdateWeatherOnMobileHomeScreen,
+    );
   }
 
   final WeatherRepository _weatherRepository;
@@ -36,38 +44,70 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     FetchWeather event,
     Emitter<WeatherState> emit,
   ) async {
-    if (event.city.isEmpty) {
+    final String eventLocation = event.city;
+    if (eventLocation.isEmpty) {
       emit(const WeatherInitial());
       return;
     }
-    emit(const WeatherLoadingState());
-    try {
-      final Weather weather = Weather.fromRepository(
-        await _weatherRepository.getWeather(event.city),
+
+    if (state is WeatherSuccess &&
+        eventLocation == state.location &&
+        !state.needsRefresh) {
+      final String message = 'Same location.\n'
+          'Wait ${state.remainingMinutes} minutes '
+          'to get updated weather and outfit.';
+
+      emit(
+        (state as WeatherSuccess).copyWith(snackbarMessage: message),
       );
+    } else {
+      emit(const WeatherLoadingState());
+      try {
+        final String location = event.city;
 
-      final TemperatureUnits units = state.weather.temperatureUnits;
+        final WeatherDomain domainWeather = await _weatherRepository.getWeather(
+          location,
+        );
 
-      final double value = units.isFahrenheit
-          ? weather.temperature.value.toFahrenheit()
-          : weather.temperature.value;
+        final Weather weather = Weather.fromRepository(domainWeather);
 
-      final Weather updatedWeather = weather.copyWith(
-        temperature: Temperature(value: value),
-        temperatureUnits: units,
-      );
+        final TemperatureUnits units = state.weather.temperatureUnits;
 
-      emit(LoadingOutfitState(weather: updatedWeather));
+        final double value = units.isFahrenheit
+            ? weather.temperature.value.toFahrenheit()
+            : weather.temperature.value;
 
-      final String imageUrl = await _aiRepository.getImageUrlFromAiAsFuture(
-        state.weather,
-      );
+        final Weather updatedWeather = weather.copyWith(
+          temperature: Temperature(value: value),
+          temperatureUnits: units,
+        );
 
-      if (state is WeatherSuccess) {
-        emit((state as WeatherSuccess).copyWith(outfitImageUrl: imageUrl));
+        emit(LoadingOutfitState(weather: updatedWeather));
+
+        final String imageUrl = await _aiRepository.getImageUrlFromAiAsFuture(
+          state.weather,
+        );
+
+        if (state is WeatherSuccess) {
+          if (kIsWeb) {
+            emit(
+              (state as WeatherSuccess).copyWith(outfitImageUrl: imageUrl),
+            );
+          } else {
+            final String filePath = await _downloadAndSaveImage(imageUrl);
+
+            emit(
+              (state as WeatherSuccess).copyWith(
+                outfitImageUrl: imageUrl,
+                outfitImagePath: filePath,
+              ),
+            );
+            add(const UpdateWeatherOnMobileHomeScreenEvent());
+          }
+        }
+      } on Exception catch (e) {
+        emit(WeatherFailure(message: '$e'));
       }
-    } on Exception catch (e) {
-      emit(WeatherFailure(message: '$e'));
     }
   }
 
@@ -111,12 +151,26 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
         ),
       );
 
-      String imageUrl = await _aiRepository.getImageUrlFromAiAsFuture(
+      final String imageUrl = await _aiRepository.getImageUrlFromAiAsFuture(
         state.weather,
       );
 
       if (state is WeatherSuccess) {
-        emit((state as WeatherSuccess).copyWith(outfitImageUrl: imageUrl));
+        if (kIsWeb) {
+          emit(
+            (state as WeatherSuccess).copyWith(outfitImageUrl: imageUrl),
+          );
+        } else {
+          final String filePath = await _downloadAndSaveImage(imageUrl);
+          emit(
+            (state as WeatherSuccess).copyWith(
+              outfitImageUrl: imageUrl,
+              outfitImagePath: filePath,
+            ),
+          );
+
+          add(const UpdateWeatherOnMobileHomeScreenEvent());
+        }
       }
     } on Exception catch (e) {
       emit(WeatherFailure(message: '$e'));
@@ -151,6 +205,73 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           ),
         ),
       );
+    }
+  }
+
+  Future<String> _downloadAndSaveImage(String imageUrl) async {
+    final http.Response response = await http.get(Uri.parse(imageUrl));
+
+    if (response.statusCode == HttpStatus.ok) {
+      final Directory directory = await getApplicationDocumentsDirectory();
+      final String filePath = '${directory.path}/outfit_image.png';
+
+      final File file = File(filePath);
+      await file.writeAsBytes(response.bodyBytes);
+      return filePath;
+    } else {
+      throw Exception('Failed to download image');
+    }
+  }
+
+  FutureOr<void> _onUpdateWeatherOnMobileHomeScreen(
+    UpdateWeatherOnMobileHomeScreenEvent event,
+    Emitter<WeatherState> emit,
+  ) async {
+    if (kIsWeb) return;
+
+    try {
+      // Set the group ID.
+      HomeWidget.setAppGroupId(constants.appGroupId);
+
+      // Save weather data to the widget.
+      HomeWidget.saveWidgetData<String>('text_emoji', state.weather.emoji);
+      HomeWidget.saveWidgetData<String>('text_location', state.weather.city);
+      HomeWidget.saveWidgetData<String>(
+        'text_temperature',
+        state.weather.formattedTemperature,
+      );
+      HomeWidget.saveWidgetData<String>(
+        'text_last_updated',
+        'Last Updated on ${state.weather.formattedLastUpdatedDateTime}',
+      );
+
+      String imagePath = state.outfitImagePath;
+
+      if (imagePath.isEmpty) {
+        if (state.outfitImageUrl.isNotEmpty) {
+          imagePath = await _downloadAndSaveImage(state.outfitImageUrl);
+        } else if (state.weather.isNotEmpty) {
+          final String imageUrl = await _aiRepository.getImageUrlFromAiAsFuture(
+            state.weather,
+          );
+          imagePath = await _downloadAndSaveImage(imageUrl);
+        } else {
+          emit(const WeatherInitial());
+        }
+      }
+
+      if (imagePath.isNotEmpty) {
+        // Save the image path if it's valid.
+        HomeWidget.saveWidgetData<String>('image_weather', imagePath);
+      }
+
+      // Update the widget.
+      HomeWidget.updateWidget(
+        iOSName: constants.iOSWidgetName,
+        androidName: constants.androidWidgetName,
+      );
+    } catch (e) {
+      debugPrint('Failed to update home screen widget: $e');
     }
   }
 }

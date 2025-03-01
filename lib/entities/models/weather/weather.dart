@@ -12,11 +12,11 @@ part 'weather.g.dart';
 class Weather extends Equatable {
   const Weather({
     required this.condition,
-    this.lastUpdatedDateTime,
     required this.city,
     required this.temperature,
     required this.temperatureUnits,
     required this.countryCode,
+    this.lastUpdatedDateTime,
   });
 
   factory Weather.fromJson(Map<String, dynamic> json) =>
@@ -65,9 +65,13 @@ class Weather extends Equatable {
 
   @override
   String toString() {
-    return 'Weather{condition: $condition, city: $city, '
-        'temperature: $temperature, temperatureUnits: $temperatureUnits, '
-        'countryCode: $countryCode}';
+    return 'Weather{'
+        'condition: $condition, '
+        'city: $city, '
+        'temperature: $temperature, '
+        'temperatureUnits: $temperatureUnits, '
+        'countryCode: $countryCode,'
+        '}';
   }
 
   Map<String, dynamic> toJson() => _$WeatherToJson(this);
@@ -116,4 +120,13 @@ class Weather extends Equatable {
   }
 
   bool get neverUpdated => lastUpdatedDateTime == null;
+
+  bool get isNotEmpty => this != empty;
+
+  int get remainingMinutes {
+    final int difference = constants.weatherRefreshDelayMinutes -
+        DateTime.now().difference(lastUpdatedDateTime ?? DateTime(0)).inMinutes;
+
+    return difference > 0 ? difference : 0;
+  }
 }

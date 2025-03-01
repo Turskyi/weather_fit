@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:open_meteo_api/open_meteo_api.dart';
+import 'package:open_meteo_api/src/models/exceptions/location_response_failure.dart';
 
 /// Exception thrown when locationSearch fails.
 class LocationRequestFailure implements Exception {}
@@ -37,23 +39,29 @@ class OpenMeteoApiClient {
       <String, String>{'name': query, 'count': '1'},
     );
 
-    final http.Response locationResponse =
-        await _httpClient.get(locationRequest);
+    final http.Response locationResponse = await _httpClient.get(
+      locationRequest,
+    );
 
-    if (locationResponse.statusCode != 200) {
+    if (locationResponse.statusCode != HttpStatus.ok) {
       throw LocationRequestFailure();
     }
 
-    final Map<String, dynamic> locationJson =
-        jsonDecode(locationResponse.body) as Map<String, dynamic>;
-
-    if (!locationJson.containsKey('results')) throw LocationNotFoundFailure();
-
-    final List<dynamic> results = locationJson['results'] as List<dynamic>;
-
-    if (results.isEmpty) throw LocationNotFoundFailure();
-
-    return LocationResponse.fromJson(results.first as Map<String, dynamic>);
+    final Object locationData = jsonDecode(locationResponse.body);
+    if (locationData is Map<String, Object?>) {
+      final Map<String, Object?> locationJson = locationData;
+      if (!locationJson.containsKey('results')) throw LocationNotFoundFailure();
+      final Object? locationResults = locationJson['results'];
+      if (locationResults is List<Object?>) {
+        final List<Object?> results = locationResults;
+        if (results.isEmpty) throw LocationNotFoundFailure();
+        final Object? location = results.firstOrNull;
+        if (location is Map<String, Object?>) {
+          return LocationResponse.fromJson(location);
+        }
+      }
+    }
+    throw LocationResponseFailure();
   }
 
   /// Fetches [WeatherResponse] for a given [latitude] and [longitude].

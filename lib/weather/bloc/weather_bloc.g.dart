@@ -40,10 +40,15 @@ WeatherLoadingState _$WeatherLoadingStateFromJson(Map<String, dynamic> json) =>
                   : Weather.fromJson(v as Map<String, dynamic>)),
           outfitImageUrl:
               $checkedConvert('outfit_image_url', (v) => v as String? ?? ''),
+          outfitImagePath:
+              $checkedConvert('outfit_image_path', (v) => v as String? ?? ''),
         );
         return val;
       },
-      fieldKeyMap: const {'outfitImageUrl': 'outfit_image_url'},
+      fieldKeyMap: const {
+        'outfitImageUrl': 'outfit_image_url',
+        'outfitImagePath': 'outfit_image_path'
+      },
     );
 
 Map<String, dynamic> _$WeatherLoadingStateToJson(
@@ -51,6 +56,7 @@ Map<String, dynamic> _$WeatherLoadingStateToJson(
     <String, dynamic>{
       'weather': instance.weather.toJson(),
       'outfit_image_url': instance.outfitImageUrl,
+      'outfit_image_path': instance.outfitImagePath,
     };
 
 WeatherSuccess _$WeatherSuccessFromJson(Map<String, dynamic> json) =>
@@ -59,23 +65,33 @@ WeatherSuccess _$WeatherSuccessFromJson(Map<String, dynamic> json) =>
       json,
       ($checkedConvert) {
         final val = WeatherSuccess(
+          outfitImageUrl:
+              $checkedConvert('outfit_image_url', (v) => v as String),
           weather: $checkedConvert(
               'weather',
               (v) => v == null
                   ? null
                   : Weather.fromJson(v as Map<String, dynamic>)),
-          outfitImageUrl:
-              $checkedConvert('outfit_image_url', (v) => v as String? ?? ''),
+          outfitImagePath:
+              $checkedConvert('outfit_image_path', (v) => v as String? ?? ''),
+          snackbarMessage:
+              $checkedConvert('snackbar_message', (v) => v as String? ?? ''),
         );
         return val;
       },
-      fieldKeyMap: const {'outfitImageUrl': 'outfit_image_url'},
+      fieldKeyMap: const {
+        'outfitImageUrl': 'outfit_image_url',
+        'outfitImagePath': 'outfit_image_path',
+        'snackbarMessage': 'snackbar_message'
+      },
     );
 
 Map<String, dynamic> _$WeatherSuccessToJson(WeatherSuccess instance) =>
     <String, dynamic>{
       'weather': instance.weather.toJson(),
       'outfit_image_url': instance.outfitImageUrl,
+      'outfit_image_path': instance.outfitImagePath,
+      'snackbar_message': instance.snackbarMessage,
     };
 
 LoadingOutfitState _$LoadingOutfitStateFromJson(Map<String, dynamic> json) =>

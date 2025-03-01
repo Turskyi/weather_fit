@@ -8,6 +8,7 @@ import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 import 'package:weather_repository/weather_repository.dart';
 
+import 'constants/dummy_constants.dart' as dummy_constants;
 import 'helpers/hydrated_bloc.dart';
 
 const String _weatherLocation = 'London';
@@ -115,7 +116,10 @@ void main() {
       blocTest<WeatherBloc, WeatherState>(
         'emits initial when location is empty',
         build: () => weatherBloc,
-        seed: () => const WeatherSuccess(weather: Weather.empty),
+        seed: () => const WeatherSuccess(
+          weather: Weather.empty,
+          outfitImageUrl: dummy_constants.dummyOutfitImageUrl,
+        ),
         act: (WeatherBloc bloc) => bloc.add(const RefreshWeather()),
         expect: () => <Matcher>[
           isA<WeatherState>().having(
@@ -146,6 +150,7 @@ void main() {
             temperatureUnits: TemperatureUnits.celsius,
             countryCode: _countryCode,
           ),
+          outfitImageUrl: dummy_constants.dummyOutfitImageUrl,
         ),
         act: (WeatherBloc bloc) => bloc.add(const RefreshWeather()),
         expect: () => <WeatherState>[
@@ -195,6 +200,7 @@ void main() {
             temperatureUnits: TemperatureUnits.fahrenheit,
             countryCode: _countryCode,
           ),
+          outfitImageUrl: dummy_constants.dummyOutfitImageUrl,
         ),
         act: (WeatherBloc bloc) => bloc.add(const ToggleUnits()),
         expect: () => <WeatherState>[
@@ -207,6 +213,7 @@ void main() {
               temperatureUnits: TemperatureUnits.celsius,
               countryCode: _countryCode,
             ),
+            outfitImageUrl: dummy_constants.dummyOutfitImageUrl,
           ),
         ],
       );
@@ -224,6 +231,7 @@ void main() {
             temperatureUnits: TemperatureUnits.celsius,
             countryCode: _countryCode,
           ),
+          outfitImageUrl: dummy_constants.dummyOutfitImageUrl,
         ),
         act: (WeatherBloc bloc) => bloc.add(const ToggleUnits()),
         expect: () => <WeatherState>[
@@ -238,6 +246,7 @@ void main() {
               temperatureUnits: TemperatureUnits.fahrenheit,
               countryCode: _countryCode,
             ),
+            outfitImageUrl: dummy_constants.dummyOutfitImageUrl,
           ),
         ],
       );

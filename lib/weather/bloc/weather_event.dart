@@ -8,7 +8,7 @@ sealed class WeatherEvent extends Equatable {
   List<Object> get props => <Object>[];
 }
 
-class FetchWeather extends WeatherEvent {
+final class FetchWeather extends WeatherEvent {
   const FetchWeather({required this.city});
 
   final String city;
@@ -17,10 +17,14 @@ class FetchWeather extends WeatherEvent {
   List<Object> get props => <Object>[city];
 }
 
-class RefreshWeather extends WeatherEvent {
+final class RefreshWeather extends WeatherEvent {
   const RefreshWeather();
 }
 
-class ToggleUnits extends WeatherEvent {
+final class ToggleUnits extends WeatherEvent {
   const ToggleUnits();
+}
+
+final class UpdateWeatherOnMobileHomeScreenEvent extends WeatherEvent {
+  const UpdateWeatherOnMobileHomeScreenEvent();
 }

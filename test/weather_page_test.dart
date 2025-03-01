@@ -17,6 +17,7 @@ import 'package:weather_fit/weather/ui/weather.dart';
 import 'package:weather_fit/weather/ui/weather_page.dart';
 import 'package:weather_repository/weather_repository.dart';
 
+import 'constants/dummy_constants.dart' as dummy_constants;
 import 'helpers/hydrated_bloc.dart';
 
 class MockWeatherRepository extends Mock implements WeatherRepository {}
@@ -143,7 +144,10 @@ void main() {
 
     testWidgets('triggers fetch on search pop', (WidgetTester tester) async {
       when(() => weatherBloc.state).thenReturn(
-        WeatherSuccess(weather: weather.copyWith(countryCode: _countryCode)),
+        WeatherSuccess(
+          weather: weather.copyWith(countryCode: _countryCode),
+          outfitImageUrl: dummy_constants.dummyOutfitImageUrl,
+        ),
       );
       when(() => weatherBloc.add(const FetchWeather(city: 'Toronto')))
           .thenAnswer((_) async {});
