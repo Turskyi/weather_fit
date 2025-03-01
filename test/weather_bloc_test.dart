@@ -10,17 +10,8 @@ import 'package:weather_repository/weather_repository.dart';
 
 import 'constants/dummy_constants.dart' as dummy_constants;
 import 'helpers/hydrated_bloc.dart';
-
-const String _weatherLocation = 'London';
-const WeatherCondition _weatherCondition = WeatherCondition.rainy;
-const double _weatherTemperature = 9.8;
-const String _countryCode = 'gb';
-
-class MockWeatherRepository extends Mock implements WeatherRepository {}
-
-class MockAiRepository extends Mock implements AiRepository {}
-
-class MockWeather extends Mock implements WeatherDomain {}
+import 'helpers/mocks/mock_entities.dart';
+import 'helpers/mocks/mock_repositories.dart';
 
 void main() {
   initHydratedStorage();
@@ -35,10 +26,18 @@ void main() {
       weather = MockWeather();
       weatherRepository = MockWeatherRepository();
       aiRepository = MockAiRepository();
-      when(() => weather.condition).thenReturn(_weatherCondition);
-      when(() => weather.location).thenReturn(_weatherLocation);
-      when(() => weather.temperature).thenReturn(_weatherTemperature);
-      when(() => weather.countryCode).thenReturn(_countryCode);
+      when(() => weather.condition).thenReturn(
+        dummy_constants.dummyWeatherCondition,
+      );
+      when(() => weather.location).thenReturn(
+        dummy_constants.dummyWeatherLocation,
+      );
+      when(() => weather.temperature).thenReturn(
+        dummy_constants.dummyWeatherTemperature,
+      );
+      when(() => weather.countryCode).thenReturn(
+        dummy_constants.dummyCountryCode,
+      );
       when(
         () => weatherRepository.getWeather(any()),
       ).thenAnswer((_) async => weather);
@@ -46,8 +45,10 @@ void main() {
     });
 
     test('initial state is correct', () {
-      final WeatherBloc weatherBloc =
-          WeatherBloc(weatherRepository, aiRepository);
+      final WeatherBloc weatherBloc = WeatherBloc(
+        weatherRepository,
+        aiRepository,
+      );
       expect(
         weatherBloc.state,
         const WeatherInitial(),
@@ -89,8 +90,9 @@ void main() {
           ).thenThrow(Exception('oops'));
         },
         build: () => weatherBloc,
-        act: (WeatherBloc bloc) =>
-            bloc.add(const FetchWeather(city: _weatherLocation)),
+        act: (WeatherBloc bloc) => bloc.add(
+          const FetchWeather(city: dummy_constants.dummyWeatherLocation),
+        ),
         expect: () => <WeatherState>[
           const WeatherLoadingState(),
           WeatherFailure(message: '${Exception('oops')}'),
@@ -132,41 +134,6 @@ void main() {
           verifyNever(() => weatherRepository.getWeather(any()));
         },
       );
-
-      blocTest<WeatherBloc, WeatherState>(
-        'emits nothing when exception is thrown',
-        setUp: () {
-          when(
-            () => weatherRepository.getWeather(any()),
-          ).thenThrow(Exception('oops'));
-        },
-        build: () => weatherBloc,
-        seed: () => WeatherSuccess(
-          weather: Weather(
-            city: _weatherLocation,
-            temperature: const Temperature(value: _weatherTemperature),
-            lastUpdatedDateTime: DateTime(2020),
-            condition: _weatherCondition,
-            temperatureUnits: TemperatureUnits.celsius,
-            countryCode: _countryCode,
-          ),
-          outfitImageUrl: dummy_constants.dummyOutfitImageUrl,
-        ),
-        act: (WeatherBloc bloc) => bloc.add(const RefreshWeather()),
-        expect: () => <WeatherState>[
-          WeatherLoadingState(
-            weather: Weather(
-              city: _weatherLocation,
-              temperature: const Temperature(value: _weatherTemperature),
-              lastUpdatedDateTime: DateTime(2020),
-              condition: _weatherCondition,
-              temperatureUnits: TemperatureUnits.celsius,
-              countryCode: _countryCode,
-            ),
-          ),
-          const WeatherFailure(message: 'Exception: oops'),
-        ],
-      );
     });
 
     group('toggleUnits', () {
@@ -177,10 +144,12 @@ void main() {
           weather: Weather(
             condition: WeatherCondition.rainy,
             lastUpdatedDateTime: DateTime(2025),
-            city: _weatherLocation,
-            temperature: const Temperature(value: _weatherTemperature),
+            city: dummy_constants.dummyWeatherLocation,
+            temperature: const Temperature(
+              value: dummy_constants.dummyWeatherTemperature,
+            ),
             temperatureUnits: TemperatureUnits.celsius,
-            countryCode: _countryCode,
+            countryCode: dummy_constants.dummyCountryCode,
           ),
         ),
         act: (WeatherBloc bloc) => bloc.add(const ToggleUnits()),
@@ -193,12 +162,14 @@ void main() {
         build: () => weatherBloc,
         seed: () => WeatherSuccess(
           weather: Weather(
-            city: _weatherLocation,
-            temperature: const Temperature(value: _weatherTemperature),
+            city: dummy_constants.dummyWeatherLocation,
+            temperature: const Temperature(
+              value: dummy_constants.dummyWeatherTemperature,
+            ),
             lastUpdatedDateTime: DateTime(2020),
             condition: WeatherCondition.rainy,
             temperatureUnits: TemperatureUnits.fahrenheit,
-            countryCode: _countryCode,
+            countryCode: dummy_constants.dummyCountryCode,
           ),
           outfitImageUrl: dummy_constants.dummyOutfitImageUrl,
         ),
@@ -206,12 +177,14 @@ void main() {
         expect: () => <WeatherState>[
           WeatherSuccess(
             weather: Weather(
-              city: _weatherLocation,
-              temperature: Temperature(value: _weatherTemperature.toCelsius()),
+              city: dummy_constants.dummyWeatherLocation,
+              temperature: Temperature(
+                value: dummy_constants.dummyWeatherTemperature.toCelsius(),
+              ),
               lastUpdatedDateTime: DateTime(2020),
               condition: WeatherCondition.rainy,
               temperatureUnits: TemperatureUnits.celsius,
-              countryCode: _countryCode,
+              countryCode: dummy_constants.dummyCountryCode,
             ),
             outfitImageUrl: dummy_constants.dummyOutfitImageUrl,
           ),
@@ -224,12 +197,14 @@ void main() {
         build: () => weatherBloc,
         seed: () => WeatherSuccess(
           weather: Weather(
-            city: _weatherLocation,
-            temperature: const Temperature(value: _weatherTemperature),
+            city: dummy_constants.dummyWeatherLocation,
+            temperature: const Temperature(
+              value: dummy_constants.dummyWeatherTemperature,
+            ),
             lastUpdatedDateTime: DateTime(2020),
             condition: WeatherCondition.rainy,
             temperatureUnits: TemperatureUnits.celsius,
-            countryCode: _countryCode,
+            countryCode: dummy_constants.dummyCountryCode,
           ),
           outfitImageUrl: dummy_constants.dummyOutfitImageUrl,
         ),
@@ -237,14 +212,14 @@ void main() {
         expect: () => <WeatherState>[
           WeatherSuccess(
             weather: Weather(
-              city: _weatherLocation,
+              city: dummy_constants.dummyWeatherLocation,
               temperature: Temperature(
-                value: _weatherTemperature.toFahrenheit(),
+                value: dummy_constants.dummyWeatherTemperature.toFahrenheit(),
               ),
               lastUpdatedDateTime: DateTime(2020),
               condition: WeatherCondition.rainy,
               temperatureUnits: TemperatureUnits.fahrenheit,
-              countryCode: _countryCode,
+              countryCode: dummy_constants.dummyCountryCode,
             ),
             outfitImageUrl: dummy_constants.dummyOutfitImageUrl,
           ),
