@@ -12,7 +12,7 @@ class Temperature extends Equatable {
 
   final double value;
 
-  Map<String, dynamic> toJson() => _$TemperatureToJson(this);
+  Map<String, Object?> toJson() => _$TemperatureToJson(this);
 
   @override
   List<Object> get props => <Object>[value];

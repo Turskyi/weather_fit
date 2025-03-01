@@ -74,7 +74,7 @@ class Weather extends Equatable {
         '}';
   }
 
-  Map<String, dynamic> toJson() => _$WeatherToJson(this);
+  Map<String, Object?> toJson() => _$WeatherToJson(this);
 
   Weather copyWith({
     WeatherCondition? condition,

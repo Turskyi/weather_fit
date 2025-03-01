@@ -70,7 +70,6 @@
         android:scaleType="fitCenter"
         android:src="@mipmap/ic_launcher_round"
         android:visibility="visible"
-        tools:ignore="UnusedAttribute"
         tools:visibility="visible" />
 
 </LinearLayout>

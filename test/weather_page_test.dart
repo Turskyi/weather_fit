@@ -17,7 +17,6 @@ import 'package:weather_fit/weather/ui/weather.dart';
 import 'package:weather_fit/weather/ui/weather_page.dart';
 import 'package:weather_repository/weather_repository.dart';
 
-import 'constants/dummy_constants.dart' as dummy_constants;
 import 'helpers/hydrated_bloc.dart';
 
 class MockWeatherRepository extends Mock implements WeatherRepository {}
@@ -79,7 +78,9 @@ void main() {
 
     testWidgets('renders WeatherLoading for WeatherStatus.initial',
         (WidgetTester tester) async {
-      when(() => weatherBloc.state).thenReturn(const WeatherLoadingState());
+      when(() => weatherBloc.state).thenReturn(
+        const WeatherLoadingState(),
+      );
       await tester.pumpWidget(
         BlocProvider<WeatherBloc>.value(
           value: weatherBloc,
@@ -91,9 +92,7 @@ void main() {
 
     testWidgets('renders WeatherLoading for WeatherStatus.loading',
         (WidgetTester tester) async {
-      when(() => weatherBloc.state).thenReturn(
-        const WeatherLoadingState(),
-      );
+      when(() => weatherBloc.state).thenReturn(const WeatherLoadingState());
       await tester.pumpWidget(
         BlocProvider<WeatherBloc>.value(
           value: weatherBloc,
@@ -146,10 +145,9 @@ void main() {
       when(() => weatherBloc.state).thenReturn(
         WeatherSuccess(
           weather: weather.copyWith(countryCode: _countryCode),
-          outfitImageUrl: dummy_constants.dummyOutfitImageUrl,
         ),
       );
-      when(() => weatherBloc.add(const FetchWeather(city: 'Toronto')))
+      when(() => weatherBloc.add(const FetchWeather(location: 'Toronto')))
           .thenAnswer((_) async {});
       await tester.pumpWidget(
         RepositoryProvider<WeatherRepository>.value(
@@ -166,8 +164,9 @@ void main() {
       await tester.tap(find.byType(ElevatedButton));
       await tester.enterText(find.byType(TextField), 'Toronto');
       await tester.tap(find.byKey(const Key('searchPage_search_iconButton')));
-      verifyNever(() => weatherBloc.add(const FetchWeather(city: 'Toronto')))
-          .called(0);
+      verifyNever(
+        () => weatherBloc.add(const FetchWeather(location: 'Toronto')),
+      ).called(0);
     });
   });
 }

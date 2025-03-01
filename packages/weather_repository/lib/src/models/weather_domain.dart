@@ -16,7 +16,7 @@ class WeatherDomain extends Equatable {
   factory WeatherDomain.fromJson(Map<String, dynamic> json) =>
       _$WeatherDomainFromJson(json);
 
-  Map<String, dynamic> toJson() => _$WeatherDomainToJson(this);
+  Map<String, Object?> toJson() => _$WeatherDomainToJson(this);
 
   final String location;
   final double temperature;

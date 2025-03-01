@@ -72,7 +72,7 @@ void main() {
       blocTest<WeatherBloc, WeatherState>(
         'emits initial when city is empty',
         build: () => weatherBloc,
-        act: (WeatherBloc bloc) => bloc.add(const FetchWeather(city: '')),
+        act: (WeatherBloc bloc) => bloc.add(const FetchWeather(location: '')),
         expect: () => <Matcher>[
           isA<WeatherState>().having(
             (WeatherState w) => w,
@@ -91,11 +91,13 @@ void main() {
         },
         build: () => weatherBloc,
         act: (WeatherBloc bloc) => bloc.add(
-          const FetchWeather(city: dummy_constants.dummyWeatherLocation),
+          const FetchWeather(location: dummy_constants.dummyWeatherLocation),
         ),
         expect: () => <WeatherState>[
           const WeatherLoadingState(),
-          WeatherFailure(message: '${Exception('oops')}'),
+          WeatherFailure(
+            message: '${Exception('oops')}',
+          ),
         ],
       );
     });
@@ -118,10 +120,7 @@ void main() {
       blocTest<WeatherBloc, WeatherState>(
         'emits initial when location is empty',
         build: () => weatherBloc,
-        seed: () => const WeatherSuccess(
-          weather: Weather.empty,
-          outfitImageUrl: dummy_constants.dummyOutfitImageUrl,
-        ),
+        seed: () => const WeatherSuccess(weather: Weather.empty),
         act: (WeatherBloc bloc) => bloc.add(const RefreshWeather()),
         expect: () => <Matcher>[
           isA<WeatherState>().having(
@@ -171,7 +170,6 @@ void main() {
             temperatureUnits: TemperatureUnits.fahrenheit,
             countryCode: dummy_constants.dummyCountryCode,
           ),
-          outfitImageUrl: dummy_constants.dummyOutfitImageUrl,
         ),
         act: (WeatherBloc bloc) => bloc.add(const ToggleUnits()),
         expect: () => <WeatherState>[
@@ -186,7 +184,6 @@ void main() {
               temperatureUnits: TemperatureUnits.celsius,
               countryCode: dummy_constants.dummyCountryCode,
             ),
-            outfitImageUrl: dummy_constants.dummyOutfitImageUrl,
           ),
         ],
       );
@@ -206,7 +203,6 @@ void main() {
             temperatureUnits: TemperatureUnits.celsius,
             countryCode: dummy_constants.dummyCountryCode,
           ),
-          outfitImageUrl: dummy_constants.dummyOutfitImageUrl,
         ),
         act: (WeatherBloc bloc) => bloc.add(const ToggleUnits()),
         expect: () => <WeatherState>[
@@ -221,7 +217,6 @@ void main() {
               temperatureUnits: TemperatureUnits.fahrenheit,
               countryCode: dummy_constants.dummyCountryCode,
             ),
-            outfitImageUrl: dummy_constants.dummyOutfitImageUrl,
           ),
         ],
       );

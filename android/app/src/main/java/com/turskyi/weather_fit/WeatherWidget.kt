@@ -66,13 +66,13 @@ internal fun updateAppWidget(
 
         val emoji: String? = widgetData.getString("text_emoji", null)
 
-        setTextViewText(R.id.text_emoji, emoji ?: "No emoji set")
+        setTextViewText(R.id.text_emoji, emoji ?: "")
 
         val location: String? = widgetData.getString("text_location", null)
 
         setTextViewText(
             R.id.text_location,
-            location ?: "No location set",
+            location ?: "",
         )
 
         val temperature: String? = widgetData.getString(
@@ -82,7 +82,17 @@ internal fun updateAppWidget(
 
         setTextViewText(
             R.id.text_temperature,
-            temperature ?: "No temperature set",
+            temperature ?: "",
+        )
+
+        val recommendation: String? = widgetData.getString(
+            "text_recommendation",
+            null,
+        )
+
+        setTextViewText(
+            R.id.text_outfit_recommendation,
+            recommendation ?: "",
         )
 
         val lastUpdated: String? = widgetData.getString(
@@ -92,7 +102,7 @@ internal fun updateAppWidget(
 
         setTextViewText(
             R.id.text_last_updated,
-            lastUpdated ?: "Last updated not set",
+            lastUpdated ?: "",
         )
 
         // Get image and put it in the widget if it exists.
@@ -101,7 +111,7 @@ internal fun updateAppWidget(
             null,
         )
 
-        if (imagePath != null) {
+        if (!imagePath.isNullOrEmpty()) {
             val imageFile = File(imagePath)
             val imageExists: Boolean = imageFile.exists()
 
@@ -114,6 +124,22 @@ internal fun updateAppWidget(
                     setImageViewBitmap(R.id.image_weather, myBitmap)
                 }
             }
+        } else if (recommendation.isNullOrEmpty()) {
+            // Default messages with emojis.
+            val defaultMessages: List<String> = listOf(
+                "👕 Oops! No outfit suggestion available.",
+                "🤷 Looks like we couldn’t pick an outfit this time.",
+                "🎭 No recommendation? Time to mix & match your own style!",
+                "💡 Your fashion instincts take the lead today!",
+                "🚀 AI is taking a fashion break. Try again!",
+                "🛌 No outfit picked—maybe today is a pajama day?",
+                "❌ No outfit available",
+                "🤔 no recommendation"
+            )
+            setTextViewText(
+                R.id.text_outfit_recommendation,
+                defaultMessages.random(),
+            )
         }
     }
 

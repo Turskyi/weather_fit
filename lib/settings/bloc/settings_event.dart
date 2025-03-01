@@ -19,8 +19,8 @@ final class ClosingFeedbackEvent extends SettingsEvent {
   const ClosingFeedbackEvent();
 }
 
-final class ErrorEvent extends SettingsEvent {
-  const ErrorEvent(this.error);
+final class SettingsErrorEvent extends SettingsEvent {
+  const SettingsErrorEvent(this.error);
 
   final String error;
 }

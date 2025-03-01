@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:weather_fit/res/theme/cubit/theme_cubit.dart';
+import 'package:weather_fit/res/widgets/local_web_cors_error.dart';
 import 'package:weather_fit/router/app_route.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 import 'package:weather_fit/weather/ui/outfit_widget.dart';
@@ -31,6 +32,11 @@ class WeatherPage extends StatelessWidget {
           listener: (BuildContext context, WeatherState state) {
             if (state is WeatherSuccess) {
               context.read<ThemeCubit>().updateTheme(state.weather);
+              if (state.message.isNotEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(state.message)),
+                );
+              }
             }
           },
           builder: (BuildContext context, WeatherState state) {
@@ -53,11 +59,11 @@ class WeatherPage extends StatelessWidget {
                 }
                 Widget outfitImageWidget = const SizedBox();
 
-                if (state.outfitImageUrl.isNotEmpty) {
+                if (state.outfitRecommendation.isNotEmpty) {
                   outfitImageWidget = OutfitWidget(
                     needsRefresh: state.weather.needsRefresh,
-                    imageUrl: state.outfitImageUrl,
-                    imagePath: state.outfitImagePath,
+                    filePath: state.outfitFilePath,
+                    outfitRecommendation: state.outfitRecommendation,
                   );
                 } else if (state is LoadingOutfitState) {
                   // Image is still loading
@@ -88,6 +94,8 @@ class WeatherPage extends StatelessWidget {
                     child: outfitImageWidget,
                   ),
                 );
+              case LocalWebCorsFailure():
+                return const LocalWebCorsError();
               case WeatherFailure():
                 return WeatherError(state.message);
             }
@@ -103,13 +111,13 @@ class WeatherPage extends StatelessWidget {
 
   Future<void> _handleCitySelectionAndFetchWeather(BuildContext context) async {
     // We cannot set generic String here, because will be an error.
-    final Object? city = await Navigator.pushNamed<Object>(
+    final Object? location = await Navigator.pushNamed<Object>(
       context,
       AppRoute.search.path,
     );
 
-    if (context.mounted && city is String) {
-      context.read<WeatherBloc>().add(FetchWeather(city: city));
+    if (context.mounted && location is String) {
+      context.read<WeatherBloc>().add(FetchWeather(location: location));
     } else {
       return;
     }

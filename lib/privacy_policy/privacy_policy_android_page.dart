@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:weather_fit/privacy_policy/email_text.dart';
+import 'package:weather_fit/res/constants.dart' as constants;
 
 class PrivacyPolicyAndroidPage extends StatelessWidget {
   const PrivacyPolicyAndroidPage({super.key});
@@ -34,7 +35,7 @@ class PrivacyPolicyAndroidPage extends StatelessWidget {
             const SizedBox(height: 10),
             Text(
               'Last updated: ${_formatDate(
-                DateTime(2025, DateTime.february, 26),
+                DateTime(2025, DateTime.march, 1),
               )}',
               style: TextStyle(fontSize: bodySize),
             ),
@@ -50,8 +51,10 @@ class PrivacyPolicyAndroidPage extends StatelessWidget {
             const SizedBox(height: 20),
             Text(
               'Information We Collect',
-              style:
-                  TextStyle(fontSize: titleSize, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: titleSize,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 10),
             Text(
@@ -92,8 +95,10 @@ class PrivacyPolicyAndroidPage extends StatelessWidget {
             const SizedBox(height: 20),
             Text(
               'Security Measures',
-              style:
-                  TextStyle(fontSize: titleSize, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: titleSize,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 10),
             Text(
@@ -104,19 +109,23 @@ class PrivacyPolicyAndroidPage extends StatelessWidget {
             const SizedBox(height: 20),
             Text(
               'Children\'s Privacy',
-              style:
-                  TextStyle(fontSize: titleSize, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: titleSize,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 10),
             Text(
               'Our services are not directed towards children under the age of '
               '$age. We do not knowingly collect personal information from '
-              'children under $age. If we become aware that a child under '
-              '$age has provided us with personal information, we will take '
-              'steps to delete such information.',
-              style: TextStyle(
-                fontSize: bodySize,
-              ),
+              'children under $age. While we strive to minimize data '
+              'collection, third-party services we use (such as Firebase '
+              'Crashlytics and Google Analytics) may collect some data. '
+              'However, this data is collected anonymously and is not linked '
+              'to any personal information. If you believe that a child under '
+              '$age has provided us with personal information, please contact '
+              'us, and we will investigate the matter.',
+              style: TextStyle(fontSize: bodySize),
             ),
             const SizedBox(height: 20),
             Text(
@@ -179,7 +188,7 @@ class PrivacyPolicyAndroidPage extends StatelessWidget {
               style: TextStyle(fontSize: bodySize),
             ),
             const SizedBox(height: 10),
-            const EmailText('dmytro@turskyi.com'),
+            const EmailText(constants.supportEmail),
           ],
         ),
       ),

@@ -19,4 +19,14 @@ enum WeatherCondition {
         return '❓';
     }
   }
+
+  bool get isClear => this == WeatherCondition.clear;
+
+  bool get isRainy => this == WeatherCondition.rainy;
+
+  bool get isCloudy => this == WeatherCondition.cloudy;
+
+  bool get isSnowy => this == WeatherCondition.snowy;
+
+  bool get isUnknown => this == WeatherCondition.unknown;
 }

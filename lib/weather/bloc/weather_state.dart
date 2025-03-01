@@ -3,125 +3,190 @@ part of 'weather_bloc.dart';
 @immutable
 sealed class WeatherState extends Equatable {
   const WeatherState({
-    this.outfitImageUrl = '',
-    this.outfitImagePath = '',
+    this.outfitRecommendation = '',
+    this.outfitFilePath = '',
     this.message = '',
     Weather? weather,
   }) : weather = weather ?? Weather.empty;
 
+  factory WeatherState.fromJson(Map<String, Object?> json) =>
+      _$WeatherSuccessFromJson(json);
+
   final Weather weather;
-  final String outfitImageUrl;
+  final String outfitRecommendation;
   final String message;
-  final String outfitImagePath;
+  final String outfitFilePath;
 
   @override
   List<Object> get props => <Object>[
         weather,
-        outfitImageUrl,
-        outfitImagePath,
+        outfitRecommendation,
+        outfitFilePath,
         message,
       ];
+
+  Map<String, Object?> toJson() {
+    return <String, Object?>{
+      'weather': weather.toJson(),
+      'outfit_recommendation': outfitRecommendation,
+      'outfit_file_path': outfitFilePath,
+      'message': message,
+    };
+  }
 
   String get location => weather.city;
 
   bool get needsRefresh => weather.needsRefresh;
 
   int get remainingMinutes => weather.remainingMinutes;
+
+  String get formattedLastUpdatedDateTime =>
+      weather.formattedLastUpdatedDateTime;
+
+  String get formattedTemperature => weather.formattedTemperature;
+
+  String get emoji => weather.emoji;
+
+  TemperatureUnits get temperatureUnits => weather.temperatureUnits;
 }
 
 @JsonSerializable()
 final class WeatherInitial extends WeatherState {
-  const WeatherInitial({super.weather});
+  const WeatherInitial({
+    super.outfitRecommendation,
+    super.weather,
+    super.outfitFilePath,
+  });
 
-  factory WeatherInitial.fromJson(Map<String, dynamic> json) =>
+  factory WeatherInitial.fromJson(Map<String, Object?> json) =>
       _$WeatherInitialFromJson(json);
 
-  Map<String, dynamic> toJson() => _$WeatherInitialToJson(this);
+  @override
+  Map<String, Object?> toJson() => _$WeatherInitialToJson(this);
 
-  WeatherInitial copyWith({Weather? weather}) =>
-      WeatherInitial(weather: weather ?? this.weather);
+  WeatherInitial copyWith({
+    Weather? weather,
+    String? outfitRecommendation,
+    String? outfitFilePath,
+  }) =>
+      WeatherInitial(
+        weather: weather ?? this.weather,
+        outfitRecommendation: outfitRecommendation ?? this.outfitRecommendation,
+        outfitFilePath: outfitFilePath ?? this.outfitFilePath,
+      );
 }
 
 @JsonSerializable()
 class WeatherLoadingState extends WeatherState {
   const WeatherLoadingState({
+    super.outfitRecommendation,
     super.weather,
-    super.outfitImageUrl = '',
-    super.outfitImagePath,
+    super.outfitFilePath,
   });
 
-  factory WeatherLoadingState.fromJson(Map<String, dynamic> json) =>
+  factory WeatherLoadingState.fromJson(Map<String, Object?> json) =>
       _$WeatherLoadingStateFromJson(json);
 
-  Map<String, dynamic> toJson() => _$WeatherLoadingStateToJson(this);
+  @override
+  Map<String, Object?> toJson() => _$WeatherLoadingStateToJson(this);
 
   WeatherLoadingState copyWith({
     Weather? weather,
-    String? outfitImageUrl,
+    String? outfitRecommendation,
   }) =>
       WeatherLoadingState(
         weather: weather ?? this.weather,
-        outfitImageUrl: outfitImageUrl ?? this.outfitImageUrl,
-      );
-
-  @override
-  List<Object> get props => <Object>[weather, outfitImageUrl, outfitImagePath];
-}
-
-@JsonSerializable()
-class WeatherSuccess extends WeatherState {
-  const WeatherSuccess({
-    required super.outfitImageUrl,
-    super.weather,
-    super.outfitImagePath = '',
-    this.snackbarMessage = '',
-  });
-
-  factory WeatherSuccess.fromJson(Map<String, dynamic> json) =>
-      _$WeatherSuccessFromJson(json);
-
-  final String snackbarMessage;
-
-  Map<String, dynamic> toJson() => _$WeatherSuccessToJson(this);
-
-  WeatherSuccess copyWith({
-    Weather? weather,
-    String? outfitImageUrl,
-    String? outfitImagePath,
-    String? snackbarMessage,
-  }) =>
-      WeatherSuccess(
-        weather: weather ?? this.weather,
-        outfitImageUrl: outfitImageUrl ?? this.outfitImageUrl,
-        outfitImagePath: outfitImagePath ?? this.outfitImagePath,
-        snackbarMessage: snackbarMessage ?? this.snackbarMessage,
+        outfitRecommendation: outfitRecommendation ?? this.outfitRecommendation,
       );
 
   @override
   List<Object> get props => <Object>[
         weather,
-        outfitImageUrl,
-        outfitImagePath,
-        snackbarMessage,
+        outfitRecommendation,
+        outfitFilePath,
+      ];
+}
+
+@JsonSerializable()
+class WeatherSuccess extends WeatherState {
+  const WeatherSuccess({
+    super.outfitFilePath,
+    super.outfitRecommendation,
+    super.weather,
+    super.message,
+  });
+
+  factory WeatherSuccess.fromJson(Map<String, Object?> json) =>
+      _$WeatherSuccessFromJson(json);
+
+  @override
+  Map<String, Object?> toJson() => _$WeatherSuccessToJson(this);
+
+  WeatherSuccess copyWith({
+    Weather? weather,
+    String? outfitRecommendation,
+    String? outfitFilePath,
+    String? message,
+  }) =>
+      WeatherSuccess(
+        weather: weather ?? this.weather,
+        outfitRecommendation: outfitRecommendation ?? this.outfitRecommendation,
+        outfitFilePath: outfitFilePath ?? this.outfitFilePath,
+        message: message ?? this.message,
+      );
+
+  @override
+  List<Object> get props => <Object>[
+        weather,
+        outfitRecommendation,
+        outfitFilePath,
+        message,
       ];
 }
 
 @JsonSerializable()
 final class LoadingOutfitState extends WeatherSuccess {
-  const LoadingOutfitState({super.weather, super.outfitImageUrl = ''});
+  const LoadingOutfitState({
+    super.outfitRecommendation = '',
+    super.outfitFilePath = '',
+    super.weather,
+  });
 
-  factory LoadingOutfitState.fromJson(Map<String, dynamic> json) =>
+  factory LoadingOutfitState.fromJson(Map<String, Object?> json) =>
       _$LoadingOutfitStateFromJson(json);
 }
 
 @JsonSerializable()
 class WeatherFailure extends WeatherState {
-  const WeatherFailure({super.message});
+  const WeatherFailure({
+    super.outfitFilePath,
+    super.outfitRecommendation,
+    super.message,
+  });
 
-  factory WeatherFailure.fromJson(Map<String, dynamic> json) =>
+  factory WeatherFailure.fromJson(Map<String, Object?> json) =>
       _$WeatherFailureFromJson(json);
 
-  Map<String, dynamic> toJson() => _$WeatherFailureToJson(this);
+  @override
+  Map<String, Object?> toJson() => _$WeatherFailureToJson(this);
+
+  @override
+  List<Object> get props => <Object>[
+        outfitRecommendation,
+        outfitFilePath,
+        message,
+      ];
+}
+
+@JsonSerializable()
+class LocalWebCorsFailure extends WeatherFailure {
+  const LocalWebCorsFailure({super.outfitRecommendation, super.message});
+
+  factory LocalWebCorsFailure.fromJson(Map<String, Object?> json) =>
+      _$LocalWebCorsFailureFromJson(json);
+
+  @override
+  Map<String, Object?> toJson() => _$LocalWebCorsFailureToJson(this);
 
   @override
   List<Object> get props => <Object>[message];

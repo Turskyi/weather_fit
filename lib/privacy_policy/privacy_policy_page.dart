@@ -1,81 +1,193 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:weather_fit/privacy_policy/email_text.dart';
+import 'package:weather_fit/res/constants.dart' as constants;
 
 class PrivacyPolicyPage extends StatelessWidget {
   const PrivacyPolicyPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final int age = 6;
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    final double? titleSize = textTheme.titleLarge?.fontSize;
+    final double? bodySize = textTheme.bodyLarge?.fontSize;
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Privacy Policy'),
-      ),
+      appBar: AppBar(title: const Text('Privacy Policy')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            const Text(
+            Text(
               'Privacy Policy',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: titleSize,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 10),
             Text(
               'Last updated: ${_formatDate(
-                DateTime(2024, DateTime.march, 21),
+                DateTime(2025, DateTime.march, 1),
               )}',
-              style: const TextStyle(fontSize: 16),
+              style: TextStyle(fontSize: bodySize),
             ),
             const SizedBox(height: 20),
-            const Text(
+            Text(
               'Your privacy is important to us. It is WeatherFit\'s policy to '
               'respect your privacy and comply with any applicable law and '
               'regulation regarding any personal information we may collect '
               'about you, including across our app, WeatherFit, and its '
               'associated services.',
-              style: TextStyle(fontSize: 16),
+              style: TextStyle(fontSize: bodySize),
             ),
             const SizedBox(height: 20),
-            const Text(
+            Text(
               'Information We Collect',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: titleSize,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 10),
-            const Text(
-              'Information we collect includes both information you knowingly '
-              'and actively provide us when using or participating in any '
-              'of our services and promotions, and any information '
-              'automatically sent by your devices in the course of accessing '
-              'our products and services.',
-              style: TextStyle(fontSize: 16),
+            Text(
+              'We do not collect any personal information such as name, email '
+              'address, or phone number.',
+              style: TextStyle(fontSize: bodySize),
             ),
             const SizedBox(height: 20),
-            const Text(
-              'Crashlytics',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            Text(
+              'Third-Party Services',
+              style: TextStyle(
+                fontSize: titleSize,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 10),
-            const Text(
+            Text(
+              'WeatherFit uses third-party services that may collect '
+              'information used to identify you. These services include '
+              'Firebase Crashlytics and Google Analytics. The data collected '
+              'by these services is used to improve app stability and user '
+              'experience. You can find more information about their privacy '
+              'practices at their respective websites.',
+              style: TextStyle(fontSize: bodySize),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Consent',
+              style:
+                  TextStyle(fontSize: titleSize, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'By using our services, you consent to the collection and use of '
+              'your information as described in this privacy policy.',
+              style: TextStyle(fontSize: bodySize),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Platform-Specific Features',
+              style: TextStyle(
+                fontSize: titleSize,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'WeatherFit offers different features depending on the platform '
+              'you are using (mobile or web). Please note the following '
+              'platform-specific details:',
+              style: TextStyle(fontSize: bodySize),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'Mobile (Android/iOS):',
+              style: TextStyle(
+                fontSize: titleSize,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'On mobile devices, WeatherFit may use AI to generate '
+              'outfit recommendations based on the current weather. '
+              'This feature involves sending weather data to a third-party '
+              'AI service to generate an image. No personal information is '
+              'shared with this service.',
+              style: TextStyle(fontSize: bodySize),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'Web:',
+              style: TextStyle(
+                fontSize: titleSize,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'On the web, due to technical limitations, WeatherFit does not '
+              'use AI to generate outfit recommendations. Instead, '
+              'predefined text recommendations are displayed based on the '
+              'weather conditions. These recommendations are not AI-generated '
+              'and are based on a set of predefined rules.',
+              style: TextStyle(fontSize: bodySize),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Crashlytics',
+              style: TextStyle(
+                fontSize: titleSize,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text(
               'WeatherFit uses Firebase Crashlytics, a service by Google, to '
               'collect crash reports anonymously to help us improve app '
               'stability and fix bugs. The data collected by Crashlytics does '
               'not include any personal information.',
-              style: TextStyle(fontSize: 16),
+              style: TextStyle(fontSize: bodySize),
             ),
             const SizedBox(height: 20),
-            const Text(
-              'Contact Us',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            Text(
+              'Children\'s Privacy',
+              style: TextStyle(
+                fontSize: titleSize,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 10),
-            const Text(
+            Text(
+              'Our services are not directed towards children under the age of '
+              '$age. We do not knowingly collect personal information from '
+              'children under $age. While we strive to minimize data '
+              'collection, third-party services we use (such as Firebase '
+              'Crashlytics and Google Analytics) may collect some data. '
+              'However, this data is collected anonymously and is not linked '
+              'to any personal information. If you believe that a child under '
+              '$age has provided us with personal information, please contact '
+              'us, and we will investigate the matter.',
+              style: TextStyle(
+                fontSize: bodySize,
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Contact Us',
+              style:
+                  TextStyle(fontSize: titleSize, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            Text(
               'For any questions or concerns regarding your privacy, you may '
               'contact us using the following details:',
-              style: TextStyle(fontSize: 16),
+              style: TextStyle(fontSize: bodySize),
             ),
             const SizedBox(height: 10),
-            const EmailText('dmytro@turskyi.com'),
+            const EmailText(constants.supportEmail),
           ],
         ),
       ),

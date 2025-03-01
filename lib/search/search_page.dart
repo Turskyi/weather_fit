@@ -30,15 +30,22 @@ class _SearchPageState extends State<SearchPage> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  const Text('🏙️', style: TextStyle(fontSize: 64)),
+                  Text(
+                    '🏙️',
+                    style: TextStyle(
+                      fontSize: textTheme.displayLarge?.fontSize,
+                    ),
+                  ),
                   Text(
                     'Let\'s explore the weather! ',
                     style: textTheme.headlineMedium,
+                    textAlign: TextAlign.center,
                   ),
                   Text(
-                    'Type the city or country name and tap "Submit"\nto see the'
+                    'Type the city or country name and tap "Submit" to see the'
                     ' weather.',
                     style: textTheme.titleSmall,
+                    textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 16.0),
                   TextField(
