@@ -10,7 +10,7 @@ void initHydratedStorage() {
   TestWidgetsFlutterBinding.ensureInitialized();
   hydratedStorage = MockStorage();
   when(
-    () => hydratedStorage.write(any(), any<dynamic>()),
+    () => hydratedStorage.write(any(), any<Object?>()),
   ).thenAnswer((_) async {});
   HydratedBloc.storage = hydratedStorage;
 }

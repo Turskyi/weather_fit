@@ -143,7 +143,7 @@ void main() {
           weather: Weather(
             condition: WeatherCondition.rainy,
             lastUpdatedDateTime: DateTime(2025),
-            city: dummy_constants.dummyWeatherLocation,
+            location: dummy_constants.dummyWeatherLocation,
             temperature: const Temperature(
               value: dummy_constants.dummyWeatherTemperature,
             ),
@@ -161,7 +161,7 @@ void main() {
         build: () => weatherBloc,
         seed: () => WeatherSuccess(
           weather: Weather(
-            city: dummy_constants.dummyWeatherLocation,
+            location: dummy_constants.dummyWeatherLocation,
             temperature: const Temperature(
               value: dummy_constants.dummyWeatherTemperature,
             ),
@@ -175,7 +175,7 @@ void main() {
         expect: () => <WeatherState>[
           WeatherSuccess(
             weather: Weather(
-              city: dummy_constants.dummyWeatherLocation,
+              location: dummy_constants.dummyWeatherLocation,
               temperature: Temperature(
                 value: dummy_constants.dummyWeatherTemperature.toCelsius(),
               ),
@@ -194,7 +194,7 @@ void main() {
         build: () => weatherBloc,
         seed: () => WeatherSuccess(
           weather: Weather(
-            city: dummy_constants.dummyWeatherLocation,
+            location: dummy_constants.dummyWeatherLocation,
             temperature: const Temperature(
               value: dummy_constants.dummyWeatherTemperature,
             ),
@@ -208,7 +208,7 @@ void main() {
         expect: () => <WeatherState>[
           WeatherSuccess(
             weather: Weather(
-              city: dummy_constants.dummyWeatherLocation,
+              location: dummy_constants.dummyWeatherLocation,
               temperature: Temperature(
                 value: dummy_constants.dummyWeatherTemperature.toFahrenheit(),
               ),

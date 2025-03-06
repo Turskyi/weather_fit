@@ -6,6 +6,7 @@ import 'package:weather_fit/data/repositories/ai_repository.dart';
 import 'package:weather_fit/res/theme/cubit/theme_cubit.dart';
 import 'package:weather_fit/router/app_route.dart';
 import 'package:weather_fit/router/routes.dart' as routes;
+import 'package:weather_fit/search/bloc/search_bloc.dart';
 import 'package:weather_fit/settings/bloc/settings_bloc.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 import 'package:weather_repository/weather_repository.dart';
@@ -27,22 +28,21 @@ class WeatherApp extends StatelessWidget {
     return MultiRepositoryProvider(
       providers: <SingleChildWidget>[
         // Provide the weather repository.
-        RepositoryProvider<WeatherRepository>.value(
-          value: _weatherRepository,
-        ),
+        RepositoryProvider<WeatherRepository>.value(value: _weatherRepository),
         // Provide the AI repository.
-        RepositoryProvider<AiRepository>.value(
-          value: _aiRepository,
-        ),
+        RepositoryProvider<AiRepository>.value(value: _aiRepository),
       ],
-      // Provide the theme cubit.
       child: MultiBlocProvider(
         providers: <SingleChildWidget>[
+          // Provide the theme cubit.
           BlocProvider<ThemeCubit>(create: (_) => ThemeCubit()),
           BlocProvider<WeatherBloc>(
             create: (_) => WeatherBloc(_weatherRepository, _aiRepository),
           ),
           BlocProvider<SettingsBloc>(create: (_) => SettingsBloc()),
+          BlocProvider<SearchBloc>(
+            create: (_) => SearchBloc(_weatherRepository),
+          ),
         ],
         child: BlocBuilder<ThemeCubit, Color>(
           builder: (_, Color color) {

@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/res/theme/cubit/theme_cubit.dart';
 import 'package:weather_fit/res/widgets/local_web_cors_error.dart';
 import 'package:weather_fit/router/app_route.dart';
@@ -44,7 +45,7 @@ class WeatherPage extends StatelessWidget {
               case WeatherInitial():
                 return const WeatherEmpty();
               case WeatherLoadingState():
-                if (state.weather.city.isEmpty) {
+                if (state.weather.location.isEmpty) {
                   return const WeatherLoadingWidget();
                 } else {
                   return WeatherPopulated(
@@ -103,21 +104,22 @@ class WeatherPage extends StatelessWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _handleCitySelectionAndFetchWeather(context),
+        onPressed: () => _handleLocationSearchAndFetchWeather(context),
         child: const Icon(Icons.search, semanticLabel: 'Search'),
       ),
     );
   }
 
-  Future<void> _handleCitySelectionAndFetchWeather(BuildContext context) async {
-    // We cannot set generic String here, because will be an error.
-    final Object? location = await Navigator.pushNamed<Object>(
+  Future<void> _handleLocationSearchAndFetchWeather(
+    BuildContext context,
+  ) async {
+    final Object? weather = await Navigator.pushNamed<Object>(
       context,
       AppRoute.search.path,
     );
 
-    if (context.mounted && location is String) {
-      context.read<WeatherBloc>().add(FetchWeather(location: location));
+    if (context.mounted && weather is Weather) {
+      context.read<WeatherBloc>().add(GetOutfitEvent(weather));
     } else {
       return;
     }

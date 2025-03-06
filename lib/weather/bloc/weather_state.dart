@@ -34,7 +34,7 @@ sealed class WeatherState extends Equatable {
     };
   }
 
-  String get location => weather.city;
+  String get location => weather.location;
 
   bool get needsRefresh => weather.needsRefresh;
 

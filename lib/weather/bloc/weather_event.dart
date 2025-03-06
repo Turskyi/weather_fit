@@ -28,3 +28,9 @@ final class ToggleUnits extends WeatherEvent {
 final class UpdateWeatherOnMobileHomeScreenEvent extends WeatherEvent {
   const UpdateWeatherOnMobileHomeScreenEvent();
 }
+
+final class GetOutfitEvent extends WeatherEvent {
+  const GetOutfitEvent(this.weather);
+
+  final Weather weather;
+}

@@ -27,6 +27,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     on<RefreshWeather>(_onRefreshWeather);
     on<ToggleUnits>(_onToggleUnits);
     on<UpdateWeatherOnMobileHomeScreenEvent>(_updateWeatherOnMobileHomeScreen);
+    on<GetOutfitEvent>(_onOutfitRecommendationRequested);
   }
 
   final WeatherRepository _weatherRepository;
@@ -397,6 +398,107 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           'and shorts.';
     } else {
       return '🌤️\nThe weather is moderate. You can wear a variety of outfits.';
+    }
+  }
+
+  FutureOr<void> _onOutfitRecommendationRequested(
+    GetOutfitEvent event,
+    Emitter<WeatherState> emit,
+  ) async {
+    final Weather weather = event.weather;
+
+    if (weather.isEmpty) {
+      emit(const WeatherInitial());
+      return;
+    }
+
+    if (state is WeatherSuccess &&
+        (weather.location == state.location) &&
+        !state.needsRefresh) {
+      final String message = 'Same location.\n'
+          'Wait ${state.remainingMinutes} minutes '
+          'to get updated weather and outfit.';
+
+      emit((state as WeatherSuccess).copyWith(message: message));
+      emit((state as WeatherSuccess).copyWith(message: ''));
+    } else {
+      emit(const WeatherLoadingState());
+      try {
+        final TemperatureUnits units = state.temperatureUnits;
+
+        final double value = units.isFahrenheit
+            ? weather.temperature.value.toFahrenheit()
+            : weather.temperature.value;
+
+        final Weather updatedWeather = weather.copyWith(
+          temperature: Temperature(value: value),
+          temperatureUnits: units,
+        );
+
+        final String outfitRecommendation = _getOutfitRecommendation(
+          updatedWeather,
+        );
+
+        emit(
+          LoadingOutfitState(
+            weather: updatedWeather,
+            outfitRecommendation: outfitRecommendation,
+          ),
+        );
+
+        if (state is WeatherSuccess) {
+          if (kIsWeb) {
+            // We cannot make remote calls in browser because of the CORS.
+            emit(state as WeatherSuccess);
+          } else {
+            final String imageUrl =
+                await _aiRepository.getImageUrlFromAiAsFuture(
+              state.weather,
+            );
+
+            final http.Response response = await http.get(Uri.parse(imageUrl));
+
+            if (response.statusCode == HttpStatus.ok) {
+              final String filePath = await _saveImageToFile(response);
+              emit(
+                (state as WeatherSuccess).copyWith(outfitFilePath: filePath),
+              );
+              add(const UpdateWeatherOnMobileHomeScreenEvent());
+            } else {
+              throw Exception('Failed to download image');
+            }
+          }
+        } else {
+          emit(
+            WeatherSuccess(
+              weather: updatedWeather,
+              outfitRecommendation: outfitRecommendation,
+            ),
+          );
+        }
+      } on Exception catch (e) {
+        if (e is http.ClientException && kDebugMode && kIsWeb) {
+          emit(
+            LocalWebCorsFailure(
+              message: 'Error: Local Environment Setup Required\nTo run this '
+                  'application locally on web, please use the following '
+                  'command:\n\nflutter run -d chrome --web-browser-flag '
+                  '"--disable-web-security"\n\nThis step is necessary to '
+                  'bypass CORS restrictions during local development. '
+                  'Please note that this flag should only be used in a '
+                  'development environment and never in production.',
+              outfitRecommendation: state.outfitRecommendation,
+            ),
+          );
+        } else {
+          emit(
+            WeatherFailure(
+              message: '$e',
+              outfitRecommendation: state.outfitRecommendation,
+            ),
+          );
+        }
+      }
     }
   }
 }

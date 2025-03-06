@@ -3,11 +3,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:open_meteo_api/open_meteo_api.dart';
 import 'package:test/test.dart';
 
-class MockHttpClient extends Mock implements http.Client {}
-
-class MockResponse extends Mock implements http.Response {}
-
-class FakeUri extends Fake implements Uri {}
+import 'helpers/mocks.dart';
 
 void main() {
   group('OpenMeteoApiClient', () {
@@ -93,7 +89,10 @@ void main() {
       "id": 4887398,
       "name": "Chicago",
       "latitude": 41.85003,
-      "longitude": -87.65005
+      "longitude": -87.65005,
+      "country_code": "US",
+      "country": "United States",
+      "admin1": "Illinois"
     }
   ]
 }''',

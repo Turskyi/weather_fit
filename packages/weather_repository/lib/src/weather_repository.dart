@@ -24,6 +24,44 @@ class WeatherRepository {
       countryCode: location.countryCode,
     );
   }
+
+  Future<Location> getLocation(String query) async {
+    final LocationResponse response = await _weatherApiClient.locationSearch(
+      query,
+    );
+
+    return Location(
+      id: response.id,
+      name: response.name,
+      latitude: response.latitude,
+      longitude: response.longitude,
+      countryCode: response.countryCode,
+      country: response.country,
+      province: response.admin1,
+    );
+  }
+
+  Future<WeatherDomain> getWeatherByLocation(Location location) async {
+    final double latitude = location.latitude;
+    final double longitude = location.longitude;
+
+    final WeatherResponse weather = await _weatherApiClient.getWeather(
+      latitude: latitude,
+      longitude: longitude,
+    );
+
+    final String locationName = location.name.isEmpty
+        ? 'Lat: ${latitude.toStringAsFixed(2)}, '
+            'Lon: ${longitude.toStringAsFixed(2)}'
+        : location.name;
+
+    return WeatherDomain(
+      temperature: weather.temperature,
+      location: locationName,
+      condition: weather.weatherCode.toInt().toCondition,
+      countryCode: location.countryCode,
+    );
+  }
 }
 
 extension on int {

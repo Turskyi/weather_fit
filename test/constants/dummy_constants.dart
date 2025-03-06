@@ -7,3 +7,4 @@ const String dummyWeatherLocation = 'London';
 const WeatherCondition dummyWeatherCondition = WeatherCondition.unknown;
 const double dummyWeatherTemperature = 9.8;
 const String dummyCountryCode = 'gb';
+const String dummyCity = 'London';

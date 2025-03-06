@@ -6,6 +6,10 @@
     android:versionName="0.1.5">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Grants approximate location access using Wi-Fi and mobile networks.
+     Does not use GPS, conserving battery. Suitable for general location-based
+     features like weather updates or regional recommendations. -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <queries>
         <intent>
