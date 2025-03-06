@@ -1,7 +1,6 @@
 package com.turskyi.weather_fit
 
 import android.annotation.SuppressLint
-import android.annotation.TargetApi
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
@@ -11,6 +10,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Build
 import android.widget.RemoteViews
+import androidx.annotation.RequiresApi
 import es.antonborri.home_widget.HomeWidgetLaunchIntent
 import es.antonborri.home_widget.HomeWidgetPlugin
 import java.io.File
@@ -19,7 +19,7 @@ import java.io.File
  * Implementation of App Widget functionality.
  */
 @SuppressLint("ObsoleteSdkInt")
-@TargetApi(Build.VERSION_CODES.CUPCAKE)
+@RequiresApi(Build.VERSION_CODES.CUPCAKE)
 class WeatherWidget : AppWidgetProvider() {
     override fun onUpdate(
         context: Context,
@@ -43,7 +43,7 @@ class WeatherWidget : AppWidgetProvider() {
 }
 
 @SuppressLint("ObsoleteSdkInt")
-@TargetApi(Build.VERSION_CODES.CUPCAKE)
+@RequiresApi(Build.VERSION_CODES.CUPCAKE)
 internal fun updateAppWidget(
     context: Context,
     appWidgetManager: AppWidgetManager,

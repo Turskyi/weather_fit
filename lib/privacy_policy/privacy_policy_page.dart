@@ -35,11 +35,11 @@ class PrivacyPolicyPage extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             Text(
-              'Your privacy is important to us. It is ${constants.appName}\'s policy to '
-              'respect your privacy and comply with any applicable law and '
-              'regulation regarding any personal information we may collect '
-              'about you, including across our app, ${constants.appName}, and its '
-              'associated services.',
+              'Your privacy is important to us. It is ${constants.appName}\'s '
+              'policy to respect your privacy and comply with any applicable '
+              'law and regulation regarding any personal information we may '
+              'collect about you, including across our app, '
+              '${constants.appName}, and its associated services.',
               style: TextStyle(fontSize: bodySize),
             ),
             const SizedBox(height: 20),
@@ -125,9 +125,9 @@ class PrivacyPolicyPage extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              '${constants.appName} offers different features depending on the platform '
-              'you are using (mobile or web). Please note the following '
-              'platform-specific details:',
+              '${constants.appName} offers different features depending on the '
+              'platform you are using (mobile or web). Please note the '
+              'following platform-specific details:',
               style: TextStyle(fontSize: bodySize),
             ),
             const SizedBox(height: 10),

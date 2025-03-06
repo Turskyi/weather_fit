@@ -73,11 +73,11 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     Emitter<SearchState> emit,
   ) async {
     emit(const SearchLoading());
-
-    await _requestLocationPermission();
-
-    final Position position = await Geolocator.getCurrentPosition();
     try {
+      await _requestLocationPermission();
+
+      final Position position = await Geolocator.getCurrentPosition();
+
       final WeatherDomain weather =
           await _weatherRepository.getWeatherByLocation(
         Location(latitude: position.latitude, longitude: position.longitude),

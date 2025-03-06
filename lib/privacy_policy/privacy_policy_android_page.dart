@@ -41,11 +41,11 @@ class PrivacyPolicyAndroidPage extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             Text(
-              'Your privacy is important to us. It is ${constants.appName}\'s policy to '
-              'respect your privacy and comply with any applicable law and '
-              'regulation regarding any personal information we may collect '
-              'about you, including across our app, ${constants.appName}, and its '
-              'associated services.',
+              'Your privacy is important to us. It is ${constants.appName}\'s '
+              'policy to respect your privacy and comply with any applicable '
+              'law and regulation regarding any personal information we may '
+              'collect about you, including across our app, '
+              '${constants.appName}, and its associated services.',
               style: TextStyle(fontSize: bodySize),
             ),
             const SizedBox(height: 20),
@@ -167,10 +167,10 @@ class PrivacyPolicyAndroidPage extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              '${constants.appName} uses Firebase Crashlytics, a service by Google, to '
-              'collect crash reports anonymously to help us improve app '
-              'stability and fix bugs. The data collected by Crashlytics does '
-              'not include any personal information.',
+              '${constants.appName} uses Firebase Crashlytics, a service by '
+              'Google, to collect crash reports anonymously to help us improve '
+              'app stability and fix bugs. The data collected by Crashlytics '
+              'does not include any personal information.',
               style: TextStyle(fontSize: bodySize),
             ),
             const SizedBox(height: 20),
@@ -183,11 +183,11 @@ class PrivacyPolicyAndroidPage extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              '${constants.appName} uses artificial intelligence (AI) to generate images '
-              'with suitable outfits for the weather. If you encounter any '
-              'issues or have concerns regarding the AI-generated content, you '
-              'can report the problem through the "Feedback" section in the '
-              'settings page.',
+              '${constants.appName} uses artificial intelligence (AI) to '
+              'generate images with suitable outfits for the weather. If you '
+              'encounter any issues or have concerns regarding the '
+              'AI-generated content, you can report the problem through the '
+              '"Feedback" section in the settings page.',
               style: TextStyle(fontSize: bodySize),
             ),
             const SizedBox(height: 20),
