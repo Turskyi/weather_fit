@@ -16,7 +16,7 @@ class PrivacyPolicyAndroidPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Privacy Policy ${kIsWeb ? 'for "WeatherFit" Android '
+          'Privacy Policy ${kIsWeb ? 'for "${constants.appName}" Android '
               'Application' : ''}',
         ),
       ),
@@ -41,10 +41,10 @@ class PrivacyPolicyAndroidPage extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             Text(
-              'Your privacy is important to us. It is WeatherFit\'s policy to '
+              'Your privacy is important to us. It is ${constants.appName}\'s policy to '
               'respect your privacy and comply with any applicable law and '
               'regulation regarding any personal information we may collect '
-              'about you, including across our app, WeatherFit, and its '
+              'about you, including across our app, ${constants.appName}, and its '
               'associated services.',
               style: TextStyle(fontSize: bodySize),
             ),
@@ -64,6 +64,36 @@ class PrivacyPolicyAndroidPage extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             Text(
+              'Location Data',
+              style: TextStyle(
+                fontSize: titleSize,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              '${constants.appName} may optionally request access to your '
+              'device\'s approximate location (coarse location). This access '
+              'is only requested if the app cannot automatically determine '
+              'your location based on your entered city name. You will be '
+              'asked to grant permission before the app attempts to access '
+              'your location.',
+              style: TextStyle(fontSize: bodySize),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'If you grant location permission, this data is used locally '
+              'within the app to help find relevant weather information for '
+              'your current location. This location data is not stored or '
+              'transmitted anywhere outside of your device and is used only '
+              'temporarily to find your current location. After finding '
+              'weather for current location it is discarded. You can choose '
+              'not to provide your location, in which case you can continue '
+              'using the app by manually entering your city name.',
+              style: TextStyle(fontSize: bodySize),
+            ),
+            const SizedBox(height: 20),
+            Text(
               'Third-Party Services',
               style: TextStyle(
                 fontSize: titleSize,
@@ -72,7 +102,7 @@ class PrivacyPolicyAndroidPage extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              'WeatherFit uses third-party services that may collect '
+              '${constants.appName} uses third-party services that may collect '
               'information used to identify you. These services include '
               'Firebase Crashlytics and Google Analytics. The data collected '
               'by these services is used to improve app stability and user '
@@ -137,7 +167,7 @@ class PrivacyPolicyAndroidPage extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              'WeatherFit uses Firebase Crashlytics, a service by Google, to '
+              '${constants.appName} uses Firebase Crashlytics, a service by Google, to '
               'collect crash reports anonymously to help us improve app '
               'stability and fix bugs. The data collected by Crashlytics does '
               'not include any personal information.',
@@ -153,7 +183,7 @@ class PrivacyPolicyAndroidPage extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              'WeatherFit uses artificial intelligence (AI) to generate images '
+              '${constants.appName} uses artificial intelligence (AI) to generate images '
               'with suitable outfits for the weather. If you encounter any '
               'issues or have concerns regarding the AI-generated content, you '
               'can report the problem through the "Feedback" section in the '
