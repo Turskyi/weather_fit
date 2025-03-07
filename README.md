@@ -5,7 +5,7 @@
 [![style: flutter lints](https://img.shields.io/badge/style-flutter__lints-blue)](https://pub.dev/packages/flutter_lints)
 [![codecov](https://codecov.io/gh/Turskyi/weather_fit/graph/badge.svg?token=X9R15N3WP3)](https://codecov.io/gh/Turskyi/weather_fit)
 [![Codemagic build status](https://api.codemagic.io/apps/65ee103d67c09b754e5d3451/65ee103d67c09b754e5d3450/status_badge.svg)](https://play.google.com/store/apps/details?id=com.turskyi.weather_fit)
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/Turskyi/portion_control)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/Turskyi/weather_fit)
 <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/m/Turskyi/weather_fit">
 
 # Weather Fit
