@@ -13,13 +13,23 @@ class WeatherRepository {
     final LocationResponse location = await _weatherApiClient.locationSearch(
       city,
     );
+
     final WeatherResponse weather = await _weatherApiClient.getWeather(
       latitude: location.latitude,
       longitude: location.longitude,
     );
+
     return WeatherDomain(
       temperature: weather.temperature,
-      location: location.name,
+      location: Location(
+        id: location.id,
+        name: location.name,
+        latitude: location.latitude,
+        longitude: location.longitude,
+        countryCode: location.countryCode,
+        country: location.country,
+        province: location.admin1,
+      ),
       condition: weather.weatherCode.toInt().toCondition,
       countryCode: location.countryCode,
     );
@@ -50,14 +60,9 @@ class WeatherRepository {
       longitude: longitude,
     );
 
-    final String locationName = location.name.isEmpty
-        ? 'Lat: ${latitude.toStringAsFixed(2)}, '
-            'Lon: ${longitude.toStringAsFixed(2)}'
-        : location.name;
-
     return WeatherDomain(
       temperature: weather.temperature,
-      location: locationName,
+      location: location,
       condition: weather.weatherCode.toInt().toCondition,
       countryCode: location.countryCode,
     );

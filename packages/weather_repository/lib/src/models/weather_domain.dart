@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:weather_repository/src/models/weather_condition.dart';
+import 'package:weather_repository/weather_repository.dart';
 
 part 'weather_domain.g.dart';
 
@@ -18,10 +18,15 @@ class WeatherDomain extends Equatable {
 
   Map<String, Object?> toJson() => _$WeatherDomainToJson(this);
 
-  final String location;
+  final Location location;
   final double temperature;
   final WeatherCondition condition;
   final String countryCode;
+
+  String get locationName => location.name.isEmpty
+      ? 'Lat: ${location.latitude.toStringAsFixed(2)}, '
+          'Lon: ${location.longitude.toStringAsFixed(2)}'
+      : location.name;
 
   @override
   List<Object> get props => <Object>[

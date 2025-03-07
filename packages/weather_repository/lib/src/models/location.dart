@@ -11,6 +11,17 @@ class Location extends Equatable {
     this.province = '',
   });
 
+  const Location.empty()
+      : this(
+          id: 0,
+          name: '',
+          latitude: 0.0,
+          longitude: 0.0,
+          countryCode: '',
+          country: '',
+          province: '',
+        );
+
   factory Location.fromJson(Map<String, Object?> json) {
     final Object? id = json['id'];
     final Object? name = json['name'];
@@ -74,4 +85,18 @@ class Location extends Equatable {
         'province: $province,'
         '}';
   }
+
+  bool get isEmpty =>
+      id == 0 &&
+      name.isEmpty &&
+      latitude == 0.0 &&
+      longitude == 0.0 &&
+      countryCode.isEmpty &&
+      country.isEmpty &&
+      province.isEmpty;
+
+  String get locationName => name.isEmpty
+      ? 'Lat: ${latitude.toStringAsFixed(2)}, '
+          'Lon: ${longitude.toStringAsFixed(2)}'
+      : name;
 }

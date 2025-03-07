@@ -6,6 +6,8 @@ import 'package:http/http.dart' as http;
 import 'package:open_meteo_api/open_meteo_api.dart';
 import 'package:open_meteo_api/src/models/exceptions/location_response_failure.dart';
 
+import 'models/exceptions/weather_response_failure.dart';
+
 /// Exception thrown when locationSearch fails.
 class LocationRequestFailure implements Exception {}
 
@@ -66,12 +68,15 @@ class OpenMeteoApiClient {
     required double latitude,
     required double longitude,
   }) async {
-    final Uri weatherRequest =
-        Uri.https(_baseUrlWeather, 'v1/forecast', <String, String>{
-      'latitude': '$latitude',
-      'longitude': '$longitude',
-      'current_weather': 'true',
-    });
+    final Uri weatherRequest = Uri.https(
+      _baseUrlWeather,
+      'v1/forecast',
+      <String, String>{
+        'latitude': '$latitude',
+        'longitude': '$longitude',
+        'current_weather': 'true',
+      },
+    );
 
     final http.Response weatherResponse = await _httpClient.get(weatherRequest);
 
@@ -79,16 +84,18 @@ class OpenMeteoApiClient {
       throw WeatherRequestFailure();
     }
 
-    final Map<String, dynamic> bodyJson =
-        jsonDecode(weatherResponse.body) as Map<String, dynamic>;
-
-    if (!bodyJson.containsKey('current_weather')) {
-      throw WeatherNotFoundFailure();
+    final Object weatherData = jsonDecode(weatherResponse.body);
+    if (weatherData is Map<String, Object?>) {
+      final Map<String, Object?> weatherJson = weatherData;
+      if (!weatherJson.containsKey('current_weather')) {
+        throw WeatherNotFoundFailure();
+      }
+      final Object? currentWeather = weatherJson['current_weather'];
+      if (currentWeather is Map<String, Object?>) {
+        return WeatherResponse.fromJson(currentWeather);
+      }
     }
 
-    final Map<String, dynamic> weatherJson =
-        bodyJson['current_weather'] as Map<String, dynamic>;
-
-    return WeatherResponse.fromJson(weatherJson);
+    throw WeatherResponseFailure();
   }
 }

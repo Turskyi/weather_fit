@@ -30,7 +30,7 @@ void main() {
         dummy_constants.dummyWeatherCondition,
       );
       when(() => weather.location).thenReturn(
-        dummy_constants.dummyWeatherLocation,
+        dummy_constants.dummyLocation,
       );
       when(() => weather.temperature).thenReturn(
         dummy_constants.dummyWeatherTemperature,
@@ -143,7 +143,7 @@ void main() {
           weather: Weather(
             condition: WeatherCondition.rainy,
             lastUpdatedDateTime: DateTime(2025),
-            location: dummy_constants.dummyWeatherLocation,
+            location: dummy_constants.dummyLocation,
             temperature: const Temperature(
               value: dummy_constants.dummyWeatherTemperature,
             ),
@@ -161,7 +161,7 @@ void main() {
         build: () => weatherBloc,
         seed: () => WeatherSuccess(
           weather: Weather(
-            location: dummy_constants.dummyWeatherLocation,
+            location: dummy_constants.dummyLocation,
             temperature: const Temperature(
               value: dummy_constants.dummyWeatherTemperature,
             ),
@@ -175,7 +175,7 @@ void main() {
         expect: () => <WeatherState>[
           WeatherSuccess(
             weather: Weather(
-              location: dummy_constants.dummyWeatherLocation,
+              location: dummy_constants.dummyLocation,
               temperature: Temperature(
                 value: dummy_constants.dummyWeatherTemperature.toCelsius(),
               ),
@@ -194,7 +194,7 @@ void main() {
         build: () => weatherBloc,
         seed: () => WeatherSuccess(
           weather: Weather(
-            location: dummy_constants.dummyWeatherLocation,
+            location: dummy_constants.dummyLocation,
             temperature: const Temperature(
               value: dummy_constants.dummyWeatherTemperature,
             ),
@@ -208,7 +208,7 @@ void main() {
         expect: () => <WeatherState>[
           WeatherSuccess(
             weather: Weather(
-              location: dummy_constants.dummyWeatherLocation,
+              location: dummy_constants.dummyLocation,
               temperature: Temperature(
                 value: dummy_constants.dummyWeatherTemperature.toFahrenheit(),
               ),

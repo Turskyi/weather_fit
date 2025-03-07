@@ -58,7 +58,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     }
 
     if (state is WeatherSuccess &&
-        eventLocation == state.location &&
+        eventLocation == state.locationName &&
         !state.needsRefresh) {
       final String message = 'Same location.\n'
           'Wait ${state.remainingMinutes} minutes '
@@ -69,10 +69,8 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     } else {
       emit(const WeatherLoadingState());
       try {
-        final String location = event.location;
-
         final WeatherDomain domainWeather = await _weatherRepository.getWeather(
-          location,
+          eventLocation,
         );
 
         final Weather weather = Weather.fromRepository(domainWeather);
@@ -184,9 +182,9 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     );
 
     try {
-      final WeatherDomain updatedWeather = await _weatherRepository.getWeather(
-        state.location,
-      );
+      final WeatherDomain updatedWeather = state.locationCity.isEmpty
+          ? await _weatherRepository.getWeatherByLocation(state.location)
+          : await _weatherRepository.getWeather(state.locationCity);
 
       final Weather weather = Weather.fromRepository(updatedWeather);
 
@@ -304,7 +302,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
       // Save weather data to the widget.
       HomeWidget.saveWidgetData<String>('text_emoji', state.emoji);
 
-      HomeWidget.saveWidgetData<String>('text_location', state.location);
+      HomeWidget.saveWidgetData<String>('text_location', state.locationName);
 
       HomeWidget.saveWidgetData<String>(
         'text_temperature',

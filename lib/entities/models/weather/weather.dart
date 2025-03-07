@@ -40,7 +40,7 @@ class Weather extends Equatable {
 
   final WeatherCondition condition;
   final DateTime? lastUpdatedDateTime;
-  final String location;
+  final Location location;
   final Temperature temperature;
   final TemperatureUnits temperatureUnits;
   final String countryCode;
@@ -48,7 +48,7 @@ class Weather extends Equatable {
   static const Weather empty = Weather(
     condition: WeatherCondition.unknown,
     temperature: Temperature(value: 0),
-    location: '',
+    location: Location.empty(),
     temperatureUnits: TemperatureUnits.celsius,
     countryCode: '',
   );
@@ -79,7 +79,7 @@ class Weather extends Equatable {
   Weather copyWith({
     WeatherCondition? condition,
     DateTime? lastUpdatedDateTime,
-    String? location,
+    Location? location,
     Temperature? temperature,
     TemperatureUnits? temperatureUnits,
     String? countryCode,
@@ -132,4 +132,9 @@ class Weather extends Equatable {
 
     return difference > 0 ? difference : 0;
   }
+
+  String get locationName => location.name.isEmpty
+      ? 'Lat: ${location.latitude.toStringAsFixed(2)}, '
+          'Lon: ${location.longitude.toStringAsFixed(2)}'
+      : location.name;
 }

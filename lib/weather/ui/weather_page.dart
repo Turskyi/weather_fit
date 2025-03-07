@@ -67,14 +67,37 @@ class WeatherPage extends StatelessWidget {
                     outfitRecommendation: state.outfitRecommendation,
                   );
                 } else if (state is LoadingOutfitState) {
+                  final double screenWidth = MediaQuery.sizeOf(context).width;
+                  final bool isNarrowScreen = screenWidth < 500;
+                  final BorderRadius borderRadius = BorderRadius.circular(20.0);
                   // Image is still loading
-                  outfitImageWidget = SizedBox(
-                    width: 400,
-                    height: 400,
-                    child: Shimmer.fromColors(
-                      baseColor: Colors.grey.shade300,
-                      highlightColor: Colors.grey.shade100,
-                      child: Container(color: Colors.white),
+                  outfitImageWidget = DecoratedBox(
+                    decoration: BoxDecoration(
+                      // Match the ClipRRect's radius.
+                      borderRadius: borderRadius,
+                      boxShadow: <BoxShadow>[
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.2),
+                          // How far the shadow spreads.
+                          spreadRadius: 2,
+                          // How blurry the shadow is.
+                          blurRadius: 8,
+                          // Vertical offset (positive for down).
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: borderRadius,
+                      child: SizedBox(
+                        width: 400,
+                        height: isNarrowScreen ? 460 : 400,
+                        child: Shimmer.fromColors(
+                          baseColor: Colors.grey.shade300,
+                          highlightColor: Colors.grey.shade100,
+                          child: const ColoredBox(color: Colors.white),
+                        ),
+                      ),
                     ),
                   );
                 }

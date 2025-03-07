@@ -12,7 +12,8 @@ WeatherDomain _$WeatherDomainFromJson(Map<String, dynamic> json) =>
       json,
       ($checkedConvert) {
         final val = WeatherDomain(
-          location: $checkedConvert('location', (v) => v as String),
+          location: $checkedConvert(
+              'location', (v) => Location.fromJson(v as Map<String, dynamic>)),
           temperature:
               $checkedConvert('temperature', (v) => (v as num).toDouble()),
           condition: $checkedConvert(

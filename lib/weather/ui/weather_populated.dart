@@ -49,10 +49,10 @@ class WeatherPopulated extends StatelessWidget {
                           height: cityTextStyle?.fontSize,
                         ),
                       const SizedBox(width: 8),
-                      Expanded(
+                      Flexible(
                         child: FittedBox(
                           child: Text(
-                            weather.location,
+                            weather.locationName,
                             style: cityTextStyle?.copyWith(
                               fontWeight: FontWeight.w200,
                             ),
@@ -91,6 +91,7 @@ class WeatherPopulated extends StatelessWidget {
                       }
                     },
                   ),
+                  const SizedBox(height: 24),
                 ],
               ),
             ),

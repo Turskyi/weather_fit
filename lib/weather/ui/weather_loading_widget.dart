@@ -24,8 +24,9 @@ class WeatherLoadingWidget extends StatelessWidget {
         const SizedBox(height: 16.0),
         Text(
           'Loading Weather',
-          style:
-              theme.textTheme.titleLarge!.copyWith(fontWeight: FontWeight.bold),
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
         ),
         const SizedBox(height: 8.0),
         CircularProgressIndicator(

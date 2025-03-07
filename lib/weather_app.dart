@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:nested/nested.dart';
 import 'package:weather_fit/data/repositories/ai_repository.dart';
+import 'package:weather_fit/res/constants.dart' as constants;
 import 'package:weather_fit/res/theme/cubit/theme_cubit.dart';
 import 'package:weather_fit/router/app_route.dart';
 import 'package:weather_fit/router/routes.dart' as routes;
@@ -46,8 +47,13 @@ class WeatherApp extends StatelessWidget {
         ],
         child: BlocBuilder<ThemeCubit, Color>(
           builder: (_, Color color) {
+            final DateTime now = DateTime.now();
+            final int hour = now.hour;
+            // Assume darkness from 10 PM to 6 AM
+            final bool completeDarkness = hour < 6 || hour > 21;
+
             return MaterialApp(
-              title: 'WeatherFit',
+              title: constants.appName,
               initialRoute: AppRoute.weather.path,
               routes: routes.routeMap,
               theme: ThemeData(
@@ -62,6 +68,21 @@ class WeatherApp extends StatelessWidget {
                 // characters" error, but it still did not help.
                 fontFamily: 'NotoSans',
               ),
+              darkTheme: ThemeData(
+                appBarTheme: const AppBarTheme(
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                ),
+                colorScheme: ColorScheme.fromSeed(
+                  seedColor: color,
+                  brightness: Brightness.dark,
+                ),
+                textTheme: GoogleFonts.rajdhaniTextTheme(
+                  ThemeData.dark().textTheme,
+                ),
+                fontFamily: 'NotoSans',
+              ),
+              themeMode: completeDarkness ? ThemeMode.dark : ThemeMode.light,
             );
           },
         ),
