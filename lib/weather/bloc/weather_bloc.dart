@@ -203,7 +203,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
             temperatureUnits: units,
           ),
           outfitRecommendation: outfitRecommendation,
-          outfitFilePath: state.outfitFilePath,
+          outfitFilePath: '',
         ),
       );
 
@@ -215,6 +215,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           final String imageUrl = await _aiRepository.getImageUrlFromAiAsFuture(
             state.weather,
           );
+
           final http.Response response = await http.get(Uri.parse(imageUrl));
 
           if (response.statusCode == HttpStatus.ok) {

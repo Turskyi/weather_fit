@@ -9,7 +9,7 @@ enum WeatherCondition {
     final DateTime now = DateTime.now();
     final int hour = now.hour;
     // Assume daytime from 6 AM to 6 PM.
-    final bool isDaytime = hour >= 6 && hour < 18;
+    final bool isDaytime = hour >= 6 && hour < 19;
     switch (this) {
       case WeatherCondition.clear:
         // Sun during day, moon at night

@@ -8,7 +8,7 @@ class RemoteDataSource {
   Future<String> getImageUrlFromOpenAiAsFuture(Weather weather) async {
     if (kDebugMode) {
       final String dummyImageUrl = _dummyImageUrls[_dummyImageUrlIndex];
-      print('Deb: Using dummy image URL: $dummyImageUrl');
+
       _dummyImageUrlIndex = (_dummyImageUrlIndex + 1) % _dummyImageUrls.length;
       await Future<void>.delayed(const Duration(seconds: 2));
       return dummyImageUrl;
