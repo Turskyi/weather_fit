@@ -10,7 +10,7 @@ class EmailText extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       child: SelectableText(
-        'WeatherFit\nEmail: $email',
+        'Email: $email',
         style: const TextStyle(fontSize: 16),
         onTap: () async {
           final Uri emailLaunchUri = Uri(

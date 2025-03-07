@@ -34,7 +34,7 @@ void main() async {
       theme: FeedbackThemeData(feedbackSheetColor: Colors.grey.shade50),
       child: WeatherApp(
         weatherRepository: WeatherRepository(),
-        aiRepository: const AiRepository(RemoteDataSource()),
+        aiRepository: AiRepository(RemoteDataSource()),
       ),
     ),
   );

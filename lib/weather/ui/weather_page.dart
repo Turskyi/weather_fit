@@ -1,11 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:home_widget/home_widget.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
-import 'package:weather_fit/res/constants.dart' as constants;
 import 'package:weather_fit/res/theme/cubit/theme_cubit.dart';
+import 'package:weather_fit/res/widgets/local_web_cors_error.dart';
 import 'package:weather_fit/router/app_route.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 import 'package:weather_fit/weather/ui/outfit_widget.dart';
@@ -34,6 +33,11 @@ class WeatherPage extends StatelessWidget {
           listener: (BuildContext context, WeatherState state) {
             if (state is WeatherSuccess) {
               context.read<ThemeCubit>().updateTheme(state.weather);
+              if (state.message.isNotEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(state.message)),
+                );
+              }
             }
           },
           builder: (BuildContext context, WeatherState state) {
@@ -41,7 +45,7 @@ class WeatherPage extends StatelessWidget {
               case WeatherInitial():
                 return const WeatherEmpty();
               case WeatherLoadingState():
-                if (state.weather.city.isEmpty) {
+                if (state.weather.location.isEmpty) {
                   return const WeatherLoadingWidget();
                 } else {
                   return WeatherPopulated(
@@ -56,26 +60,44 @@ class WeatherPage extends StatelessWidget {
                 }
                 Widget outfitImageWidget = const SizedBox();
 
-                if (state.outfitImageUrl.isNotEmpty) {
+                if (state.outfitRecommendation.isNotEmpty) {
                   outfitImageWidget = OutfitWidget(
                     needsRefresh: state.weather.needsRefresh,
-                    imageUrl: state.outfitImageUrl,
-                    onLoaded: kIsWeb
-                        ? null
-                        : () => _updateWeatherOnMobileHomeScreenWidget(
-                              weather: state.weather,
-                              outfitImageWidget: outfitImageWidget,
-                            ),
+                    filePath: state.outfitFilePath,
+                    outfitRecommendation: state.outfitRecommendation,
                   );
                 } else if (state is LoadingOutfitState) {
+                  final double screenWidth = MediaQuery.sizeOf(context).width;
+                  final bool isNarrowScreen = screenWidth < 500;
+                  final BorderRadius borderRadius = BorderRadius.circular(20.0);
                   // Image is still loading
-                  outfitImageWidget = SizedBox(
-                    width: 400,
-                    height: 400,
-                    child: Shimmer.fromColors(
-                      baseColor: Colors.grey.shade300,
-                      highlightColor: Colors.grey.shade100,
-                      child: Container(color: Colors.white),
+                  outfitImageWidget = DecoratedBox(
+                    decoration: BoxDecoration(
+                      // Match the ClipRRect's radius.
+                      borderRadius: borderRadius,
+                      boxShadow: <BoxShadow>[
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.2),
+                          // How far the shadow spreads.
+                          spreadRadius: 2,
+                          // How blurry the shadow is.
+                          blurRadius: 8,
+                          // Vertical offset (positive for down).
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: borderRadius,
+                      child: SizedBox(
+                        width: 400,
+                        height: isNarrowScreen ? 460 : 400,
+                        child: Shimmer.fromColors(
+                          baseColor: Colors.grey.shade300,
+                          highlightColor: Colors.grey.shade100,
+                          child: const ColoredBox(color: Colors.white),
+                        ),
+                      ),
                     ),
                   );
                 }
@@ -96,6 +118,8 @@ class WeatherPage extends StatelessWidget {
                     child: outfitImageWidget,
                   ),
                 );
+              case LocalWebCorsFailure():
+                return const LocalWebCorsError();
               case WeatherFailure():
                 return WeatherError(state.message);
             }
@@ -103,64 +127,24 @@ class WeatherPage extends StatelessWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _handleCitySelectionAndFetchWeather(context),
+        onPressed: () => _handleLocationSearchAndFetchWeather(context),
         child: const Icon(Icons.search, semanticLabel: 'Search'),
       ),
     );
   }
 
-  Future<void> _handleCitySelectionAndFetchWeather(BuildContext context) async {
-    final String? city = await Navigator.pushNamed<dynamic>(
+  Future<void> _handleLocationSearchAndFetchWeather(
+    BuildContext context,
+  ) async {
+    final Object? weather = await Navigator.pushNamed<Object>(
       context,
       AppRoute.search.path,
     );
 
-    if (context.mounted && city is String) {
-      context.read<WeatherBloc>().add(FetchWeather(city: city));
+    if (context.mounted && weather is Weather) {
+      context.read<WeatherBloc>().add(GetOutfitEvent(weather));
     } else {
       return;
-    }
-  }
-
-  Future<void> _updateWeatherOnMobileHomeScreenWidget({
-    required Weather weather,
-    required Widget outfitImageWidget,
-  }) async {
-    if (!kIsWeb && weather.needsRefresh) {
-      // Set the group ID.
-      HomeWidget.setAppGroupId(constants.appGroupId);
-
-      // Save the weather widget data to the widget.
-      HomeWidget.saveWidgetData<String>('text_emoji', weather.emoji);
-
-      HomeWidget.saveWidgetData<String>('text_location', weather.city);
-
-      HomeWidget.saveWidgetData<String>(
-        'text_temperature',
-        weather.formattedTemperature,
-      );
-
-      HomeWidget.saveWidgetData<String>(
-        'text_last_updated',
-        'Last Updated on ${weather.formattedLastUpdatedDateTime}',
-      );
-
-      final dynamic imagePath = await HomeWidget.renderFlutterWidget(
-        outfitImageWidget,
-        key: 'image_weather',
-        logicalSize: const Size(400, 400),
-      );
-
-      // Save the image path if it exists.
-      if (imagePath is String && imagePath.isNotEmpty) {
-        HomeWidget.saveWidgetData<String>('image_weather', imagePath);
-      }
-
-      // Update the widget.
-      HomeWidget.updateWidget(
-        iOSName: constants.iOSWidgetName,
-        androidName: constants.androidWidgetName,
-      );
     }
   }
 

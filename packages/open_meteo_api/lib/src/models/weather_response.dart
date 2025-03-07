@@ -6,7 +6,7 @@ part 'weather_response.g.dart';
 class WeatherResponse {
   const WeatherResponse({required this.temperature, required this.weatherCode});
 
-  factory WeatherResponse.fromJson(Map<String, dynamic> json) =>
+  factory WeatherResponse.fromJson(Map<String, Object?> json) =>
       _$WeatherResponseFromJson(json);
 
   final double temperature;

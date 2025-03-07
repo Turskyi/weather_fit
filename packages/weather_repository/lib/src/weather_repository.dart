@@ -13,13 +13,56 @@ class WeatherRepository {
     final LocationResponse location = await _weatherApiClient.locationSearch(
       city,
     );
+
     final WeatherResponse weather = await _weatherApiClient.getWeather(
       latitude: location.latitude,
       longitude: location.longitude,
     );
+
     return WeatherDomain(
       temperature: weather.temperature,
-      location: location.name,
+      location: Location(
+        id: location.id,
+        name: location.name,
+        latitude: location.latitude,
+        longitude: location.longitude,
+        countryCode: location.countryCode,
+        country: location.country,
+        province: location.admin1,
+      ),
+      condition: weather.weatherCode.toInt().toCondition,
+      countryCode: location.countryCode,
+    );
+  }
+
+  Future<Location> getLocation(String query) async {
+    final LocationResponse response = await _weatherApiClient.locationSearch(
+      query,
+    );
+
+    return Location(
+      id: response.id,
+      name: response.name,
+      latitude: response.latitude,
+      longitude: response.longitude,
+      countryCode: response.countryCode,
+      country: response.country,
+      province: response.admin1,
+    );
+  }
+
+  Future<WeatherDomain> getWeatherByLocation(Location location) async {
+    final double latitude = location.latitude;
+    final double longitude = location.longitude;
+
+    final WeatherResponse weather = await _weatherApiClient.getWeather(
+      latitude: latitude,
+      longitude: longitude,
+    );
+
+    return WeatherDomain(
+      temperature: weather.temperature,
+      location: location,
       condition: weather.weatherCode.toInt().toCondition,
       countryCode: location.countryCode,
     );

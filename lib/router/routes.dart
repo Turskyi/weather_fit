@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:weather_fit/privacy_policy/privacy_policy_android_page.dart';
 import 'package:weather_fit/privacy_policy/privacy_policy_page.dart';
 import 'package:weather_fit/router/app_route.dart';
-import 'package:weather_fit/search/search_page.dart';
+import 'package:weather_fit/search/ui/search_page.dart';
 import 'package:weather_fit/settings/ui/settings_page.dart';
 import 'package:weather_fit/weather/ui/weather_page.dart';
 

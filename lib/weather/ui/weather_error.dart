@@ -7,22 +7,25 @@ class WeatherError extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
+    final TextTheme textTheme = Theme.of(context).textTheme;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        const Text('🫠', style: TextStyle(fontSize: 64)),
+        Text(
+          '🫠',
+          style: TextStyle(fontSize: textTheme.displayLarge?.fontSize),
+        ),
         Text(
           'Something went wrong!',
-          style: theme.textTheme.headlineMedium,
+          style: textTheme.headlineMedium,
         ),
         const SizedBox(height: 20),
         Container(
           alignment: Alignment.center,
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: Text(
+          child: SelectableText(
             message,
-            style: theme.textTheme.headlineSmall,
+            style: textTheme.headlineSmall,
           ),
         ),
       ],

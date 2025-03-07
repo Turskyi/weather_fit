@@ -15,7 +15,7 @@ class WeatherEmpty extends StatelessWidget {
           style: theme.textTheme.headlineMedium,
         ),
         Text(
-          'Tap 🔍 to search for a city.',
+          'Tap 🔍 to search for a city or country.',
           style: theme.textTheme.titleSmall,
         ),
         const SizedBox(height: 16.0),

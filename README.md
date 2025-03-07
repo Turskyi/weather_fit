@@ -1,6 +1,6 @@
 [![Stand With Ukraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner-direct-single.svg)](https://stand-with-ukraine.pp.ua)
 [![Upload Android build to App Tester.](https://github.com/Turskyi/weather_fit/actions/workflows/flutter_android_ci.yml/badge.svg?branch=master)](https://appdistribution.firebase.dev/i/350faded06826d7b)
-[![Deploy web build.](https://github.com/Turskyi/weather_fit/actions/workflows/flutter_web_ci.yml/badge.svg?branch=master&event=push)](https://weather-fit-ai.web.app)
+[![Deploy to Firebase Hosting on merge](https://github.com/Turskyi/weather_fit/actions/workflows/firebase-hosting-merge.yml/badge.svg)](https://github.com/Turskyi/weather_fit/actions/workflows/firebase-hosting-merge.yml)
 [![Code Quality](https://github.com/Turskyi/weather_fit/actions/workflows/code_quality_tests.yml/badge.svg?branch=master&event=push)](https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo)
 [![style: flutter lints](https://img.shields.io/badge/style-flutter__lints-blue)](https://pub.dev/packages/flutter_lints)
 [![codecov](https://codecov.io/gh/Turskyi/weather_fit/graph/badge.svg?token=X9R15N3WP3)](https://codecov.io/gh/Turskyi/weather_fit)
@@ -193,7 +193,8 @@ The implementation is hidden behind the `polymorphism`.
 
 - [DON'T cast a nullable value to a non-nullable type. This hides a null check and most of the time it is not what is expected.](https://dart-lang.github.io/linter/lints/avoid_as.html)
 
-- [PREFER using `const` for instantiating constant constructors](https://dart-lang.github.io/linter/lints/prefer_const_constructors.html)
+- [PREFER using
+  `const` for instantiating constant constructors](https://dart-lang.github.io/linter/lints/prefer_const_constructors.html)
 
 If a constructor can be invoked as const to produce a canonicalized instance,
 it's preferable to do so.
@@ -471,3 +472,10 @@ more expression and flexibility.
 This project is based on the
 [Flutter Weather Tutorial](https://bloclibrary.dev/tutorials/flutter-weather/)
 by [the Bloc Community](https://github.com/felangel/bloc/graphs/contributors).
+
+Additionally, this project also references the tutorial
+[Flutter Home Screen Widgets](https://codelabs.developers.google.com/flutter-home-screen-widgets)
+by the
+[Flutter Community](https://github.com/flutter/codelabs/graphs/contributors),
+available on
+[GitHub](https://github.com/flutter/codelabs/tree/main/homescreen_codelab/step_06).

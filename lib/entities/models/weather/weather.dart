@@ -12,11 +12,11 @@ part 'weather.g.dart';
 class Weather extends Equatable {
   const Weather({
     required this.condition,
-    this.lastUpdatedDateTime,
-    required this.city,
+    required this.location,
     required this.temperature,
     required this.temperatureUnits,
     required this.countryCode,
+    this.lastUpdatedDateTime,
   });
 
   factory Weather.fromJson(Map<String, dynamic> json) =>
@@ -31,7 +31,7 @@ class Weather extends Equatable {
     return Weather(
       condition: weather.condition,
       lastUpdatedDateTime: parsedDateTime,
-      city: weather.location,
+      location: weather.location,
       temperature: Temperature(value: weather.temperature),
       temperatureUnits: TemperatureUnits.celsius,
       countryCode: weather.countryCode,
@@ -40,7 +40,7 @@ class Weather extends Equatable {
 
   final WeatherCondition condition;
   final DateTime? lastUpdatedDateTime;
-  final String city;
+  final Location location;
   final Temperature temperature;
   final TemperatureUnits temperatureUnits;
   final String countryCode;
@@ -48,7 +48,7 @@ class Weather extends Equatable {
   static const Weather empty = Weather(
     condition: WeatherCondition.unknown,
     temperature: Temperature(value: 0),
-    city: '',
+    location: Location.empty(),
     temperatureUnits: TemperatureUnits.celsius,
     countryCode: '',
   );
@@ -57,7 +57,7 @@ class Weather extends Equatable {
   List<Object?> get props => <Object?>[
         condition,
         lastUpdatedDateTime,
-        city,
+        location,
         temperature,
         temperatureUnits,
         countryCode,
@@ -65,17 +65,21 @@ class Weather extends Equatable {
 
   @override
   String toString() {
-    return 'Weather{condition: $condition, city: $city, '
-        'temperature: $temperature, temperatureUnits: $temperatureUnits, '
-        'countryCode: $countryCode}';
+    return 'Weather{'
+        'condition: $condition, '
+        'location: $location, '
+        'temperature: $temperature, '
+        'temperatureUnits: $temperatureUnits, '
+        'countryCode: $countryCode,'
+        '}';
   }
 
-  Map<String, dynamic> toJson() => _$WeatherToJson(this);
+  Map<String, Object?> toJson() => _$WeatherToJson(this);
 
   Weather copyWith({
     WeatherCondition? condition,
     DateTime? lastUpdatedDateTime,
-    String? city,
+    Location? location,
     Temperature? temperature,
     TemperatureUnits? temperatureUnits,
     String? countryCode,
@@ -83,7 +87,7 @@ class Weather extends Equatable {
       Weather(
         condition: condition ?? this.condition,
         lastUpdatedDateTime: lastUpdatedDateTime ?? this.lastUpdatedDateTime,
-        city: city ?? this.city,
+        location: location ?? this.location,
         temperature: temperature ?? this.temperature,
         temperatureUnits: temperatureUnits ?? this.temperatureUnits,
         countryCode: countryCode ?? this.countryCode,
@@ -94,7 +98,8 @@ class Weather extends Equatable {
 
   String get emoji => condition.toEmoji;
 
-  bool get isUnknown => condition == WeatherCondition.unknown || city.isEmpty;
+  bool get isUnknown =>
+      condition == WeatherCondition.unknown || location.isEmpty;
 
   bool get needsRefresh {
     final int difference = DateTime.now()
@@ -116,4 +121,20 @@ class Weather extends Equatable {
   }
 
   bool get neverUpdated => lastUpdatedDateTime == null;
+
+  bool get isNotEmpty => this != empty;
+
+  bool get isEmpty => this == empty;
+
+  int get remainingMinutes {
+    final int difference = constants.weatherRefreshDelayMinutes -
+        DateTime.now().difference(lastUpdatedDateTime ?? DateTime(0)).inMinutes;
+
+    return difference > 0 ? difference : 0;
+  }
+
+  String get locationName => location.name.isEmpty
+      ? 'Lat: ${location.latitude.toStringAsFixed(2)}, '
+          'Lon: ${location.longitude.toStringAsFixed(2)}'
+      : location.name;
 }

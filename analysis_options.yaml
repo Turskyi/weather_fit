@@ -31,7 +31,6 @@ linter:
     # opinionated to enable them by default.#
     # ------------------------------------- #
     require_trailing_commas: true
-    # The new tabs vs. spaces. Choose wisely.
     prefer_single_quotes: true
     # Blindly follow the Flutter code style, which prefers types everywhere.
     always_specify_types: true
@@ -41,6 +40,13 @@ linter:
     avoid_classes_with_only_static_members: true
     sort_constructors_first: true
     unnecessary_library_name: true
+    always_put_required_named_parameters_first: true
+    avoid_as: true
+    avoid_void_async: true
+    cancel_subscriptions: true
+    prefer_const_constructors: true
+    prefer_const_literals_to_create_immutables: true
+    avoid_print: true
 
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options

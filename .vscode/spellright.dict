@@ -10,3 +10,6 @@ jsonc
 esbenp
 vscode
 typescriptreact
+arraybuffer
+axios
+cors

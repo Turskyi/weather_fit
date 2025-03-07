@@ -7,11 +7,14 @@ void main() {
       test('returns correct Location object', () {
         expect(
           LocationResponse.fromJson(
-            <String, dynamic>{
+            <String, Object?>{
               'id': 4887398,
               'name': 'Chicago',
               'latitude': 41.85003,
               'longitude': -87.65005,
+              'country_code': 'US',
+              'country': 'United States',
+              'admin1': 'Illinois',
             },
           ),
           isA<LocationResponse>()

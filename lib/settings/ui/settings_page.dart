@@ -120,7 +120,9 @@ class _SettingsPageState extends State<SettingsPage> {
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       subtitle: const Text(
-                        'Let us know your thoughts and suggestions.',
+                        'Let us know your thoughts and suggestions. '
+                        '${kIsWeb ? '' : 'You can also report any problems '
+                            'with AI-generated content.'}',
                       ),
                       trailing: const Icon(Icons.feedback),
                       onTap: () => context
