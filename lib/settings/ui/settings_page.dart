@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:feedback/feedback.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -20,14 +22,15 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   FeedbackController? _feedbackController;
   bool _isFeedbackControllerInitialized = false;
+  bool _isDisposing = false;
 
   @override
   void didChangeDependencies() {
+    super.didChangeDependencies();
     if (!_isFeedbackControllerInitialized) {
       _feedbackController = BetterFeedback.of(context);
       _isFeedbackControllerInitialized = true;
     }
-    super.didChangeDependencies();
   }
 
   @override
@@ -155,9 +158,17 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   void dispose() {
+    _isDisposing = true;
     _feedbackController?.removeListener(_onFeedbackChanged);
-    _feedbackController?.dispose();
-    _feedbackController = null;
+    // Do not dispose it here, dispose when it is not null.
+    if (_feedbackController != null) {
+      // Schedule the dispose to occur after a short delay.
+      Future<void>.delayed(const Duration(milliseconds: 100), () {
+        if (!_isDisposing) return;
+        _feedbackController?.dispose();
+        _feedbackController = null;
+      });
+    }
     super.dispose();
   }
 
@@ -173,15 +184,19 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   void _showFeedbackUi() {
-    _feedbackController?.show(
-      (UserFeedback feedback) => context.read<SettingsBloc>().add(
-            SubmitFeedbackEvent(feedback),
-          ),
-    );
-    _feedbackController?.addListener(_onFeedbackChanged);
+    if (_isDisposing) return;
+    if (_feedbackController != null) {
+      _feedbackController?.show(
+        (UserFeedback feedback) => context.read<SettingsBloc>().add(
+              SubmitFeedbackEvent(feedback),
+            ),
+      );
+      _feedbackController?.addListener(_onFeedbackChanged);
+    }
   }
 
   void _onFeedbackChanged() {
+    if (_isDisposing) return;
     bool? isVisible = _feedbackController?.isVisible;
     if (isVisible == false) {
       _feedbackController?.removeListener(_onFeedbackChanged);

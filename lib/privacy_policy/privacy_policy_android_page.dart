@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:weather_fit/privacy_policy/email_text.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
+import 'package:weather_fit/router/app_route.dart';
 
 class PrivacyPolicyAndroidPage extends StatelessWidget {
   const PrivacyPolicyAndroidPage({super.key});
@@ -19,6 +20,29 @@ class PrivacyPolicyAndroidPage extends StatelessWidget {
           'Privacy Policy ${kIsWeb ? 'for "${constants.appName}" Android '
               'Application' : ''}',
         ),
+        leading: kIsWeb
+            ? Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8.0),
+                  child: Material(
+                    // Ensures the background remains unchanged.
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () => Navigator.of(context).popUntil(
+                        ModalRoute.withName(AppRoute.weather.path),
+                      ),
+                      child: Ink.image(
+                        image: const AssetImage(
+                          '${constants.imagePath}logo.jpeg',
+                        ),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                ),
+              )
+            : null,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
