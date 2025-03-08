@@ -447,19 +447,19 @@ more expression and flexibility.
 • Screenshots:
 
 <!--suppress CheckImageSize -->
-<img src="screenshots/Web-Screenshot-2024-03-11.png" width="400"  alt="screenshot">
+<img src="screenshots/City_weather.png" width="400"  alt="screenshot">
 <!--suppress CheckImageSize -->
-<img src="screenshots/Android-Pixel2-Screenshot_20240311.png" width="400"  alt="screenshot">
+<img src="screenshots/location_permission.png" width="400"  alt="screenshot">
 <!--suppress CheckImageSize -->
-<img src="screenshots/Pixel_XL_Screenshot_20240311.png" width="400"  alt="screenshot">
+<img src="screenshots/Screenshot_confirmation_20250307.png" width="400"  alt="screenshot">
 <!--suppress CheckImageSize -->
-<img src="screenshots/Search_Screenshot_20240311.png" width="400"  alt="screenshot">
+<img src="screenshots/Screenshot_home_march_2025.png" width="400"  alt="screenshot">
 <!--suppress CheckImageSize -->
-<img src="screenshots/Settings_Screenshot_20240311.png" width="400"  alt="screenshot">
+<img src="screenshots/Screenshot_privacy_20250307.png" width="400"  alt="screenshot">
 <!--suppress CheckImageSize -->
-<img src="screenshots/Privacy_Screenshot_20240311.png" width="400"  alt="screenshot">
+<img src="screenshots/Screenshot_tablet_profile_search_20250307.png" width="400"  alt="screenshot">
 <!--suppress CheckImageSize -->
-<img src="screenshots/Home_widget_Screenshot_20240311.png" width="400"  alt="screenshot">
+<img src="screenshots/Weather_by_location.png" width="400"  alt="screenshot">
 
 ## Download
 

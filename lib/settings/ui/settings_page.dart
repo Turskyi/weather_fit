@@ -19,10 +19,14 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   FeedbackController? _feedbackController;
+  bool _isFeedbackControllerInitialized = false;
 
   @override
   void didChangeDependencies() {
-    _feedbackController = BetterFeedback.of(context);
+    if (!_isFeedbackControllerInitialized) {
+      _feedbackController = BetterFeedback.of(context);
+      _isFeedbackControllerInitialized = true;
+    }
     super.didChangeDependencies();
   }
 
@@ -135,8 +139,9 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ],
         ),
-        backgroundColor:
-            Theme.of(context).colorScheme.primaryContainer.brighten(50),
+        backgroundColor: Theme.of(
+          context,
+        ).colorScheme.primaryContainer.brighten(50),
         bottomNavigationBar: kIsWeb
             ? const GooglePlayBadge(
                 url:
@@ -150,7 +155,9 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   void dispose() {
+    _feedbackController?.removeListener(_onFeedbackChanged);
     _feedbackController?.dispose();
+    _feedbackController = null;
     super.dispose();
   }
 
@@ -167,8 +174,9 @@ class _SettingsPageState extends State<SettingsPage> {
 
   void _showFeedbackUi() {
     _feedbackController?.show(
-      (UserFeedback feedback) =>
-          context.read<SettingsBloc>().add(SubmitFeedbackEvent(feedback)),
+      (UserFeedback feedback) => context.read<SettingsBloc>().add(
+            SubmitFeedbackEvent(feedback),
+          ),
     );
     _feedbackController?.addListener(_onFeedbackChanged);
   }

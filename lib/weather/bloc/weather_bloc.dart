@@ -34,8 +34,9 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
   final AiRepository _aiRepository;
 
   @override
-  WeatherSuccess fromJson(Map<String, Object?> json) =>
-      WeatherSuccess.fromJson(json);
+  WeatherSuccess fromJson(Map<String, Object?> json) {
+    return WeatherSuccess.fromJson(json);
+  }
 
   @override
   Map<String, Object?> toJson(Object? state) {
