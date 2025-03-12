@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:weather_fit/entities/enums/feedback_rating.dart';
 import 'package:weather_fit/entities/enums/feedback_type.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
@@ -36,9 +37,6 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     emit(const LoadingSettingsState());
     final UserFeedback feedback = event.feedback;
     try {
-      final String screenshotFilePath =
-          await _writeImageToStorage(feedback.screenshot);
-
       final PackageInfo packageInfo = await PackageInfo.fromPlatform();
 
       final Map<String, dynamic>? extra = feedback.extra;
@@ -59,20 +57,49 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         ..writeln('${rating is FeedbackRating ? 'Rating' : ''}'
             '${rating is FeedbackRating ? ':' : ''}'
             ' ${rating is FeedbackRating ? rating.value : ''}');
-
-      final Email email = Email(
-        body: feedbackBody.toString(),
-        subject: 'App Feedback: '
-            '${packageInfo.appName}',
-        recipients: <String>[constants.supportEmail],
-        attachmentPaths: <String>[screenshotFilePath],
-      );
-      try {
-        await FlutterEmailSender.send(email);
-      } catch (e, stackTrace) {
-        debugPrint(
-          'Warning: an error occurred in $this: $e;\nStackTrace: $stackTrace',
+      if (kIsWeb) {
+        final Uri emailLaunchUri = Uri(
+          scheme: 'mailto',
+          path: constants.supportEmail,
+          queryParameters: <String, Object?>{
+            'subject': 'App Feedback: ${packageInfo.appName}',
+            'body': feedbackBody.toString(),
+          },
         );
+        try {
+          if (await canLaunchUrl(emailLaunchUri)) {
+            await launchUrl(emailLaunchUri);
+            debugPrint(
+              'Feedback email launched successfully via url_launcher.',
+            );
+          } else {
+            throw 'Could not launch email with url_launcher.';
+          }
+        } catch (urlLauncherError, urlLauncherStackTrace) {
+          final String urlLauncherErrorMessage =
+              'Error launching email via url_launcher: $urlLauncherError';
+          debugPrint(
+            '$urlLauncherErrorMessage\nStackTrace: $urlLauncherStackTrace',
+          );
+          // Optionally, show an error message to the user.
+        }
+      } else {
+        final String screenshotFilePath = await _writeImageToStorage(
+          feedback.screenshot,
+        );
+        final Email email = Email(
+          subject: 'App Feedback: ${packageInfo.appName}',
+          body: feedbackBody.toString(),
+          recipients: <String>[constants.supportEmail],
+          attachmentPaths: <String>[screenshotFilePath],
+        );
+        try {
+          await FlutterEmailSender.send(email);
+        } catch (e, stackTrace) {
+          debugPrint(
+            'Warning: an error occurred in $this: $e;\nStackTrace: $stackTrace',
+          );
+        }
       }
     } catch (e, stackTrace) {
       debugPrint('SettingsErrorEvent: $e\nStackTrace: $stackTrace');
