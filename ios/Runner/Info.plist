@@ -48,5 +48,7 @@
 <key>NSLocationWhenInUseUsageDescription</key>
 <string>WeatherFit may use your location to find relevant weather information
 if you choose to use this feature.</string>
+<key>ITSAppUsesNonExemptEncryption</key>
+<false/>
 </dict>
 </plist>

@@ -65,6 +65,7 @@ class WeatherPage extends StatelessWidget {
                     needsRefresh: state.weather.needsRefresh,
                     filePath: state.outfitFilePath,
                     outfitRecommendation: state.outfitRecommendation,
+                    onRefresh: () => _refresh(context),
                   );
                 } else if (state is LoadingOutfitState) {
                   final double screenWidth = MediaQuery.sizeOf(context).width;

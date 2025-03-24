@@ -9,6 +9,7 @@ class OutfitWidget extends StatelessWidget {
   const OutfitWidget({
     required this.needsRefresh,
     required this.filePath,
+    required this.onRefresh,
     this.outfitRecommendation = '',
     super.key,
   });
@@ -16,6 +17,7 @@ class OutfitWidget extends StatelessWidget {
   final bool needsRefresh;
   final String filePath;
   final String outfitRecommendation;
+  final RefreshCallback onRefresh;
 
   static final List<String> _defaultMessages = <String>[
     '🛑 Oops! No outfit suggestion available.',
@@ -98,7 +100,31 @@ class OutfitWidget extends StatelessWidget {
                       children: <Widget>[
                         Expanded(
                           flex: 3,
-                          child: Image.file(File(filePath), fit: BoxFit.cover),
+                          child: Image.file(
+                            File(filePath),
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, Object error, ___) {
+                              return Container(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    colors: <Color>[
+                                      colorScheme.primaryContainer,
+                                      colorScheme.secondaryContainer,
+                                    ],
+                                  ),
+                                ),
+                                padding: const EdgeInsets.all(20),
+                                alignment: Alignment.center,
+                                child: ElevatedButton(
+                                  onPressed: onRefresh,
+                                  child:
+                                      const Text('Get New Outfit Suggestion'),
+                                ),
+                              );
+                            },
+                          ),
                         ),
                         Expanded(
                           flex: 2,

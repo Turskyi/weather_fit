@@ -49,7 +49,8 @@ bundle to **Google Play** after every merge (push) to **master** branch;
 • State management approach: [BLoC](https://bloclibrary.dev);
 
 • App testing platforms:
-[Firebase App Distribution](https://firebase.google.com/docs/app-distribution);
+[Firebase App Distribution](https://firebase.google.com/docs/app-distribution),
+[iOS TestFlight](https://testflight.apple.com/join/u5k9mzjN);
 
 **Code Readability:** code is easily readable with no unnecessary blank lines,
 no unused variables or methods, and no commented-out code, all variables,

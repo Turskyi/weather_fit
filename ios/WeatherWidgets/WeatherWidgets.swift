@@ -7,7 +7,6 @@
 
 import WidgetKit
 import SwiftUI
-import CoreLocation
 
 // 1. Data Model
 struct WeatherData: Codable {
@@ -16,13 +15,13 @@ struct WeatherData: Codable {
     let temperature: String?
     let recommendation: String?
     let lastUpdated: String?
-    let imageURL: String?
+    let imagePath: String?
 }
 
 // 2. Data Provider
 struct Provider: TimelineProvider {
     
-    let appGroupIdentifier = "group.com.turskyi.weatherfit"
+    let appGroupIdentifier = "group.dmytrowidget"
     
     // Helper function to fetch weather data from UserDefaults
     func getWeatherData() -> WeatherData? {
@@ -47,16 +46,16 @@ struct Provider: TimelineProvider {
     }
 
     func placeholder(in context: Context) -> SimpleEntry {
-        SimpleEntry(date: Date(), weatherData: WeatherData(emoji: "☀️", location: "Placeholder", temperature: "25°C", recommendation: "Shorts and T-shirt", lastUpdated: "Just now", imageURL: nil))
+        SimpleEntry(date: Date(), weatherData: WeatherData(emoji: "☀️", location: "Placeholder", temperature: "25°C", recommendation: "Shorts and T-shirt", lastUpdated: "Just now", imagePath: nil))
     }
 
     func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> ()) {
-        let entry = SimpleEntry(date: Date(), weatherData: getWeatherData() ?? WeatherData(emoji: "☀️", location: "Snapshot", temperature: "25°C", recommendation: "Shorts and T-shirt", lastUpdated: "Just now", imageURL: nil))
+        let entry = SimpleEntry(date: Date(), weatherData: getWeatherData() ?? WeatherData(emoji: "☀️", location: "Snapshot", temperature: "25°C", recommendation: "Shorts and T-shirt", lastUpdated: "Just now", imagePath: nil))
         completion(entry)
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> ()) {
-        let entry = SimpleEntry(date: Date(), weatherData: getWeatherData() ?? WeatherData(emoji: "☀️", location: "Timeline", temperature: "25°C", recommendation: "Shorts and T-shirt", lastUpdated: "Just now", imageURL: nil))
+        let entry = SimpleEntry(date: Date(), weatherData: getWeatherData() ?? WeatherData(emoji: "☀️", location: "Timeline", temperature: "25°C", recommendation: "Shorts and T-shirt", lastUpdated: "Just now", imagePath: nil))
         let timeline = Timeline(entries: [entry], policy: .atEnd)
         completion(timeline)
     }
@@ -68,27 +67,25 @@ struct SimpleEntry: TimelineEntry {
 }
 
 // 3. Widget Entry View
-struct WeatherWidgetsEntryView : View {
+struct WeatherWidgetsEntryView: View {
     var entry: Provider.Entry
     
-    // Function to load image from URL
-    func loadImage(from urlString: String?) -> some View {
-        guard let urlString = urlString, let url = URL(string: urlString) else {
+    // Function to load image from file path
+    func loadImage(from filePath: String?) -> some View {
+        guard let filePath = filePath else {
             return AnyView(Image(systemName: "photo").resizable().scaledToFit())
         }
-        
-        return AnyView(AsyncImage(url: url) { image in
-            image
-                .resizable()
-                .scaledToFit()
-        } placeholder: {
-            ProgressView()
-        })
+
+        let fileURL = URL(fileURLWithPath: filePath)
+        if let imageData = try? Data(contentsOf: fileURL), let uiImage = UIImage(data: imageData) {
+            return AnyView(Image(uiImage: uiImage).resizable().scaledToFit())
+        } else {
+            return AnyView(Image(systemName: "photo").resizable().scaledToFit())
+        }
     }
 
     var body: some View {
         ZStack {
-            // Optional: Background color.
             Color.gray.opacity(0.3)
             VStack(alignment: .leading) {
                 
@@ -104,10 +101,10 @@ struct WeatherWidgetsEntryView : View {
                 Text(entry.weatherData.temperature ?? "")
                     .font(.title)
                 
-                if let imageURL = entry.weatherData.imageURL {
-                    loadImage(from: imageURL)
+                if let imagePath = entry.weatherData.imagePath {
+                    loadImage(from: imagePath)
                 }
-                
+
                 Text(entry.weatherData.recommendation ?? "")
                     .font(.footnote)
 
@@ -149,5 +146,5 @@ struct WeatherWidgets: Widget {
 #Preview(as: .systemMedium) {
     WeatherWidgets()
 } timeline: {
-    SimpleEntry(date: .now, weatherData: WeatherData(emoji: "☀️", location: "Preview", temperature: "25°C", recommendation: "Shorts and T-shirt", lastUpdated: "Just now", imageURL: nil))
+    SimpleEntry(date: .now, weatherData: WeatherData(emoji: "☀️", location: "Preview", temperature: "25°C", recommendation: "Shorts and T-shirt", lastUpdated: "Just now", imagePath: nil))
 }
