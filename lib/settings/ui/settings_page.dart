@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:feedback/feedback.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -137,6 +135,31 @@ class _SettingsPageState extends State<SettingsPage> {
                           .add(const BugReportPressedEvent()),
                     ),
                   ),
+                  const SizedBox(height: 20),
+                  Card(
+                    elevation: 2.0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    child: ListTile(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      title: const Text(
+                        'Support',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: const Text(
+                        'Visit our support page for help and frequently asked '
+                        'questions.',
+                      ),
+                      trailing: const Icon(Icons.help_outline),
+                      onTap: () => Navigator.pushNamed(
+                        context,
+                        AppRoute.support.path,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -147,8 +170,7 @@ class _SettingsPageState extends State<SettingsPage> {
         ).colorScheme.primaryContainer.brighten(50),
         bottomNavigationBar: kIsWeb
             ? const GooglePlayBadge(
-                url:
-                    'https://play.google.com/store/apps/details?id=com.turskyi.weather_fit',
+                url: constants.googlePlayUrl,
                 assetPath: '${constants.imagePath}play_store_badge.png',
               )
             : null,
@@ -159,16 +181,13 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   void dispose() {
     _isDisposing = true;
+    // Immediately remove the listener.
     _feedbackController?.removeListener(_onFeedbackChanged);
-    // Do not dispose it here, dispose when it is not null.
-    if (_feedbackController != null) {
-      // Schedule the dispose to occur after a short delay.
-      Future<void>.delayed(const Duration(milliseconds: 100), () {
-        if (!_isDisposing) return;
-        _feedbackController?.dispose();
-        _feedbackController = null;
-      });
-    }
+
+    // Dispose the controller right away.
+    _feedbackController?.dispose();
+    _feedbackController = null;
+
     super.dispose();
   }
 

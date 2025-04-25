@@ -75,6 +75,53 @@ class OutfitWidget extends StatelessWidget {
                             child: Image.file(
                               File(filePath),
                               fit: BoxFit.fitHeight,
+                              errorBuilder: (BuildContext context, _, __) {
+                                final ThemeData theme = Theme.of(context);
+                                final TextTheme textTheme = theme.textTheme;
+
+                                return Container(
+                                  color: theme.colorScheme.surface,
+                                  padding: const EdgeInsets.all(16),
+                                  alignment: Alignment.center,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      Icon(
+                                        Icons.broken_image,
+                                        size: 48,
+                                        color: theme.colorScheme.error,
+                                      ),
+                                      const SizedBox(height: 12),
+                                      Text(
+                                        'Unable to load outfit image.',
+                                        style: textTheme.titleMedium?.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                          color: theme.colorScheme.onSurface,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        'Please try refreshing the weather.',
+                                        style: textTheme.bodyMedium?.copyWith(
+                                          color: theme.colorScheme.onSurface
+                                              .withValues(
+                                            alpha: 0.7,
+                                          ),
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      const SizedBox(height: 12),
+                                      ElevatedButton(
+                                        onPressed: onRefresh,
+                                        child: const Text(
+                                          'Get New Outfit Suggestion',
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
                             ),
                           ),
                           Expanded(
@@ -103,7 +150,7 @@ class OutfitWidget extends StatelessWidget {
                           child: Image.file(
                             File(filePath),
                             fit: BoxFit.cover,
-                            errorBuilder: (_, Object error, ___) {
+                            errorBuilder: (_, __, ___) {
                               return Container(
                                 decoration: BoxDecoration(
                                   gradient: LinearGradient(
@@ -119,8 +166,9 @@ class OutfitWidget extends StatelessWidget {
                                 alignment: Alignment.center,
                                 child: ElevatedButton(
                                   onPressed: onRefresh,
-                                  child:
-                                      const Text('Get New Outfit Suggestion'),
+                                  child: const Text(
+                                    'Get New Outfit Suggestion',
+                                  ),
                                 ),
                               );
                             },

@@ -53,6 +53,7 @@ class WeatherApp extends StatelessWidget {
             final bool completeDarkness = hour < 6 || hour > 21;
 
             return MaterialApp(
+              debugShowCheckedModeBanner: false,
               title: constants.appName,
               initialRoute: AppRoute.weather.path,
               routes: routes.routeMap,
