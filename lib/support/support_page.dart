@@ -1,6 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
+import 'package:weather_fit/res/widgets/leading_widget.dart';
 
 class SupportPage extends StatelessWidget {
   const SupportPage({super.key});
@@ -11,6 +13,7 @@ class SupportPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        leading: kIsWeb ? const LeadingWidget() : null,
         title: const Text('Support'),
       ),
       body: Padding(

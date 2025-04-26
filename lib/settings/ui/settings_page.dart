@@ -34,20 +34,7 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     return BlocListener<SettingsBloc, SettingsState>(
-      listener: (BuildContext context, SettingsState state) {
-        if (state is FeedbackState) {
-          _showFeedbackUi();
-        } else if (state is FeedbackSent) {
-          _notifyFeedbackSent();
-        } else if (state is SettingsError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.errorMessage),
-              duration: const Duration(seconds: 2),
-            ),
-          );
-        }
-      },
+      listener: _settingsBlocStateListener,
       child: Scaffold(
         extendBodyBehindAppBar: true,
         appBar: AppBar(title: const Text('Settings')),
@@ -85,6 +72,30 @@ class _SettingsPageState extends State<SettingsPage> {
                         ),
                       );
                     },
+                  ),
+                  const SizedBox(height: 20),
+                  Card(
+                    elevation: 2.0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    child: ListTile(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      title: const Text(
+                        'About',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: const Text(
+                        'Learn more about ${constants.appName}.',
+                      ),
+                      trailing: const Icon(Icons.info_outline),
+                      onTap: () => Navigator.pushNamed(
+                        context,
+                        AppRoute.about.path,
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 20),
                   Card(
@@ -220,6 +231,21 @@ class _SettingsPageState extends State<SettingsPage> {
     if (isVisible == false) {
       _feedbackController?.removeListener(_onFeedbackChanged);
       context.read<SettingsBloc>().add(const ClosingFeedbackEvent());
+    }
+  }
+
+  void _settingsBlocStateListener(BuildContext context, SettingsState state) {
+    if (state is FeedbackState) {
+      _showFeedbackUi();
+    } else if (state is FeedbackSent) {
+      _notifyFeedbackSent();
+    } else if (state is SettingsError) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(state.errorMessage),
+          duration: const Duration(seconds: 2),
+        ),
+      );
     }
   }
 }

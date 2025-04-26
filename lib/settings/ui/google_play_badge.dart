@@ -5,25 +5,48 @@ class GooglePlayBadge extends StatelessWidget {
   const GooglePlayBadge({
     required this.url,
     required this.assetPath,
+    this.height = 100,
+    this.width = 240,
+    this.borderRadius = 8.0,
     super.key,
   });
 
   final String url;
   final String assetPath;
+  final double height;
+  final double width;
+  final double borderRadius;
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () async {
-        if (await canLaunchUrl(Uri.parse(url))) {
-          await launchUrl(Uri.parse(url));
-        } else if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Could not launch $url')),
-          );
-        }
-      },
-      child: Image.asset(assetPath, width: 240, height: 100),
+    return SizedBox(
+      height: height,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(borderRadius),
+          onTap: () async {
+            if (await canLaunchUrl(Uri.parse(url))) {
+              await launchUrl(Uri.parse(url));
+            } else if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Could not launch $url')),
+              );
+            }
+          },
+          child: Ink(
+            height: height,
+            width: width,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(borderRadius),
+              image: DecorationImage(
+                image: AssetImage(assetPath),
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

@@ -1,7 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:weather_fit/privacy_policy/email_text.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
+import 'package:weather_fit/res/widgets/leading_widget.dart';
 
 class PrivacyPolicyPage extends StatelessWidget {
   const PrivacyPolicyPage({super.key});
@@ -13,7 +15,10 @@ class PrivacyPolicyPage extends StatelessWidget {
     final double? titleSize = textTheme.titleLarge?.fontSize;
     final double? bodySize = textTheme.bodyLarge?.fontSize;
     return Scaffold(
-      appBar: AppBar(title: const Text('Privacy Policy')),
+      appBar: AppBar(
+        leading: kIsWeb ? const LeadingWidget() : null,
+        title: const Text('Privacy Policy'),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
