@@ -55,15 +55,14 @@ class _CustomFeedbackFormState extends State<FeedbackForm> {
                       Flexible(
                         child: DropdownButton<FeedbackType>(
                           value: _customFeedback.feedbackType,
-                          items: FeedbackType.values
-                              .map(
-                                (FeedbackType type) =>
-                                    DropdownMenuItem<FeedbackType>(
-                                  value: type,
-                                  child: Text(type.value),
-                                ),
-                              )
-                              .toList(),
+                          items: FeedbackType.values.map(
+                            (FeedbackType type) {
+                              return DropdownMenuItem<FeedbackType>(
+                                value: type,
+                                child: Text(type.value),
+                              );
+                            },
+                          ).toList(),
                           onChanged: (FeedbackType? feedbackType) => setState(
                             () => _customFeedback.feedbackType = feedbackType,
                           ),

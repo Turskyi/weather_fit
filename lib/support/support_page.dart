@@ -87,7 +87,7 @@ class SupportPage extends StatelessWidget {
             const SizedBox(height: 8),
             ElevatedButton.icon(
               onPressed: () => launchUrl(
-                Uri.parse('https://${constants.companyDomain}/#/support'),
+                Uri.parse('https://${constants.developerDomain}/#/support'),
                 mode: LaunchMode.externalApplication,
               ),
               icon: const Icon(Icons.web),

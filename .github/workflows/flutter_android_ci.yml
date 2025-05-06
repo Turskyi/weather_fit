@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Write google-services.json file
+      - name: Write the google-services.json file
         run: |
           cd android/app
           echo $GOOGLE_SERVICES | base64 -d > google-services.json

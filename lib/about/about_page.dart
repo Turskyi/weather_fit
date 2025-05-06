@@ -112,7 +112,7 @@ class AboutPage extends StatelessWidget {
               icon: const Icon(Icons.email_outlined),
               label: const Text('Developer Contact Form'),
               onPressed: () => launchUrl(
-                Uri.parse('https://${constants.companyDomain}/#/support'),
+                Uri.parse('https://${constants.developerDomain}/#/support'),
               ),
             ),
             const SizedBox(height: 32),

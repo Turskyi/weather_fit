@@ -39,24 +39,36 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     try {
       final PackageInfo packageInfo = await PackageInfo.fromPlatform();
 
-      final Map<String, dynamic>? extra = feedback.extra;
-      final dynamic rating = extra?['rating'];
-      final dynamic type = extra?['feedback_type'];
+      final String platform = kIsWeb
+          ? 'Web'
+          : switch (defaultTargetPlatform) {
+              TargetPlatform.android => 'Android',
+              TargetPlatform.iOS => 'iOS',
+              TargetPlatform.macOS => 'macOS',
+              TargetPlatform.windows => 'Windows',
+              TargetPlatform.linux => 'Linux',
+              _ => 'Unknown',
+            };
 
+      final Map<String, Object?>? extra = feedback.extra;
+      final Object? rating = extra?['rating'];
+      final Object? type = extra?['feedback_type'];
+
+      final bool isFeedbackType = type is FeedbackType;
+      final bool isFeedbackRating = rating is FeedbackRating;
       // Construct the feedback text with details from `extra'.
       final StringBuffer feedbackBody = StringBuffer()
-        ..writeln('${type is FeedbackType ? 'Feedback Type' : ''}:'
-            ' ${type is FeedbackType ? type.value : ''}')
+        ..writeln('${isFeedbackType ? 'Feedback Type' : ''}:'
+            ' ${isFeedbackType ? type.value : ''}')
         ..writeln()
         ..writeln(feedback.text)
-        ..writeln()
+        ..writeln()..writeln('${isFeedbackRating ? 'Rating' : ''}'
+            '${isFeedbackRating ? ':' : ''}'
+            ' ${isFeedbackRating ? rating.value : ''}')..writeln()
         ..writeln('App id: ${packageInfo.packageName}')
         ..writeln('App version: ${packageInfo.version}')
         ..writeln('Build number: ${packageInfo.buildNumber}')
-        ..writeln()
-        ..writeln('${rating is FeedbackRating ? 'Rating' : ''}'
-            '${rating is FeedbackRating ? ':' : ''}'
-            ' ${rating is FeedbackRating ? rating.value : ''}');
+        ..writeln()..writeln('Platform: $platform')..writeln();
       if (kIsWeb) {
         final Uri emailLaunchUri = Uri(
           scheme: 'mailto',
