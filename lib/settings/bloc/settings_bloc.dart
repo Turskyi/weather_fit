@@ -59,16 +59,20 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       // Construct the feedback text with details from `extra'.
       final StringBuffer feedbackBody = StringBuffer()
         ..writeln('${isFeedbackType ? 'Feedback Type' : ''}:'
-            ' ${isFeedbackType ? type.value : ''}')..writeln()..writeln(
-            feedback.text)..writeln()..writeln(
-            '${isFeedbackRating ? 'Rating' : ''}'
+            ' ${isFeedbackType ? type.value : ''}')
+        ..writeln()
+        ..writeln(feedback.text)
+        ..writeln()
+        ..writeln('${isFeedbackRating ? 'Rating' : ''}'
             '${isFeedbackRating ? ':' : ''}'
             ' ${isFeedbackRating ? rating.value : ''}')
         ..writeln()
-        ..writeln('App id: ${packageInfo.packageName}')..writeln(
-            'App version: ${packageInfo.version}')..writeln(
-            'Build number: ${packageInfo.buildNumber}')..writeln()..writeln(
-            'Platform: $platform')..writeln();
+        ..writeln('App id: ${packageInfo.packageName}')
+        ..writeln('App version: ${packageInfo.version}')
+        ..writeln('Build number: ${packageInfo.buildNumber}')
+        ..writeln()
+        ..writeln('Platform: $platform')
+        ..writeln();
       if (kIsWeb) {
         final Uri emailLaunchUri = Uri(
           scheme: 'mailto',
