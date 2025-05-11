@@ -18,8 +18,11 @@ part 'settings_state.dart';
 class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   SettingsBloc() : super(const SettingsInitial()) {
     on<ClosingFeedbackEvent>(_onFeedbackDialogDismissed);
+
     on<BugReportPressedEvent>(_onFeedbackRequested);
+
     on<SubmitFeedbackEvent>(_sendUserFeedback);
+
     on<SettingsErrorEvent>(_handleError);
   }
 

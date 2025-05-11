@@ -24,7 +24,7 @@ jobs:
         env:
           ENV: ${{ secrets.ENV }}
 
-      - name: Install dependencies and Build web project
+      - name: Install dependencies and build web project
         run: >-
           flutter pub get && dart run
           build_runner build --delete-conflicting-outputs && flutter build web

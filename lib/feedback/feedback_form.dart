@@ -23,7 +23,7 @@ class FeedbackForm extends StatefulWidget {
 }
 
 class _CustomFeedbackFormState extends State<FeedbackForm> {
-  final FeedbackDetails _customFeedback = FeedbackDetails();
+  FeedbackDetails _customFeedback = const FeedbackDetails();
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +36,8 @@ class _CustomFeedbackFormState extends State<FeedbackForm> {
                 const FeedbackSheetDragHandle(),
               ListView(
                 controller: widget.scrollController,
-                // Pad the top by 20 to match the corner radius if drag enabled.
+                // Pad the top by 20 to match the corner radius if drag is
+                // enabled.
                 padding: EdgeInsets.fromLTRB(
                   16,
                   widget.scrollController != null ? 20 : 16,
@@ -64,7 +65,9 @@ class _CustomFeedbackFormState extends State<FeedbackForm> {
                             },
                           ).toList(),
                           onChanged: (FeedbackType? feedbackType) => setState(
-                            () => _customFeedback.feedbackType = feedbackType,
+                            () => _customFeedback = _customFeedback.copyWith(
+                              feedbackType: feedbackType,
+                            ),
                           ),
                         ),
                       ),
@@ -73,8 +76,8 @@ class _CustomFeedbackFormState extends State<FeedbackForm> {
                   const SizedBox(height: 16),
                   const Text('What is your feedback?'),
                   TextField(
-                    onChanged: (String newFeedback) =>
-                        _customFeedback.feedbackText = newFeedback,
+                    onChanged: (String newFeedback) => _customFeedback =
+                        _customFeedback.copyWith(feedbackText: newFeedback),
                   ),
                   const SizedBox(height: 16),
                   const Text('How does this make you feel?'),
@@ -118,7 +121,9 @@ class _CustomFeedbackFormState extends State<FeedbackForm> {
     }
     return IconButton(
       color: isSelected ? Theme.of(context).colorScheme.secondary : Colors.grey,
-      onPressed: () => setState(() => _customFeedback.rating = rating),
+      onPressed: () => setState(
+        () => _customFeedback = _customFeedback.copyWith(rating: rating),
+      ),
       icon: Icon(icon),
       iconSize: 36,
     );

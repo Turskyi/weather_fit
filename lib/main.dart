@@ -26,11 +26,12 @@ void main() async {
         BuildContext context,
         OnSubmit onSubmit,
         ScrollController? scrollController,
-      ) =>
-          FeedbackForm(
-        onSubmit: onSubmit,
-        scrollController: scrollController,
-      ),
+      ) {
+        return FeedbackForm(
+          onSubmit: onSubmit,
+          scrollController: scrollController,
+        );
+      },
       theme: FeedbackThemeData(feedbackSheetColor: Colors.grey.shade50),
       child: WeatherApp(
         weatherRepository: WeatherRepository(),
