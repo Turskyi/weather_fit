@@ -9,7 +9,7 @@ import 'package:weather_fit/res/theme/cubit/theme_cubit.dart';
 import 'package:weather_fit/res/widgets/local_web_cors_error.dart';
 import 'package:weather_fit/router/app_route.dart';
 import 'package:weather_fit/settings/bloc/settings_bloc.dart';
-import 'package:weather_fit/settings/ui/google_play_badge.dart';
+import 'package:weather_fit/settings/ui/store_badge.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 import 'package:weather_fit/weather/ui/outfit_widget.dart';
 import 'package:weather_fit/weather/ui/weather.dart';
@@ -233,11 +233,17 @@ class _WeatherPageState extends State<WeatherPage> {
           label: const Text('Support'),
         ),
       ),
-      const GooglePlayBadge(
+      const StoreBadge(
         url: constants.googlePlayUrl,
         assetPath: '${constants.imagePath}play_store_badge.png',
         height: 90,
         width: 150,
+      ),
+      const StoreBadge(
+        url: constants.appStoreUrl,
+        assetPath: '${constants.imagePath}Download_on_the_App_Store_Badge.png',
+        height: 80,
+        width: 140,
       ),
     ];
   }

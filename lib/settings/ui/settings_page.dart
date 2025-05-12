@@ -7,7 +7,7 @@ import 'package:weather_fit/res/extensions/color_extensions.dart';
 import 'package:weather_fit/res/widgets/background.dart';
 import 'package:weather_fit/router/app_route.dart';
 import 'package:weather_fit/settings/bloc/settings_bloc.dart';
-import 'package:weather_fit/settings/ui/google_play_badge.dart';
+import 'package:weather_fit/settings/ui/store_badge.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -180,7 +180,7 @@ class _SettingsPageState extends State<SettingsPage> {
           context,
         ).colorScheme.primaryContainer.brighten(50),
         bottomNavigationBar: kIsWeb
-            ? const GooglePlayBadge(
+            ? const StoreBadge(
                 url: constants.googlePlayUrl,
                 assetPath: '${constants.imagePath}play_store_badge.png',
               )

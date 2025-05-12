@@ -8,3 +8,5 @@ const String imagePath = 'assets/images/';
 const String appName = 'WeatherFit';
 const String googlePlayUrl =
     'https://play.google.com/store/apps/details?id=com.turskyi.weather_fit';
+const String appStoreUrl =
+    'https://apps.apple.com/ca/app/weatherfit/id6743688355';

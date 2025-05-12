@@ -464,9 +464,29 @@ more expression and flexibility.
 
 ## Download
 
-<a href="https://play.google.com/store/apps/details?id=com.turskyi.weather_fit" target="_blank">
-<img src="https://play.google.com/intl/en_gb/badges/static/images/badges/en_badge_web_generic.png" width=240  alt="google play badge"/>
-</a>
+<!--suppress HtmlDeprecatedAttribute -->
+<div align="center">
+  <a href="https://play.google.com/store/apps/details?id=com.turskyi.weather_fit" target="_blank" style="display: inline-block; vertical-align: middle;">
+    <img src="https://play.google.com/intl/en_gb/badges/static/images/badges/en_badge_web_generic.png" width=240 alt="google play badge"/>
+  </a>
+  <a href="https://apps.apple.com/ca/app/weatherfit/id6743688355" target="_blank" style="display: inline-block; vertical-align: middle;">
+    <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" width=200 alt="app store badge"/>
+  </a>
+</div>
+
+## Web Version
+
+In addition to the Android and iOS apps, WeatherFit is also available as a web
+app.
+You can access it in two ways:
+
+- [Hosted on Firebase](https://weather-fit-ai.web.app) — the raw build for
+  development and testing
+- [Official Website](https://weather-fit.com) — the recommended domain for users
+
+The web version offers the same core features as the mobile apps, including
+real-time weather updates and AI-generated outfit suggestions based on current
+conditions.
 
 ## Credits
 

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class GooglePlayBadge extends StatelessWidget {
-  const GooglePlayBadge({
+class StoreBadge extends StatelessWidget {
+  const StoreBadge({
     required this.url,
     required this.assetPath,
     this.height = 100,
