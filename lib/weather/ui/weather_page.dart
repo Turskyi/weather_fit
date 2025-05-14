@@ -7,9 +7,9 @@ import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
 import 'package:weather_fit/res/theme/cubit/theme_cubit.dart';
 import 'package:weather_fit/res/widgets/local_web_cors_error.dart';
+import 'package:weather_fit/res/widgets/store_badge.dart';
 import 'package:weather_fit/router/app_route.dart';
 import 'package:weather_fit/settings/bloc/settings_bloc.dart';
-import 'package:weather_fit/settings/ui/store_badge.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 import 'package:weather_fit/weather/ui/outfit_widget.dart';
 import 'package:weather_fit/weather/ui/weather.dart';
@@ -28,18 +28,19 @@ class _WeatherPageState extends State<WeatherPage> {
 
   @override
   Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.sizeOf(context).width;
+    final bool isLargeScreen = screenWidth > 800;
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         actions: <Widget>[
-          if (!kIsWeb)
-            IconButton(
-              icon: const Icon(Icons.settings),
-              onPressed: () => Navigator.pushNamed(
-                context,
-                AppRoute.settings.path,
-              ),
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () => Navigator.pushNamed(
+              context,
+              AppRoute.settings.path,
             ),
+          ),
         ],
       ),
       body: Center(
@@ -137,7 +138,8 @@ class _WeatherPageState extends State<WeatherPage> {
         child: const Icon(Icons.search, semanticLabel: 'Search'),
       ),
       persistentFooterAlignment: AlignmentDirectional.center,
-      persistentFooterButtons: kIsWeb ? _buildSettingsButtons(context) : null,
+      persistentFooterButtons:
+          (kIsWeb && isLargeScreen) ? _buildSettingsButtons(context) : null,
     );
   }
 

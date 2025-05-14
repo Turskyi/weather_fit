@@ -5,9 +5,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
 import 'package:weather_fit/res/extensions/color_extensions.dart';
 import 'package:weather_fit/res/widgets/background.dart';
+import 'package:weather_fit/res/widgets/store_badge.dart';
 import 'package:weather_fit/router/app_route.dart';
 import 'package:weather_fit/settings/bloc/settings_bloc.dart';
-import 'package:weather_fit/settings/ui/store_badge.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -21,15 +21,6 @@ class _SettingsPageState extends State<SettingsPage> {
   FeedbackController? _feedbackController;
   bool _isFeedbackControllerInitialized = false;
   bool _isDisposing = false;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (!_isFeedbackControllerInitialized) {
-      _feedbackController = BetterFeedback.of(context);
-      _isFeedbackControllerInitialized = true;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -180,9 +171,22 @@ class _SettingsPageState extends State<SettingsPage> {
           context,
         ).colorScheme.primaryContainer.brighten(50),
         bottomNavigationBar: kIsWeb
-            ? const StoreBadge(
-                url: constants.googlePlayUrl,
-                assetPath: '${constants.imagePath}play_store_badge.png',
+            ? const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  StoreBadge(
+                    url: constants.googlePlayUrl,
+                    assetPath: '${constants.imagePath}play_store_badge.png',
+                  ),
+                  SizedBox(width: 10), // Add some spacing between badges
+                  StoreBadge(
+                    url: constants.appStoreUrl,
+                    assetPath:
+                        '${constants.imagePath}Download_on_the_App_Store_Badge.png',
+                    height: 120,
+                    width: 200,
+                  ),
+                ],
               )
             : null,
       ),
@@ -198,12 +202,12 @@ class _SettingsPageState extends State<SettingsPage> {
     // Dispose the controller right away.
     _feedbackController?.dispose();
     _feedbackController = null;
-
+    _isFeedbackControllerInitialized = false;
     super.dispose();
   }
 
   void _notifyFeedbackSent() {
-    BetterFeedback.of(context).hide();
+    _feedbackController?.hide();
     // Let user know that his feedback is sent.
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -215,6 +219,10 @@ class _SettingsPageState extends State<SettingsPage> {
 
   void _showFeedbackUi() {
     if (_isDisposing) return;
+    if (!_isFeedbackControllerInitialized) {
+      _feedbackController = BetterFeedback.of(context);
+      _isFeedbackControllerInitialized = true;
+    }
     if (_feedbackController != null) {
       _feedbackController?.show(
         (UserFeedback feedback) => context.read<SettingsBloc>().add(
@@ -230,6 +238,8 @@ class _SettingsPageState extends State<SettingsPage> {
     bool? isVisible = _feedbackController?.isVisible;
     if (isVisible == false) {
       _feedbackController?.removeListener(_onFeedbackChanged);
+      _feedbackController = null;
+      _isFeedbackControllerInitialized = false;
       context.read<SettingsBloc>().add(const ClosingFeedbackEvent());
     }
   }
