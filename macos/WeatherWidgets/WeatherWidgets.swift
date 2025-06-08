@@ -158,7 +158,8 @@ struct WeatherWidgetsEntryView: View {
     
     func isImageMissing(imagePath: String?) -> Bool {
         guard let path = imagePath else {
-            return true // Handles the imagePath == nil case
+        // Handles the imagePath == nil case.
+            return true
         }
         let fileURL = URL(fileURLWithPath: path)
         return (try? Data(contentsOf: fileURL)) == nil

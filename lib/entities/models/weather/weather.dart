@@ -113,7 +113,7 @@ class Weather extends Equatable {
   /// Output: e.g., "Dec 12, Monday at 03:45 PM".
   String get formattedLastUpdatedDateTime {
     if (lastUpdatedDateTime != null) {
-      final DateFormat formatter = DateFormat('MMM dd, EEEE \'at\' hh:mm a');
+      final DateFormat formatter = DateFormat('MMM dd,\nEEEE\n\'at\' hh:mm a');
       return formatter.format(lastUpdatedDateTime ?? DateTime(0));
     } else {
       return 'Never updated';

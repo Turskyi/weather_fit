@@ -249,6 +249,22 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     }
   }
 
+  Future<Directory> _getAppDirectory() async {
+    if (!kIsWeb & Platform.isIOS) {
+      const MethodChannel channel = MethodChannel(
+        'weatherfit.shared/container',
+      );
+      final String path = await channel.invokeMethod(
+        'getAppleAppGroupDirectory',
+      );
+
+      return Directory(path);
+    } else {
+      // On Android or other platforms, fallback to Documents directory.
+      return getApplicationDocumentsDirectory();
+    }
+  }
+
   Future<String> _downloadAndSaveImage(String assetPath) async {
     // Check if the platform is web OR macOS. If so, return early.
     // See issue: https://github.com/ABausG/home_widget/issues/137.
@@ -260,7 +276,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
       final ByteData byteData = await rootBundle.load(assetPath);
 
       // Get the application documents directory.
-      final Directory directory = await getApplicationDocumentsDirectory();
+      final Directory directory = await _getAppDirectory();
       final String filePath = '${directory.path}/outfit_image.png';
       // Write the bytes to the file.
       final File file = File(filePath);
@@ -319,7 +335,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
 
       HomeWidget.saveWidgetData<String>(
         'text_last_updated',
-        'Last Updated on ${state.formattedLastUpdatedDateTime}',
+        'Last Updated on\n${state.formattedLastUpdatedDateTime}',
       );
 
       HomeWidget.saveWidgetData<String>(
@@ -335,6 +351,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
         }
       }
       final String filePath = await _downloadAndSaveImage(assetPath);
+
       // Save the image path if it's valid.
       HomeWidget.saveWidgetData<String>('image_weather', filePath);
 
@@ -415,11 +432,11 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
       );
 
       if (state is WeatherSuccess) {
-        final String filePath = _outfitRepository.getOutfitImageAssetPath(
+        final String assetPath = _outfitRepository.getOutfitImageAssetPath(
           weather,
         );
         emit(
-          (state as WeatherSuccess).copyWith(outfitAssetPath: filePath),
+          (state as WeatherSuccess).copyWith(outfitAssetPath: assetPath),
         );
         // Only add the event if it's NOT web AND NOT macOS.
         // For context, see issue:
