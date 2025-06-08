@@ -173,16 +173,18 @@ class _SettingsPageState extends State<SettingsPage> {
         bottomNavigationBar: kIsWeb
             ? const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
+                // Add some spacing between badges.
+                spacing: 10,
                 children: <Widget>[
                   StoreBadge(
                     url: constants.googlePlayUrl,
                     assetPath: '${constants.imagePath}play_store_badge.png',
                   ),
-                  SizedBox(width: 10), // Add some spacing between badges
                   StoreBadge(
                     url: constants.appStoreUrl,
                     assetPath:
-                        '${constants.imagePath}Download_on_the_App_Store_Badge.png',
+                        '${constants.imagePath}Download_on_the_App_Store_Badge'
+                        '.png',
                     height: 120,
                     width: 200,
                   ),

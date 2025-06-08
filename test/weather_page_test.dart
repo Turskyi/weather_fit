@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:nested/nested.dart';
-import 'package:weather_fit/data/repositories/ai_repository.dart';
+import 'package:weather_fit/data/repositories/outfit_repository.dart';
 import 'package:weather_fit/router/app_route.dart';
 import 'package:weather_fit/router/routes.dart' as routes;
 import 'package:weather_fit/search/bloc/search_bloc.dart';
@@ -19,7 +19,7 @@ import 'helpers/mocks/mock_repositories.dart';
 void main() {
   initHydratedStorage();
   late WeatherRepository weatherRepository;
-  late AiRepository aiRepository;
+  late OutfitRepository aiRepository;
   setUp(() {
     weatherRepository = MockWeatherRepository();
     aiRepository = MockAiRepository();

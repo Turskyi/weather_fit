@@ -1,4 +1,7 @@
+import 'dart:io' show Platform;
+
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
@@ -7,6 +10,11 @@ import 'package:weather_fit/router/app_route.dart';
 
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
+
+  bool get _showWidgetsFeature {
+    if (kIsWeb) return false;
+    return Platform.isAndroid || Platform.isIOS;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,9 +47,9 @@ class AboutPage extends StatelessWidget {
             const SizedBox(height: 24),
             Text(
               '${constants.appName} helps you dress for the weather with '
-              'AI-powered outfit suggestions. '
-              'Just enter a location, and the app will show you the current '
-              'forecast and a visual and text recommendation on what to wear.',
+              'carefully crafted outfit suggestions. Just enter a location, '
+              'and the app will show you the current forecast along with a '
+              'visual and text-based recommendation on what to wear.',
               style: textTheme.bodyLarge,
             ),
             const SizedBox(height: 24),
@@ -53,12 +61,53 @@ class AboutPage extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              '• AI-generated outfit suggestions\n'
+              '• Outfit suggestions based on weather\n'
               '• Location-based weather forecast\n'
-              '• Approximate location support (no GPS required)\n'
-              '• Privacy-friendly (no tracking, no accounts)\n'
-              '• Home screen widgets for mobile devices\n',
+              '• ${_getLocationSupportText()}\n'
+              '• Privacy-friendly (no tracking, no accounts)'
+              '${_showWidgetsFeature ? '\n'
+                  '• Home screen widgets for mobile devices' : ''}',
               style: textTheme.bodyMedium,
+            ),
+            const SizedBox(height: 24),
+            Text(
+              '🎨 Artwork',
+              style: textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            RichText(
+              text: TextSpan(
+                style: textTheme.bodyMedium,
+                children: <InlineSpan>[
+                  const TextSpan(text: 'The outfit illustrations in '),
+                  TextSpan(
+                    text: constants.appName,
+                    style: textTheme.bodyMedium
+                        ?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  const TextSpan(text: ' were hand-drawn by artist '),
+                  TextSpan(
+                    text: 'Anna Turska',
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: Colors.blue,
+                      decoration: TextDecoration.underline,
+                    ),
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () {
+                        launchUrl(
+                          Uri.parse('https://www.instagram.com/anartistart/'),
+                          mode: LaunchMode.externalApplication,
+                        );
+                      },
+                  ),
+                  const TextSpan(
+                    text: ', whose style brings charm and personality to the '
+                        'app.',
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 24),
             Text(
@@ -70,9 +119,10 @@ class AboutPage extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               '${constants.appName} does not collect or store any personal '
-              'data. Approximate location is only used to provide local '
-              'weather, and is never shared. You can read the full privacy '
-              'policy below.',
+              'data. Your approximate location is used only to show the local '
+              'weather and is never shared. Outfit suggestions are generated '
+              'on-device based on the weather conditions. You can read the '
+              'full privacy policy below.',
               style: textTheme.bodyMedium,
             ),
             const SizedBox(height: 12),
@@ -120,5 +170,15 @@ class AboutPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _getLocationSupportText() {
+    if (kIsWeb) {
+      return 'Approximate location support (browser permission required)';
+    }
+    if (Platform.isMacOS) {
+      return 'Approximate location support (location permission required)';
+    }
+    return 'Approximate location support (no GPS required)';
   }
 }

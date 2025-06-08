@@ -1,7 +1,7 @@
 import 'package:feedback/feedback.dart';
 import 'package:flutter/material.dart';
-import 'package:weather_fit/data/data_sources/remote/remote_data_source.dart';
-import 'package:weather_fit/data/repositories/ai_repository.dart';
+import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
+import 'package:weather_fit/data/repositories/outfit_repository.dart';
 import 'package:weather_fit/di/injector.dart';
 import 'package:weather_fit/feedback/feedback_form.dart';
 import 'package:weather_fit/weather_app.dart';
@@ -35,7 +35,7 @@ void main() async {
       theme: FeedbackThemeData(feedbackSheetColor: Colors.grey.shade50),
       child: WeatherApp(
         weatherRepository: WeatherRepository(),
-        aiRepository: AiRepository(RemoteDataSource()),
+        outfitRepository: const OutfitRepository(LocalDataSource()),
       ),
     ),
   );

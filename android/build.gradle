@@ -3,7 +3,7 @@
 buildscript {
     //noinspection GrUnresolvedAccess
     ext {
-        kotlin_version = '2.1.10'
+        kotlin_version = '2.1.21'
         application_id = 'com.turskyi.weather_fit'
 
         getSigningProperty = { key ->

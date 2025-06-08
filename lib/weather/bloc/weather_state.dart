@@ -4,7 +4,7 @@ part of 'weather_bloc.dart';
 sealed class WeatherState extends Equatable {
   const WeatherState({
     this.outfitRecommendation = '',
-    this.outfitFilePath = '',
+    this.outfitAssetPath = '',
     this.message = '',
     Weather? weather,
   }) : weather = weather ?? Weather.empty;
@@ -15,13 +15,13 @@ sealed class WeatherState extends Equatable {
   final Weather weather;
   final String outfitRecommendation;
   final String message;
-  final String outfitFilePath;
+  final String outfitAssetPath;
 
   @override
   List<Object> get props => <Object>[
         weather,
         outfitRecommendation,
-        outfitFilePath,
+        outfitAssetPath,
         message,
       ];
 
@@ -29,7 +29,7 @@ sealed class WeatherState extends Equatable {
     return <String, Object?>{
       'weather': weather.toJson(),
       'outfit_recommendation': outfitRecommendation,
-      'outfit_file_path': outfitFilePath,
+      'outfit_asset_path': outfitAssetPath,
       'message': message,
     };
   }
@@ -59,7 +59,7 @@ final class WeatherInitial extends WeatherState {
   const WeatherInitial({
     super.outfitRecommendation,
     super.weather,
-    super.outfitFilePath,
+    super.outfitAssetPath,
   });
 
   factory WeatherInitial.fromJson(Map<String, Object?> json) =>
@@ -71,12 +71,12 @@ final class WeatherInitial extends WeatherState {
   WeatherInitial copyWith({
     Weather? weather,
     String? outfitRecommendation,
-    String? outfitFilePath,
+    String? outfitAssetPath,
   }) =>
       WeatherInitial(
         weather: weather ?? this.weather,
         outfitRecommendation: outfitRecommendation ?? this.outfitRecommendation,
-        outfitFilePath: outfitFilePath ?? this.outfitFilePath,
+        outfitAssetPath: outfitAssetPath ?? this.outfitAssetPath,
       );
 }
 
@@ -85,7 +85,7 @@ class WeatherLoadingState extends WeatherState {
   const WeatherLoadingState({
     super.outfitRecommendation,
     super.weather,
-    super.outfitFilePath,
+    super.outfitAssetPath,
   });
 
   factory WeatherLoadingState.fromJson(Map<String, Object?> json) =>
@@ -107,14 +107,14 @@ class WeatherLoadingState extends WeatherState {
   List<Object> get props => <Object>[
         weather,
         outfitRecommendation,
-        outfitFilePath,
+        outfitAssetPath,
       ];
 }
 
 @JsonSerializable()
 class WeatherSuccess extends WeatherState {
   const WeatherSuccess({
-    super.outfitFilePath,
+    super.outfitAssetPath,
     super.outfitRecommendation,
     super.weather,
     super.message,
@@ -129,13 +129,13 @@ class WeatherSuccess extends WeatherState {
   WeatherSuccess copyWith({
     Weather? weather,
     String? outfitRecommendation,
-    String? outfitFilePath,
+    String? outfitAssetPath,
     String? message,
   }) =>
       WeatherSuccess(
         weather: weather ?? this.weather,
         outfitRecommendation: outfitRecommendation ?? this.outfitRecommendation,
-        outfitFilePath: outfitFilePath ?? this.outfitFilePath,
+        outfitAssetPath: outfitAssetPath ?? this.outfitAssetPath,
         message: message ?? this.message,
       );
 
@@ -143,7 +143,7 @@ class WeatherSuccess extends WeatherState {
   List<Object> get props => <Object>[
         weather,
         outfitRecommendation,
-        outfitFilePath,
+        outfitAssetPath,
         message,
       ];
 }
@@ -152,7 +152,7 @@ class WeatherSuccess extends WeatherState {
 final class LoadingOutfitState extends WeatherSuccess {
   const LoadingOutfitState({
     super.outfitRecommendation = '',
-    super.outfitFilePath = '',
+    super.outfitAssetPath = '',
     super.weather,
   });
 
@@ -163,7 +163,7 @@ final class LoadingOutfitState extends WeatherSuccess {
 @JsonSerializable()
 class WeatherFailure extends WeatherState {
   const WeatherFailure({
-    super.outfitFilePath,
+    super.outfitAssetPath,
     super.outfitRecommendation,
     super.message,
   });
@@ -177,7 +177,7 @@ class WeatherFailure extends WeatherState {
   @override
   List<Object> get props => <Object>[
         outfitRecommendation,
-        outfitFilePath,
+        outfitAssetPath,
         message,
       ];
 }

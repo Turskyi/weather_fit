@@ -1,21 +1,19 @@
-import 'dart:io';
 import 'dart:math';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:weather_fit/weather/ui/text_recommendation_widget.dart';
 
 class OutfitWidget extends StatelessWidget {
   const OutfitWidget({
     required this.needsRefresh,
-    required this.filePath,
+    required this.assetPath,
     required this.onRefresh,
     this.outfitRecommendation = '',
     super.key,
   });
 
   final bool needsRefresh;
-  final String filePath;
+  final String assetPath;
   final String outfitRecommendation;
   final RefreshCallback onRefresh;
 
@@ -40,6 +38,7 @@ class OutfitWidget extends StatelessWidget {
 
     final double screenWidth = MediaQuery.sizeOf(context).width;
     final bool isNarrowScreen = screenWidth < 500;
+
     final BorderRadius borderRadius = BorderRadius.circular(20.0);
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -62,7 +61,7 @@ class OutfitWidget extends StatelessWidget {
         height: isNarrowScreen ? 520 : 400,
         child: ClipRRect(
           borderRadius: borderRadius,
-          child: kIsWeb || filePath.isEmpty
+          child: assetPath.isEmpty
               ? TextRecommendationWidget(displayText: displayText)
               : isNarrowScreen
                   ? ColoredBox(
@@ -72,10 +71,20 @@ class OutfitWidget extends StatelessWidget {
                         children: <Widget>[
                           Expanded(
                             flex: 5,
-                            child: Image.file(
-                              File(filePath),
+                            child: Image.asset(
+                              assetPath,
                               fit: BoxFit.fitHeight,
-                              errorBuilder: (BuildContext context, _, __) {
+                              errorBuilder: (
+                                BuildContext context,
+                                Object error,
+                                __,
+                              ) {
+                                debugPrint(
+                                  '⚠️ Failed to load outfit image on narrow '
+                                  'screen: "$assetPath". '
+                                  'Error: $error\n'
+                                  'Fallback UI displayed.',
+                                );
                                 final ThemeData theme = Theme.of(context);
                                 final TextTheme textTheme = theme.textTheme;
 
@@ -147,10 +156,16 @@ class OutfitWidget extends StatelessWidget {
                       children: <Widget>[
                         Expanded(
                           flex: 3,
-                          child: Image.file(
-                            File(filePath),
+                          child: Image.asset(
+                            assetPath,
                             fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) {
+                            errorBuilder: (_, Object error, ___) {
+                              debugPrint(
+                                '⚠️ Failed to load outfit image on wide '
+                                'screen: "$assetPath". '
+                                'Error: $error\n'
+                                'Fallback UI displayed.',
+                              );
                               return Container(
                                 decoration: BoxDecoration(
                                   gradient: LinearGradient(

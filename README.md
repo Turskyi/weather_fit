@@ -465,14 +465,14 @@ more expression and flexibility.
 ## Download
 
 <!--suppress HtmlDeprecatedAttribute -->
-<div align="center">
-  <a href="https://play.google.com/store/apps/details?id=com.turskyi.weather_fit" target="_blank" style="display: inline-block; vertical-align: middle;">
-    <img src="https://play.google.com/intl/en_gb/badges/static/images/badges/en_badge_web_generic.png" width=240 alt="google play badge"/>
+<p align="center">
+  <a href="https://play.google.com/store/apps/details?id=com.turskyi.weather_fit" target="_blank">
+    <img src="https://play.google.com/intl/en_gb/badges/static/images/badges/en_badge_web_generic.png" height="80" alt="google play badge"/>
   </a>
-  <a href="https://apps.apple.com/ca/app/weatherfit/id6743688355" target="_blank" style="display: inline-block; vertical-align: middle;">
-    <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" width=200 alt="app store badge"/>
+  <a href="https://apps.apple.com/ca/app/weatherfit/id6743688355" target="_blank">
+    <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" height="80" alt="app store badge"/>
   </a>
-</div>
+</p>
 
 ## Web Version
 

@@ -101,7 +101,10 @@ class SupportPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12),
-            Text('Developer: Dmytro Turskyi', style: textTheme.bodySmall),
+            Text(
+              'Developer: ${constants.developerName}',
+              style: textTheme.bodySmall,
+            ),
             Text(
               'Email: ${constants.supportEmail}',
               style: textTheme.bodySmall,
@@ -125,7 +128,7 @@ class SupportPage extends StatelessWidget {
   Future<void> _launchEmail(BuildContext context) async {
     final Uri emailLaunchUri = Uri(
       scheme: 'mailto',
-      path: 'support@turskyi.com',
+      path: constants.supportEmail,
       query: _encodeQueryParameters(<String, String>{
         'subject': 'WeatherFit Support',
         'body': 'Hi, I need help with...',
@@ -135,7 +138,9 @@ class SupportPage extends StatelessWidget {
     if (await canLaunchUrl(emailLaunchUri)) {
       await launchUrl(emailLaunchUri);
     } else {
-      final Uri fallbackUri = Uri.parse('https://turskyi.com/#/support');
+      final Uri fallbackUri = Uri.parse(
+        'https://${constants.developerDomain}/#/support',
+      );
       if (await canLaunchUrl(fallbackUri)) {
         await launchUrl(fallbackUri);
       } else if (context.mounted) {

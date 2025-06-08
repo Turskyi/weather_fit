@@ -78,7 +78,7 @@ class WeatherContent extends StatelessWidget {
                     weather.needsRefresh) {
                   return ElevatedButton(
                     onPressed: onRefresh,
-                    child: const Text('Get New Outfit Suggestion'),
+                    child: const Text('Check Latest Weather'),
                   );
                 } else {
                   return const SizedBox();

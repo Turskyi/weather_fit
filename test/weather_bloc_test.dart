@@ -1,7 +1,7 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:weather_fit/data/repositories/ai_repository.dart';
+import 'package:weather_fit/data/repositories/outfit_repository.dart';
 import 'package:weather_fit/entities/enums/temperature_units.dart';
 import 'package:weather_fit/entities/models/temperature/temperature.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
@@ -19,7 +19,7 @@ void main() {
   group('WeatherBloc', () {
     late WeatherDomain weather;
     late WeatherRepository weatherRepository;
-    late AiRepository aiRepository;
+    late OutfitRepository aiRepository;
     late WeatherBloc weatherBloc;
 
     setUp(() async {

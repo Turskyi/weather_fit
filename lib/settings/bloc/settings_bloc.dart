@@ -76,7 +76,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         ..writeln()
         ..writeln('Platform: $platform')
         ..writeln();
-      if (kIsWeb) {
+      if (kIsWeb || Platform.isMacOS) {
         final Uri emailLaunchUri = Uri(
           scheme: 'mailto',
           path: constants.supportEmail,
@@ -130,7 +130,10 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     }
   }
 
-  FutureOr<void> _onFeedbackRequested(_, Emitter<SettingsState> emit) {
+  FutureOr<void> _onFeedbackRequested(
+    BugReportPressedEvent _,
+    Emitter<SettingsState> emit,
+  ) {
     emit(const FeedbackState());
   }
 
@@ -142,7 +145,10 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     return screenshotFilePath;
   }
 
-  FutureOr<void> _onFeedbackDialogDismissed(_, Emitter<SettingsState> emit) {
+  FutureOr<void> _onFeedbackDialogDismissed(
+    ClosingFeedbackEvent _,
+    Emitter<SettingsState> emit,
+  ) {
     emit(const SettingsInitial());
   }
 }

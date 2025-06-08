@@ -12,7 +12,7 @@ enum WeatherCondition {
     final bool isDaytime = hour >= 6 && hour < 22;
     switch (this) {
       case WeatherCondition.clear:
-        // Sun during day, moon at night
+        // Sun during day, moon at night.
         return isDaytime ? '☀️' : '🌕';
       case WeatherCondition.rainy:
         return '🌧️';
@@ -35,4 +35,7 @@ enum WeatherCondition {
   bool get isSnowy => this == WeatherCondition.snowy;
 
   bool get isUnknown => this == WeatherCondition.unknown;
+
+  bool get isPrecipitation =>
+      this == WeatherCondition.rainy || this == WeatherCondition.snowy;
 }

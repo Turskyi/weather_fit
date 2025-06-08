@@ -1,5 +1,6 @@
 import WidgetKit
 import SwiftUI
+import UIKit
 
 // 1. Data Model
 struct WeatherData: Codable {
@@ -11,18 +12,23 @@ struct WeatherData: Codable {
     let imagePath: String?
 }
 
+struct SimpleEntry: TimelineEntry {
+    let date: Date
+    let weatherData: WeatherData
+}
+
 // 2. Data Provider
 struct Provider: TimelineProvider {
     let appGroupIdentifier = "group.dmytrowidget"
     
-    // Helper function to fetch weather data from UserDefaults
+    // Helper function to fetch weather data from UserDefaults.
     func getWeatherData() -> WeatherData? {
         guard let sharedDefaults = UserDefaults(suiteName: appGroupIdentifier) else {
             print("Could not load shared defaults.")
             return nil
         }
         
-        // Use the correct keys, matching Android's SharedPreferences keys
+        // Use the correct keys, matching Android's SharedPreferences keys.
         let keys: [String: String] = [
             "emoji": "text_emoji",
             "location": "text_location",
@@ -32,7 +38,7 @@ struct Provider: TimelineProvider {
             "imagePath": "image_weather",
         ]
         
-        //Retrieve data from Shared Defaults
+        //Retrieve data from Shared Defaults.
         let emoji = sharedDefaults.string(forKey: keys["emoji"]!)
         let location = sharedDefaults.string(forKey: keys["location"]!)
         let temperature = sharedDefaults.string(forKey: keys["temperature"]!)
@@ -40,7 +46,7 @@ struct Provider: TimelineProvider {
         let lastUpdated = sharedDefaults.string(forKey: keys["lastUpdated"]!)
         let imagePath = sharedDefaults.string(forKey: keys["imagePath"]!)
         
-        // Create and return WeatherData struct
+        // Create and return WeatherData struct.
         return WeatherData(emoji: emoji, location: location, temperature: temperature, recommendation: recommendation, lastUpdated: lastUpdated, imagePath: imagePath)
     }
     
@@ -61,11 +67,6 @@ struct Provider: TimelineProvider {
         let timeline = Timeline(entries: [entry], policy: .after(nextUpdate))
         completion(timeline)
     }
-}
-
-struct SimpleEntry: TimelineEntry {
-    let date: Date
-    let weatherData: WeatherData
 }
 
 // 3. Widget Entry View
@@ -150,6 +151,8 @@ struct WeatherWidgetsEntryView: View {
 
 // 4. Widget Definition
 struct WeatherWidgets: Widget {
+// In the Widget Configuration it is important to set the kind to the same
+// value as the name/iOSName in the updateWidget function in Flutter.
     let kind: String = "WeatherWidgets"
     
     var body: some WidgetConfiguration {
