@@ -3,18 +3,17 @@ import 'dart:io';
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/painting.dart';
-import 'package:flutter/services.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:http/http.dart' as http;
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:weather_fit/data/repositories/outfit_repository.dart';
 import 'package:weather_fit/entities/enums/temperature_units.dart';
 import 'package:weather_fit/entities/models/temperature/temperature.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
+import 'package:weather_fit/res/extensions/double_extension.dart';
+import 'package:weather_fit/res/home_widget_keys.dart';
 import 'package:weather_repository/weather_repository.dart';
 
 part 'weather_bloc.g.dart';
@@ -174,7 +173,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
 
       final TemperatureUnits units = state.weather.temperatureUnits;
 
-      final double value = units.isFahrenheit
+      final double temperatureValue = units.isFahrenheit
           ? weather.temperature.value.toFahrenheit()
           : weather.temperature.value;
 
@@ -183,7 +182,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
       emit(
         LoadingOutfitState(
           weather: weather.copyWith(
-            temperature: Temperature(value: value),
+            temperature: Temperature(value: temperatureValue),
             temperatureUnits: units,
           ),
           outfitRecommendation: outfitRecommendation,
@@ -249,64 +248,8 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     }
   }
 
-  Future<Directory> _getAppDirectory() async {
-    if (!kIsWeb & Platform.isIOS) {
-      const MethodChannel channel = MethodChannel(
-        'weatherfit.shared/container',
-      );
-      final String path = await channel.invokeMethod(
-        'getAppleAppGroupDirectory',
-      );
-
-      return Directory(path);
-    } else {
-      // On Android or other platforms, fallback to Documents directory.
-      return getApplicationDocumentsDirectory();
-    }
-  }
-
   Future<String> _downloadAndSaveImage(String assetPath) async {
-    // Check if the platform is web OR macOS. If so, return early.
-    // See issue: https://github.com/ABausG/home_widget/issues/137.
-    if (kIsWeb || (!kIsWeb && Platform.isMacOS)) {
-      return '';
-    }
-    try {
-      // Load asset data as ByteData.
-      final ByteData byteData = await rootBundle.load(assetPath);
-
-      // Get the application documents directory.
-      final Directory directory = await _getAppDirectory();
-      final String filePath = '${directory.path}/outfit_image.png';
-      // Write the bytes to the file.
-      final File file = File(filePath);
-
-      // Check if the file exists and delete it if it does.
-      if (await file.exists()) {
-        await file.delete();
-      }
-
-      // Ensure the directory exists.
-      await directory.create(recursive: true);
-
-      // Write the new image data.
-      await file.writeAsBytes(
-        byteData.buffer.asUint8List(
-          byteData.offsetInBytes,
-          byteData.lengthInBytes,
-        ),
-      );
-
-      // Invalidate the image cache.
-      PaintingBinding.instance.imageCache.clear();
-      PaintingBinding.instance.imageCache.clearLiveImages();
-
-      return filePath;
-    } catch (e) {
-      // Handle potential errors (e.g., asset not found)
-      debugPrint('Error saving asset image to file: $e');
-      throw Exception('Failed to save asset image: $e');
-    }
+    return _outfitRepository.downloadAndSaveImage(assetPath);
   }
 
   FutureOr<void> _updateWeatherOnMobileHomeScreen(
@@ -324,22 +267,28 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
       HomeWidget.setAppGroupId(constants.appleAppGroupId);
 
       // Save weather data to the widget.
-      HomeWidget.saveWidgetData<String>('text_emoji', state.emoji);
-
-      HomeWidget.saveWidgetData<String>('text_location', state.locationName);
+      HomeWidget.saveWidgetData<String>(
+        HomeWidgetKey.textEmoji.stringValue,
+        state.emoji,
+      );
 
       HomeWidget.saveWidgetData<String>(
-        'text_temperature',
+        HomeWidgetKey.textLocation.stringValue,
+        state.locationName,
+      );
+
+      HomeWidget.saveWidgetData<String>(
+        HomeWidgetKey.textTemperature.stringValue,
         state.formattedTemperature,
       );
 
       HomeWidget.saveWidgetData<String>(
-        'text_last_updated',
+        HomeWidgetKey.textLastUpdated.stringValue,
         'Last Updated on\n${state.formattedLastUpdatedDateTime}',
       );
 
       HomeWidget.saveWidgetData<String>(
-        'text_recommendation',
+        HomeWidgetKey.textRecommendation.stringValue,
         state.outfitRecommendation,
       );
 
@@ -353,7 +302,10 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
       final String filePath = await _downloadAndSaveImage(assetPath);
 
       // Save the image path if it's valid.
-      HomeWidget.saveWidgetData<String>('image_weather', filePath);
+      HomeWidget.saveWidgetData<String>(
+        HomeWidgetKey.imageWeather.stringValue,
+        filePath,
+      );
 
       // Update the widget.
       HomeWidget.updateWidget(
@@ -366,34 +318,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
   }
 
   String _getOutfitRecommendation(Weather weather) {
-    final double temperature = weather.temperature.value;
-    final WeatherCondition condition = weather.condition;
-    final TemperatureUnits units = weather.temperatureUnits;
-
-    if (condition.isRainy) {
-      return '🌧️\nIt\'s rainy! Consider wearing a waterproof jacket and '
-          'boots.';
-    } else if (condition.isSnowy) {
-      return '❄️\nIt\'s snowy! Dress warmly with a heavy coat, hat, gloves, '
-          'and scarf.';
-    } else if (temperature < 10 && units.isCelsius ||
-        temperature < 50 && units.isFahrenheit) {
-      return '🥶\nIt\'s cold! Wear a warm jacket, sweater, and consider a hat '
-          'and gloves.';
-    } else if (temperature >= 10 && temperature < 20 && units.isCelsius ||
-        temperature >= 50 && temperature < 68 && units.isFahrenheit) {
-      return '🧥\nIt\'s cool. A light jacket or sweater should be comfortable.';
-    } else if (temperature >= 20 && temperature < 30 && units.isCelsius ||
-        temperature >= 68 && temperature < 86 && units.isFahrenheit) {
-      return '👕\nIt\'s warm. Shorts, t-shirts, and light dresses are great '
-          'options.';
-    } else if (temperature >= 30 && units.isCelsius ||
-        temperature >= 86 && units.isFahrenheit) {
-      return '☀️\nIt\'s hot! Wear light, breathable clothing like tank tops '
-          'and shorts.';
-    } else {
-      return '🌤️\nThe weather is moderate. You can wear a variety of outfits.';
-    }
+    return _outfitRepository.getOutfitRecommendation(weather);
   }
 
   FutureOr<void> _onOutfitRecommendationRequested(
@@ -411,12 +336,12 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     try {
       final TemperatureUnits units = state.temperatureUnits;
 
-      final double value = units.isFahrenheit
+      final double temperatureValue = units.isFahrenheit
           ? weather.temperature.value.toFahrenheit()
           : weather.temperature.value;
 
       final Weather updatedWeather = weather.copyWith(
-        temperature: Temperature(value: value),
+        temperature: Temperature(value: temperatureValue),
         temperatureUnits: units,
       );
 
@@ -476,10 +401,4 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
       }
     }
   }
-}
-
-extension on double {
-  double toFahrenheit() => (this * 9 / 5) + 32;
-
-  double toCelsius() => (this - 32) * 5 / 9;
 }

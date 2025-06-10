@@ -2,14 +2,21 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.turskyi.weather_fit"
-    android:versionCode="16"
-    android:versionName="0.1.6">
+    android:versionCode="17"
+    android:versionName="0.1.7">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- Grants approximate location access using Wi-Fi and mobile networks.
      Does not use GPS, conserving battery. Suitable for general location-based
      features like weather updates or regional recommendations. -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <!--
+  Required to allow the app to reschedule background tasks (e.g., widget
+  updates) after the device is rebooted. Used by WorkManager to ensure
+  persistent updates.
+-->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <queries>
         <intent>

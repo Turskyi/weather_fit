@@ -9,4 +9,12 @@ class OutfitRepository {
   String getOutfitImageAssetPath(Weather weather) {
     return _localDataSource.getOutfitImageAssetPath(weather);
   }
+
+  String getOutfitRecommendation(Weather weather) {
+    return _localDataSource.getOutfitRecommendation(weather);
+  }
+
+  Future<String> downloadAndSaveImage(String assetPath) async {
+    return _localDataSource.downloadAndSaveImage(assetPath);
+  }
 }
