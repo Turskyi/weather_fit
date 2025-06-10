@@ -19,7 +19,7 @@ class Weather extends Equatable {
     this.lastUpdatedDateTime,
   });
 
-  factory Weather.fromJson(Map<String, dynamic> json) =>
+  factory Weather.fromJson(Map<String, Object?> json) =>
       _$WeatherFromJson(json);
 
   factory Weather.fromRepository(WeatherDomain weather) {
@@ -71,6 +71,7 @@ class Weather extends Equatable {
         'temperature: $temperature, '
         'temperatureUnits: $temperatureUnits, '
         'countryCode: $countryCode,'
+        'lastUpdatedDateTime: $lastUpdatedDateTime'
         '}';
   }
 

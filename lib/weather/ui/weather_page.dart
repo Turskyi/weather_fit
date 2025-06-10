@@ -27,6 +27,12 @@ class _WeatherPageState extends State<WeatherPage> {
   bool _isDisposing = false;
 
   @override
+  void initState() {
+    super.initState();
+    context.read<WeatherBloc>().add(const RefreshWeather());
+  }
+
+  @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.sizeOf(context).width;
     final bool isLargeScreen = screenWidth > 800;

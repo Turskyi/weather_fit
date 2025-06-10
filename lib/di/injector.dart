@@ -59,15 +59,19 @@ void _callbackDispatcher() {
 
       // Get latest weather.
       final WeatherRepository weatherRepository = WeatherRepository();
+
       final WeatherDomain domainWeather = await weatherRepository.getWeather(
         city,
       );
+
       final Weather weather = Weather.fromRepository(domainWeather);
 
       final TemperatureUnits units = weather.temperatureUnits;
+
       final double temperatureValue = units.isFahrenheit
           ? weather.temperature.value.toFahrenheit()
           : weather.temperature.value;
+
       final Weather updatedWeather = weather.copyWith(
         temperature: Temperature(value: temperatureValue),
         temperatureUnits: units,
@@ -81,6 +85,7 @@ void _callbackDispatcher() {
           outfitRepository.getOutfitRecommendation(
         updatedWeather,
       );
+
       final String outfitAssetPath = outfitRepository.getOutfitImageAssetPath(
         weather,
       );
@@ -94,22 +99,27 @@ void _callbackDispatcher() {
         HomeWidgetKey.textEmoji.stringValue,
         weather.condition.toEmoji,
       );
+
       await HomeWidget.saveWidgetData(
         HomeWidgetKey.textLocation.stringValue,
         weather.locationName,
       );
+
       await HomeWidget.saveWidgetData(
         HomeWidgetKey.textTemperature.stringValue,
         weather.formattedTemperature,
       );
+
       await HomeWidget.saveWidgetData(
         HomeWidgetKey.textRecommendation.stringValue,
         outfitRecommendation,
       );
+
       await HomeWidget.saveWidgetData(
         HomeWidgetKey.textLastUpdated.stringValue,
         'Last Updated on\n${weather.formattedLastUpdatedDateTime}',
       );
+
       await HomeWidget.saveWidgetData(
         HomeWidgetKey.imageWeather.stringValue,
         outfitFilePath,
