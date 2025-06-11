@@ -184,8 +184,8 @@ class _SettingsPageState extends State<SettingsPage> {
                     assetPath:
                         '${constants.imagePath}Download_on_the_App_Store_Badge'
                         '.png',
-                    height: 120,
-                    width: 200,
+                    height: constants.appStoreBadgeHeight,
+                    width: constants.appStoreBadgeWidth,
                   ),
                 ],
               )

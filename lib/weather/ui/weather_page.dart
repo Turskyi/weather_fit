@@ -244,14 +244,12 @@ class _WeatherPageState extends State<WeatherPage> {
       const StoreBadge(
         url: constants.googlePlayUrl,
         assetPath: '${constants.imagePath}play_store_badge.png',
-        height: 90,
-        width: 150,
       ),
       const StoreBadge(
         url: constants.appStoreUrl,
         assetPath: '${constants.imagePath}Download_on_the_App_Store_Badge.png',
-        height: 80,
-        width: 140,
+        height: constants.appStoreBadgeHeight,
+        width: constants.appStoreBadgeWidth,
       ),
     ];
   }

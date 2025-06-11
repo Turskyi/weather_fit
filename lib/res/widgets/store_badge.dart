@@ -5,8 +5,8 @@ class StoreBadge extends StatelessWidget {
   const StoreBadge({
     required this.url,
     required this.assetPath,
-    this.height = 100,
-    this.width = 240,
+    this.height = 90,
+    this.width = 170,
     this.borderRadius = 8.0,
     super.key,
   });
