@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:nested/nested.dart';
-import 'package:weather_fit/data/repositories/ai_repository.dart';
+import 'package:weather_fit/data/repositories/outfit_repository.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
 import 'package:weather_fit/res/theme/cubit/theme_cubit.dart';
 import 'package:weather_fit/router/app_route.dart';
@@ -15,13 +15,13 @@ import 'package:weather_repository/weather_repository.dart';
 class WeatherApp extends StatelessWidget {
   const WeatherApp({
     required WeatherRepository weatherRepository,
-    required AiRepository aiRepository,
+    required OutfitRepository outfitRepository,
     super.key,
   })  : _weatherRepository = weatherRepository,
-        _aiRepository = aiRepository;
+        _aiRepository = outfitRepository;
 
   final WeatherRepository _weatherRepository;
-  final AiRepository _aiRepository;
+  final OutfitRepository _aiRepository;
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +31,7 @@ class WeatherApp extends StatelessWidget {
         // Provide the weather repository.
         RepositoryProvider<WeatherRepository>.value(value: _weatherRepository),
         // Provide the AI repository.
-        RepositoryProvider<AiRepository>.value(value: _aiRepository),
+        RepositoryProvider<OutfitRepository>.value(value: _aiRepository),
       ],
       child: MultiBlocProvider(
         providers: <SingleChildWidget>[
@@ -53,6 +53,7 @@ class WeatherApp extends StatelessWidget {
             final bool completeDarkness = hour < 6 || hour > 21;
 
             return MaterialApp(
+              debugShowCheckedModeBanner: false,
               title: constants.appName,
               initialRoute: AppRoute.weather.path,
               routes: routes.routeMap,

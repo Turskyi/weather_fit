@@ -49,7 +49,8 @@ bundle to **Google Play** after every merge (push) to **master** branch;
 • State management approach: [BLoC](https://bloclibrary.dev);
 
 • App testing platforms:
-[Firebase App Distribution](https://firebase.google.com/docs/app-distribution);
+[Firebase App Distribution](https://firebase.google.com/docs/app-distribution),
+[iOS TestFlight](https://testflight.apple.com/join/u5k9mzjN);
 
 **Code Readability:** code is easily readable with no unnecessary blank lines,
 no unused variables or methods, and no commented-out code, all variables,
@@ -447,25 +448,44 @@ more expression and flexibility.
 • Screenshots:
 
 <!--suppress CheckImageSize -->
-<img src="screenshots/Web-Screenshot-2024-03-11.png" width="400"  alt="screenshot">
+<img src="screenshots/City_weather.png" width="400"  alt="screenshot">
 <!--suppress CheckImageSize -->
-<img src="screenshots/Android-Pixel2-Screenshot_20240311.png" width="400"  alt="screenshot">
+<img src="screenshots/location_permission.png" width="400"  alt="screenshot">
 <!--suppress CheckImageSize -->
-<img src="screenshots/Pixel_XL_Screenshot_20240311.png" width="400"  alt="screenshot">
+<img src="screenshots/Screenshot_confirmation_20250307.png" width="400"  alt="screenshot">
 <!--suppress CheckImageSize -->
-<img src="screenshots/Search_Screenshot_20240311.png" width="400"  alt="screenshot">
+<img src="screenshots/Screenshot_home_march_2025.png" width="400"  alt="screenshot">
 <!--suppress CheckImageSize -->
-<img src="screenshots/Settings_Screenshot_20240311.png" width="400"  alt="screenshot">
+<img src="screenshots/Screenshot_privacy_20250307.png" width="400"  alt="screenshot">
 <!--suppress CheckImageSize -->
-<img src="screenshots/Privacy_Screenshot_20240311.png" width="400"  alt="screenshot">
+<img src="screenshots/Screenshot_tablet_profile_search_20250307.png" width="400"  alt="screenshot">
 <!--suppress CheckImageSize -->
-<img src="screenshots/Home_widget_Screenshot_20240311.png" width="400"  alt="screenshot">
+<img src="screenshots/Weather_by_location.png" width="400"  alt="screenshot">
 
 ## Download
 
-<a href="https://play.google.com/store/apps/details?id=com.turskyi.weather_fit" target="_blank">
-<img src="https://play.google.com/intl/en_gb/badges/static/images/badges/en_badge_web_generic.png" width=240  alt="google play badge"/>
-</a>
+<!--suppress HtmlDeprecatedAttribute -->
+<p align="center">
+  <a href="https://play.google.com/store/apps/details?id=com.turskyi.weather_fit" target="_blank">
+    <img src="https://play.google.com/intl/en_gb/badges/static/images/badges/en_badge_web_generic.png" height="80" alt="google play badge"/>
+  </a>
+  <a href="https://apps.apple.com/ca/app/weatherfit/id6743688355" target="_blank">
+    <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" height="80" alt="app store badge"/>
+  </a>
+</p>
+
+## Web Version
+
+In addition to the Android and iOS apps, WeatherFit is also available as a web
+app.
+You can access it in two ways:
+
+- [Hosted on Firebase](https://weather-fit-ai.web.app) — the raw build for
+  development and testing
+- [Official Website](https://weather-fit.com) — the recommended domain for users
+
+The web version offers the same core features as the mobile apps, including
+real-time weather updates and outfit suggestions based on current conditions.
 
 ## Credits
 

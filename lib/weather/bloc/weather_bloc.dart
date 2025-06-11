@@ -3,17 +3,17 @@ import 'dart:io';
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/painting.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:http/http.dart' as http;
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:weather_fit/data/repositories/ai_repository.dart';
+import 'package:weather_fit/data/repositories/outfit_repository.dart';
 import 'package:weather_fit/entities/enums/temperature_units.dart';
 import 'package:weather_fit/entities/models/temperature/temperature.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
+import 'package:weather_fit/res/extensions/double_extension.dart';
+import 'package:weather_fit/res/home_widget_keys.dart';
 import 'package:weather_repository/weather_repository.dart';
 
 part 'weather_bloc.g.dart';
@@ -21,7 +21,7 @@ part 'weather_event.dart';
 part 'weather_state.dart';
 
 class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
-  WeatherBloc(this._weatherRepository, this._aiRepository)
+  WeatherBloc(this._weatherRepository, this._outfitRepository)
       : super(const WeatherInitial()) {
     on<FetchWeather>(_onFetchWeather);
     on<RefreshWeather>(_onRefreshWeather);
@@ -31,11 +31,12 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
   }
 
   final WeatherRepository _weatherRepository;
-  final AiRepository _aiRepository;
+  final OutfitRepository _outfitRepository;
 
   @override
-  WeatherSuccess fromJson(Map<String, Object?> json) =>
-      WeatherSuccess.fromJson(json);
+  WeatherSuccess fromJson(Map<String, Object?> json) {
+    return WeatherSuccess.fromJson(json);
+  }
 
   @override
   Map<String, Object?> toJson(Object? state) {
@@ -57,98 +58,80 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
       return;
     }
 
-    if (state is WeatherSuccess &&
-        eventLocation == state.locationName &&
-        !state.needsRefresh) {
-      final String message = 'Same location.\n'
-          'Wait ${state.remainingMinutes} minutes '
-          'to get updated weather and outfit.';
+    emit(const WeatherLoadingState());
+    try {
+      final WeatherDomain domainWeather = await _weatherRepository.getWeather(
+        eventLocation,
+      );
 
-      emit((state as WeatherSuccess).copyWith(message: message));
-      emit((state as WeatherSuccess).copyWith(message: ''));
-    } else {
-      emit(const WeatherLoadingState());
-      try {
-        final WeatherDomain domainWeather = await _weatherRepository.getWeather(
-          eventLocation,
-        );
+      final Weather weather = Weather.fromRepository(domainWeather);
 
-        final Weather weather = Weather.fromRepository(domainWeather);
+      final TemperatureUnits units = state.temperatureUnits;
 
-        final TemperatureUnits units = state.temperatureUnits;
+      final double value = units.isFahrenheit
+          ? weather.temperature.value.toFahrenheit()
+          : weather.temperature.value;
 
-        final double value = units.isFahrenheit
-            ? weather.temperature.value.toFahrenheit()
-            : weather.temperature.value;
+      final Weather updatedWeather = weather.copyWith(
+        temperature: Temperature(value: value),
+        temperatureUnits: units,
+      );
 
-        final Weather updatedWeather = weather.copyWith(
-          temperature: Temperature(value: value),
-          temperatureUnits: units,
-        );
+      final String outfitRecommendation = _getOutfitRecommendation(
+        updatedWeather,
+      );
 
-        final String outfitRecommendation = _getOutfitRecommendation(
-          updatedWeather,
+      emit(
+        LoadingOutfitState(
+          weather: updatedWeather,
+          outfitRecommendation: outfitRecommendation,
+        ),
+      );
+
+      if (state is WeatherSuccess) {
+        final String assetPath = _outfitRepository.getOutfitImageAssetPath(
+          weather,
         );
 
         emit(
-          LoadingOutfitState(
+          (state as WeatherSuccess).copyWith(outfitAssetPath: assetPath),
+        );
+
+        // Only add the event if it's NOT web AND NOT macOS.
+        // For context, see issue:
+        // https://github.com/ABausG/home_widget/issues/137.
+        if (!kIsWeb && !Platform.isMacOS) {
+          add(const UpdateWeatherOnMobileHomeScreenEvent());
+        }
+      } else {
+        emit(
+          WeatherSuccess(
             weather: updatedWeather,
             outfitRecommendation: outfitRecommendation,
           ),
         );
-
-        if (state is WeatherSuccess) {
-          if (kIsWeb) {
-            // We cannot make remote calls in browser because of the CORS.
-            emit(state as WeatherSuccess);
-          } else {
-            final String imageUrl =
-                await _aiRepository.getImageUrlFromAiAsFuture(
-              state.weather,
-            );
-
-            final http.Response response = await http.get(Uri.parse(imageUrl));
-
-            if (response.statusCode == HttpStatus.ok) {
-              final String filePath = await _saveImageToFile(response);
-              emit(
-                (state as WeatherSuccess).copyWith(outfitFilePath: filePath),
-              );
-              add(const UpdateWeatherOnMobileHomeScreenEvent());
-            } else {
-              throw Exception('Failed to download image');
-            }
-          }
-        } else {
-          emit(
-            WeatherSuccess(
-              weather: updatedWeather,
-              outfitRecommendation: outfitRecommendation,
-            ),
-          );
-        }
-      } on Exception catch (e) {
-        if (e is http.ClientException && kDebugMode && kIsWeb) {
-          emit(
-            LocalWebCorsFailure(
-              message: 'Error: Local Environment Setup Required\nTo run this '
-                  'application locally on web, please use the following '
-                  'command:\n\nflutter run -d chrome --web-browser-flag '
-                  '"--disable-web-security"\n\nThis step is necessary to '
-                  'bypass CORS restrictions during local development. '
-                  'Please note that this flag should only be used in a '
-                  'development environment and never in production.',
-              outfitRecommendation: state.outfitRecommendation,
-            ),
-          );
-        } else {
-          emit(
-            WeatherFailure(
-              message: '$e',
-              outfitRecommendation: state.outfitRecommendation,
-            ),
-          );
-        }
+      }
+    } on Exception catch (e) {
+      if (e is http.ClientException && kDebugMode && kIsWeb) {
+        emit(
+          LocalWebCorsFailure(
+            message: 'Error: Local Environment Setup Required\nTo run this '
+                'application locally on web, please use the following '
+                'command:\n\nflutter run -d chrome --web-browser-flag '
+                '"--disable-web-security"\n\nThis step is necessary to '
+                'bypass CORS restrictions during local development. '
+                'Please note that this flag should only be used in a '
+                'development environment and never in production.',
+            outfitRecommendation: state.outfitRecommendation,
+          ),
+        );
+      } else {
+        emit(
+          WeatherFailure(
+            message: '$e',
+            outfitRecommendation: state.outfitRecommendation,
+          ),
+        );
       }
     }
   }
@@ -162,7 +145,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
         WeatherInitial(
           weather: state.weather,
           outfitRecommendation: state.outfitRecommendation,
-          outfitFilePath: state.outfitFilePath,
+          outfitAssetPath: state.outfitAssetPath,
         ),
       );
       return;
@@ -177,7 +160,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
       WeatherLoadingState(
         weather: state.weather,
         outfitRecommendation: state.outfitRecommendation,
-        outfitFilePath: state.outfitFilePath,
+        outfitAssetPath: state.outfitAssetPath,
       ),
     );
 
@@ -190,7 +173,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
 
       final TemperatureUnits units = state.weather.temperatureUnits;
 
-      final double value = units.isFahrenheit
+      final double temperatureValue = units.isFahrenheit
           ? weather.temperature.value.toFahrenheit()
           : weather.temperature.value;
 
@@ -199,36 +182,28 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
       emit(
         LoadingOutfitState(
           weather: weather.copyWith(
-            temperature: Temperature(value: value),
+            temperature: Temperature(value: temperatureValue),
             temperatureUnits: units,
           ),
           outfitRecommendation: outfitRecommendation,
-          outfitFilePath: '',
+          outfitAssetPath: _outfitRepository.getOutfitImageAssetPath(weather),
         ),
       );
 
       if (state is WeatherSuccess) {
-        if (kIsWeb) {
-          // We cannot make remote calls in browser because of the CORS.
-          emit(state as WeatherSuccess);
-        } else {
-          final String imageUrl = await _aiRepository.getImageUrlFromAiAsFuture(
-            state.weather,
-          );
+        final String filePath = _outfitRepository.getOutfitImageAssetPath(
+          weather,
+        );
 
-          final http.Response response = await http.get(Uri.parse(imageUrl));
+        emit(
+          (state as WeatherSuccess).copyWith(outfitAssetPath: filePath),
+        );
 
-          if (response.statusCode == HttpStatus.ok) {
-            final String filePath = await _saveImageToFile(response);
-
-            emit(
-              (state as WeatherSuccess).copyWith(outfitFilePath: filePath),
-            );
-
-            add(const UpdateWeatherOnMobileHomeScreenEvent());
-          } else {
-            throw Exception('Failed to download image');
-          }
+        // Only add the event if it's NOT web AND NOT macOS.
+        // For context, see issue:
+        // https://github.com/ABausG/home_widget/issues/137.
+        if (!kIsWeb && !Platform.isMacOS) {
+          add(const UpdateWeatherOnMobileHomeScreenEvent());
         }
       }
     } on Exception catch (e) {
@@ -236,13 +211,13 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
         WeatherFailure(
           message: '$e',
           outfitRecommendation: state.outfitRecommendation,
-          outfitFilePath: state.outfitFilePath,
+          outfitAssetPath: state.outfitAssetPath,
         ),
       );
     }
   }
 
-  void _onToggleUnits(_, Emitter<WeatherState> emit) {
+  void _onToggleUnits(ToggleUnits _, Emitter<WeatherState> emit) {
     final TemperatureUnits units = state.weather.temperatureUnits.isFahrenheit
         ? TemperatureUnits.celsius
         : TemperatureUnits.fahrenheit;
@@ -273,64 +248,64 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     }
   }
 
-  Future<String> _downloadAndSaveImage(String imageUrl) async {
-    if (kIsWeb) return '';
-    final http.Response response = await http.get(Uri.parse(imageUrl));
-
-    if (response.statusCode == HttpStatus.ok) {
-      final Directory directory = await getApplicationDocumentsDirectory();
-      final String filePath = '${directory.path}/outfit_image.png';
-
-      final File file = File(filePath);
-      await file.writeAsBytes(response.bodyBytes);
-      return filePath;
-    } else {
-      throw Exception('Failed to download image');
-    }
+  Future<String> _downloadAndSaveImage(String assetPath) async {
+    return _outfitRepository.downloadAndSaveImage(assetPath);
   }
 
   FutureOr<void> _updateWeatherOnMobileHomeScreen(
     UpdateWeatherOnMobileHomeScreenEvent event,
     Emitter<WeatherState> emit,
   ) async {
-    String filePath = state.outfitFilePath;
-    if (kIsWeb) return;
+    // Check if the platform is web OR macOS. If so, return early.
+    // See issue: https://github.com/ABausG/home_widget/issues/137.
+    if (kIsWeb || (!kIsWeb && Platform.isMacOS)) {
+      return;
+    }
 
     try {
       // Set the group ID.
-      HomeWidget.setAppGroupId(constants.appGroupId);
+      HomeWidget.setAppGroupId(constants.appleAppGroupId);
 
       // Save weather data to the widget.
-      HomeWidget.saveWidgetData<String>('text_emoji', state.emoji);
-
-      HomeWidget.saveWidgetData<String>('text_location', state.locationName);
+      HomeWidget.saveWidgetData<String>(
+        HomeWidgetKey.textEmoji.stringValue,
+        state.emoji,
+      );
 
       HomeWidget.saveWidgetData<String>(
-        'text_temperature',
+        HomeWidgetKey.textLocation.stringValue,
+        state.locationName,
+      );
+
+      HomeWidget.saveWidgetData<String>(
+        HomeWidgetKey.textTemperature.stringValue,
         state.formattedTemperature,
       );
 
       HomeWidget.saveWidgetData<String>(
-        'text_last_updated',
-        'Last Updated on ${state.formattedLastUpdatedDateTime}',
+        HomeWidgetKey.textLastUpdated.stringValue,
+        'Last Updated on\n${state.formattedLastUpdatedDateTime}',
       );
 
       HomeWidget.saveWidgetData<String>(
-        'text_recommendation',
+        HomeWidgetKey.textRecommendation.stringValue,
         state.outfitRecommendation,
       );
 
-      if (filePath.isEmpty) {
-        if (state.weather.isNotEmpty) {
-          final String imageUrl = await _aiRepository.getImageUrlFromAiAsFuture(
-            state.weather,
-          );
-          filePath = await _downloadAndSaveImage(imageUrl);
+      String assetPath = state.outfitAssetPath;
+      if (assetPath.isEmpty) {
+        final Weather weather = state.weather;
+        if (weather.isNotEmpty) {
+          assetPath = _outfitRepository.getOutfitImageAssetPath(weather);
         }
       }
+      final String filePath = await _downloadAndSaveImage(assetPath);
 
       // Save the image path if it's valid.
-      HomeWidget.saveWidgetData<String>('image_weather', filePath);
+      HomeWidget.saveWidgetData<String>(
+        HomeWidgetKey.imageWeather.stringValue,
+        filePath,
+      );
 
       // Update the widget.
       HomeWidget.updateWidget(
@@ -342,62 +317,8 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     }
   }
 
-  Future<String> _saveImageToFile(http.Response response) async {
-    if (kIsWeb) return '';
-
-    if (response.statusCode == HttpStatus.ok) {
-      final Directory directory = await getApplicationDocumentsDirectory();
-      final String filePath = '${directory.path}/outfit_image.png';
-
-      final File file = File(filePath);
-
-      // Check if the file exists and delete it if it does.
-      if (await file.exists()) {
-        await file.delete();
-      }
-
-      // Write the new image data.
-      await file.writeAsBytes(response.bodyBytes);
-
-      // Invalidate the image cache.
-      PaintingBinding.instance.imageCache.clear();
-      PaintingBinding.instance.imageCache.clearLiveImages();
-
-      return filePath;
-    } else {
-      throw Exception('Failed to save image');
-    }
-  }
-
   String _getOutfitRecommendation(Weather weather) {
-    final double temperature = weather.temperature.value;
-    final WeatherCondition condition = weather.condition;
-    final TemperatureUnits units = weather.temperatureUnits;
-
-    if (condition.isRainy) {
-      return '🌧️\nIt\'s rainy! Consider wearing a waterproof jacket and '
-          'boots.';
-    } else if (condition.isSnowy) {
-      return '❄️\nIt\'s snowy! Dress warmly with a heavy coat, hat, gloves, '
-          'and scarf.';
-    } else if (temperature < 10 && units.isCelsius ||
-        temperature < 50 && units.isFahrenheit) {
-      return '🥶\nIt\'s cold! Wear a warm jacket, sweater, and consider a hat '
-          'and gloves.';
-    } else if (temperature >= 10 && temperature < 20 && units.isCelsius ||
-        temperature >= 50 && temperature < 68 && units.isFahrenheit) {
-      return '🧥\nIt\'s cool. A light jacket or sweater should be comfortable.';
-    } else if (temperature >= 20 && temperature < 30 && units.isCelsius ||
-        temperature >= 68 && temperature < 86 && units.isFahrenheit) {
-      return '👕\nIt\'s warm. Shorts, t-shirts, and light dresses are great '
-          'options.';
-    } else if (temperature >= 30 && units.isCelsius ||
-        temperature >= 86 && units.isFahrenheit) {
-      return '☀️\nIt\'s hot! Wear light, breathable clothing like tank tops '
-          'and shorts.';
-    } else {
-      return '🌤️\nThe weather is moderate. You can wear a variety of outfits.';
-    }
+    return _outfitRepository.getOutfitRecommendation(weather);
   }
 
   FutureOr<void> _onOutfitRecommendationRequested(
@@ -411,99 +332,73 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
       return;
     }
 
-    if (state is WeatherSuccess &&
-        (weather.location == state.location) &&
-        !state.needsRefresh) {
-      final String message = 'Same location.\n'
-          'Wait ${state.remainingMinutes} minutes '
-          'to get updated weather and outfit.';
+    emit(const WeatherLoadingState());
+    try {
+      final TemperatureUnits units = state.temperatureUnits;
 
-      emit((state as WeatherSuccess).copyWith(message: message));
-      emit((state as WeatherSuccess).copyWith(message: ''));
-    } else {
-      emit(const WeatherLoadingState());
-      try {
-        final TemperatureUnits units = state.temperatureUnits;
+      final double temperatureValue = units.isFahrenheit
+          ? weather.temperature.value.toFahrenheit()
+          : weather.temperature.value;
 
-        final double value = units.isFahrenheit
-            ? weather.temperature.value.toFahrenheit()
-            : weather.temperature.value;
+      final Weather updatedWeather = weather.copyWith(
+        temperature: Temperature(value: temperatureValue),
+        temperatureUnits: units,
+      );
 
-        final Weather updatedWeather = weather.copyWith(
-          temperature: Temperature(value: value),
-          temperatureUnits: units,
+      final String outfitRecommendation = _getOutfitRecommendation(
+        updatedWeather,
+      );
+
+      emit(
+        LoadingOutfitState(
+          weather: updatedWeather,
+          outfitRecommendation: outfitRecommendation,
+        ),
+      );
+
+      if (state is WeatherSuccess) {
+        final String assetPath = _outfitRepository.getOutfitImageAssetPath(
+          weather,
         );
-
-        final String outfitRecommendation = _getOutfitRecommendation(
-          updatedWeather,
-        );
-
         emit(
-          LoadingOutfitState(
+          (state as WeatherSuccess).copyWith(outfitAssetPath: assetPath),
+        );
+        // Only add the event if it's NOT web AND NOT macOS.
+        // For context, see issue:
+        // https://github.com/ABausG/home_widget/issues/137.
+        if (!kIsWeb && !Platform.isMacOS) {
+          add(const UpdateWeatherOnMobileHomeScreenEvent());
+        }
+      } else {
+        emit(
+          WeatherSuccess(
             weather: updatedWeather,
             outfitRecommendation: outfitRecommendation,
           ),
         );
-
-        if (state is WeatherSuccess) {
-          if (kIsWeb) {
-            // We cannot make remote calls in browser because of the CORS.
-            emit(state as WeatherSuccess);
-          } else {
-            final String imageUrl =
-                await _aiRepository.getImageUrlFromAiAsFuture(
-              state.weather,
-            );
-
-            final http.Response response = await http.get(Uri.parse(imageUrl));
-
-            if (response.statusCode == HttpStatus.ok) {
-              final String filePath = await _saveImageToFile(response);
-              emit(
-                (state as WeatherSuccess).copyWith(outfitFilePath: filePath),
-              );
-              add(const UpdateWeatherOnMobileHomeScreenEvent());
-            } else {
-              throw Exception('Failed to download image');
-            }
-          }
-        } else {
-          emit(
-            WeatherSuccess(
-              weather: updatedWeather,
-              outfitRecommendation: outfitRecommendation,
-            ),
-          );
-        }
-      } on Exception catch (e) {
-        if (e is http.ClientException && kDebugMode && kIsWeb) {
-          emit(
-            LocalWebCorsFailure(
-              message: 'Error: Local Environment Setup Required\nTo run this '
-                  'application locally on web, please use the following '
-                  'command:\n\nflutter run -d chrome --web-browser-flag '
-                  '"--disable-web-security"\n\nThis step is necessary to '
-                  'bypass CORS restrictions during local development. '
-                  'Please note that this flag should only be used in a '
-                  'development environment and never in production.',
-              outfitRecommendation: state.outfitRecommendation,
-            ),
-          );
-        } else {
-          emit(
-            WeatherFailure(
-              message: '$e',
-              outfitRecommendation: state.outfitRecommendation,
-            ),
-          );
-        }
+      }
+    } on Exception catch (e) {
+      if (e is http.ClientException && kDebugMode && kIsWeb) {
+        emit(
+          LocalWebCorsFailure(
+            message: 'Error: Local Environment Setup Required\nTo run this '
+                'application locally on web, please use the following '
+                'command:\n\nflutter run -d chrome --web-browser-flag '
+                '"--disable-web-security"\n\nThis step is necessary to '
+                'bypass CORS restrictions during local development. '
+                'Please note that this flag should only be used in a '
+                'development environment and never in production.',
+            outfitRecommendation: state.outfitRecommendation,
+          ),
+        );
+      } else {
+        emit(
+          WeatherFailure(
+            message: '$e',
+            outfitRecommendation: state.outfitRecommendation,
+          ),
+        );
       }
     }
   }
-}
-
-extension on double {
-  double toFahrenheit() => (this * 9 / 5) + 32;
-
-  double toCelsius() => (this - 32) * 5 / 9;
 }

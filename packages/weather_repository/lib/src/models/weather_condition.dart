@@ -8,11 +8,11 @@ enum WeatherCondition {
   String get toEmoji {
     final DateTime now = DateTime.now();
     final int hour = now.hour;
-    // Assume daytime from 6 AM to 6 PM.
-    final bool isDaytime = hour >= 6 && hour < 19;
+    // Assume daytime from 6 AM to 10 PM.
+    final bool isDaytime = hour >= 6 && hour < 22;
     switch (this) {
       case WeatherCondition.clear:
-        // Sun during day, moon at night
+        // Sun during day, moon at night.
         return isDaytime ? '☀️' : '🌕';
       case WeatherCondition.rainy:
         return '🌧️';
@@ -35,4 +35,7 @@ enum WeatherCondition {
   bool get isSnowy => this == WeatherCondition.snowy;
 
   bool get isUnknown => this == WeatherCondition.unknown;
+
+  bool get isPrecipitation =>
+      this == WeatherCondition.rainy || this == WeatherCondition.snowy;
 }

@@ -27,7 +27,5 @@ extension ColorExtension on Color {
 
   int get intBlue => _floatToInt8(b);
 
-  int _floatToInt8(double x) {
-    return (x * 255.0).round() & 0xff;
-  }
+  int _floatToInt8(double x) => (x * 255.0).round() & 0xff;
 }

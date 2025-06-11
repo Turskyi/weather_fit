@@ -19,13 +19,13 @@ class Weather extends Equatable {
     this.lastUpdatedDateTime,
   });
 
-  factory Weather.fromJson(Map<String, dynamic> json) =>
+  factory Weather.fromJson(Map<String, Object?> json) =>
       _$WeatherFromJson(json);
 
   factory Weather.fromRepository(WeatherDomain weather) {
-    DateTime now = DateTime.now();
-    String formattedNow = DateFormat('yyyy-MM-dd HH:mm').format(now);
-    DateTime parsedDateTime =
+    final DateTime now = DateTime.now();
+    final String formattedNow = DateFormat('yyyy-MM-dd HH:mm').format(now);
+    final DateTime parsedDateTime =
         DateFormat('yyyy-MM-dd HH:mm').parse(formattedNow);
 
     return Weather(
@@ -71,6 +71,7 @@ class Weather extends Equatable {
         'temperature: $temperature, '
         'temperatureUnits: $temperatureUnits, '
         'countryCode: $countryCode,'
+        'lastUpdatedDateTime: $lastUpdatedDateTime'
         '}';
   }
 
@@ -110,7 +111,7 @@ class Weather extends Equatable {
     return difference > constants.weatherRefreshDelayMinutes;
   }
 
-  /// Output: e.g., "Dec 12, Monday at 03:45 PM"
+  /// Output: e.g., "Dec 12, Monday at 03:45 PM".
   String get formattedLastUpdatedDateTime {
     if (lastUpdatedDateTime != null) {
       final DateFormat formatter = DateFormat('MMM dd, EEEE \'at\' hh:mm a');

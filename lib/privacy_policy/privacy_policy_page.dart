@@ -1,7 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:weather_fit/privacy_policy/email_text.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
+import 'package:weather_fit/res/widgets/leading_widget.dart';
+import 'package:weather_fit/utils/date_util.dart';
 
 class PrivacyPolicyPage extends StatelessWidget {
   const PrivacyPolicyPage({super.key});
@@ -13,7 +15,10 @@ class PrivacyPolicyPage extends StatelessWidget {
     final double? titleSize = textTheme.titleLarge?.fontSize;
     final double? bodySize = textTheme.bodyLarge?.fontSize;
     return Scaffold(
-      appBar: AppBar(title: const Text('Privacy Policy')),
+      appBar: AppBar(
+        leading: kIsWeb ? const LeadingWidget() : null,
+        title: const Text('Privacy Policy'),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -28,9 +33,7 @@ class PrivacyPolicyPage extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              'Last updated: ${_formatDate(
-                DateTime(2025, DateTime.march, 1),
-              )}',
+              'Last updated: $kPrivacyLastUpdatedDate',
               style: TextStyle(fontSize: bodySize),
             ),
             const SizedBox(height: 20),
@@ -126,7 +129,7 @@ class PrivacyPolicyPage extends StatelessWidget {
             const SizedBox(height: 10),
             Text(
               '${constants.appName} offers different features depending on the '
-              'platform you are using (mobile or web). Please note the '
+              'platform you are using (mobile, macOS, or web). Please note the '
               'following platform-specific details:',
               style: TextStyle(fontSize: bodySize),
             ),
@@ -140,11 +143,36 @@ class PrivacyPolicyPage extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              'On mobile devices, ${constants.appName} may use AI to generate '
-              'outfit recommendations based on the current weather. '
-              'This feature involves sending weather data to a third-party '
-              'AI service to generate an image. No personal information is '
-              'shared with this service.',
+              'On mobile devices, ${constants.appName} provides visual outfit '
+              'recommendations based on current weather conditions. These '
+              'images are not generated in real time by AI, but instead are '
+              'pre-drawn and stored locally within the app. No weather or user '
+              'data is sent to external services to generate these outfits.',
+              style: TextStyle(fontSize: bodySize),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'macOS:',
+              style: TextStyle(
+                fontSize: titleSize,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'On macOS, the app uses approximate location (with permission) '
+              'to provide local weather and corresponding outfit '
+              'recommendations, similar to mobile. ',
+              style: TextStyle(fontSize: bodySize),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'On mobile and desktop platforms, outfit images are not '
+              'generated in real time using AI. Instead, they are pre-drawn '
+              'illustrations bundled with the app. Some of these assets may '
+              'have been initially drafted or refined with the help of AI '
+              'tools during the creative process, but no user data is shared '
+              'with AI services during app usage.',
               style: TextStyle(fontSize: bodySize),
             ),
             const SizedBox(height: 10),
@@ -157,11 +185,10 @@ class PrivacyPolicyPage extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              'On the web, due to technical limitations, ${constants.appName} '
-              'does not use AI to generate outfit recommendations. Instead, '
-              'predefined text recommendations are displayed based on the '
-              'weather conditions. These recommendations are not AI-generated '
-              'and are based on a set of predefined rules.',
+              'On the web, ${constants.appName} displays both text and visual '
+              'outfit recommendations, just like on mobile and desktop '
+              'platforms. However, home screen widgets are not available on '
+              'the web due to current technical limitations.',
               style: TextStyle(fontSize: bodySize),
             ),
             const SizedBox(height: 20),
@@ -203,6 +230,24 @@ class PrivacyPolicyPage extends StatelessWidget {
                 fontSize: bodySize,
               ),
             ),
+            const SizedBox(height: 24),
+            Text(
+              '🎨 Image Attribution & Rights',
+              style: TextStyle(
+                fontSize: titleSize,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'All outfit illustrations in ${constants.appName} were created '
+              'and edited by artist Anna Turska using a combination of '
+              'original design work and AI-assisted drafts (e.g., Bing Image '
+              'Creator). These images are bundled with the app and not fetched '
+              'from any external source during use. All rights to the final '
+              'images are reserved by the developer.',
+              style: TextStyle(fontSize: bodySize),
+            ),
             const SizedBox(height: 20),
             Text(
               'Contact Us',
@@ -223,10 +268,5 @@ class PrivacyPolicyPage extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  String _formatDate(DateTime date) {
-    final DateFormat formatter = DateFormat('yMMMMd');
-    return formatter.format(date);
   }
 }

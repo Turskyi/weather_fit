@@ -1,21 +1,21 @@
-import 'dart:io';
 import 'dart:math';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:weather_fit/weather/ui/text_recommendation_widget.dart';
 
 class OutfitWidget extends StatelessWidget {
   const OutfitWidget({
     required this.needsRefresh,
-    required this.filePath,
+    required this.assetPath,
+    required this.onRefresh,
     this.outfitRecommendation = '',
     super.key,
   });
 
   final bool needsRefresh;
-  final String filePath;
+  final String assetPath;
   final String outfitRecommendation;
+  final RefreshCallback onRefresh;
 
   static final List<String> _defaultMessages = <String>[
     '🛑 Oops! No outfit suggestion available.',
@@ -38,6 +38,7 @@ class OutfitWidget extends StatelessWidget {
 
     final double screenWidth = MediaQuery.sizeOf(context).width;
     final bool isNarrowScreen = screenWidth < 500;
+
     final BorderRadius borderRadius = BorderRadius.circular(20.0);
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -60,7 +61,7 @@ class OutfitWidget extends StatelessWidget {
         height: isNarrowScreen ? 520 : 400,
         child: ClipRRect(
           borderRadius: borderRadius,
-          child: kIsWeb || filePath.isEmpty
+          child: assetPath.isEmpty
               ? TextRecommendationWidget(displayText: displayText)
               : isNarrowScreen
                   ? ColoredBox(
@@ -70,9 +71,66 @@ class OutfitWidget extends StatelessWidget {
                         children: <Widget>[
                           Expanded(
                             flex: 5,
-                            child: Image.file(
-                              File(filePath),
+                            child: Image.asset(
+                              assetPath,
                               fit: BoxFit.fitHeight,
+                              errorBuilder: (
+                                BuildContext context,
+                                Object error,
+                                __,
+                              ) {
+                                debugPrint(
+                                  '⚠️ Failed to load outfit image on narrow '
+                                  'screen: "$assetPath". '
+                                  'Error: $error\n'
+                                  'Fallback UI displayed.',
+                                );
+                                final ThemeData theme = Theme.of(context);
+                                final TextTheme textTheme = theme.textTheme;
+
+                                return Container(
+                                  color: theme.colorScheme.surface,
+                                  padding: const EdgeInsets.all(16),
+                                  alignment: Alignment.center,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      Icon(
+                                        Icons.broken_image,
+                                        size: 48,
+                                        color: theme.colorScheme.error,
+                                      ),
+                                      const SizedBox(height: 12),
+                                      Text(
+                                        'Unable to load outfit image.',
+                                        style: textTheme.titleMedium?.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                          color: theme.colorScheme.onSurface,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        'Please try refreshing the weather.',
+                                        style: textTheme.bodyMedium?.copyWith(
+                                          color: theme.colorScheme.onSurface
+                                              .withValues(
+                                            alpha: 0.7,
+                                          ),
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      const SizedBox(height: 12),
+                                      ElevatedButton(
+                                        onPressed: onRefresh,
+                                        child: const Text(
+                                          'Get New Outfit Suggestion',
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
                             ),
                           ),
                           Expanded(
@@ -98,7 +156,38 @@ class OutfitWidget extends StatelessWidget {
                       children: <Widget>[
                         Expanded(
                           flex: 3,
-                          child: Image.file(File(filePath), fit: BoxFit.cover),
+                          child: Image.asset(
+                            assetPath,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, Object error, ___) {
+                              debugPrint(
+                                '⚠️ Failed to load outfit image on wide '
+                                'screen: "$assetPath". '
+                                'Error: $error\n'
+                                'Fallback UI displayed.',
+                              );
+                              return Container(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    colors: <Color>[
+                                      colorScheme.primaryContainer,
+                                      colorScheme.secondaryContainer,
+                                    ],
+                                  ),
+                                ),
+                                padding: const EdgeInsets.all(20),
+                                alignment: Alignment.center,
+                                child: ElevatedButton(
+                                  onPressed: onRefresh,
+                                  child: const Text(
+                                    'Get New Outfit Suggestion',
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
                         ),
                         Expanded(
                           flex: 2,
