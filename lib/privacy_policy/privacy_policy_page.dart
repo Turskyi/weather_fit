@@ -1,9 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:weather_fit/privacy_policy/email_text.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
 import 'package:weather_fit/res/widgets/leading_widget.dart';
+import 'package:weather_fit/utils/date_util.dart';
 
 class PrivacyPolicyPage extends StatelessWidget {
   const PrivacyPolicyPage({super.key});
@@ -33,9 +33,7 @@ class PrivacyPolicyPage extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              'Last updated: ${_formatDate(
-                DateTime(2025, DateTime.june, 1),
-              )}',
+              'Last updated: $kPrivacyLastUpdatedDate',
               style: TextStyle(fontSize: bodySize),
             ),
             const SizedBox(height: 20),
@@ -270,10 +268,5 @@ class PrivacyPolicyPage extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  String _formatDate(DateTime date) {
-    final DateFormat formatter = DateFormat('yMMMMd');
-    return formatter.format(date);
   }
 }

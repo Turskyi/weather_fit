@@ -105,9 +105,20 @@ class SupportPage extends StatelessWidget {
               'Developer: ${constants.developerName}',
               style: textTheme.bodySmall,
             ),
-            Text(
-              'Email: ${constants.supportEmail}',
-              style: textTheme.bodySmall,
+            InkWell(
+              onTap: () => launchUrl(
+                Uri(
+                  scheme: 'mailto',
+                  path: constants.supportEmail,
+                ),
+              ),
+              child: Text(
+                'Email: ${constants.supportEmail}',
+                style: textTheme.bodySmall?.copyWith(
+                  color: Colors.blue,
+                  decoration: TextDecoration.underline,
+                ),
+              ),
             ),
             const SizedBox(height: 32),
           ],

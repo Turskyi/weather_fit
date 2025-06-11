@@ -485,8 +485,7 @@ You can access it in two ways:
 - [Official Website](https://weather-fit.com) — the recommended domain for users
 
 The web version offers the same core features as the mobile apps, including
-real-time weather updates and AI-generated outfit suggestions based on current
-conditions.
+real-time weather updates and outfit suggestions based on current conditions.
 
 ## Credits
 

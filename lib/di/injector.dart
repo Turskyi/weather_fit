@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:home_widget/home_widget.dart';
@@ -18,17 +20,19 @@ import 'package:workmanager/workmanager.dart';
 Future<void> injectDependencies() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  Workmanager()
-      .initialize(_callbackDispatcher, isInDebugMode: kDebugMode)
-      .then((void _) {
-    Workmanager().registerPeriodicTask(
-      'weatherfit_background_update',
-      'updateWidgetTask',
-      // Every 4 hours.
-      frequency: const Duration(hours: 4),
-      constraints: Constraints(networkType: NetworkType.connected),
-    );
-  });
+  if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
+    Workmanager()
+        .initialize(_callbackDispatcher, isInDebugMode: kDebugMode)
+        .then((void _) {
+      Workmanager().registerPeriodicTask(
+        'weatherfit_background_update',
+        'updateWidgetTask',
+        // Every 4 hours.
+        frequency: const Duration(hours: 4),
+        constraints: Constraints(networkType: NetworkType.connected),
+      );
+    });
+  }
 
   Bloc.observer = const WeatherBlocObserver();
   HydratedBloc.storage = await HydratedStorage.build(

@@ -1,9 +1,11 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:weather_fit/privacy_policy/email_text.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
 import 'package:weather_fit/res/widgets/leading_widget.dart';
+import 'package:weather_fit/utils/date_util.dart';
 
 class PrivacyPolicyAndroidPage extends StatelessWidget {
   const PrivacyPolicyAndroidPage({super.key});
@@ -11,7 +13,8 @@ class PrivacyPolicyAndroidPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final int age = 6;
-    final TextTheme textTheme = Theme.of(context).textTheme;
+    final ThemeData themeData = Theme.of(context);
+    final TextTheme textTheme = themeData.textTheme;
     final double? titleSize = textTheme.titleLarge?.fontSize;
     final double? bodySize = textTheme.bodyLarge?.fontSize;
     return Scaffold(
@@ -36,9 +39,7 @@ class PrivacyPolicyAndroidPage extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              'Last updated: ${_formatDate(
-                DateTime(2025, DateTime.march, 1),
-              )}',
+              'Last updated: $kPrivacyLastUpdatedDate',
               style: TextStyle(fontSize: bodySize),
             ),
             const SizedBox(height: 20),
@@ -185,12 +186,43 @@ class PrivacyPolicyAndroidPage extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              '${constants.appName} uses artificial intelligence (AI) to '
-              'generate images with suitable outfits for the weather. If you '
-              'encounter any issues or have concerns regarding the '
-              'AI-generated content, you can report the problem through the '
-              '"Feedback" section in the settings page.',
+              '${constants.appName} no longer uses artificial intelligence '
+              '(AI) to generate outfit images in real time. Instead, all '
+              'images are now pre-drawn and bundled with the app. While some '
+              'images may have been assisted by AI tools during the design '
+              'process, no user data is sent to external AI services during '
+              'usage.\n\nIf you have concerns or wish to provide feedback on '
+              'any content, please use the "Feedback" option in the app’s '
+              'settings.',
               style: TextStyle(fontSize: bodySize),
+            ),
+            const SizedBox(height: 10),
+            RichText(
+              text: TextSpan(
+                style: TextStyle(
+                  fontSize: bodySize,
+                  color: themeData.colorScheme.onSurface,
+                ),
+                children: <TextSpan>[
+                  const TextSpan(text: 'Outfit illustrations were created by '),
+                  TextSpan(
+                    text: 'Anna Turska',
+                    style: const TextStyle(
+                      decoration: TextDecoration.underline,
+                      color: Colors.blue,
+                    ),
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () => launchUrl(
+                            Uri.parse(
+                              'https://www.instagram.com/anartistart/',
+                            ),
+                          ),
+                  ),
+                  const TextSpan(
+                    text: ', using a mix of hand-drawn elements and AI tools.',
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 20),
             Text(
@@ -225,10 +257,5 @@ class PrivacyPolicyAndroidPage extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  String _formatDate(DateTime date) {
-    final DateFormat formatter = DateFormat('yMMMMd');
-    return formatter.format(date);
   }
 }
