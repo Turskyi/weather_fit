@@ -34,7 +34,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build
 # suffix.
-version: 0.1.8+18
+version: 0.1.9+19
 
 environment:
   sdk: '>=3.2.6 <4.0.0'
@@ -59,6 +59,7 @@ dependencies:
   geocoding: ^4.0.0
   geolocator: ^14.0.1
   google_fonts: ^6.2.1
+  # Tested home_widget: ^0.8.0 and it does not compile on Android.
   home_widget: ^0.7.0+1
   http: ^1.4.0
   hydrated_bloc: ^10.0.0
