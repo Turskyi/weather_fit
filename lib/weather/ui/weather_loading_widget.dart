@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 
 class WeatherLoadingWidget extends StatelessWidget {
   const WeatherLoadingWidget({super.key});
@@ -23,7 +24,7 @@ class WeatherLoadingWidget extends StatelessWidget {
         ),
         const SizedBox(height: 16.0),
         Text(
-          'Loading Weather',
+          translate('weather.loading_weather'),
           style: theme.textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.bold,
           ),

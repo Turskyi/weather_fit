@@ -4,18 +4,12 @@ import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:open_meteo_api/open_meteo_api.dart';
+import 'package:open_meteo_api/src/models/exceptions/location_request_failure.dart';
 import 'package:open_meteo_api/src/models/exceptions/location_response_failure.dart';
+import 'package:open_meteo_api/src/models/exceptions/weather_not_found_failure.dart';
+import 'package:open_meteo_api/src/models/exceptions/weather_request_failure.dart';
 
 import 'models/exceptions/weather_response_failure.dart';
-
-/// Exception thrown when locationSearch fails.
-class LocationRequestFailure implements Exception {}
-
-/// Exception thrown when getWeather fails.
-class WeatherRequestFailure implements Exception {}
-
-/// Exception thrown when weather for provided location is not found.
-class WeatherNotFoundFailure implements Exception {}
 
 /// {@template open_meteo_api_client}
 /// Dart API Client which wraps the [Open Meteo API](https://open-meteo.com).
@@ -80,7 +74,7 @@ class OpenMeteoApiClient {
 
     final http.Response weatherResponse = await _httpClient.get(weatherRequest);
 
-    if (weatherResponse.statusCode != 200) {
+    if (weatherResponse.statusCode != HttpStatus.ok) {
       throw WeatherRequestFailure();
     }
 

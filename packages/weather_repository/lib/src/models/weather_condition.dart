@@ -36,6 +36,7 @@ enum WeatherCondition {
 
   bool get isUnknown => this == WeatherCondition.unknown;
 
-  bool get isPrecipitation =>
-      this == WeatherCondition.rainy || this == WeatherCondition.snowy;
+  bool get isPrecipitation {
+    return this == WeatherCondition.rainy || this == WeatherCondition.snowy;
+  }
 }

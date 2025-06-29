@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
+import 'package:weather_fit/res/constants.dart' as constants;
 import 'package:weather_fit/weather/ui/weather_icon.dart';
 
 import '../bloc/weather_bloc.dart';
@@ -21,7 +23,8 @@ class WeatherContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    final TextStyle? cityTextStyle = theme.textTheme.displayMedium;
+    final TextTheme textTheme = theme.textTheme;
+    final TextStyle? cityTextStyle = textTheme.displayMedium;
     final String countryCode = weather.countryCode.toLowerCase();
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
@@ -38,7 +41,7 @@ class WeatherContent extends StatelessWidget {
               children: <Widget>[
                 if (countryCode.isNotEmpty)
                   SvgPicture.network(
-                    'https://open-meteo.com/images/country-flags/'
+                    '${constants.countryFlagsBaseUrl}'
                     '$countryCode.svg',
                     height: cityTextStyle?.fontSize,
                   ),
@@ -58,7 +61,7 @@ class WeatherContent extends StatelessWidget {
             if (!weather.neverUpdated)
               Text(
                 weather.formattedTemperature,
-                style: theme.textTheme.displaySmall?.copyWith(
+                style: textTheme.displaySmall?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -66,19 +69,27 @@ class WeatherContent extends StatelessWidget {
               Text(weather.formattedLastUpdatedDateTime)
             else
               Text(
-                'Last Updated on ${weather.formattedLastUpdatedDateTime}',
+                '${translate('last_updated_on_label')} '
+                '${weather.formattedLastUpdatedDateTime}',
               ),
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Text(
+                _getTranslatedWeatherDescription(weather.code),
+                style: textTheme.bodySmall?.copyWith(color: Colors.grey),
+              ),
+            ),
             const SizedBox(height: 24),
             if (!weather.neverUpdated) child,
             const SizedBox(height: 24),
             BlocBuilder<WeatherBloc, WeatherState>(
-              builder: (_, WeatherState state) {
+              builder: (BuildContext _, WeatherState state) {
                 if (state is! LoadingOutfitState &&
                     state is! WeatherLoadingState &&
                     weather.needsRefresh) {
                   return ElevatedButton(
                     onPressed: onRefresh,
-                    child: const Text('Check Latest Weather'),
+                    child: Text(translate('weather.check_latest_button')),
                   );
                 } else {
                   return const SizedBox();
@@ -90,5 +101,22 @@ class WeatherContent extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _getTranslatedWeatherDescription(int weatherCode) {
+    final String specificKey = 'weather.code_$weatherCode';
+    final String fallbackKey = 'weather.code_unknown';
+
+    // Attempt to translate the specific key.
+    String translatedDescription = translate(specificKey);
+
+    // If flutter_translate returns the key itself, it means the key was not
+    // found.
+    // So, we use the fallback translation.
+    if (translatedDescription == specificKey) {
+      translatedDescription = translate(fallbackKey);
+    }
+
+    return translatedDescription;
   }
 }

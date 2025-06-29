@@ -2,10 +2,11 @@ import 'package:equatable/equatable.dart';
 
 class Location extends Equatable {
   const Location({
-    this.id = 0,
-    this.name = '',
     required this.latitude,
     required this.longitude,
+    required this.locale,
+    this.id = 0,
+    this.name = '',
     this.countryCode = '',
     this.country = '',
     this.province = '',
@@ -20,6 +21,7 @@ class Location extends Equatable {
           countryCode: '',
           country: '',
           province: '',
+          locale: '',
         );
 
   factory Location.fromJson(Map<String, Object?> json) {
@@ -30,15 +32,17 @@ class Location extends Equatable {
     final Object? countryCode = json['country_code'];
     final Object? country = json['country'];
     final Object? province = json['admin1'];
+    final Object? locale = json['locale'];
 
     return Location(
       id: id is int ? id : 0,
-      name: name is String ? name : 'Unknown',
+      name: name is String ? name : '',
       latitude: latitude is double ? latitude : 0.0,
       longitude: longitude is double ? longitude : 0.0,
       countryCode: countryCode is String ? countryCode : '',
-      country: country is String ? country : 'Unknown',
+      country: country is String ? country : '',
       province: province is String ? province : '',
+      locale: locale is String ? locale : '',
     );
   }
 
@@ -49,6 +53,7 @@ class Location extends Equatable {
   final String countryCode;
   final String country;
   final String province;
+  final String locale;
 
   Map<String, Object?> toJson() {
     return <String, Object?>{
@@ -59,6 +64,7 @@ class Location extends Equatable {
       'country_code': countryCode,
       'country': country,
       'province': province,
+      'locale': locale,
     };
   }
 
@@ -71,6 +77,7 @@ class Location extends Equatable {
         countryCode,
         country,
         province,
+        locale,
       ];
 
   @override
@@ -83,6 +90,7 @@ class Location extends Equatable {
         'countryCode: $countryCode, '
         'country: $country, '
         'province: $province,'
+        'locale: $locale'
         '}';
   }
 

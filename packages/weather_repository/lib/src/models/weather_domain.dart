@@ -11,10 +11,14 @@ class WeatherDomain extends Equatable {
     required this.temperature,
     required this.condition,
     required this.countryCode,
+    required this.description,
+    required this.weatherCode,
+    required this.locale,
   });
 
-  factory WeatherDomain.fromJson(Map<String, dynamic> json) =>
-      _$WeatherDomainFromJson(json);
+  factory WeatherDomain.fromJson(Map<String, Object?> json) {
+    return _$WeatherDomainFromJson(json);
+  }
 
   Map<String, Object?> toJson() => _$WeatherDomainToJson(this);
 
@@ -22,6 +26,9 @@ class WeatherDomain extends Equatable {
   final double temperature;
   final WeatherCondition condition;
   final String countryCode;
+  final String description;
+  final int weatherCode;
+  final String locale;
 
   String get locationName => location.name.isEmpty
       ? 'Lat: ${location.latitude.toStringAsFixed(2)}, '
@@ -34,5 +41,8 @@ class WeatherDomain extends Equatable {
         temperature,
         condition,
         countryCode,
+        description,
+        weatherCode,
+        locale,
       ];
 }

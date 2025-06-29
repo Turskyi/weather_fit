@@ -1,5 +1,6 @@
 import 'package:feedback/feedback.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:weather_fit/entities/enums/feedback_rating.dart';
 import 'package:weather_fit/entities/enums/feedback_type.dart';
 import 'package:weather_fit/entities/models/feedback_details.dart';
@@ -45,7 +46,7 @@ class _CustomFeedbackFormState extends State<FeedbackForm> {
                   0,
                 ),
                 children: <Widget>[
-                  const Text('What kind of feedback do you want to give?'),
+                  Text(translate('feedback.what_kind')),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[
@@ -74,13 +75,13 @@ class _CustomFeedbackFormState extends State<FeedbackForm> {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  const Text('What is your feedback?'),
+                  Text(translate('feedback.what_is_your_feedback')),
                   TextField(
                     onChanged: (String newFeedback) => _customFeedback =
                         _customFeedback.copyWith(feedbackText: newFeedback),
                   ),
                   const SizedBox(height: 16),
-                  const Text('How does this make you feel?'),
+                  Text(translate('feedback.how_does_this_feel')),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: FeedbackRating.values.map(_ratingToIcon).toList(),
@@ -98,7 +99,7 @@ class _CustomFeedbackFormState extends State<FeedbackForm> {
                     extras: _customFeedback.toMap(),
                   )
               : null,
-          child: const Text('submit'),
+          child: Text(translate('submit')),
         ),
         const SizedBox(height: 8),
       ],

@@ -9,8 +9,9 @@ sealed class WeatherState extends Equatable {
     Weather? weather,
   }) : weather = weather ?? Weather.empty;
 
-  factory WeatherState.fromJson(Map<String, Object?> json) =>
-      _$WeatherSuccessFromJson(json);
+  factory WeatherState.fromJson(Map<String, Object?> json) {
+    return _$WeatherSuccessFromJson(json);
+  }
 
   final Weather weather;
   final String outfitRecommendation;
@@ -44,14 +45,17 @@ sealed class WeatherState extends Equatable {
 
   int get remainingMinutes => weather.remainingMinutes;
 
-  String get formattedLastUpdatedDateTime =>
-      weather.formattedLastUpdatedDateTime;
+  String get formattedLastUpdatedDateTime {
+    return weather.formattedLastUpdatedDateTime;
+  }
 
   String get formattedTemperature => weather.formattedTemperature;
 
   String get emoji => weather.emoji;
 
   TemperatureUnits get temperatureUnits => weather.temperatureUnits;
+
+  bool get isCelsius => weather.temperatureUnits.isCelsius;
 }
 
 @JsonSerializable()
@@ -62,8 +66,9 @@ final class WeatherInitial extends WeatherState {
     super.outfitAssetPath,
   });
 
-  factory WeatherInitial.fromJson(Map<String, Object?> json) =>
-      _$WeatherInitialFromJson(json);
+  factory WeatherInitial.fromJson(Map<String, Object?> json) {
+    return _$WeatherInitialFromJson(json);
+  }
 
   @override
   Map<String, Object?> toJson() => _$WeatherInitialToJson(this);
@@ -72,12 +77,14 @@ final class WeatherInitial extends WeatherState {
     Weather? weather,
     String? outfitRecommendation,
     String? outfitAssetPath,
-  }) =>
-      WeatherInitial(
-        weather: weather ?? this.weather,
-        outfitRecommendation: outfitRecommendation ?? this.outfitRecommendation,
-        outfitAssetPath: outfitAssetPath ?? this.outfitAssetPath,
-      );
+    Language? language,
+  }) {
+    return WeatherInitial(
+      weather: weather ?? this.weather,
+      outfitRecommendation: outfitRecommendation ?? this.outfitRecommendation,
+      outfitAssetPath: outfitAssetPath ?? this.outfitAssetPath,
+    );
+  }
 }
 
 @JsonSerializable()

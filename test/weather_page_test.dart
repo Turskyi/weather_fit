@@ -3,6 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:nested/nested.dart';
+import 'package:nominatim_api/nominatim_api.dart';
+import 'package:open_meteo_api/open_meteo_api.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
+import 'package:weather_fit/data/repositories/location_repository.dart';
 import 'package:weather_fit/data/repositories/outfit_repository.dart';
 import 'package:weather_fit/router/app_route.dart';
 import 'package:weather_fit/router/routes.dart' as routes;
@@ -19,29 +24,48 @@ import 'helpers/mocks/mock_repositories.dart';
 void main() {
   initHydratedStorage();
   late WeatherRepository weatherRepository;
-  late OutfitRepository aiRepository;
+  late OutfitRepository outfitRepository;
   setUp(() {
     weatherRepository = MockWeatherRepository();
-    aiRepository = MockAiRepository();
+    outfitRepository = MockOutfitRepository();
   });
 
   group('WeatherPage', () {
     testWidgets('renders AppBar', (WidgetTester tester) async {
+      final SharedPreferences preferences =
+          await SharedPreferences.getInstance();
       await tester.pumpWidget(
         RepositoryProvider<WeatherRepository>.value(
           value: weatherRepository,
           child: MultiBlocProvider(
             providers: <SingleChildWidget>[
               BlocProvider<WeatherBloc>(
-                create: (_) => WeatherBloc(weatherRepository, aiRepository),
+                create: (BuildContext _) => WeatherBloc(
+                  weatherRepository,
+                  outfitRepository,
+                  LocalDataSource(preferences),
+                ),
               ),
               BlocProvider<SearchBloc>(
-                create: (_) => SearchBloc(weatherRepository),
+                create: (BuildContext _) {
+                  final LocalDataSource localDataSource = LocalDataSource(
+                    preferences,
+                  );
+                  return SearchBloc(
+                    weatherRepository,
+                    LocationRepository(
+                      NominatimApiClient(),
+                      OpenMeteoApiClient(),
+                      localDataSource,
+                    ),
+                    localDataSource,
+                  );
+                },
               ),
             ],
             child: MaterialApp(
               initialRoute: AppRoute.weather.path,
-              routes: routes.routeMap,
+              routes: routes.getRouteMap('en'),
             ),
           ),
         ),

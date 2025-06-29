@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
 import 'package:weather_fit/res/widgets/leading_widget.dart';
@@ -14,106 +15,134 @@ class SupportPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         leading: kIsWeb ? const LeadingWidget() : null,
-        title: const Text('Support'),
+        title: Text(translate('support.title')),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ListView(
           children: <Widget>[
             Text(
-              'WeatherFit Support',
+              '«${translate('title')}» ${translate('support.title')}',
               style: textTheme.headlineMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 16),
             Text(
-              'Need help or want to give feedback? You’re in the right place.',
+              translate('support.intro_line'),
               style: textTheme.bodyLarge,
             ),
             const SizedBox(height: 32),
             Text(
-              '📌 Frequently Asked Questions',
+              '📌 ${translate('faq')}',
               style: textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 12),
-            Text(
-              '• Why is there no hourly forecast?\n  '
-              'Hourly weather is currently not supported, '
-              'but may be added in the future.\n',
-              style: textTheme.bodyMedium,
+            RichText(
+              text: TextSpan(
+                style: textTheme.bodyMedium,
+                children: <TextSpan>[
+                  TextSpan(
+                    text: '${translate('support.faq_hourly_forecast_q')}\n  ',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  TextSpan(
+                    text: '${translate('support.faq_hourly_forecast_a')}\n',
+                  ),
+                ],
+              ),
             ),
-            Text(
-              '• Can I change my location later?\n  '
-              'Yes, the app lets you confirm and update your location during '
-              'use.\n',
-              style: textTheme.bodyMedium,
+            RichText(
+              text: TextSpan(
+                style: textTheme.bodyMedium,
+                children: <TextSpan>[
+                  TextSpan(
+                    text: '${translate('support.faq_change_location_q')}\n  ',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  TextSpan(
+                    text: '${translate('support.faq_change_location_a')}\n',
+                  ),
+                ],
+              ),
             ),
-            Text(
-              '• Why does the theme change at night?\n  '
-              'The app automatically switches to a moon-themed dark mode '
-              'between 11pm and 5am for a more natural look.\n',
-              style: textTheme.bodyMedium,
+            RichText(
+              text: TextSpan(
+                style: textTheme.bodyMedium,
+                children: <TextSpan>[
+                  TextSpan(
+                    text: '${translate('support.faq_theme_change_q')}\n  ',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  TextSpan(
+                    text: '${translate('support.faq_theme_change_a')}\n',
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 32),
             Text(
-              '📬 Contact Support',
+              '📬 ${translate('contact_support')}',
               style: textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 12),
             Text(
-              'If you’re experiencing issues or have suggestions:',
+              translate('support.contact_intro'),
               style: textTheme.bodyMedium,
             ),
             const SizedBox(height: 8),
             ElevatedButton.icon(
               onPressed: () => _launchEmail(context),
               icon: const Icon(Icons.mail),
-              label: const Text('Contact Us via Email'),
+              label: Text(translate('support.contact_us_via_email_button')),
             ),
             const SizedBox(height: 8),
             ElevatedButton.icon(
               onPressed: () => launchUrl(
-                Uri.parse('https://t.me/+J3nrwxVrxVE2MDdi'),
+                Uri.parse(constants.telegramUrl),
                 mode: LaunchMode.externalApplication,
               ),
               icon: const Icon(Icons.chat),
-              label: const Text('Join Telegram Support Group'),
+              label: Text(translate('support.join_telegram_support_button')),
             ),
             const SizedBox(height: 8),
             ElevatedButton.icon(
               onPressed: () => launchUrl(
-                Uri.parse('https://${constants.developerDomain}/#/support'),
+                Uri.parse(constants.developerSupportUrl),
                 mode: LaunchMode.externalApplication,
               ),
               icon: const Icon(Icons.web),
-              label: const Text('Visit Support Page on Developer\'s Website'),
+              label: Text(
+                translate('support.visit_developer_support_website_button'),
+              ),
             ),
             const SizedBox(height: 32),
             Text(
-              '📄 Legal & App Info',
+              translate('legal_and_app_info_title'),
               style: textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 12),
             Text(
-              'Developer: ${constants.developerName}',
+              '${translate('developer')}: ${translate('developer_name')}',
               style: textTheme.bodySmall,
             ),
             InkWell(
               onTap: () => launchUrl(
                 Uri(
-                  scheme: 'mailto',
+                  scheme: constants.mailToScheme,
                   path: constants.supportEmail,
                 ),
               ),
-              child: Text(
-                'Email: ${constants.supportEmail}',
+              child: SelectableText(
+                '${translate('email')}: ${constants.supportEmail}',
                 style: textTheme.bodySmall?.copyWith(
                   color: Colors.blue,
                   decoration: TextDecoration.underline,
@@ -138,27 +167,26 @@ class SupportPage extends StatelessWidget {
 
   Future<void> _launchEmail(BuildContext context) async {
     final Uri emailLaunchUri = Uri(
-      scheme: 'mailto',
+      scheme: constants.mailToScheme,
       path: constants.supportEmail,
       query: _encodeQueryParameters(<String, String>{
-        'subject': 'WeatherFit Support',
-        'body': 'Hi, I need help with...',
+        constants.subjectParameter:
+            '«${translate('title')}» ${translate('support.title')}',
+        constants.bodyParameter: translate('support_email_default_body'),
       }),
     );
 
     if (await canLaunchUrl(emailLaunchUri)) {
       await launchUrl(emailLaunchUri);
     } else {
-      final Uri fallbackUri = Uri.parse(
-        'https://${constants.developerDomain}/#/support',
-      );
+      final Uri fallbackUri = Uri.parse(constants.developerSupportUrl);
       if (await canLaunchUrl(fallbackUri)) {
         await launchUrl(fallbackUri);
       } else if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Could not launch email or support page.'),
-            duration: Duration(seconds: 3),
+          SnackBar(
+            content: Text(translate('error.launch_email_or_support_page')),
+            duration: const Duration(seconds: 3),
           ),
         );
       }

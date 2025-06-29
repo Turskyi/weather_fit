@@ -1,5 +1,6 @@
 import 'package:weather_fit/entities/enums/feedback_rating.dart';
 import 'package:weather_fit/entities/enums/feedback_type.dart';
+import 'package:weather_fit/res/constants.dart' as constants;
 
 /// A data type holding user feedback consisting of a feedback type, free from
 /// feedback text, and a sentiment rating.
@@ -17,9 +18,9 @@ class FeedbackDetails {
   @override
   String toString() {
     return <String, String?>{
-      if (rating != null) 'rating': rating.toString(),
-      'feedback_type': feedbackType.toString(),
-      'feedback_text': feedbackText,
+      if (rating != null) constants.ratingProperty: rating.toString(),
+      constants.feedbackTypeProperty: feedbackType.toString(),
+      constants.feedbackTextProperty: feedbackText,
     }.toString();
   }
 
@@ -41,9 +42,9 @@ class FeedbackDetails {
 
   Map<String, Object?> toMap() {
     return <String, Object?>{
-      if (rating != null) 'rating': rating,
-      'feedback_type': feedbackType,
-      'feedback_text': feedbackText,
+      if (rating != null) constants.ratingProperty: rating,
+      constants.feedbackTypeProperty: feedbackType,
+      constants.feedbackTextProperty: feedbackText,
     };
   }
 }

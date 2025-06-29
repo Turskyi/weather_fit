@@ -11,7 +11,7 @@ sealed class WeatherEvent extends Equatable {
 final class FetchWeather extends WeatherEvent {
   const FetchWeather({required this.location});
 
-  final String location;
+  final Location location;
 
   @override
   List<Object> get props => <Object>[location];

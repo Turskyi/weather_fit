@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:weather_fit/privacy_policy/email_text.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
@@ -8,7 +9,12 @@ import 'package:weather_fit/res/widgets/leading_widget.dart';
 import 'package:weather_fit/utils/date_util.dart';
 
 class PrivacyPolicyAndroidPage extends StatelessWidget {
-  const PrivacyPolicyAndroidPage({super.key});
+  const PrivacyPolicyAndroidPage({
+    required this.languageIsoCode,
+    super.key,
+  });
+
+  final String languageIsoCode;
 
   @override
   Widget build(BuildContext context) {
@@ -19,184 +25,147 @@ class PrivacyPolicyAndroidPage extends StatelessWidget {
     final double? bodySize = textTheme.bodyLarge?.fontSize;
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Privacy Policy ${kIsWeb ? 'for "${constants.appName}" Android '
-              'Application' : ''}',
+        title: Text(
+          '${translate('privacy_policy')} ${kIsWeb ? '${translate('for')} '
+              '«${translate('title')}» ${translate('android_app')}' : ''}',
         ),
         leading: kIsWeb ? const LeadingWidget() : null,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
+          spacing: 10,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(
-              'Privacy Policy',
+              '${translate('last_update')}: ${getPrivacyLastUpdatedDate(
+                languageIsoCode,
+              )}',
+              style: TextStyle(fontSize: bodySize),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              translate(
+                'privacy.policy_intro',
+                args: <String, Object?>{'appName': translate('title')},
+              ),
+              style: TextStyle(fontSize: bodySize),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              translate('privacy.information_we_collect'),
               style: TextStyle(
                 fontSize: titleSize,
                 fontWeight: FontWeight.bold,
               ),
             ),
+            Text(
+              translate('privacy.no_personal_data_collection'),
+              style: TextStyle(fontSize: bodySize),
+            ),
             const SizedBox(height: 10),
             Text(
-              'Last updated: $kPrivacyLastUpdatedDate',
-              style: TextStyle(fontSize: bodySize),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'Your privacy is important to us. It is ${constants.appName}\'s '
-              'policy to respect your privacy and comply with any applicable '
-              'law and regulation regarding any personal information we may '
-              'collect about you, including across our app, '
-              '${constants.appName}, and its associated services.',
-              style: TextStyle(fontSize: bodySize),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'Information We Collect',
+              translate('location'),
               style: TextStyle(
                 fontSize: titleSize,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 10),
             Text(
-              'We do not collect any personal information such as name, email '
-              'address, or phone number.',
+              translate(
+                'privacy.location_access_request',
+                args: <String, Object?>{'appName': translate('title')},
+              ),
               style: TextStyle(fontSize: bodySize),
             ),
-            const SizedBox(height: 20),
             Text(
-              'Location Data',
+              translate('privacy.location_data_usage'),
+              style: TextStyle(fontSize: bodySize),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              translate('third_party'),
               style: TextStyle(
                 fontSize: titleSize,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 10),
             Text(
-              '${constants.appName} may optionally request access to your '
-              'device\'s approximate location (coarse location). This access '
-              'is only requested if the app cannot automatically determine '
-              'your location based on your entered city name. You will be '
-              'asked to grant permission before the app attempts to access '
-              'your location.',
+              translate(
+                'privacy.third_party_services_info',
+                args: <String, Object?>{'appName': translate('title')},
+              ),
               style: TextStyle(fontSize: bodySize),
             ),
             const SizedBox(height: 10),
             Text(
-              'If you grant location permission, this data is used locally '
-              'within the app to help find relevant weather information for '
-              'your current location. This location data is not stored or '
-              'transmitted anywhere outside of your device and is used only '
-              'temporarily to find your current location. After finding '
-              'weather for current location it is discarded. You can choose '
-              'not to provide your location, in which case you can continue '
-              'using the app by manually entering your city name.',
-              style: TextStyle(fontSize: bodySize),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'Third-Party Services',
+              translate('consent'),
               style: TextStyle(
                 fontSize: titleSize,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 10),
             Text(
-              '${constants.appName} uses third-party services that may collect '
-              'information used to identify you. These services include '
-              'Firebase Crashlytics and Google Analytics. The data collected '
-              'by these services is used to improve app stability and user '
-              'experience. You can find more information about their privacy '
-              'practices at their respective websites.',
+              translate('privacy.consent_agreement'),
               style: TextStyle(fontSize: bodySize),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'Consent',
-              style:
-                  TextStyle(fontSize: titleSize, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
             Text(
-              'By using our services, you consent to the collection and use of '
-              'your information as described in this privacy policy.',
-              style: TextStyle(fontSize: bodySize),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'Security Measures',
+              translate('privacy.security_measures'),
               style: TextStyle(
                 fontSize: titleSize,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 10),
             Text(
-              'We take reasonable measures to protect your information from '
-              'unauthorized access, disclosure, or modification.',
+              translate('privacy.security_measures_description'),
               style: TextStyle(fontSize: bodySize),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
             Text(
-              'Children\'s Privacy',
+              translate('children_privacy'),
               style: TextStyle(
                 fontSize: titleSize,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 10),
             Text(
-              'Our services are not directed towards children under the age of '
-              '$age. We do not knowingly collect personal information from '
-              'children under $age. While we strive to minimize data '
-              'collection, third-party services we use (such as Firebase '
-              'Crashlytics and Google Analytics) may collect some data. '
-              'However, this data is collected anonymously and is not linked '
-              'to any personal information. If you believe that a child under '
-              '$age has provided us with personal information, please contact '
-              'us, and we will investigate the matter.',
+              translate(
+                'privacy.children_description',
+                args: <String, Object?>{'age': age},
+              ),
               style: TextStyle(fontSize: bodySize),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
             Text(
-              'Crashlytics',
+              translate('crashlytics'),
               style: TextStyle(
                 fontSize: titleSize,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 10),
             Text(
-              '${constants.appName} uses Firebase Crashlytics, a service by '
-              'Google, to collect crash reports anonymously to help us improve '
-              'app stability and fix bugs. The data collected by Crashlytics '
-              'does not include any personal information.',
+              translate(
+                'privacy.crashlytics_description',
+                args: <String, Object?>{'appName': translate('title')},
+              ),
               style: TextStyle(fontSize: bodySize),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
             Text(
-              'AI-Generated Content',
+              translate('ai_content'),
               style: TextStyle(
                 fontSize: titleSize,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 10),
             Text(
-              '${constants.appName} no longer uses artificial intelligence '
-              '(AI) to generate outfit images in real time. Instead, all '
-              'images are now pre-drawn and bundled with the app. While some '
-              'images may have been assisted by AI tools during the design '
-              'process, no user data is sent to external AI services during '
-              'usage.\n\nIf you have concerns or wish to provide feedback on '
-              'any content, please use the "Feedback" option in the app’s '
-              'settings.',
+              translate(
+                'privacy.ai_content_description',
+                args: <String, Object?>{'appName': translate('title')},
+              ),
               style: TextStyle(fontSize: bodySize),
             ),
-            const SizedBox(height: 10),
             RichText(
               text: TextSpan(
                 style: TextStyle(
@@ -204,55 +173,52 @@ class PrivacyPolicyAndroidPage extends StatelessWidget {
                   color: themeData.colorScheme.onSurface,
                 ),
                 children: <TextSpan>[
-                  const TextSpan(text: 'Outfit illustrations were created by '),
                   TextSpan(
-                    text: 'Anna Turska',
+                    text: '${translate(
+                      'privacy.outfit_illustrations_created_by',
+                    )} ',
+                  ),
+                  TextSpan(
+                    text: translate('anna_turska'),
                     style: const TextStyle(
                       decoration: TextDecoration.underline,
                       color: Colors.blue,
                     ),
                     recognizer: TapGestureRecognizer()
                       ..onTap = () => launchUrl(
-                            Uri.parse(
-                              'https://www.instagram.com/anartistart/',
-                            ),
+                            Uri.parse(constants.artistInstagramUrl),
                           ),
                   ),
-                  const TextSpan(
-                    text: ', using a mix of hand-drawn elements and AI tools.',
+                  TextSpan(
+                    text: translate('privacy.artwork_creation_method'),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
             Text(
-              'Updates and Notification',
+              translate('updates_and_notifications'),
               style: TextStyle(
                 fontSize: titleSize,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 10),
             Text(
-              'This privacy policy may be updated periodically. Any changes '
-              'to the policy will be communicated to you through app updates '
-              'or notifications.',
+              translate('privacy.updates_and_notifications_description'),
               style: TextStyle(fontSize: bodySize),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
             Text(
-              'Contact Us',
+              translate('contact_us'),
               style:
                   TextStyle(fontSize: titleSize, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 10),
             Text(
-              'For any questions or concerns regarding your privacy, you may '
-              'contact us using the following details:',
+              translate('privacy.contact_us_invitation'),
               style: TextStyle(fontSize: bodySize),
             ),
-            const SizedBox(height: 10),
             const EmailText(constants.supportEmail),
+            const SizedBox(height: 10),
           ],
         ),
       ),

@@ -1,12 +1,18 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:weather_fit/privacy_policy/email_text.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
 import 'package:weather_fit/res/widgets/leading_widget.dart';
 import 'package:weather_fit/utils/date_util.dart';
 
 class PrivacyPolicyPage extends StatelessWidget {
-  const PrivacyPolicyPage({super.key});
+  const PrivacyPolicyPage({
+    required this.languageIsoCode,
+    super.key,
+  });
+
+  final String languageIsoCode;
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +23,7 @@ class PrivacyPolicyPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         leading: kIsWeb ? const LeadingWidget() : null,
-        title: const Text('Privacy Policy'),
+        title: Text(translate('privacy_policy')),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -25,7 +31,7 @@ class PrivacyPolicyPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(
-              'Privacy Policy',
+              translate('privacy_policy'),
               style: TextStyle(
                 fontSize: titleSize,
                 fontWeight: FontWeight.bold,
@@ -33,21 +39,22 @@ class PrivacyPolicyPage extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              'Last updated: $kPrivacyLastUpdatedDate',
+              '${translate('last_updated')}: ${getPrivacyLastUpdatedDate(
+                languageIsoCode,
+              )}',
               style: TextStyle(fontSize: bodySize),
             ),
             const SizedBox(height: 20),
             Text(
-              'Your privacy is important to us. It is ${constants.appName}\'s '
-              'policy to respect your privacy and comply with any applicable '
-              'law and regulation regarding any personal information we may '
-              'collect about you, including across our app, '
-              '${constants.appName}, and its associated services.',
+              translate(
+                'privacy.policy_intro',
+                args: <String, Object?>{'appName': translate('title')},
+              ),
               style: TextStyle(fontSize: bodySize),
             ),
             const SizedBox(height: 20),
             Text(
-              'Information We Collect',
+              translate('privacy.information_we_collect'),
               style: TextStyle(
                 fontSize: titleSize,
                 fontWeight: FontWeight.bold,
@@ -55,13 +62,12 @@ class PrivacyPolicyPage extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              'We do not collect any personal information such as name, email '
-              'address, or phone number.',
+              translate('privacy.no_personal_data_collection'),
               style: TextStyle(fontSize: bodySize),
             ),
             const SizedBox(height: 20),
             Text(
-              'Location Data',
+              translate('location'),
               style: TextStyle(
                 fontSize: titleSize,
                 fontWeight: FontWeight.bold,
@@ -69,28 +75,20 @@ class PrivacyPolicyPage extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              '${constants.appName} may optionally request access to your '
-              'device\'s approximate location. This access is only requested '
-              'if the app cannot automatically determine your location based '
-              'on your entered city name. You will be asked to grant '
-              'permission before the app attempts to access your location.',
+              translate(
+                'privacy.location_access_request',
+                args: <String, Object?>{'appName': translate('title')},
+              ),
               style: TextStyle(fontSize: bodySize),
             ),
             const SizedBox(height: 10),
             Text(
-              'If you grant location permission, this data is used locally '
-              'within the app to help find relevant weather information for '
-              'your current location. This location data is not stored or '
-              'transmitted anywhere outside of your device and is used only '
-              'temporarily to find your current location. After finding '
-              'weather for current location it is discarded. You can choose '
-              'not to provide your location, in which case you can continue '
-              'using the app by manually entering your city name.',
+              translate('privacy.location_data_usage'),
               style: TextStyle(fontSize: bodySize),
             ),
             const SizedBox(height: 20),
             Text(
-              'Third-Party Services',
+              translate('third_party'),
               style: TextStyle(
                 fontSize: titleSize,
                 fontWeight: FontWeight.bold,
@@ -98,29 +96,28 @@ class PrivacyPolicyPage extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              '${constants.appName} uses third-party services that may collect '
-              'information used to identify you. These services include '
-              'Firebase Crashlytics and Google Analytics. The data collected '
-              'by these services is used to improve app stability and user '
-              'experience. You can find more information about their privacy '
-              'practices at their respective websites.',
+              translate(
+                'privacy.third_party_services_info',
+                args: <String, Object?>{'appName': translate('title')},
+              ),
               style: TextStyle(fontSize: bodySize),
             ),
             const SizedBox(height: 20),
             Text(
-              'Consent',
-              style:
-                  TextStyle(fontSize: titleSize, fontWeight: FontWeight.bold),
+              translate('consent'),
+              style: TextStyle(
+                fontSize: titleSize,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 10),
             Text(
-              'By using our services, you consent to the collection and use of '
-              'your information as described in this privacy policy.',
+              translate('privacy.consent_agreement'),
               style: TextStyle(fontSize: bodySize),
             ),
             const SizedBox(height: 20),
             Text(
-              'Platform-Specific Features',
+              translate('platform_specific'),
               style: TextStyle(
                 fontSize: titleSize,
                 fontWeight: FontWeight.bold,
@@ -128,14 +125,15 @@ class PrivacyPolicyPage extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              '${constants.appName} offers different features depending on the '
-              'platform you are using (mobile, macOS, or web). Please note the '
-              'following platform-specific details:',
+              translate(
+                'privacy.platform_specific_intro',
+                args: <String, Object?>{'appName': translate('title')},
+              ),
               style: TextStyle(fontSize: bodySize),
             ),
             const SizedBox(height: 10),
             Text(
-              'Mobile (Android/iOS):',
+              '${translate('mobile')}:',
               style: TextStyle(
                 fontSize: titleSize,
                 fontWeight: FontWeight.bold,
@@ -143,16 +141,15 @@ class PrivacyPolicyPage extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              'On mobile devices, ${constants.appName} provides visual outfit '
-              'recommendations based on current weather conditions. These '
-              'images are not generated in real time by AI, but instead are '
-              'pre-drawn and stored locally within the app. No weather or user '
-              'data is sent to external services to generate these outfits.',
+              translate(
+                'privacy.platform_mobile_description',
+                args: <String, Object?>{'appName': translate('title')},
+              ),
               style: TextStyle(fontSize: bodySize),
             ),
             const SizedBox(height: 10),
             Text(
-              'macOS:',
+              '${translate('macos')}:',
               style: TextStyle(
                 fontSize: titleSize,
                 fontWeight: FontWeight.bold,
@@ -160,24 +157,17 @@ class PrivacyPolicyPage extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              'On macOS, the app uses approximate location (with permission) '
-              'to provide local weather and corresponding outfit '
-              'recommendations, similar to mobile. ',
+              translate('privacy.platform_macos_description'),
               style: TextStyle(fontSize: bodySize),
             ),
             const SizedBox(height: 10),
             Text(
-              'On mobile and desktop platforms, outfit images are not '
-              'generated in real time using AI. Instead, they are pre-drawn '
-              'illustrations bundled with the app. Some of these assets may '
-              'have been initially drafted or refined with the help of AI '
-              'tools during the creative process, but no user data is shared '
-              'with AI services during app usage.',
+              translate('privacy.platform_image_generation_explanation'),
               style: TextStyle(fontSize: bodySize),
             ),
             const SizedBox(height: 10),
             Text(
-              'Web:',
+              '${translate('web')}:',
               style: TextStyle(
                 fontSize: titleSize,
                 fontWeight: FontWeight.bold,
@@ -185,15 +175,15 @@ class PrivacyPolicyPage extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              'On the web, ${constants.appName} displays both text and visual '
-              'outfit recommendations, just like on mobile and desktop '
-              'platforms. However, home screen widgets are not available on '
-              'the web due to current technical limitations.',
+              translate(
+                'privacy.platform_web_description',
+                args: <String, Object?>{'appName': translate('title')},
+              ),
               style: TextStyle(fontSize: bodySize),
             ),
             const SizedBox(height: 20),
             Text(
-              'Crashlytics',
+              translate('crashlytics'),
               style: TextStyle(
                 fontSize: titleSize,
                 fontWeight: FontWeight.bold,
@@ -201,15 +191,15 @@ class PrivacyPolicyPage extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              '${constants.appName} uses Firebase Crashlytics, a service by '
-              'Google, to collect crash reports anonymously to help us improve '
-              'app stability and fix bugs. The data collected by Crashlytics '
-              'does not include any personal information.',
+              translate(
+                'privacy.crashlytics_description',
+                args: <String, Object?>{'appName': translate('title')},
+              ),
               style: TextStyle(fontSize: bodySize),
             ),
             const SizedBox(height: 20),
             Text(
-              'Children\'s Privacy',
+              translate('children_privacy'),
               style: TextStyle(
                 fontSize: titleSize,
                 fontWeight: FontWeight.bold,
@@ -217,22 +207,17 @@ class PrivacyPolicyPage extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              'Our services are not directed towards children under the age of '
-              '$age. We do not knowingly collect personal information from '
-              'children under $age. While we strive to minimize data '
-              'collection, third-party services we use (such as Firebase '
-              'Crashlytics and Google Analytics) may collect some data. '
-              'However, this data is collected anonymously and is not linked '
-              'to any personal information. If you believe that a child under '
-              '$age has provided us with personal information, please contact '
-              'us, and we will investigate the matter.',
+              translate(
+                'privacy.children_description',
+                args: <String, Object?>{'age': age},
+              ),
               style: TextStyle(
                 fontSize: bodySize,
               ),
             ),
             const SizedBox(height: 24),
             Text(
-              '🎨 Image Attribution & Rights',
+              '🎨 ${translate('image_attribution_and_rights_title')}',
               style: TextStyle(
                 fontSize: titleSize,
                 fontWeight: FontWeight.bold,
@@ -240,17 +225,15 @@ class PrivacyPolicyPage extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              'All outfit illustrations in ${constants.appName} were created '
-              'and edited by artist Anna Turska using a combination of '
-              'original design work and AI-assisted drafts (e.g., Bing Image '
-              'Creator). These images are bundled with the app and not fetched '
-              'from any external source during use. All rights to the final '
-              'images are reserved by the developer.',
+              translate(
+                'privacy.image_attribution_and_rights_description',
+                args: <String, Object?>{'appName': translate('title')},
+              ),
               style: TextStyle(fontSize: bodySize),
             ),
             const SizedBox(height: 20),
             Text(
-              'Contact Us',
+              translate('contact_us'),
               style: TextStyle(
                 fontSize: titleSize,
                 fontWeight: FontWeight.bold,
@@ -258,8 +241,7 @@ class PrivacyPolicyPage extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              'For any questions or concerns regarding your privacy, you may '
-              'contact us using the following details:',
+              translate('privacy.contact_us_invitation'),
               style: TextStyle(fontSize: bodySize),
             ),
             const SizedBox(height: 10),

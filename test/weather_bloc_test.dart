@@ -1,6 +1,8 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
 import 'package:weather_fit/data/repositories/outfit_repository.dart';
 import 'package:weather_fit/entities/enums/temperature_units.dart';
 import 'package:weather_fit/entities/models/temperature/temperature.dart';
@@ -19,13 +21,13 @@ void main() {
   group('WeatherBloc', () {
     late WeatherDomain weather;
     late WeatherRepository weatherRepository;
-    late OutfitRepository aiRepository;
+    late OutfitRepository outfitRepository;
     late WeatherBloc weatherBloc;
 
     setUp(() async {
       weather = MockWeather();
       weatherRepository = MockWeatherRepository();
-      aiRepository = MockAiRepository();
+      outfitRepository = MockOutfitRepository();
       when(() => weather.condition).thenReturn(
         dummy_constants.dummyWeatherCondition,
       );
@@ -39,15 +41,24 @@ void main() {
         dummy_constants.dummyCountryCode,
       );
       when(
-        () => weatherRepository.getWeather(any()),
+        () => weatherRepository.getWeatherByLocation(any()),
       ).thenAnswer((_) async => weather);
-      weatherBloc = WeatherBloc(weatherRepository, aiRepository);
+      final SharedPreferences preferences =
+          await SharedPreferences.getInstance();
+      weatherBloc = WeatherBloc(
+        weatherRepository,
+        outfitRepository,
+        LocalDataSource(preferences),
+      );
     });
 
-    test('initial state is correct', () {
+    test('initial state is correct', () async {
+      final SharedPreferences preferences =
+          await SharedPreferences.getInstance();
       final WeatherBloc weatherBloc = WeatherBloc(
         weatherRepository,
-        aiRepository,
+        outfitRepository,
+        LocalDataSource(preferences),
       );
       expect(
         weatherBloc.state,
@@ -56,10 +67,11 @@ void main() {
     });
 
     group('toJson/fromJson', () {
-      test('work properly', () {
+      test('work properly', () async {
         final WeatherBloc weatherBloc = WeatherBloc(
           weatherRepository,
-          aiRepository,
+          outfitRepository,
+          LocalDataSource(await SharedPreferences.getInstance()),
         );
         expect(
           const WeatherInitial(),
@@ -72,7 +84,9 @@ void main() {
       blocTest<WeatherBloc, WeatherState>(
         'emits initial when city is empty',
         build: () => weatherBloc,
-        act: (WeatherBloc bloc) => bloc.add(const FetchWeather(location: '')),
+        act: (WeatherBloc bloc) => bloc.add(
+          const FetchWeather(location: dummy_constants.dummyLocation),
+        ),
         expect: () => <Matcher>[
           isA<WeatherState>().having(
             (WeatherState w) => w,
@@ -86,12 +100,12 @@ void main() {
         'emits [loading, failure] when getWeather throws',
         setUp: () {
           when(
-            () => weatherRepository.getWeather(any()),
+            () => weatherRepository.getWeatherByLocation(any()),
           ).thenThrow(Exception('oops'));
         },
         build: () => weatherBloc,
         act: (WeatherBloc bloc) => bloc.add(
-          const FetchWeather(location: dummy_constants.dummyWeatherLocation),
+          const FetchWeather(location: dummy_constants.dummyLocation),
         ),
         expect: () => <WeatherState>[
           const WeatherLoadingState(),
@@ -114,7 +128,9 @@ void main() {
             isA<WeatherInitial>(),
           ),
         ],
-        verify: (_) => verifyNever(() => weatherRepository.getWeather(any())),
+        verify: (_) => verifyNever(
+          () => weatherRepository.getWeatherByLocation(any()),
+        ),
       );
 
       blocTest<WeatherBloc, WeatherState>(
@@ -130,7 +146,7 @@ void main() {
           ),
         ],
         verify: (_) {
-          verifyNever(() => weatherRepository.getWeather(any()));
+          verifyNever(() => weatherRepository.getWeatherByLocation(any()));
         },
       );
     });
@@ -149,6 +165,9 @@ void main() {
             ),
             temperatureUnits: TemperatureUnits.celsius,
             countryCode: dummy_constants.dummyCountryCode,
+            description: '',
+            code: 0,
+            locale: 'en',
           ),
         ),
         act: (WeatherBloc bloc) => bloc.add(const ToggleUnits()),
@@ -169,6 +188,9 @@ void main() {
             condition: WeatherCondition.rainy,
             temperatureUnits: TemperatureUnits.fahrenheit,
             countryCode: dummy_constants.dummyCountryCode,
+            description: '',
+            code: 0,
+            locale: 'en',
           ),
         ),
         act: (WeatherBloc bloc) => bloc.add(const ToggleUnits()),
@@ -183,6 +205,9 @@ void main() {
               condition: WeatherCondition.rainy,
               temperatureUnits: TemperatureUnits.celsius,
               countryCode: dummy_constants.dummyCountryCode,
+              description: '',
+              code: 0,
+              locale: 'en',
             ),
           ),
         ],
@@ -202,6 +227,9 @@ void main() {
             condition: WeatherCondition.rainy,
             temperatureUnits: TemperatureUnits.celsius,
             countryCode: dummy_constants.dummyCountryCode,
+            description: '',
+            code: 0,
+            locale: 'en',
           ),
         ),
         act: (WeatherBloc bloc) => bloc.add(const ToggleUnits()),
@@ -216,6 +244,9 @@ void main() {
               condition: WeatherCondition.rainy,
               temperatureUnits: TemperatureUnits.fahrenheit,
               countryCode: dummy_constants.dummyCountryCode,
+              description: '',
+              code: 0,
+              locale: 'en',
             ),
           ),
         ],

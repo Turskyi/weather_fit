@@ -31,7 +31,7 @@
     <application
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
-        android:label="Weather Fit">
+        android:label="@string/weatherfit">
         <!--suppress AndroidDomInspection -->
         <receiver
             android:name=".WeatherWidget"

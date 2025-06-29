@@ -24,3 +24,9 @@ final class SettingsErrorEvent extends SettingsEvent {
 
   final String error;
 }
+
+class ChangeLanguageEvent extends SettingsEvent {
+  const ChangeLanguageEvent(this.language);
+
+  final Language language;
+}

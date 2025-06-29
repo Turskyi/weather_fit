@@ -2,6 +2,8 @@ import 'package:feedback/feedback.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_translate/flutter_translate.dart';
+import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
 import 'package:weather_fit/res/extensions/color_extensions.dart';
 import 'package:weather_fit/res/widgets/background.dart';
@@ -24,11 +26,13 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData themeData = Theme.of(context);
+    final ColorScheme colorScheme = themeData.colorScheme;
     return BlocListener<SettingsBloc, SettingsState>(
       listener: _settingsBlocStateListener,
       child: Scaffold(
         extendBodyBehindAppBar: true,
-        appBar: AppBar(title: const Text('Settings')),
+        appBar: AppBar(title: Text(translate('settings.title'))),
         body: Stack(
           children: <Widget>[
             const Background(),
@@ -36,27 +40,135 @@ class _SettingsPageState extends State<SettingsPage> {
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: ListView(
                 children: <Widget>[
-                  BlocBuilder<WeatherBloc, WeatherState>(
-                    buildWhen: (WeatherState previous, WeatherState current) =>
-                        previous.weather.temperatureUnits !=
-                        current.weather.temperatureUnits,
-                    builder: (BuildContext context, WeatherState state) {
+                  // Language Switcher Card.
+                  BlocBuilder<SettingsBloc, SettingsState>(
+                    buildWhen: (SettingsState previous, SettingsState current) {
+                      return previous.language != current.language;
+                    },
+                    builder: (
+                      BuildContext _,
+                      SettingsState settingsState,
+                    ) {
+                      final bool isEnglishSelected = settingsState.isEnglish;
+
+                      // Approximate width of the Switch.
+                      final double switchWidth = 60.0;
+                      // Approximate height of the Switch.
+                      final double switchHeight = 38.0;
+
                       return Card(
                         elevation: 2.0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10.0),
                         ),
                         child: ListTile(
-                          title: const Text(
-                            'Temperature Units',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                          title: Text(
+                            translate('settings.language'),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
-                          subtitle: const Text(
-                            'Use metric measurements for temperature units.',
+                          subtitle: Text(
+                            // Dynamically show current language.
+                            settingsState.isUkrainian
+                                ? translate('ukrainian')
+                                : translate('english'),
                           ),
+                          trailing: SizedBox(
+                            width: switchWidth,
+                            height: switchHeight,
+                            child: Stack(
+                              // Align children within the Stack.
+                              alignment: Alignment.center,
+                              children: <Widget>[
+                                // The Switch itself (will be at the bottom of
+                                // the stack).
+                                Switch(
+                                  value: isEnglishSelected,
+                                  onChanged: _changeLanguage,
+                                ),
+
+                                // Positioned on the left side of the track
+                                // area.
+                                Positioned(
+                                  left: 10.0,
+                                  child: AnimatedOpacity(
+                                    opacity: isEnglishSelected ? 1.0 : 0.0,
+                                    duration: const Duration(milliseconds: 200),
+                                    // Smooth transition
+                                    child: IgnorePointer(
+                                      // So text doesn't interfere with switch
+                                      // tap.
+                                      child: Text(
+                                        translate('en'),
+                                        style: TextStyle(
+                                          color: isEnglishSelected
+                                              ? colorScheme.onPrimary
+                                              : Colors.transparent,
+                                          // Text color on active track
+                                          fontSize: 10,
+                                          // Adjust size
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+
+                                // "UK" Text - visible when Ukrainian is
+                                // selected.
+                                // Positioned on the right side of the track
+                                // area.
+                                Positioned(
+                                  right: 12.0,
+                                  child: AnimatedOpacity(
+                                    opacity: !isEnglishSelected ? 1.0 : 0.0,
+                                    duration: const Duration(milliseconds: 200),
+                                    child: IgnorePointer(
+                                      child: Text(
+                                        translate('uk'),
+                                        style: TextStyle(
+                                          color: !isEnglishSelected
+                                              ? colorScheme.primary
+                                              : Colors.transparent,
+                                          fontSize: themeData
+                                              .textTheme.labelSmall?.fontSize,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  BlocBuilder<WeatherBloc, WeatherState>(
+                    buildWhen: (WeatherState previous, WeatherState current) =>
+                        previous.weather.temperatureUnits !=
+                        current.weather.temperatureUnits,
+                    builder: (BuildContext context, WeatherState state) {
+                      // Determine which subtitle to show
+                      final String subtitleKey = state.isCelsius
+                          ? 'settings.temperature_units_subtitle_metric'
+                          : 'settings.temperature_units_subtitle_imperial';
+
+                      return Card(
+                        elevation: 2.0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        child: ListTile(
+                          title: Text(
+                            translate('settings.temperature_units'),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: Text(translate(subtitleKey)),
                           trailing: Switch(
                             value: state.weather.temperatureUnits.isCelsius,
-                            onChanged: (_) => context
+                            onChanged: (bool _) => context
                                 .read<WeatherBloc>()
                                 .add(const ToggleUnits()),
                           ),
@@ -74,13 +186,11 @@ class _SettingsPageState extends State<SettingsPage> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10.0),
                       ),
-                      title: const Text(
-                        'About',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                      title: Text(
+                        translate('about.title'),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      subtitle: const Text(
-                        'Learn more about ${constants.appName}.',
-                      ),
+                      subtitle: Text(translate('settings.about_app_subtitle')),
                       trailing: const Icon(Icons.info_outline),
                       onTap: () => Navigator.pushNamed(
                         context,
@@ -98,9 +208,9 @@ class _SettingsPageState extends State<SettingsPage> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10.0),
                       ),
-                      title: const Text(
-                        'Privacy Policy',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                      title: Text(
+                        translate('privacy_policy'),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       subtitle: const SizedBox(),
                       trailing: const Icon(Icons.privacy_tip),
@@ -122,14 +232,11 @@ class _SettingsPageState extends State<SettingsPage> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10.0),
                       ),
-                      title: const Text(
-                        'Feedback',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                      title: Text(
+                        translate('feedback.title'),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      subtitle: const Text(
-                        'Let us know your thoughts and suggestions. You can '
-                        'also report any issues with the app’s content.',
-                      ),
+                      subtitle: Text(translate('settings.feedback_subtitle')),
                       trailing: const Icon(Icons.feedback),
                       onTap: () => context
                           .read<SettingsBloc>()
@@ -146,14 +253,11 @@ class _SettingsPageState extends State<SettingsPage> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10.0),
                       ),
-                      title: const Text(
-                        'Support',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                      title: Text(
+                        translate('support.title'),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      subtitle: const Text(
-                        'Visit our support page for help and frequently asked '
-                        'questions.',
-                      ),
+                      subtitle: Text(translate('settings.support_subtitle')),
                       trailing: const Icon(Icons.help_outline),
                       onTap: () => Navigator.pushNamed(
                         context,
@@ -166,9 +270,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ],
         ),
-        backgroundColor: Theme.of(
-          context,
-        ).colorScheme.primaryContainer.brighten(50),
+        backgroundColor: colorScheme.primaryContainer.brighten(50),
         bottomNavigationBar: kIsWeb
             ? const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -177,13 +279,11 @@ class _SettingsPageState extends State<SettingsPage> {
                 children: <Widget>[
                   StoreBadge(
                     url: constants.googlePlayUrl,
-                    assetPath: '${constants.imagePath}play_store_badge.png',
+                    assetPath: constants.playStoreBadgePath,
                   ),
                   StoreBadge(
                     url: constants.appStoreUrl,
-                    assetPath:
-                        '${constants.imagePath}Download_on_the_App_Store_Badge'
-                        '.png',
+                    assetPath: constants.appStoreBadgeAssetPath,
                     height: constants.appStoreBadgeHeight,
                     width: constants.appStoreBadgeWidth,
                   ),
@@ -192,6 +292,17 @@ class _SettingsPageState extends State<SettingsPage> {
             : null,
       ),
     );
+  }
+
+  void _changeLanguage(bool isEnglish) {
+    final Language newLanguage = isEnglish ? Language.en : Language.uk;
+    changeLocale(context, newLanguage.isoLanguageCode)
+        // The returned value is always `null`.
+        .then((Object? _) {
+      if (mounted) {
+        context.read<SettingsBloc>().add(ChangeLanguageEvent(newLanguage));
+      }
+    });
   }
 
   @override
@@ -211,9 +322,9 @@ class _SettingsPageState extends State<SettingsPage> {
     _feedbackController?.hide();
     // Let user know that his feedback is sent.
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Your feedback has been sent successfully!'),
-        duration: Duration(seconds: 2),
+      SnackBar(
+        content: Text(translate('feedback.sent')),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
@@ -236,12 +347,14 @@ class _SettingsPageState extends State<SettingsPage> {
 
   void _onFeedbackChanged() {
     if (_isDisposing) return;
-    bool? isVisible = _feedbackController?.isVisible;
+    final bool? isVisible = _feedbackController?.isVisible;
     if (isVisible == false) {
       _feedbackController?.removeListener(_onFeedbackChanged);
       _feedbackController = null;
       _isFeedbackControllerInitialized = false;
-      context.read<SettingsBloc>().add(const ClosingFeedbackEvent());
+      context.read<SettingsBloc>().add(
+            const ClosingFeedbackEvent(),
+          );
     }
   }
 

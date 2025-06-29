@@ -12,6 +12,7 @@ const String dummyCity = 'London';
 const Location dummyLocation = Location(
   latitude: 51.5073219,
   longitude: -0.1276474,
+  locale: 'en',
   name: dummyCity,
   countryCode: dummyCountryCode,
   country: 'United Kingdom',

@@ -4,67 +4,30 @@ import 'package:open_meteo_api/open_meteo_api.dart';
 import 'package:weather_repository/weather_repository.dart';
 
 class WeatherRepository {
-  WeatherRepository({OpenMeteoApiClient? weatherApiClient})
-      : _weatherApiClient = weatherApiClient ?? OpenMeteoApiClient();
+  WeatherRepository({
+    OpenMeteoApiClient? weatherApiClient,
+  }) : _openMeteoApiClient = weatherApiClient ?? OpenMeteoApiClient();
 
-  final OpenMeteoApiClient _weatherApiClient;
-
-  Future<WeatherDomain> getWeather(String city) async {
-    final LocationResponse location = await _weatherApiClient.locationSearch(
-      city,
-    );
-
-    final WeatherResponse weather = await _weatherApiClient.getWeather(
-      latitude: location.latitude,
-      longitude: location.longitude,
-    );
-
-    return WeatherDomain(
-      temperature: weather.temperature,
-      location: Location(
-        id: location.id,
-        name: location.name,
-        latitude: location.latitude,
-        longitude: location.longitude,
-        countryCode: location.countryCode,
-        country: location.country,
-        province: location.admin1,
-      ),
-      condition: weather.weatherCode.toInt().toCondition,
-      countryCode: location.countryCode,
-    );
-  }
-
-  Future<Location> getLocation(String query) async {
-    final LocationResponse response = await _weatherApiClient.locationSearch(
-      query,
-    );
-
-    return Location(
-      id: response.id,
-      name: response.name,
-      latitude: response.latitude,
-      longitude: response.longitude,
-      countryCode: response.countryCode,
-      country: response.country,
-      province: response.admin1,
-    );
-  }
+  final OpenMeteoApiClient _openMeteoApiClient;
 
   Future<WeatherDomain> getWeatherByLocation(Location location) async {
     final double latitude = location.latitude;
     final double longitude = location.longitude;
 
-    final WeatherResponse weather = await _weatherApiClient.getWeather(
+    final WeatherResponse weatherResponse =
+        await _openMeteoApiClient.getWeather(
       latitude: latitude,
       longitude: longitude,
     );
 
     return WeatherDomain(
-      temperature: weather.temperature,
+      temperature: weatherResponse.temperature,
       location: location,
-      condition: weather.weatherCode.toInt().toCondition,
+      condition: weatherResponse.code.toCondition,
       countryCode: location.countryCode,
+      description: weatherResponse.description,
+      weatherCode: weatherResponse.code,
+      locale: location.locale,
     );
   }
 }

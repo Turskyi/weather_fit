@@ -55,7 +55,8 @@ dependencies:
     sdk: flutter
   flutter_bloc: ^9.1.1
   flutter_email_sender: ^7.0.0
-  flutter_svg: ^2.1.0
+  flutter_svg: ^2.2.0
+  flutter_translate: any
   geocoding: ^4.0.0
   geolocator: ^14.0.1
   google_fonts: ^6.2.1
@@ -67,6 +68,10 @@ dependencies:
   json_annotation: ^4.9.0
   meta: any
   nested: ^1.0.0
+  nominatim_api:
+    path: packages/nominatim_api
+  open_meteo_api:
+    path: packages/open_meteo_api
   package_info_plus: ^8.3.0
   path_provider: ^2.1.5
   permission_handler: ^12.0.0+1
@@ -75,11 +80,11 @@ dependencies:
   url_launcher: ^6.3.1
   weather_repository:
     path: packages/weather_repository
-  workmanager: ^0.6.0
+  workmanager: ^0.7.0
 
 dev_dependencies:
   bloc_test: ^10.0.0
-  build_runner: ^2.4.15
+  build_runner: ^2.5.4
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -105,6 +110,8 @@ flutter:
 
   # Assets of the application.
   assets:
+    # strings
+    - assets/i18n/
     - assets/images/
     - assets/images/outfits/
 

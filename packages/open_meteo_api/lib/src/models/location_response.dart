@@ -14,8 +14,9 @@ class LocationResponse {
     required this.admin1,
   });
 
-  factory LocationResponse.fromJson(Map<String, Object?> json) =>
-      _$LocationResponseFromJson(json);
+  factory LocationResponse.fromJson(Map<String, Object?> json) {
+    return _$LocationResponseFromJson(json);
+  }
 
   final int id;
   final String name;
