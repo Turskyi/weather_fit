@@ -55,6 +55,9 @@ dependencies:
     sdk: flutter
   flutter_bloc: ^9.1.1
   flutter_email_sender: ^7.0.0
+  flutter_localization: ^0.3.3
+  flutter_localizations:
+    sdk: flutter
   flutter_svg: ^2.2.0
   flutter_translate: any
   geocoding: ^4.0.0

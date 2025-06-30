@@ -16,33 +16,63 @@ import 'helpers/mocks/mock_entities.dart';
 import 'helpers/mocks/mock_repositories.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  setUpAll(() {
+    SharedPreferences.setMockInitialValues(<String, Object>{});
+
+    registerFallbackValue(dummy_constants.dummyLocation);
+    registerFallbackValue(Weather.empty);
+  });
+
   initHydratedStorage();
 
   group('WeatherBloc', () {
-    late WeatherDomain weather;
+    late WeatherDomain weatherDomain;
     late WeatherRepository weatherRepository;
     late OutfitRepository outfitRepository;
     late WeatherBloc weatherBloc;
 
     setUp(() async {
-      weather = MockWeather();
+      weatherDomain = MockWeatherDomain();
       weatherRepository = MockWeatherRepository();
       outfitRepository = MockOutfitRepository();
-      when(() => weather.condition).thenReturn(
+      when(() => weatherDomain.condition).thenReturn(
         dummy_constants.dummyWeatherCondition,
       );
-      when(() => weather.location).thenReturn(
+      when(() => weatherDomain.location).thenReturn(
         dummy_constants.dummyLocation,
       );
-      when(() => weather.temperature).thenReturn(
+      when(() => weatherDomain.temperature).thenReturn(
         dummy_constants.dummyWeatherTemperature,
       );
-      when(() => weather.countryCode).thenReturn(
+      when(() => weatherDomain.countryCode).thenReturn(
         dummy_constants.dummyCountryCode,
+      );
+      when(() => weatherDomain.description).thenReturn(
+        dummy_constants.dummyWeatherDescription,
+      );
+      when(() => weatherDomain.weatherCode).thenReturn(
+        dummy_constants.dummyWeatherCode,
+      );
+      when(() => weatherDomain.locale).thenReturn(
+        dummy_constants.dummyLocale,
       );
       when(
         () => weatherRepository.getWeatherByLocation(any()),
-      ).thenAnswer((_) async => weather);
+      ).thenAnswer((_) async => weatherDomain);
+
+      when(
+        () => outfitRepository.getOutfitRecommendation(
+          any(),
+        ),
+      ).thenAnswer((Invocation _) => 'Wear a T-shirt and shorts');
+
+      when(
+        () => outfitRepository.getOutfitImageAssetPath(
+          any(),
+        ),
+      ).thenReturn('assets/images/outfits/clear_0.png');
+
       final SharedPreferences preferences =
           await SharedPreferences.getInstance();
       weatherBloc = WeatherBloc(
@@ -82,17 +112,31 @@ void main() {
 
     group('fetchWeather', () {
       blocTest<WeatherBloc, WeatherState>(
-        'emits initial when city is empty',
+        'emits loading and success states when FetchWeather is added with '
+        'valid location',
         build: () => weatherBloc,
         act: (WeatherBloc bloc) => bloc.add(
           const FetchWeather(location: dummy_constants.dummyLocation),
         ),
         expect: () => <Matcher>[
-          isA<WeatherState>().having(
-            (WeatherState w) => w,
-            'state',
-            isA<WeatherInitial>(),
-          ),
+          isA<WeatherLoadingState>(),
+          isA<LoadingOutfitState>(),
+          isA<WeatherSuccess>()
+              .having(
+                (WeatherSuccess s) => s.weather.location.name,
+                'location name',
+                dummy_constants.dummyLocation.name,
+              )
+              .having(
+                (WeatherSuccess s) => s.outfitRecommendation,
+                'outfit recommendation',
+                'Wear a T-shirt and shorts',
+              )
+              .having(
+                (WeatherSuccess s) => s.outfitAssetPath,
+                'outfit asset path',
+                'assets/images/outfits/clear_0.png',
+              ),
         ],
       );
 
