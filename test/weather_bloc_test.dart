@@ -7,6 +7,7 @@ import 'package:weather_fit/data/repositories/outfit_repository.dart';
 import 'package:weather_fit/entities/enums/temperature_units.dart';
 import 'package:weather_fit/entities/models/temperature/temperature.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
+import 'package:weather_fit/services/home_widget_service.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 import 'package:weather_repository/weather_repository.dart';
 
@@ -14,28 +15,55 @@ import 'constants/dummy_constants.dart' as dummy_constants;
 import 'helpers/hydrated_bloc.dart';
 import 'helpers/mocks/mock_entities.dart';
 import 'helpers/mocks/mock_repositories.dart';
+import 'helpers/mocks/mock_services.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  late HomeWidgetService mockHomeWidgetService;
+  late WeatherBloc weatherBloc;
+  late WeatherRepository mockWeatherRepository;
+  late OutfitRepository mockOutfitRepository;
   setUpAll(() {
     SharedPreferences.setMockInitialValues(<String, Object>{});
-
+    registerFallbackValue(Uri.parse('http://example.com'));
     registerFallbackValue(dummy_constants.dummyLocation);
     registerFallbackValue(Weather.empty);
+  });
+
+  setUp(() async {
+    // ...
+    mockHomeWidgetService = MockHomeWidgetService();
+    mockWeatherRepository = MockWeatherRepository();
+    mockOutfitRepository = MockOutfitRepository();
+    // Stub the methods of mockHomeWidgetService that will be called.
+    when(() => mockHomeWidgetService.setAppGroupId(any()))
+        .thenAnswer((_) async {});
+    when(() => mockHomeWidgetService.saveWidgetData<String>(any(), any()))
+        .thenAnswer((_) async => true);
+    when(
+      () => mockHomeWidgetService.updateWidget(
+        iOSName: any(named: 'iOSName'),
+        androidName: any(named: 'androidName'),
+      ),
+    ).thenAnswer((_) async => true);
+
+    final SharedPreferences preferences = await SharedPreferences.getInstance();
+    weatherBloc = WeatherBloc(
+      mockWeatherRepository,
+      mockOutfitRepository,
+      LocalDataSource(preferences),
+      mockHomeWidgetService,
+    );
   });
 
   initHydratedStorage();
 
   group('WeatherBloc', () {
     late WeatherDomain weatherDomain;
-    late WeatherRepository weatherRepository;
-    late OutfitRepository outfitRepository;
-    late WeatherBloc weatherBloc;
 
     setUp(() async {
       weatherDomain = MockWeatherDomain();
-      weatherRepository = MockWeatherRepository();
-      outfitRepository = MockOutfitRepository();
+
       when(() => weatherDomain.condition).thenReturn(
         dummy_constants.dummyWeatherCondition,
       );
@@ -58,17 +86,17 @@ void main() {
         dummy_constants.dummyLocale,
       );
       when(
-        () => weatherRepository.getWeatherByLocation(any()),
+        () => mockWeatherRepository.getWeatherByLocation(any()),
       ).thenAnswer((_) async => weatherDomain);
 
       when(
-        () => outfitRepository.getOutfitRecommendation(
+        () => mockOutfitRepository.getOutfitRecommendation(
           any(),
         ),
       ).thenAnswer((Invocation _) => 'Wear a T-shirt and shorts');
 
       when(
-        () => outfitRepository.getOutfitImageAssetPath(
+        () => mockOutfitRepository.getOutfitImageAssetPath(
           any(),
         ),
       ).thenReturn('assets/images/outfits/clear_0.png');
@@ -76,9 +104,10 @@ void main() {
       final SharedPreferences preferences =
           await SharedPreferences.getInstance();
       weatherBloc = WeatherBloc(
-        weatherRepository,
-        outfitRepository,
+        mockWeatherRepository,
+        mockOutfitRepository,
         LocalDataSource(preferences),
+        mockHomeWidgetService,
       );
     });
 
@@ -86,9 +115,10 @@ void main() {
       final SharedPreferences preferences =
           await SharedPreferences.getInstance();
       final WeatherBloc weatherBloc = WeatherBloc(
-        weatherRepository,
-        outfitRepository,
+        mockWeatherRepository,
+        mockOutfitRepository,
         LocalDataSource(preferences),
+        mockHomeWidgetService,
       );
       expect(
         weatherBloc.state,
@@ -99,9 +129,10 @@ void main() {
     group('toJson/fromJson', () {
       test('work properly', () async {
         final WeatherBloc weatherBloc = WeatherBloc(
-          weatherRepository,
-          outfitRepository,
+          mockWeatherRepository,
+          mockOutfitRepository,
           LocalDataSource(await SharedPreferences.getInstance()),
+          mockHomeWidgetService,
         );
         expect(
           const WeatherInitial(),
@@ -144,7 +175,7 @@ void main() {
         'emits [loading, failure] when getWeather throws',
         setUp: () {
           when(
-            () => weatherRepository.getWeatherByLocation(any()),
+            () => mockWeatherRepository.getWeatherByLocation(any()),
           ).thenThrow(Exception('oops'));
         },
         build: () => weatherBloc,
@@ -173,7 +204,7 @@ void main() {
           ),
         ],
         verify: (_) => verifyNever(
-          () => weatherRepository.getWeatherByLocation(any()),
+          () => mockWeatherRepository.getWeatherByLocation(any()),
         ),
       );
 
@@ -190,7 +221,7 @@ void main() {
           ),
         ],
         verify: (_) {
-          verifyNever(() => weatherRepository.getWeatherByLocation(any()));
+          verifyNever(() => mockWeatherRepository.getWeatherByLocation(any()));
         },
       );
     });

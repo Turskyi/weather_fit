@@ -15,6 +15,7 @@ import 'package:weather_fit/localization/localization_delelegate_getter.dart';
 import 'package:weather_fit/router/app_route.dart';
 import 'package:weather_fit/router/routes.dart';
 import 'package:weather_fit/search/bloc/search_bloc.dart';
+import 'package:weather_fit/services/home_widget_service.dart';
 import 'package:weather_fit/settings/bloc/settings_bloc.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 import 'package:weather_fit/weather/ui/weather.dart';
@@ -25,6 +26,7 @@ import 'helpers/flutter_translate_test_utils.dart';
 import 'helpers/hydrated_bloc.dart';
 import 'helpers/mocks/mock_blocs.dart';
 import 'helpers/mocks/mock_repositories.dart';
+import 'helpers/mocks/mock_services.dart';
 
 void main() {
   initHydratedStorage();
@@ -41,9 +43,11 @@ void main() {
   });
   late WeatherRepository weatherRepository;
   late OutfitRepository outfitRepository;
+  late HomeWidgetService mockHomeWidgetService;
 
   late SettingsBloc settingsBloc;
   setUp(() {
+    mockHomeWidgetService = MockHomeWidgetService();
     weatherRepository = MockWeatherRepository();
     outfitRepository = MockOutfitRepository();
 
@@ -74,6 +78,7 @@ void main() {
                   weatherRepository,
                   outfitRepository,
                   LocalDataSource(preferences),
+                  mockHomeWidgetService,
                 ),
               ),
               BlocProvider<SearchBloc>(

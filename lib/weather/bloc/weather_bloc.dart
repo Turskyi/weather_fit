@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:home_widget/home_widget.dart';
 import 'package:http/http.dart' as http;
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -17,6 +16,7 @@ import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
 import 'package:weather_fit/res/extensions/double_extension.dart';
 import 'package:weather_fit/res/home_widget_keys.dart';
+import 'package:weather_fit/services/home_widget_service.dart';
 import 'package:weather_repository/weather_repository.dart';
 
 part 'weather_bloc.g.dart';
@@ -28,6 +28,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     this._weatherRepository,
     this._outfitRepository,
     this._localDataSource,
+    this._homeWidgetService,
   ) : super(const WeatherInitial()) {
     on<FetchWeather>(_onFetchWeather);
     on<RefreshWeather>(_onRefreshWeather);
@@ -39,6 +40,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
   final WeatherRepository _weatherRepository;
   final OutfitRepository _outfitRepository;
   final LocalDataSource _localDataSource;
+  final HomeWidgetService _homeWidgetService;
 
   @override
   WeatherSuccess fromJson(Map<String, Object?> json) {
@@ -266,33 +268,31 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     }
 
     try {
-      // Set the group ID.
-      HomeWidget.setAppGroupId(constants.appleAppGroupId);
+      _homeWidgetService.setAppGroupId(constants.appleAppGroupId);
 
-      // Save weather data to the widget.
-      HomeWidget.saveWidgetData<String>(
+      _homeWidgetService.saveWidgetData<String>(
         HomeWidgetKey.textEmoji.stringValue,
         state.emoji,
       );
 
-      HomeWidget.saveWidgetData<String>(
+      _homeWidgetService.saveWidgetData<String>(
         HomeWidgetKey.textLocation.stringValue,
         state.locationName,
       );
 
-      HomeWidget.saveWidgetData<String>(
+      _homeWidgetService.saveWidgetData<String>(
         HomeWidgetKey.textTemperature.stringValue,
         state.formattedTemperature,
       );
 
-      HomeWidget.saveWidgetData<String>(
+      _homeWidgetService.saveWidgetData<String>(
         HomeWidgetKey.textLastUpdated.stringValue,
         '${translate(
           'last_updated_on_label',
         )}\n${state.formattedLastUpdatedDateTime}',
       );
 
-      HomeWidget.saveWidgetData<String>(
+      _homeWidgetService.saveWidgetData<String>(
         HomeWidgetKey.textRecommendation.stringValue,
         state.outfitRecommendation,
       );
@@ -306,14 +306,12 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
       }
       final String filePath = await _downloadAndSaveImage(assetPath);
 
-      // Save the image path if it's valid.
-      HomeWidget.saveWidgetData<String>(
+      _homeWidgetService.saveWidgetData<String>(
         HomeWidgetKey.imageWeather.stringValue,
         filePath,
       );
 
-      // Update the widget.
-      HomeWidget.updateWidget(
+      _homeWidgetService.updateWidget(
         iOSName: constants.iOSWidgetName,
         androidName: constants.androidWidgetName,
       );

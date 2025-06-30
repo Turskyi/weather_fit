@@ -12,6 +12,7 @@ import 'package:weather_fit/res/theme/cubit/theme_cubit.dart';
 import 'package:weather_fit/router/app_route.dart';
 import 'package:weather_fit/router/routes.dart' as routes;
 import 'package:weather_fit/search/bloc/search_bloc.dart';
+import 'package:weather_fit/services/home_widget_service.dart';
 import 'package:weather_fit/settings/bloc/settings_bloc.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 import 'package:weather_repository/weather_repository.dart';
@@ -54,6 +55,7 @@ class WeatherApp extends StatelessWidget {
                 _weatherRepository,
                 _outfitRepository,
                 _localDataSource,
+                const HomeWidgetServiceImpl(),
               );
             },
           ),
