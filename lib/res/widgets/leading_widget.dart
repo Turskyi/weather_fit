@@ -5,7 +5,12 @@ import 'package:weather_fit/weather/ui/weather_page.dart';
 import '../constants.dart' as constants;
 
 class LeadingWidget extends StatelessWidget {
-  const LeadingWidget({super.key});
+  const LeadingWidget({
+    required this.languageIsoCode,
+    super.key,
+  });
+
+  final String languageIsoCode;
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +24,9 @@ class LeadingWidget extends StatelessWidget {
           child: InkWell(
             onTap: () => Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute<void>(
-                builder: (_) => const WeatherPage(),
+                builder: (BuildContext _) {
+                  return WeatherPage(languageIsoCode: languageIsoCode);
+                },
                 settings: RouteSettings(name: AppRoute.weather.path),
               ),
               (_) => false,

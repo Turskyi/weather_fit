@@ -43,7 +43,7 @@ void main() async {
       localizationDelegate,
       BetterFeedback(
         feedbackBuilder: (
-          BuildContext context,
+          BuildContext _,
           OnSubmit onSubmit,
           ScrollController? scrollController,
         ) {

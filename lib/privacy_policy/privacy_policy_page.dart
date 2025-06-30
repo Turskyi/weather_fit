@@ -22,7 +22,11 @@ class PrivacyPolicyPage extends StatelessWidget {
     final double? bodySize = textTheme.bodyLarge?.fontSize;
     return Scaffold(
       appBar: AppBar(
-        leading: kIsWeb ? const LeadingWidget() : null,
+        leading: kIsWeb
+            ? LeadingWidget(
+                languageIsoCode: languageIsoCode,
+              )
+            : null,
         title: Text(translate('privacy_policy')),
       ),
       body: SingleChildScrollView(

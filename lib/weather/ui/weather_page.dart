@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
 import 'package:weather_fit/res/theme/cubit/theme_cubit.dart';
@@ -16,7 +17,12 @@ import 'package:weather_fit/weather/ui/outfit_widget.dart';
 import 'package:weather_fit/weather/ui/weather.dart';
 
 class WeatherPage extends StatefulWidget {
-  const WeatherPage({super.key});
+  const WeatherPage({
+    required this.languageIsoCode,
+    super.key,
+  });
+
+  final String languageIsoCode;
 
   @override
   State<WeatherPage> createState() => _WeatherPageState();
@@ -30,6 +36,7 @@ class _WeatherPageState extends State<WeatherPage> {
   @override
   void initState() {
     super.initState();
+    _setInitialLanguage();
     context.read<WeatherBloc>().add(const RefreshWeather());
   }
 
@@ -56,7 +63,7 @@ class _WeatherPageState extends State<WeatherPage> {
           builder: (BuildContext context, WeatherState state) {
             switch (state) {
               case WeatherInitial():
-                return const WeatherEmpty();
+                return WeatherEmpty(key: widget.key);
               case WeatherLoadingState():
                 if (state.weather.location.isEmpty) {
                   return const WeatherLoadingWidget();
@@ -306,5 +313,23 @@ class _WeatherPageState extends State<WeatherPage> {
         duration: const Duration(seconds: 2),
       ),
     );
+  }
+
+  void _setInitialLanguage() {
+    final String languageCode = LocalizedApp.of(
+      context,
+    ).delegate.currentLocale.languageCode;
+
+    final Language currentLanguage = Language.fromIsoLanguageCode(
+      languageCode,
+    );
+
+    final Language savedLanguage = Language.fromIsoLanguageCode(
+      widget.languageIsoCode,
+    );
+
+    if (currentLanguage != savedLanguage) {
+      changeLocale(context, savedLanguage.isoLanguageCode);
+    }
   }
 }

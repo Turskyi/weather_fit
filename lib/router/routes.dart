@@ -10,11 +10,17 @@ import 'package:weather_fit/weather/ui/weather_page.dart';
 
 Map<String, WidgetBuilder> getRouteMap(String languageIsoCode) {
   return <String, WidgetBuilder>{
-    AppRoute.weather.path: (BuildContext _) => const WeatherPage(),
+    AppRoute.weather.path: (BuildContext _) {
+      return WeatherPage(languageIsoCode: languageIsoCode);
+    },
     AppRoute.search.path: (BuildContext _) => const SearchPage(),
-    AppRoute.support.path: (BuildContext _) => const SupportPage(),
+    AppRoute.support.path: (BuildContext _) {
+      return SupportPage(languageIsoCode: languageIsoCode);
+    },
     AppRoute.settings.path: (BuildContext _) => const SettingsPage(),
-    AppRoute.about.path: (BuildContext _) => const AboutPage(),
+    AppRoute.about.path: (BuildContext _) {
+      return AboutPage(languageIsoCode: languageIsoCode);
+    },
     AppRoute.privacyPolicyAndroid.path: (BuildContext _) {
       return PrivacyPolicyAndroidPage(languageIsoCode: languageIsoCode);
     },

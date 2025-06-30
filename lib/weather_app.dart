@@ -49,8 +49,7 @@ class WeatherApp extends StatelessWidget {
           // Provide the theme cubit.
           BlocProvider<ThemeCubit>(create: (_) => ThemeCubit()),
           BlocProvider<WeatherBloc>(
-            create: (BuildContext context) {
-              _setInitialLanguage(context);
+            create: (BuildContext _) {
               return WeatherBloc(
                 _weatherRepository,
                 _outfitRepository,
@@ -117,19 +116,6 @@ class WeatherApp extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  void _setInitialLanguage(BuildContext context) {
-    final Language currentLanguage = Language.fromIsoLanguageCode(
-      LocalizedApp.of(context).delegate.currentLocale.languageCode,
-    );
-    final Language savedLanguage = Language.fromIsoLanguageCode(
-      _localDataSource.getLanguageIsoCode(),
-    );
-
-    if (currentLanguage != savedLanguage) {
-      changeLocale(context, savedLanguage.isoLanguageCode);
-    }
   }
 
   Language _getInitialLanguage(BuildContext context) {

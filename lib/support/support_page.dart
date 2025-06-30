@@ -6,7 +6,12 @@ import 'package:weather_fit/res/constants.dart' as constants;
 import 'package:weather_fit/res/widgets/leading_widget.dart';
 
 class SupportPage extends StatelessWidget {
-  const SupportPage({super.key});
+  const SupportPage({
+    required this.languageIsoCode,
+    super.key,
+  });
+
+  final String languageIsoCode;
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +19,11 @@ class SupportPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        leading: kIsWeb ? const LeadingWidget() : null,
+        leading: kIsWeb
+            ? LeadingWidget(
+                languageIsoCode: languageIsoCode,
+              )
+            : null,
         title: Text(translate('support.title')),
       ),
       body: Padding(

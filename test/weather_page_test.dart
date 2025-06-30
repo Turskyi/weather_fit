@@ -102,9 +102,12 @@ void main() {
               ),
             ],
             child: prepareWidgetForTesting(
-              MaterialApp(
-                initialRoute: AppRoute.weather.path,
-                routes: getRouteMap('en'),
+              LocalizedApp(
+                localizationDelegate,
+                MaterialApp(
+                  initialRoute: AppRoute.weather.path,
+                  routes: getRouteMap('en'),
+                ),
               ),
               localizationDelegate,
             ),
@@ -132,7 +135,10 @@ void main() {
       await tester.pumpWidget(
         BlocProvider<WeatherBloc>.value(
           value: weatherBloc,
-          child: const MaterialApp(home: WeatherPage()),
+          child: LocalizedApp(
+            localizationDelegate,
+            const MaterialApp(home: WeatherPage(languageIsoCode: 'en')),
+          ),
         ),
       );
       expect(find.byType(WeatherLoadingWidget), findsOneWidget);
@@ -144,7 +150,10 @@ void main() {
       await tester.pumpWidget(
         BlocProvider<WeatherBloc>.value(
           value: weatherBloc,
-          child: const MaterialApp(home: WeatherPage()),
+          child: LocalizedApp(
+            localizationDelegate,
+            const MaterialApp(home: WeatherPage(languageIsoCode: 'en')),
+          ),
         ),
       );
       expect(find.byType(WeatherLoadingWidget), findsOneWidget);
@@ -160,7 +169,10 @@ void main() {
           value: weatherRepository,
           child: BlocProvider<WeatherBloc>.value(
             value: weatherBloc,
-            child: const MaterialApp(home: WeatherPage()),
+            child: LocalizedApp(
+              localizationDelegate,
+              const MaterialApp(home: WeatherPage(languageIsoCode: 'en')),
+            ),
           ),
         ),
       );

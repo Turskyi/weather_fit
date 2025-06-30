@@ -29,7 +29,11 @@ class PrivacyPolicyAndroidPage extends StatelessWidget {
           '${translate('privacy_policy')} ${kIsWeb ? '${translate('for')} '
               '«${translate('title')}» ${translate('android_app')}' : ''}',
         ),
-        leading: kIsWeb ? const LeadingWidget() : null,
+        leading: kIsWeb
+            ? LeadingWidget(
+                languageIsoCode: languageIsoCode,
+              )
+            : null,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),

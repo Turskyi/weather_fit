@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_translate/flutter_translate.dart';
+import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weather_fit/entities/enums/language.dart';
@@ -156,10 +157,22 @@ class LocalDataSource {
   }
 
   String getLanguageIsoCode() {
-    return _preferences.getString(Settings.languageIsoCode.key) ??
-        Language.fromIsoLanguageCode(
-          PlatformDispatcher.instance.locale.languageCode,
-        ).isoLanguageCode;
+    final String? savedLanguageIsoCode = _preferences.getString(
+      Settings.languageIsoCode.key,
+    );
+
+    String defaultLanguageCode =
+        PlatformDispatcher.instance.locale.languageCode;
+
+    final String host = Uri.base.host;
+    if (host.startsWith('uk.')) {
+      // Sets the default locale for the intl package in Dart/Flutter to
+      // Ukrainian.
+      Intl.defaultLocale = 'uk';
+      defaultLanguageCode = Language.uk.isoLanguageCode;
+    }
+
+    return savedLanguageIsoCode ?? defaultLanguageCode;
   }
 
   /// Saves the provided [location] to persistent storage as a JSON string.

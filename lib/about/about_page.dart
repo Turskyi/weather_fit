@@ -10,7 +10,12 @@ import 'package:weather_fit/res/widgets/leading_widget.dart';
 import 'package:weather_fit/router/app_route.dart';
 
 class AboutPage extends StatelessWidget {
-  const AboutPage({super.key});
+  const AboutPage({
+    required this.languageIsoCode,
+    super.key,
+  });
+
+  final String languageIsoCode;
 
   bool get _showWidgetsFeature {
     if (kIsWeb) return false;
@@ -45,7 +50,11 @@ class AboutPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        leading: kIsWeb ? const LeadingWidget() : null,
+        leading: kIsWeb
+            ? LeadingWidget(
+                languageIsoCode: languageIsoCode,
+              )
+            : null,
         title: Text(
           '${translate('about.title')} «${translate('title')}»',
           maxLines: 2,
