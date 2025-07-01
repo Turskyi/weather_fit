@@ -29,7 +29,8 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     this._outfitRepository,
     this._localDataSource,
     this._homeWidgetService,
-  ) : super(const WeatherInitial()) {
+    this._locale,
+  ) : super(WeatherInitial(locale: _locale)) {
     on<FetchWeather>(_onFetchWeather);
     on<RefreshWeather>(_onRefreshWeather);
     on<ToggleUnits>(_onToggleUnits);
@@ -41,6 +42,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
   final OutfitRepository _outfitRepository;
   final LocalDataSource _localDataSource;
   final HomeWidgetService _homeWidgetService;
+  final String _locale;
 
   @override
   WeatherSuccess fromJson(Map<String, Object?> json) {
@@ -63,11 +65,11 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     final Location eventLocation = event.location;
 
     if (eventLocation.isEmpty) {
-      emit(const WeatherInitial());
+      emit(WeatherInitial(locale: _locale));
       return;
     }
 
-    emit(const WeatherLoadingState());
+    emit(WeatherLoadingState(locale: _locale));
     try {
       final WeatherDomain domainWeather =
           await _weatherRepository.getWeatherByLocation(
@@ -93,6 +95,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
 
       emit(
         LoadingOutfitState(
+          locale: _locale,
           weather: updatedWeather,
           outfitRecommendation: outfitRecommendation,
         ),
@@ -116,6 +119,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
       } else {
         emit(
           WeatherSuccess(
+            locale: _locale,
             weather: updatedWeather,
             outfitRecommendation: outfitRecommendation,
           ),
@@ -125,6 +129,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
       if (e is http.ClientException && kDebugMode && kIsWeb) {
         emit(
           LocalWebCorsFailure(
+            locale: _locale,
             message: translate('error.cors'),
             outfitRecommendation: state.outfitRecommendation,
           ),
@@ -132,6 +137,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
       } else {
         emit(
           WeatherFailure(
+            locale: _locale,
             message: '$e',
             outfitRecommendation: state.outfitRecommendation,
           ),
@@ -147,6 +153,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     if (state is! WeatherSuccess) {
       emit(
         WeatherInitial(
+          locale: _locale,
           weather: state.weather,
           outfitRecommendation: state.outfitRecommendation,
           outfitAssetPath: state.outfitAssetPath,
@@ -156,12 +163,13 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     }
 
     if (state.weather.isUnknown) {
-      emit(const WeatherInitial());
+      emit(WeatherInitial(locale: _locale));
       return;
     }
 
     emit(
       WeatherLoadingState(
+        locale: _locale,
         weather: state.weather,
         outfitRecommendation: state.outfitRecommendation,
         outfitAssetPath: state.outfitAssetPath,
@@ -186,6 +194,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
 
       emit(
         LoadingOutfitState(
+          locale: _locale,
           weather: weather.copyWith(
             temperature: Temperature(value: temperatureValue),
             temperatureUnits: units,
@@ -214,6 +223,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     } on Exception catch (e) {
       emit(
         WeatherFailure(
+          locale: _locale,
           message: '$e',
           outfitRecommendation: state.outfitRecommendation,
           outfitAssetPath: state.outfitAssetPath,
@@ -331,11 +341,11 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     final Weather weather = event.weather;
 
     if (weather.isEmpty) {
-      emit(const WeatherInitial());
+      emit(WeatherInitial(locale: _locale));
       return;
     }
 
-    emit(const WeatherLoadingState());
+    emit(WeatherLoadingState(locale: _locale));
     try {
       final TemperatureUnits units = state.temperatureUnits;
 
@@ -354,6 +364,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
 
       emit(
         LoadingOutfitState(
+          locale: _locale,
           weather: updatedWeather,
           outfitRecommendation: outfitRecommendation,
         ),
@@ -381,6 +392,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
       } else {
         emit(
           WeatherSuccess(
+            locale: _locale,
             weather: updatedWeather,
             outfitRecommendation: outfitRecommendation,
           ),
@@ -390,6 +402,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
       if (e is http.ClientException && kDebugMode && kIsWeb) {
         emit(
           LocalWebCorsFailure(
+            locale: _locale,
             message: translate('error.cors'),
             outfitRecommendation: state.outfitRecommendation,
           ),
@@ -397,6 +410,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
       } else {
         emit(
           WeatherFailure(
+            locale: _locale,
             message: '$e',
             outfitRecommendation: state.outfitRecommendation,
           ),

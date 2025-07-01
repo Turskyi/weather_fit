@@ -127,7 +127,9 @@ void _callbackDispatcher() {
       await HomeWidget.saveWidgetData(
         HomeWidgetKey.textLastUpdated.stringValue,
         '${translate('last_updated_on_label')}\n'
-        '${weather.formattedLastUpdatedDateTime}',
+        '${weather.getFormattedLastUpdatedDateTime(
+          localDataSource.getLanguageIsoCode(),
+        )}',
       );
 
       await HomeWidget.saveWidgetData(

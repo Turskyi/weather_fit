@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
+import 'package:weather_fit/settings/bloc/settings_bloc.dart';
 import 'package:weather_fit/weather/ui/weather_icon.dart';
 
 import '../bloc/weather_bloc.dart';
@@ -66,11 +67,23 @@ class WeatherContent extends StatelessWidget {
                 ),
               ),
             if (weather.neverUpdated)
-              Text(weather.formattedLastUpdatedDateTime)
+              BlocBuilder<SettingsBloc, SettingsState>(
+                builder: (BuildContext _, SettingsState state) {
+                  return Text(
+                    weather.getFormattedLastUpdatedDateTime(state.locale),
+                  );
+                },
+              )
             else
-              Text(
-                '${translate('last_updated_on_label')} '
-                '${weather.formattedLastUpdatedDateTime}',
+              BlocBuilder<SettingsBloc, SettingsState>(
+                builder: (BuildContext _, SettingsState state) {
+                  return Text(
+                    '${translate('last_updated_on_label')} '
+                    '${weather.getFormattedLastUpdatedDateTime(
+                      state.locale,
+                    )}',
+                  );
+                },
               ),
             Padding(
               padding: const EdgeInsets.only(top: 8.0),

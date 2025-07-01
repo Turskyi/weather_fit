@@ -22,6 +22,7 @@ import 'package:weather_fit/weather/ui/weather.dart';
 import 'package:weather_fit/weather/ui/weather_page.dart';
 import 'package:weather_repository/weather_repository.dart';
 
+import 'constants/dummy_constants.dart' as dummy_constants;
 import 'helpers/flutter_translate_test_utils.dart';
 import 'helpers/hydrated_bloc.dart';
 import 'helpers/mocks/mock_blocs.dart';
@@ -74,12 +75,17 @@ void main() {
           child: MultiBlocProvider(
             providers: <SingleChildWidget>[
               BlocProvider<WeatherBloc>(
-                create: (BuildContext _) => WeatherBloc(
-                  weatherRepository,
-                  outfitRepository,
-                  LocalDataSource(preferences),
-                  mockHomeWidgetService,
-                ),
+                create: (BuildContext _) {
+                  final LocalDataSource localDataSource =
+                      LocalDataSource(preferences);
+                  return WeatherBloc(
+                    weatherRepository,
+                    outfitRepository,
+                    localDataSource,
+                    mockHomeWidgetService,
+                    localDataSource.getLanguageIsoCode(),
+                  );
+                },
               ),
               BlocProvider<SearchBloc>(
                 create: (BuildContext _) {
@@ -130,7 +136,7 @@ void main() {
     testWidgets('renders WeatherLoading for WeatherStatus.initial',
         (WidgetTester tester) async {
       when(() => weatherBloc.state).thenReturn(
-        const WeatherLoadingState(),
+        const WeatherLoadingState(locale: dummy_constants.dummyLocale),
       );
       await tester.pumpWidget(
         BlocProvider<WeatherBloc>.value(
@@ -146,7 +152,9 @@ void main() {
 
     testWidgets('renders WeatherLoading for WeatherStatus.loading',
         (WidgetTester tester) async {
-      when(() => weatherBloc.state).thenReturn(const WeatherLoadingState());
+      when(() => weatherBloc.state).thenReturn(
+        const WeatherLoadingState(locale: dummy_constants.dummyLocale),
+      );
       await tester.pumpWidget(
         BlocProvider<WeatherBloc>.value(
           value: weatherBloc,
@@ -162,7 +170,10 @@ void main() {
     testWidgets('renders WeatherError for WeatherStatus.failure',
         (WidgetTester tester) async {
       when(() => weatherBloc.state).thenReturn(
-        const WeatherFailure(message: 'Error'),
+        const WeatherFailure(
+          message: 'Error',
+          locale: dummy_constants.dummyLocale,
+        ),
       );
       await tester.pumpWidget(
         RepositoryProvider<WeatherRepository>.value(
@@ -171,7 +182,9 @@ void main() {
             value: weatherBloc,
             child: LocalizedApp(
               localizationDelegate,
-              const MaterialApp(home: WeatherPage(languageIsoCode: 'en')),
+              const MaterialApp(
+                home: WeatherPage(languageIsoCode: dummy_constants.dummyLocale),
+              ),
             ),
           ),
         ),

@@ -55,6 +55,7 @@ class WeatherApp extends StatelessWidget {
                 _outfitRepository,
                 _localDataSource,
                 const HomeWidgetServiceImpl(),
+                _localDataSource.getLanguageIsoCode(),
               );
             },
           ),

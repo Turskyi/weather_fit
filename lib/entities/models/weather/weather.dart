@@ -146,7 +146,7 @@ class Weather extends Equatable {
   }
 
   /// Output: e.g., "Dec 12, Monday at 03:45 PM".
-  String get formattedLastUpdatedDateTime {
+  String getFormattedLastUpdatedDateTime(String locale) {
     if (lastUpdatedDateTime != null) {
       try {
         final DateFormat formatter = DateFormat(

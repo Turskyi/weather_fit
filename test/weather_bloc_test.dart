@@ -48,11 +48,13 @@ void main() {
     ).thenAnswer((_) async => true);
 
     final SharedPreferences preferences = await SharedPreferences.getInstance();
+    final LocalDataSource localDataSource = LocalDataSource(preferences);
     weatherBloc = WeatherBloc(
       mockWeatherRepository,
       mockOutfitRepository,
-      LocalDataSource(preferences),
+      localDataSource,
       mockHomeWidgetService,
+      localDataSource.getLanguageIsoCode(),
     );
   });
 
@@ -103,39 +105,49 @@ void main() {
 
       final SharedPreferences preferences =
           await SharedPreferences.getInstance();
+      final LocalDataSource localDataSource = LocalDataSource(preferences);
       weatherBloc = WeatherBloc(
         mockWeatherRepository,
         mockOutfitRepository,
-        LocalDataSource(preferences),
+        localDataSource,
         mockHomeWidgetService,
+        localDataSource.getLanguageIsoCode(),
       );
     });
 
     test('initial state is correct', () async {
       final SharedPreferences preferences =
           await SharedPreferences.getInstance();
+      final LocalDataSource localDataSource = LocalDataSource(preferences);
+      final String locale = localDataSource.getLanguageIsoCode();
       final WeatherBloc weatherBloc = WeatherBloc(
         mockWeatherRepository,
         mockOutfitRepository,
-        LocalDataSource(preferences),
+        localDataSource,
         mockHomeWidgetService,
+        locale,
       );
       expect(
         weatherBloc.state,
-        const WeatherInitial(),
+        WeatherInitial(locale: locale),
       );
     });
 
     group('toJson/fromJson', () {
       test('work properly', () async {
+        final SharedPreferences preferences =
+            await SharedPreferences.getInstance();
+        final LocalDataSource localDataSource = LocalDataSource(preferences);
+        final String locale = localDataSource.getLanguageIsoCode();
         final WeatherBloc weatherBloc = WeatherBloc(
           mockWeatherRepository,
           mockOutfitRepository,
-          LocalDataSource(await SharedPreferences.getInstance()),
+          localDataSource,
           mockHomeWidgetService,
+          locale,
         );
         expect(
-          const WeatherInitial(),
+          WeatherInitial(locale: locale),
           weatherBloc.state,
         );
       });
@@ -183,9 +195,10 @@ void main() {
           const FetchWeather(location: dummy_constants.dummyLocation),
         ),
         expect: () => <WeatherState>[
-          const WeatherLoadingState(),
+          const WeatherLoadingState(locale: dummy_constants.dummyLocale),
           WeatherFailure(
             message: '${Exception('oops')}',
+            locale: dummy_constants.dummyLocale,
           ),
         ],
       );
@@ -211,7 +224,10 @@ void main() {
       blocTest<WeatherBloc, WeatherState>(
         'emits initial when location is empty',
         build: () => weatherBloc,
-        seed: () => const WeatherSuccess(weather: Weather.empty),
+        seed: () => const WeatherSuccess(
+          weather: Weather.empty,
+          locale: dummy_constants.dummyLocale,
+        ),
         act: (WeatherBloc bloc) => bloc.add(const RefreshWeather()),
         expect: () => <Matcher>[
           isA<WeatherState>().having(
@@ -231,6 +247,7 @@ void main() {
         'emits updated units when status is not success',
         build: () => weatherBloc,
         seed: () => WeatherLoadingState(
+          locale: dummy_constants.dummyLocale,
           weather: Weather(
             condition: WeatherCondition.rainy,
             lastUpdatedDateTime: DateTime(2025),
@@ -254,6 +271,7 @@ void main() {
         'when status is success (celsius)',
         build: () => weatherBloc,
         seed: () => WeatherSuccess(
+          locale: dummy_constants.dummyLocale,
           weather: Weather(
             location: dummy_constants.dummyLocation,
             temperature: const Temperature(
@@ -271,6 +289,7 @@ void main() {
         act: (WeatherBloc bloc) => bloc.add(const ToggleUnits()),
         expect: () => <WeatherState>[
           WeatherSuccess(
+            locale: dummy_constants.dummyLocale,
             weather: Weather(
               location: dummy_constants.dummyLocation,
               temperature: Temperature(
@@ -293,6 +312,7 @@ void main() {
         'when status is success (fahrenheit)',
         build: () => weatherBloc,
         seed: () => WeatherSuccess(
+          locale: dummy_constants.dummyLocale,
           weather: Weather(
             location: dummy_constants.dummyLocation,
             temperature: const Temperature(
@@ -310,6 +330,7 @@ void main() {
         act: (WeatherBloc bloc) => bloc.add(const ToggleUnits()),
         expect: () => <WeatherState>[
           WeatherSuccess(
+            locale: dummy_constants.dummyLocale,
             weather: Weather(
               location: dummy_constants.dummyLocation,
               temperature: Temperature(
