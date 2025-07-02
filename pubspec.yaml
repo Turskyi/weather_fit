@@ -61,7 +61,7 @@ dependencies:
   flutter_svg: ^2.2.0
   flutter_translate: any
   geocoding: ^4.0.0
-  geolocator: ^14.0.1
+  geolocator: ^14.0.2
   google_fonts: ^6.2.1
   # Tested home_widget: ^0.8.0 and it does not compile on Android.
   home_widget: ^0.7.0+1
@@ -83,7 +83,8 @@ dependencies:
   url_launcher: ^6.3.1
   weather_repository:
     path: packages/weather_repository
-  workmanager: ^0.8.0
+    # Tested workmanager: ^0.8.0 and it does not compile on iOS.
+  workmanager: ^0.7.0
 
 dev_dependencies:
   bloc_test: ^10.0.0
