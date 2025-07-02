@@ -52,6 +52,9 @@
   "windows": "Windows",
   "linux": "Linux",
   "unknown": "Unknown",
+  "get_new_outfit_suggestion": "Get New Outfit Suggestion",
+  "please_try_refreshing_weather": "Please try refreshing the weather.",
+  "unable_to_load_outfit_image": "Unable to load outfit image.",
   "feedback": {
     "title": "Feedback",
     "app_feedback": "App Feedback",

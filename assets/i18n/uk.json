@@ -53,6 +53,9 @@
   "windows": "Віндовс",
   "linux": "Лінукс",
   "unknown": "Невідомо",
+  "get_new_outfit_suggestion": "Отримати Нову Пропозицію Образу",
+  "please_try_refreshing_weather": "Будь ласка, спробуйте оновити погоду.",
+  "unable_to_load_outfit_image": "Не вдалося завантажити зображення образу.",
   "feedback": {
     "title": "Відгук",
     "app_feedback": "Відгук про додаток",

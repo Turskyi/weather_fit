@@ -50,10 +50,20 @@ class _WeatherPageState extends State<WeatherPage> {
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.settings),
-            onPressed: () => Navigator.pushNamed(
-              context,
-              AppRoute.settings.path,
-            ),
+            onPressed: () {
+              Navigator.pushNamed(
+                context,
+                AppRoute.settings.path,
+              ).whenComplete(() {
+                if (context.mounted) {
+                  context.read<WeatherBloc>().add(
+                        GetOutfitEvent(
+                          context.read<WeatherBloc>().state.weather,
+                        ),
+                      );
+                }
+              });
+            },
           ),
         ],
       ),

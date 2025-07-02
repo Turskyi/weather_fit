@@ -109,7 +109,9 @@ class OutfitWidget extends StatelessWidget {
                                       ),
                                       const SizedBox(height: 12),
                                       Text(
-                                        'Unable to load outfit image.',
+                                        translate(
+                                          'unable_to_load_outfit_image',
+                                        ),
                                         style: textTheme.titleMedium?.copyWith(
                                           fontWeight: FontWeight.bold,
                                           color: theme.colorScheme.onSurface,
@@ -118,7 +120,9 @@ class OutfitWidget extends StatelessWidget {
                                       ),
                                       const SizedBox(height: 8),
                                       Text(
-                                        'Please try refreshing the weather.',
+                                        translate(
+                                          'please_try_refreshing_weather',
+                                        ),
                                         style: textTheme.bodyMedium?.copyWith(
                                           color: theme.colorScheme.onSurface
                                               .withValues(
@@ -130,8 +134,10 @@ class OutfitWidget extends StatelessWidget {
                                       const SizedBox(height: 12),
                                       ElevatedButton(
                                         onPressed: onRefresh,
-                                        child: const Text(
-                                          'Get New Outfit Suggestion',
+                                        child: Text(
+                                          translate(
+                                            'get_new_outfit_suggestion',
+                                          ),
                                         ),
                                       ),
                                     ],
@@ -188,8 +194,8 @@ class OutfitWidget extends StatelessWidget {
                                 alignment: Alignment.center,
                                 child: ElevatedButton(
                                   onPressed: onRefresh,
-                                  child: const Text(
-                                    'Get New Outfit Suggestion',
+                                  child: Text(
+                                    translate('get_new_outfit_suggestion'),
                                   ),
                                 ),
                               );

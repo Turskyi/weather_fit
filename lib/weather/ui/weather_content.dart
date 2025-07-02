@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_translate/flutter_translate.dart';
+import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
 import 'package:weather_fit/settings/bloc/settings_bloc.dart';
+import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 import 'package:weather_fit/weather/ui/weather_icon.dart';
 
-import '../bloc/weather_bloc.dart';
-
-class WeatherContent extends StatelessWidget {
+class WeatherContent extends StatefulWidget {
   const WeatherContent({
     required this.weather,
     required this.child,
@@ -22,11 +22,16 @@ class WeatherContent extends StatelessWidget {
   final RefreshCallback onRefresh;
 
   @override
+  State<WeatherContent> createState() => _WeatherContentState();
+}
+
+class _WeatherContentState extends State<WeatherContent> {
+  @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final TextTheme textTheme = theme.textTheme;
     final TextStyle? cityTextStyle = textTheme.displayMedium;
-    final String countryCode = weather.countryCode.toLowerCase();
+    final String countryCode = widget.weather.countryCode.toLowerCase();
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
       clipBehavior: Clip.none,
@@ -35,8 +40,8 @@ class WeatherContent extends StatelessWidget {
         child: Column(
           children: <Widget>[
             const SizedBox(height: 48),
-            if (!weather.neverUpdated)
-              WeatherIcon(condition: weather.condition),
+            if (!widget.weather.neverUpdated)
+              WeatherIcon(condition: widget.weather.condition),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
@@ -49,28 +54,50 @@ class WeatherContent extends StatelessWidget {
                 const SizedBox(width: 8),
                 Flexible(
                   child: FittedBox(
-                    child: Text(
-                      weather.locationName,
-                      style: cityTextStyle?.copyWith(
-                        fontWeight: FontWeight.w200,
+                    child: BlocListener<SettingsBloc, SettingsState>(
+                      listenWhen: (
+                        SettingsState previousState,
+                        SettingsState currentState,
+                      ) {
+                        final String languageCode = LocalizedApp.of(
+                          context,
+                        ).delegate.currentLocale.languageCode;
+
+                        final Language currentLanguage =
+                            Language.fromIsoLanguageCode(
+                          languageCode,
+                        );
+                        return previousState.language !=
+                                currentState.language ||
+                            currentLanguage != currentState.language;
+                      },
+                      listener: (BuildContext _, SettingsState __) {
+                        setState(() {});
+                      },
+                      child: Text(
+                        widget.weather.locationName,
+                        style: cityTextStyle?.copyWith(
+                          fontWeight: FontWeight.w200,
+                        ),
                       ),
                     ),
                   ),
                 ),
               ],
             ),
-            if (!weather.neverUpdated)
+            if (!widget.weather.neverUpdated)
               Text(
-                weather.formattedTemperature,
+                widget.weather.formattedTemperature,
                 style: textTheme.displaySmall?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
               ),
-            if (weather.neverUpdated)
+            if (widget.weather.neverUpdated)
               BlocBuilder<SettingsBloc, SettingsState>(
                 builder: (BuildContext _, SettingsState state) {
                   return Text(
-                    weather.getFormattedLastUpdatedDateTime(state.locale),
+                    widget.weather
+                        .getFormattedLastUpdatedDateTime(state.locale),
                   );
                 },
               )
@@ -79,7 +106,7 @@ class WeatherContent extends StatelessWidget {
                 builder: (BuildContext _, SettingsState state) {
                   return Text(
                     '${translate('last_updated_on_label')} '
-                    '${weather.getFormattedLastUpdatedDateTime(
+                    '${widget.weather.getFormattedLastUpdatedDateTime(
                       state.locale,
                     )}',
                   );
@@ -88,20 +115,20 @@ class WeatherContent extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(top: 8.0),
               child: Text(
-                _getTranslatedWeatherDescription(weather.code),
+                _getTranslatedWeatherDescription(widget.weather.code),
                 style: textTheme.bodySmall?.copyWith(color: Colors.grey),
               ),
             ),
             const SizedBox(height: 24),
-            if (!weather.neverUpdated) child,
+            if (!widget.weather.neverUpdated) widget.child,
             const SizedBox(height: 24),
             BlocBuilder<WeatherBloc, WeatherState>(
               builder: (BuildContext _, WeatherState state) {
                 if (state is! LoadingOutfitState &&
                     state is! WeatherLoadingState &&
-                    weather.needsRefresh) {
+                    widget.weather.needsRefresh) {
                   return ElevatedButton(
-                    onPressed: onRefresh,
+                    onPressed: widget.onRefresh,
                     child: Text(translate('weather.check_latest_button')),
                   );
                 } else {
