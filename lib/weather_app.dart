@@ -37,6 +37,7 @@ class WeatherApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Use the `MultiRepositoryProvider` widget to provide two repositories.
+    final Language initialLanguage = _getInitialLanguage(context);
     return MultiRepositoryProvider(
       providers: <SingleChildWidget>[
         // Provide the weather repository.
@@ -60,8 +61,7 @@ class WeatherApp extends StatelessWidget {
             },
           ),
           BlocProvider<SettingsBloc>(
-            create: (BuildContext context) {
-              final Language initialLanguage = _getInitialLanguage(context);
+            create: (BuildContext _) {
               return SettingsBloc(_localDataSource, initialLanguage);
             },
           ),

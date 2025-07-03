@@ -27,7 +27,7 @@ class _CustomFeedbackFormState extends State<FeedbackForm> {
   FeedbackDetails _customFeedback = const FeedbackDetails();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext _) {
     return Column(
       children: <Widget>[
         Expanded(

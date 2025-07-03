@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
 import 'package:weather_fit/res/theme/cubit/theme_cubit.dart';
@@ -36,7 +35,6 @@ class _WeatherPageState extends State<WeatherPage> {
   @override
   void initState() {
     super.initState();
-    _setInitialLanguage();
     context.read<WeatherBloc>().add(const RefreshWeather());
   }
 
@@ -323,23 +321,5 @@ class _WeatherPageState extends State<WeatherPage> {
         duration: const Duration(seconds: 2),
       ),
     );
-  }
-
-  void _setInitialLanguage() {
-    final String languageCode = LocalizedApp.of(
-      context,
-    ).delegate.currentLocale.languageCode;
-
-    final Language currentLanguage = Language.fromIsoLanguageCode(
-      languageCode,
-    );
-
-    final Language savedLanguage = Language.fromIsoLanguageCode(
-      widget.languageIsoCode,
-    );
-
-    if (currentLanguage != savedLanguage) {
-      changeLocale(context, savedLanguage.isoLanguageCode);
-    }
   }
 }

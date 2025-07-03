@@ -5,20 +5,13 @@ import 'package:weather_fit/entities/enums/language.dart';
 Future<LocalizationDelegate> getLocalizationDelegate(
   LocalDataSource localDataSource,
 ) async {
-  final Language savedLanguage = Language.fromIsoLanguageCode(
-    localDataSource.getLanguageIsoCode(),
-  );
-
-  final String fallbackLocale = Language.fromIsoLanguageCode(
-    savedLanguage.isoLanguageCode,
-  ).isoLanguageCode;
-
   final LocalizationDelegate localizationDelegate =
       await LocalizationDelegate.create(
-    fallbackLocale: fallbackLocale,
+    fallbackLocale: localDataSource.getLanguageIsoCode(),
     supportedLocales: Language.values
         .map((Language language) => language.isoLanguageCode)
         .toList(),
   );
+
   return localizationDelegate;
 }

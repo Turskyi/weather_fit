@@ -165,10 +165,10 @@ class LocalDataSource {
         PlatformDispatcher.instance.locale.languageCode;
 
     final String host = Uri.base.host;
-    if (host.startsWith('uk.')) {
+    if (host.startsWith('${Language.uk.isoLanguageCode}.')) {
       // Sets the default locale for the intl package in Dart/Flutter to
       // Ukrainian.
-      Intl.defaultLocale = 'uk';
+      Intl.defaultLocale = Language.uk.isoLanguageCode;
       defaultLanguageCode = Language.uk.isoLanguageCode;
     }
 
