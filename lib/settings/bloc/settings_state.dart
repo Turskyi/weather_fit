@@ -21,6 +21,13 @@ final class SettingsInitial extends SettingsState {
   }) {
     return SettingsInitial(language: language ?? this.language);
   }
+
+  @override
+  String toString() {
+    return 'SettingsInitial{'
+        '  language: $language,'
+        '}';
+  }
 }
 
 final class FeedbackState extends SettingsState {

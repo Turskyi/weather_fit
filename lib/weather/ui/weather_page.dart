@@ -282,6 +282,8 @@ class _WeatherPageState extends State<WeatherPage> {
           duration: const Duration(seconds: 2),
         ),
       );
+    } else if (state is SettingsInitial) {
+      setState(() {});
     }
   }
 
