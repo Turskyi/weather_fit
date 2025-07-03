@@ -69,7 +69,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
       return;
     }
 
-    emit(WeatherLoadingState(locale: _locale));
+    emit(WeatherLoadingState(locale: _locale, weather: state.weather));
     try {
       final WeatherDomain domainWeather =
           await _weatherRepository.getWeatherByLocation(
@@ -243,12 +243,14 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
         : temperature.value.toFahrenheit();
 
     if (state is WeatherSuccess) {
+      final Weather updatedWeather = weather.copyWith(
+        temperature: Temperature(value: value),
+        temperatureUnits: units,
+      );
+
       emit(
         (state as WeatherSuccess).copyWith(
-          weather: weather.copyWith(
-            temperature: Temperature(value: value),
-            temperatureUnits: units,
-          ),
+          weather: updatedWeather,
         ),
       );
     } else if (state is WeatherInitial) {
@@ -345,16 +347,12 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
       return;
     }
 
-    emit(WeatherLoadingState(locale: _locale));
+    emit(WeatherLoadingState(locale: _locale, weather: state.weather));
     try {
       final TemperatureUnits units = state.temperatureUnits;
 
-      final double temperatureValue = units.isFahrenheit
-          ? weather.temperature.value.toFahrenheit()
-          : weather.temperature.value;
-
       final Weather updatedWeather = weather.copyWith(
-        temperature: Temperature(value: temperatureValue),
+        temperature: Temperature(value: weather.temperature.value),
         temperatureUnits: units,
       );
 

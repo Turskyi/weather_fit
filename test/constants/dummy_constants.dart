@@ -1,3 +1,6 @@
+import 'package:weather_fit/entities/enums/temperature_units.dart';
+import 'package:weather_fit/entities/models/temperature/temperature.dart';
+import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_repository/weather_repository.dart';
 
 const String dummyOutfitImageUrl =
@@ -6,7 +9,7 @@ const String dummyOutfitImageUrl =
 const String dummyWeatherLocation = 'London';
 const WeatherCondition dummyWeatherCondition = WeatherCondition.unknown;
 const double dummyWeatherTemperature = 9.8;
-const String dummyCountryCode = 'gb';
+const String dummyCountryCode = 'en';
 const String dummyCity = 'London';
 const String dummyWeatherDescription = 'Fog';
 const int dummyWeatherCode = 45;
@@ -19,4 +22,16 @@ const Location dummyLocation = Location(
   name: dummyCity,
   countryCode: dummyCountryCode,
   country: 'United Kingdom',
+);
+
+Weather dummyWeather = Weather(
+  location: dummyLocation,
+  temperature: const Temperature(value: dummyWeatherTemperature),
+  lastUpdatedDateTime: DateTime(2025, DateTime.april, 1),
+  condition: dummyWeatherCondition,
+  temperatureUnits: TemperatureUnits.celsius,
+  countryCode: dummyCountryCode,
+  description: dummyWeatherDescription,
+  code: dummyWeatherCode,
+  locale: dummyLocale,
 );

@@ -46,13 +46,13 @@ WeatherLoadingState _$WeatherLoadingStateFromJson(Map<String, dynamic> json) =>
       ($checkedConvert) {
         final val = WeatherLoadingState(
           locale: $checkedConvert('locale', (v) => v as String),
-          outfitRecommendation: $checkedConvert(
-              'outfit_recommendation', (v) => v as String? ?? ''),
           weather: $checkedConvert(
               'weather',
               (v) => v == null
                   ? null
                   : Weather.fromJson(v as Map<String, dynamic>)),
+          outfitRecommendation: $checkedConvert(
+              'outfit_recommendation', (v) => v as String? ?? ''),
           outfitAssetPath:
               $checkedConvert('outfit_asset_path', (v) => v as String? ?? ''),
         );

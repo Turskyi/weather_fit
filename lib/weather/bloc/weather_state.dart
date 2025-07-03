@@ -27,6 +27,7 @@ sealed class WeatherState extends Equatable {
         outfitAssetPath,
         message,
         locale,
+        isCelsius,
       ];
 
   Map<String, Object?> toJson() {
@@ -97,8 +98,8 @@ final class WeatherInitial extends WeatherState {
 class WeatherLoadingState extends WeatherState {
   const WeatherLoadingState({
     required super.locale,
+    required super.weather,
     super.outfitRecommendation,
-    super.weather,
     super.outfitAssetPath,
   });
 

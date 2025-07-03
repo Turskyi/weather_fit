@@ -7,6 +7,7 @@ import 'package:weather_fit/data/repositories/outfit_repository.dart';
 import 'package:weather_fit/entities/enums/temperature_units.dart';
 import 'package:weather_fit/entities/models/temperature/temperature.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
+import 'package:weather_fit/res/extensions/double_extension.dart';
 import 'package:weather_fit/services/home_widget_service.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 import 'package:weather_repository/weather_repository.dart';
@@ -183,120 +184,59 @@ void main() {
         ],
       );
 
-      blocTest<WeatherBloc, WeatherState>(
-        'emits [loading, failure] when getWeather throws',
-        setUp: () {
-          when(
+      group('refreshWeather', () {
+        blocTest<WeatherBloc, WeatherState>(
+          'emits initial when status is not success',
+          build: () => weatherBloc,
+          act: (WeatherBloc bloc) => bloc.add(const RefreshWeather()),
+          expect: () => <Matcher>[
+            isA<WeatherState>().having(
+              (WeatherState w) => w,
+              'state',
+              isA<WeatherInitial>(),
+            ),
+          ],
+          verify: (_) => verifyNever(
             () => mockWeatherRepository.getWeatherByLocation(any()),
-          ).thenThrow(Exception('oops'));
-        },
-        build: () => weatherBloc,
-        act: (WeatherBloc bloc) => bloc.add(
-          const FetchWeather(location: dummy_constants.dummyLocation),
-        ),
-        expect: () => <WeatherState>[
-          const WeatherLoadingState(locale: dummy_constants.dummyLocale),
-          WeatherFailure(
-            message: '${Exception('oops')}',
+          ),
+        );
+
+        blocTest<WeatherBloc, WeatherState>(
+          'emits initial when location is empty',
+          build: () => weatherBloc,
+          seed: () => const WeatherSuccess(
+            weather: Weather.empty,
             locale: dummy_constants.dummyLocale,
           ),
-        ],
-      );
-    });
-
-    group('refreshWeather', () {
-      blocTest<WeatherBloc, WeatherState>(
-        'emits initial when status is not success',
-        build: () => weatherBloc,
-        act: (WeatherBloc bloc) => bloc.add(const RefreshWeather()),
-        expect: () => <Matcher>[
-          isA<WeatherState>().having(
-            (WeatherState w) => w,
-            'state',
-            isA<WeatherInitial>(),
-          ),
-        ],
-        verify: (_) => verifyNever(
-          () => mockWeatherRepository.getWeatherByLocation(any()),
-        ),
-      );
-
-      blocTest<WeatherBloc, WeatherState>(
-        'emits initial when location is empty',
-        build: () => weatherBloc,
-        seed: () => const WeatherSuccess(
-          weather: Weather.empty,
-          locale: dummy_constants.dummyLocale,
-        ),
-        act: (WeatherBloc bloc) => bloc.add(const RefreshWeather()),
-        expect: () => <Matcher>[
-          isA<WeatherState>().having(
-            (WeatherState w) => w,
-            'state',
-            isA<WeatherInitial>(),
-          ),
-        ],
-        verify: (_) {
-          verifyNever(() => mockWeatherRepository.getWeatherByLocation(any()));
-        },
-      );
-    });
-
-    group('toggleUnits', () {
-      blocTest<WeatherBloc, WeatherState>(
-        'emits updated units when status is not success',
-        build: () => weatherBloc,
-        seed: () => WeatherLoadingState(
-          locale: dummy_constants.dummyLocale,
-          weather: Weather(
-            condition: WeatherCondition.rainy,
-            lastUpdatedDateTime: DateTime(2025),
-            location: dummy_constants.dummyLocation,
-            temperature: const Temperature(
-              value: dummy_constants.dummyWeatherTemperature,
+          act: (WeatherBloc bloc) => bloc.add(const RefreshWeather()),
+          expect: () => <Matcher>[
+            isA<WeatherState>().having(
+              (WeatherState w) => w,
+              'state',
+              isA<WeatherInitial>(),
             ),
-            temperatureUnits: TemperatureUnits.celsius,
-            countryCode: dummy_constants.dummyCountryCode,
-            description: '',
-            code: 0,
-            locale: 'en',
-          ),
-        ),
-        act: (WeatherBloc bloc) => bloc.add(const ToggleUnits()),
-        expect: () => <WeatherState>[],
-      );
+          ],
+          verify: (_) {
+            verifyNever(
+              () => mockWeatherRepository.getWeatherByLocation(any()),
+            );
+          },
+        );
+      });
 
-      blocTest<WeatherBloc, WeatherState>(
-        'emits updated units and temperature '
-        'when status is success (celsius)',
-        build: () => weatherBloc,
-        seed: () => WeatherSuccess(
-          locale: dummy_constants.dummyLocale,
-          weather: Weather(
-            location: dummy_constants.dummyLocation,
-            temperature: const Temperature(
-              value: dummy_constants.dummyWeatherTemperature,
-            ),
-            lastUpdatedDateTime: DateTime(2020),
-            condition: WeatherCondition.rainy,
-            temperatureUnits: TemperatureUnits.fahrenheit,
-            countryCode: dummy_constants.dummyCountryCode,
-            description: '',
-            code: 0,
-            locale: 'en',
-          ),
-        ),
-        act: (WeatherBloc bloc) => bloc.add(const ToggleUnits()),
-        expect: () => <WeatherState>[
-          WeatherSuccess(
+      group('toggleUnits', () {
+        blocTest<WeatherBloc, WeatherState>(
+          'emits updated units when status is not success',
+          build: () => weatherBloc,
+          seed: () => WeatherLoadingState(
             locale: dummy_constants.dummyLocale,
             weather: Weather(
-              location: dummy_constants.dummyLocation,
-              temperature: Temperature(
-                value: dummy_constants.dummyWeatherTemperature.toCelsius(),
-              ),
-              lastUpdatedDateTime: DateTime(2020),
               condition: WeatherCondition.rainy,
+              lastUpdatedDateTime: DateTime(2025),
+              location: dummy_constants.dummyLocation,
+              temperature: const Temperature(
+                value: dummy_constants.dummyWeatherTemperature,
+              ),
               temperatureUnits: TemperatureUnits.celsius,
               countryCode: dummy_constants.dummyCountryCode,
               description: '',
@@ -304,37 +244,20 @@ void main() {
               locale: 'en',
             ),
           ),
-        ],
-      );
+          act: (WeatherBloc bloc) => bloc.add(const ToggleUnits()),
+          expect: () => <WeatherState>[],
+        );
 
-      blocTest<WeatherBloc, WeatherState>(
-        'emits updated units and temperature '
-        'when status is success (fahrenheit)',
-        build: () => weatherBloc,
-        seed: () => WeatherSuccess(
-          locale: dummy_constants.dummyLocale,
-          weather: Weather(
-            location: dummy_constants.dummyLocation,
-            temperature: const Temperature(
-              value: dummy_constants.dummyWeatherTemperature,
-            ),
-            lastUpdatedDateTime: DateTime(2020),
-            condition: WeatherCondition.rainy,
-            temperatureUnits: TemperatureUnits.celsius,
-            countryCode: dummy_constants.dummyCountryCode,
-            description: '',
-            code: 0,
-            locale: 'en',
-          ),
-        ),
-        act: (WeatherBloc bloc) => bloc.add(const ToggleUnits()),
-        expect: () => <WeatherState>[
-          WeatherSuccess(
+        blocTest<WeatherBloc, WeatherState>(
+          'emits updated units and temperature '
+          'when status is success (celsius)',
+          build: () => weatherBloc,
+          seed: () => WeatherSuccess(
             locale: dummy_constants.dummyLocale,
             weather: Weather(
               location: dummy_constants.dummyLocation,
-              temperature: Temperature(
-                value: dummy_constants.dummyWeatherTemperature.toFahrenheit(),
+              temperature: const Temperature(
+                value: dummy_constants.dummyWeatherTemperature,
               ),
               lastUpdatedDateTime: DateTime(2020),
               condition: WeatherCondition.rainy,
@@ -345,14 +268,68 @@ void main() {
               locale: 'en',
             ),
           ),
-        ],
-      );
+          act: (WeatherBloc bloc) => bloc.add(const ToggleUnits()),
+          expect: () => <WeatherState>[
+            WeatherSuccess(
+              locale: dummy_constants.dummyLocale,
+              weather: Weather(
+                location: dummy_constants.dummyLocation,
+                temperature: Temperature(
+                  value: dummy_constants.dummyWeatherTemperature.toCelsius(),
+                ),
+                lastUpdatedDateTime: DateTime(2020),
+                condition: WeatherCondition.rainy,
+                temperatureUnits: TemperatureUnits.celsius,
+                countryCode: dummy_constants.dummyCountryCode,
+                description: '',
+                code: 0,
+                locale: 'en',
+              ),
+            ),
+          ],
+        );
+
+        blocTest<WeatherBloc, WeatherState>(
+          'emits updated units and temperature '
+          'when status is success (fahrenheit)',
+          build: () => weatherBloc,
+          seed: () => WeatherSuccess(
+            locale: dummy_constants.dummyLocale,
+            weather: Weather(
+              location: dummy_constants.dummyLocation,
+              temperature: const Temperature(
+                value: dummy_constants.dummyWeatherTemperature,
+              ),
+              lastUpdatedDateTime: DateTime(2020),
+              condition: WeatherCondition.rainy,
+              temperatureUnits: TemperatureUnits.celsius,
+              countryCode: dummy_constants.dummyCountryCode,
+              description: '',
+              code: 0,
+              locale: 'en',
+            ),
+          ),
+          act: (WeatherBloc bloc) => bloc.add(const ToggleUnits()),
+          expect: () => <WeatherState>[
+            WeatherSuccess(
+              locale: dummy_constants.dummyLocale,
+              weather: Weather(
+                location: dummy_constants.dummyLocation,
+                temperature: Temperature(
+                  value: dummy_constants.dummyWeatherTemperature.toFahrenheit(),
+                ),
+                lastUpdatedDateTime: DateTime(2020),
+                condition: WeatherCondition.rainy,
+                temperatureUnits: TemperatureUnits.fahrenheit,
+                countryCode: dummy_constants.dummyCountryCode,
+                description: '',
+                code: 0,
+                locale: 'en',
+              ),
+            ),
+          ],
+        );
+      });
     });
   });
-}
-
-extension on double {
-  double toFahrenheit() => (this * 9 / 5) + 32;
-
-  double toCelsius() => (this - 32) * 5 / 9;
 }

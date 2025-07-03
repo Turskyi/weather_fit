@@ -189,4 +189,6 @@ class Weather extends Equatable {
       ? '${translate('lat')}: ${location.latitude.toStringAsFixed(2)}, '
           '${translate('lon')}: ${location.longitude.toStringAsFixed(2)}'
       : location.name;
+
+  bool get isCelsius => temperatureUnits.isCelsius;
 }

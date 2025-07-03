@@ -86,18 +86,23 @@ class _WeatherContentState extends State<WeatherContent> {
               ],
             ),
             if (!widget.weather.neverUpdated)
-              Text(
-                widget.weather.formattedTemperature,
-                style: textTheme.displaySmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+              BlocBuilder<WeatherBloc, WeatherState>(
+                builder: (BuildContext _, WeatherState state) {
+                  return Text(
+                    state.weather.formattedTemperature,
+                    style: textTheme.displaySmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  );
+                },
               ),
             if (widget.weather.neverUpdated)
               BlocBuilder<SettingsBloc, SettingsState>(
                 builder: (BuildContext _, SettingsState state) {
                   return Text(
-                    widget.weather
-                        .getFormattedLastUpdatedDateTime(state.locale),
+                    widget.weather.getFormattedLastUpdatedDateTime(
+                      state.locale,
+                    ),
                   );
                 },
               )

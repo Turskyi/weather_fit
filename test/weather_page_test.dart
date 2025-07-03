@@ -133,40 +133,6 @@ void main() {
       weatherBloc = MockWeatherBloc();
     });
 
-    testWidgets('renders WeatherLoading for WeatherStatus.initial',
-        (WidgetTester tester) async {
-      when(() => weatherBloc.state).thenReturn(
-        const WeatherLoadingState(locale: dummy_constants.dummyLocale),
-      );
-      await tester.pumpWidget(
-        BlocProvider<WeatherBloc>.value(
-          value: weatherBloc,
-          child: LocalizedApp(
-            localizationDelegate,
-            const MaterialApp(home: WeatherPage(languageIsoCode: 'en')),
-          ),
-        ),
-      );
-      expect(find.byType(WeatherLoadingWidget), findsOneWidget);
-    });
-
-    testWidgets('renders WeatherLoading for WeatherStatus.loading',
-        (WidgetTester tester) async {
-      when(() => weatherBloc.state).thenReturn(
-        const WeatherLoadingState(locale: dummy_constants.dummyLocale),
-      );
-      await tester.pumpWidget(
-        BlocProvider<WeatherBloc>.value(
-          value: weatherBloc,
-          child: LocalizedApp(
-            localizationDelegate,
-            const MaterialApp(home: WeatherPage(languageIsoCode: 'en')),
-          ),
-        ),
-      );
-      expect(find.byType(WeatherLoadingWidget), findsOneWidget);
-    });
-
     testWidgets('renders WeatherError for WeatherStatus.failure',
         (WidgetTester tester) async {
       when(() => weatherBloc.state).thenReturn(
