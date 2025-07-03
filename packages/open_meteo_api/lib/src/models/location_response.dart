@@ -11,7 +11,7 @@ class LocationResponse {
     required this.longitude,
     required this.countryCode,
     required this.country,
-    required this.admin1,
+    this.admin1 = '',
   });
 
   factory LocationResponse.fromJson(Map<String, Object?> json) {
