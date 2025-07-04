@@ -2,9 +2,11 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
 import 'package:weather_fit/data/repositories/outfit_repository.dart';
 import 'package:weather_fit/entities/enums/temperature_units.dart';
@@ -56,16 +58,19 @@ void _callbackDispatcher() {
       // Set app group ID.
       HomeWidget.setAppGroupId(constants.appleAppGroupId);
 
-      final String city = await HomeWidget.getWidgetData<String>(
-        HomeWidgetKey.textLocation.stringValue,
-        defaultValue: '',
-      ).then((String? value) => value ?? '');
-
       // Get latest weather.
       final WeatherRepository weatherRepository = WeatherRepository();
 
-      final WeatherDomain domainWeather = await weatherRepository.getWeather(
-        city,
+      final SharedPreferences preferences =
+          await SharedPreferences.getInstance();
+
+      final LocalDataSource localDataSource = LocalDataSource(preferences);
+
+      final Location lastSavedLocation = localDataSource.getLastSavedLocation();
+
+      final WeatherDomain domainWeather =
+          await weatherRepository.getWeatherByLocation(
+        lastSavedLocation,
       );
 
       final Weather weather = Weather.fromRepository(domainWeather);
@@ -81,8 +86,8 @@ void _callbackDispatcher() {
         temperatureUnits: units,
       );
 
-      final OutfitRepository outfitRepository = const OutfitRepository(
-        LocalDataSource(),
+      final OutfitRepository outfitRepository = OutfitRepository(
+        localDataSource,
       );
 
       final String outfitRecommendation =
@@ -121,7 +126,10 @@ void _callbackDispatcher() {
 
       await HomeWidget.saveWidgetData(
         HomeWidgetKey.textLastUpdated.stringValue,
-        'Last Updated on\n${weather.formattedLastUpdatedDateTime}',
+        '${translate('last_updated_on_label')}\n'
+        '${weather.getFormattedLastUpdatedDateTime(
+          localDataSource.getLanguageIsoCode(),
+        )}',
       );
 
       await HomeWidget.saveWidgetData(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 
 class WeatherError extends StatelessWidget {
   const WeatherError(this.message, {super.key});
@@ -16,7 +17,7 @@ class WeatherError extends StatelessWidget {
           style: TextStyle(fontSize: textTheme.displayLarge?.fontSize),
         ),
         Text(
-          'Something went wrong!',
+          translate('error.something_went_wrong'),
           style: textTheme.headlineMedium,
         ),
         const SizedBox(height: 20),

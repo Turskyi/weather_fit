@@ -34,7 +34,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build
 # suffix.
-version: 0.1.8+18
+version: 0.2.1+21
 
 environment:
   sdk: '>=3.2.6 <4.0.0'
@@ -55,10 +55,15 @@ dependencies:
     sdk: flutter
   flutter_bloc: ^9.1.1
   flutter_email_sender: ^7.0.0
-  flutter_svg: ^2.1.0
+  flutter_localization: ^0.3.3
+  flutter_localizations:
+    sdk: flutter
+  flutter_svg: ^2.2.0
+  flutter_translate: any
   geocoding: ^4.0.0
-  geolocator: ^14.0.1
+  geolocator: ^14.0.2
   google_fonts: ^6.2.1
+  # Tested home_widget: ^0.8.0 and it does not compile on Android.
   home_widget: ^0.7.0+1
   http: ^1.4.0
   hydrated_bloc: ^10.0.0
@@ -66,6 +71,10 @@ dependencies:
   json_annotation: ^4.9.0
   meta: any
   nested: ^1.0.0
+  nominatim_api:
+    path: packages/nominatim_api
+  open_meteo_api:
+    path: packages/open_meteo_api
   package_info_plus: ^8.3.0
   path_provider: ^2.1.5
   permission_handler: ^12.0.0+1
@@ -74,11 +83,12 @@ dependencies:
   url_launcher: ^6.3.1
   weather_repository:
     path: packages/weather_repository
-  workmanager: ^0.6.0
+    # Tested workmanager: ^0.8.0 and it does not compile on iOS.
+  workmanager: ^0.7.0
 
 dev_dependencies:
   bloc_test: ^10.0.0
-  build_runner: ^2.4.15
+  build_runner: ^2.5.4
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -104,6 +114,8 @@ flutter:
 
   # Assets of the application.
   assets:
+    # strings
+    - assets/i18n/
     - assets/images/
     - assets/images/outfits/
 

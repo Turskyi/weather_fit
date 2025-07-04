@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class StoreBadge extends StatelessWidget {
   const StoreBadge({
     required this.url,
     required this.assetPath,
-    this.height = 100,
-    this.width = 240,
+    this.height = 90,
+    this.width = 170,
     this.borderRadius = 8.0,
     super.key,
   });
@@ -30,7 +31,9 @@ class StoreBadge extends StatelessWidget {
               await launchUrl(Uri.parse(url));
             } else if (context.mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Could not launch $url')),
+                SnackBar(
+                  content: Text('${translate('could_not_launch')} $url'),
+                ),
               );
             }
           },

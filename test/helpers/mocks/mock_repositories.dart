@@ -4,4 +4,4 @@ import 'package:weather_repository/weather_repository.dart';
 
 class MockWeatherRepository extends Mock implements WeatherRepository {}
 
-class MockAiRepository extends Mock implements OutfitRepository {}
+class MockOutfitRepository extends Mock implements OutfitRepository {}

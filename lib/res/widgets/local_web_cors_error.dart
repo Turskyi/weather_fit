@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 
 class LocalWebCorsError extends StatelessWidget {
   const LocalWebCorsError({super.key});
@@ -14,7 +15,7 @@ class LocalWebCorsError extends StatelessWidget {
           style: TextStyle(fontSize: textTheme.displayLarge?.fontSize),
         ),
         Text(
-          'Something went wrong!',
+          translate('error.something_went_wrong'),
           style: textTheme.headlineMedium,
         ),
         const SizedBox(height: 20),
@@ -28,16 +29,10 @@ class LocalWebCorsError extends StatelessWidget {
               alignment: Alignment.center,
               padding: const EdgeInsets.all(16),
               child: SelectableText(
-                'Error: Local Environment Setup Required\nTo run this '
-                'application locally on web, please use the following '
-                'command:\n\nflutter run -d chrome --web-browser-flag '
-                '"--disable-web-security"\n\nThis step is necessary to '
-                'bypass CORS restrictions during local development. '
-                'Please note that this flag should only be used in a '
-                'development environment and never in production.',
+                translate('error.cors'),
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: Theme.of(context).textTheme.titleMedium?.fontSize,
+                  fontSize: textTheme.titleMedium?.fontSize,
                 ),
               ),
             ),

@@ -12,6 +12,7 @@ WeatherInitial _$WeatherInitialFromJson(Map<String, dynamic> json) =>
       json,
       ($checkedConvert) {
         final val = WeatherInitial(
+          locale: $checkedConvert('locale', (v) => v as String),
           outfitRecommendation: $checkedConvert(
               'outfit_recommendation', (v) => v as String? ?? ''),
           weather: $checkedConvert(
@@ -35,6 +36,7 @@ Map<String, dynamic> _$WeatherInitialToJson(WeatherInitial instance) =>
       'weather': instance.weather.toJson(),
       'outfit_recommendation': instance.outfitRecommendation,
       'outfit_asset_path': instance.outfitAssetPath,
+      'locale': instance.locale,
     };
 
 WeatherLoadingState _$WeatherLoadingStateFromJson(Map<String, dynamic> json) =>
@@ -43,13 +45,14 @@ WeatherLoadingState _$WeatherLoadingStateFromJson(Map<String, dynamic> json) =>
       json,
       ($checkedConvert) {
         final val = WeatherLoadingState(
-          outfitRecommendation: $checkedConvert(
-              'outfit_recommendation', (v) => v as String? ?? ''),
+          locale: $checkedConvert('locale', (v) => v as String),
           weather: $checkedConvert(
               'weather',
               (v) => v == null
                   ? null
                   : Weather.fromJson(v as Map<String, dynamic>)),
+          outfitRecommendation: $checkedConvert(
+              'outfit_recommendation', (v) => v as String? ?? ''),
           outfitAssetPath:
               $checkedConvert('outfit_asset_path', (v) => v as String? ?? ''),
         );
@@ -67,6 +70,7 @@ Map<String, dynamic> _$WeatherLoadingStateToJson(
       'weather': instance.weather.toJson(),
       'outfit_recommendation': instance.outfitRecommendation,
       'outfit_asset_path': instance.outfitAssetPath,
+      'locale': instance.locale,
     };
 
 WeatherSuccess _$WeatherSuccessFromJson(Map<String, dynamic> json) =>
@@ -75,6 +79,7 @@ WeatherSuccess _$WeatherSuccessFromJson(Map<String, dynamic> json) =>
       json,
       ($checkedConvert) {
         final val = WeatherSuccess(
+          locale: $checkedConvert('locale', (v) => v as String),
           outfitAssetPath:
               $checkedConvert('outfit_asset_path', (v) => v as String? ?? ''),
           outfitRecommendation: $checkedConvert(
@@ -100,6 +105,7 @@ Map<String, dynamic> _$WeatherSuccessToJson(WeatherSuccess instance) =>
       'outfit_recommendation': instance.outfitRecommendation,
       'message': instance.message,
       'outfit_asset_path': instance.outfitAssetPath,
+      'locale': instance.locale,
     };
 
 LoadingOutfitState _$LoadingOutfitStateFromJson(Map<String, dynamic> json) =>
@@ -108,6 +114,7 @@ LoadingOutfitState _$LoadingOutfitStateFromJson(Map<String, dynamic> json) =>
       json,
       ($checkedConvert) {
         final val = LoadingOutfitState(
+          locale: $checkedConvert('locale', (v) => v as String),
           outfitRecommendation: $checkedConvert(
               'outfit_recommendation', (v) => v as String? ?? ''),
           outfitAssetPath:
@@ -131,6 +138,7 @@ Map<String, dynamic> _$LoadingOutfitStateToJson(LoadingOutfitState instance) =>
       'weather': instance.weather.toJson(),
       'outfit_recommendation': instance.outfitRecommendation,
       'outfit_asset_path': instance.outfitAssetPath,
+      'locale': instance.locale,
     };
 
 WeatherFailure _$WeatherFailureFromJson(Map<String, dynamic> json) =>
@@ -139,6 +147,7 @@ WeatherFailure _$WeatherFailureFromJson(Map<String, dynamic> json) =>
       json,
       ($checkedConvert) {
         final val = WeatherFailure(
+          locale: $checkedConvert('locale', (v) => v as String),
           outfitAssetPath:
               $checkedConvert('outfit_asset_path', (v) => v as String? ?? ''),
           outfitRecommendation: $checkedConvert(
@@ -158,6 +167,7 @@ Map<String, dynamic> _$WeatherFailureToJson(WeatherFailure instance) =>
       'outfit_recommendation': instance.outfitRecommendation,
       'message': instance.message,
       'outfit_asset_path': instance.outfitAssetPath,
+      'locale': instance.locale,
     };
 
 LocalWebCorsFailure _$LocalWebCorsFailureFromJson(Map<String, dynamic> json) =>
@@ -166,6 +176,7 @@ LocalWebCorsFailure _$LocalWebCorsFailureFromJson(Map<String, dynamic> json) =>
       json,
       ($checkedConvert) {
         final val = LocalWebCorsFailure(
+          locale: $checkedConvert('locale', (v) => v as String),
           outfitRecommendation: $checkedConvert(
               'outfit_recommendation', (v) => v as String? ?? ''),
           message: $checkedConvert('message', (v) => v as String? ?? ''),
@@ -180,4 +191,5 @@ Map<String, dynamic> _$LocalWebCorsFailureToJson(
     <String, dynamic>{
       'outfit_recommendation': instance.outfitRecommendation,
       'message': instance.message,
+      'locale': instance.locale,
     };

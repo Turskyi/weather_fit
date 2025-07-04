@@ -2,6 +2,7 @@ import 'package:feedback/feedback.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
@@ -15,7 +16,12 @@ import 'package:weather_fit/weather/ui/outfit_widget.dart';
 import 'package:weather_fit/weather/ui/weather.dart';
 
 class WeatherPage extends StatefulWidget {
-  const WeatherPage({super.key});
+  const WeatherPage({
+    required this.languageIsoCode,
+    super.key,
+  });
+
+  final String languageIsoCode;
 
   @override
   State<WeatherPage> createState() => _WeatherPageState();
@@ -42,10 +48,20 @@ class _WeatherPageState extends State<WeatherPage> {
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.settings),
-            onPressed: () => Navigator.pushNamed(
-              context,
-              AppRoute.settings.path,
-            ),
+            onPressed: () {
+              Navigator.pushNamed(
+                context,
+                AppRoute.settings.path,
+              ).whenComplete(() {
+                if (context.mounted) {
+                  context.read<WeatherBloc>().add(
+                        GetOutfitEvent(
+                          context.read<WeatherBloc>().state.weather,
+                        ),
+                      );
+                }
+              });
+            },
           ),
         ],
       ),
@@ -55,7 +71,7 @@ class _WeatherPageState extends State<WeatherPage> {
           builder: (BuildContext context, WeatherState state) {
             switch (state) {
               case WeatherInitial():
-                return const WeatherEmpty();
+                return WeatherEmpty(key: widget.key);
               case WeatherLoadingState():
                 if (state.weather.location.isEmpty) {
                   return const WeatherLoadingWidget();
@@ -208,7 +224,7 @@ class _WeatherPageState extends State<WeatherPage> {
                   const BugReportPressedEvent(),
                 ),
             icon: const Icon(Icons.feedback),
-            label: const Text('Feedback'),
+            label: Text(translate('feedback.title')),
           ),
         ),
       ),
@@ -222,7 +238,7 @@ class _WeatherPageState extends State<WeatherPage> {
                 : AppRoute.privacyPolicy.path,
           ),
           icon: const Icon(Icons.privacy_tip),
-          label: const Text('Privacy Policy'),
+          label: Text(translate('privacy_policy')),
         ),
       ),
       Padding(
@@ -230,7 +246,7 @@ class _WeatherPageState extends State<WeatherPage> {
         child: ElevatedButton.icon(
           onPressed: () => Navigator.pushNamed(context, AppRoute.about.path),
           icon: const Icon(Icons.info_outline),
-          label: const Text('About'),
+          label: Text(translate('about.title')),
         ),
       ),
       Padding(
@@ -238,20 +254,18 @@ class _WeatherPageState extends State<WeatherPage> {
         child: ElevatedButton.icon(
           onPressed: () => Navigator.pushNamed(context, AppRoute.support.path),
           icon: const Icon(Icons.support),
-          label: const Text('Support'),
+          label: Text(translate('support.title')),
         ),
       ),
       const StoreBadge(
         url: constants.googlePlayUrl,
-        assetPath: '${constants.imagePath}play_store_badge.png',
-        height: 90,
-        width: 150,
+        assetPath: constants.playStoreBadgePath,
       ),
       const StoreBadge(
         url: constants.appStoreUrl,
-        assetPath: '${constants.imagePath}Download_on_the_App_Store_Badge.png',
-        height: 80,
-        width: 140,
+        assetPath: constants.appStoreBadgeAssetPath,
+        height: constants.appStoreBadgeHeight,
+        width: constants.appStoreBadgeWidth,
       ),
     ];
   }
@@ -268,6 +282,8 @@ class _WeatherPageState extends State<WeatherPage> {
           duration: const Duration(seconds: 2),
         ),
       );
+    } else if (state is SettingsInitial) {
+      setState(() {});
     }
   }
 
@@ -292,7 +308,9 @@ class _WeatherPageState extends State<WeatherPage> {
     bool? isVisible = _feedbackController?.isVisible;
     if (isVisible == false) {
       _feedbackController?.removeListener(_onFeedbackChanged);
-      context.read<SettingsBloc>().add(const ClosingFeedbackEvent());
+      context.read<SettingsBloc>().add(
+            const ClosingFeedbackEvent(),
+          );
     }
   }
 
@@ -300,9 +318,9 @@ class _WeatherPageState extends State<WeatherPage> {
     BetterFeedback.of(context).hide();
     // Let user know that his feedback is sent.
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Your feedback has been sent successfully!'),
-        duration: Duration(seconds: 2),
+      SnackBar(
+        content: Text(translate('feedback.sent')),
+        duration: const Duration(seconds: 2),
       ),
     );
   }

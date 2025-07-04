@@ -3,17 +3,20 @@ import 'dart:io';
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
-import 'package:home_widget/home_widget.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:http/http.dart' as http;
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
 import 'package:weather_fit/data/repositories/outfit_repository.dart';
+import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/entities/enums/temperature_units.dart';
 import 'package:weather_fit/entities/models/temperature/temperature.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
 import 'package:weather_fit/res/extensions/double_extension.dart';
 import 'package:weather_fit/res/home_widget_keys.dart';
+import 'package:weather_fit/services/home_widget_service.dart';
 import 'package:weather_repository/weather_repository.dart';
 
 part 'weather_bloc.g.dart';
@@ -21,8 +24,13 @@ part 'weather_event.dart';
 part 'weather_state.dart';
 
 class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
-  WeatherBloc(this._weatherRepository, this._outfitRepository)
-      : super(const WeatherInitial()) {
+  WeatherBloc(
+    this._weatherRepository,
+    this._outfitRepository,
+    this._localDataSource,
+    this._homeWidgetService,
+    this._locale,
+  ) : super(WeatherInitial(locale: _locale)) {
     on<FetchWeather>(_onFetchWeather);
     on<RefreshWeather>(_onRefreshWeather);
     on<ToggleUnits>(_onToggleUnits);
@@ -32,6 +40,9 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
 
   final WeatherRepository _weatherRepository;
   final OutfitRepository _outfitRepository;
+  final LocalDataSource _localDataSource;
+  final HomeWidgetService _homeWidgetService;
+  final String _locale;
 
   @override
   WeatherSuccess fromJson(Map<String, Object?> json) {
@@ -51,16 +62,17 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     FetchWeather event,
     Emitter<WeatherState> emit,
   ) async {
-    final String eventLocation = event.location;
+    final Location eventLocation = event.location;
 
     if (eventLocation.isEmpty) {
-      emit(const WeatherInitial());
+      emit(WeatherInitial(locale: _locale));
       return;
     }
 
-    emit(const WeatherLoadingState());
+    emit(WeatherLoadingState(locale: _locale, weather: state.weather));
     try {
-      final WeatherDomain domainWeather = await _weatherRepository.getWeather(
+      final WeatherDomain domainWeather =
+          await _weatherRepository.getWeatherByLocation(
         eventLocation,
       );
 
@@ -83,6 +95,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
 
       emit(
         LoadingOutfitState(
+          locale: _locale,
           weather: updatedWeather,
           outfitRecommendation: outfitRecommendation,
         ),
@@ -106,6 +119,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
       } else {
         emit(
           WeatherSuccess(
+            locale: _locale,
             weather: updatedWeather,
             outfitRecommendation: outfitRecommendation,
           ),
@@ -115,19 +129,15 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
       if (e is http.ClientException && kDebugMode && kIsWeb) {
         emit(
           LocalWebCorsFailure(
-            message: 'Error: Local Environment Setup Required\nTo run this '
-                'application locally on web, please use the following '
-                'command:\n\nflutter run -d chrome --web-browser-flag '
-                '"--disable-web-security"\n\nThis step is necessary to '
-                'bypass CORS restrictions during local development. '
-                'Please note that this flag should only be used in a '
-                'development environment and never in production.',
+            locale: _locale,
+            message: translate('error.cors'),
             outfitRecommendation: state.outfitRecommendation,
           ),
         );
       } else {
         emit(
           WeatherFailure(
+            locale: _locale,
             message: '$e',
             outfitRecommendation: state.outfitRecommendation,
           ),
@@ -143,6 +153,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     if (state is! WeatherSuccess) {
       emit(
         WeatherInitial(
+          locale: _locale,
           weather: state.weather,
           outfitRecommendation: state.outfitRecommendation,
           outfitAssetPath: state.outfitAssetPath,
@@ -152,12 +163,13 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     }
 
     if (state.weather.isUnknown) {
-      emit(const WeatherInitial());
+      emit(WeatherInitial(locale: _locale));
       return;
     }
 
     emit(
       WeatherLoadingState(
+        locale: _locale,
         weather: state.weather,
         outfitRecommendation: state.outfitRecommendation,
         outfitAssetPath: state.outfitAssetPath,
@@ -165,9 +177,10 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     );
 
     try {
-      final WeatherDomain updatedWeather = state.locationCity.isEmpty
-          ? await _weatherRepository.getWeatherByLocation(state.location)
-          : await _weatherRepository.getWeather(state.locationCity);
+      final WeatherDomain updatedWeather =
+          await _weatherRepository.getWeatherByLocation(
+        state.location,
+      );
 
       final Weather weather = Weather.fromRepository(updatedWeather);
 
@@ -181,6 +194,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
 
       emit(
         LoadingOutfitState(
+          locale: _locale,
           weather: weather.copyWith(
             temperature: Temperature(value: temperatureValue),
             temperatureUnits: units,
@@ -209,6 +223,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     } on Exception catch (e) {
       emit(
         WeatherFailure(
+          locale: _locale,
           message: '$e',
           outfitRecommendation: state.outfitRecommendation,
           outfitAssetPath: state.outfitAssetPath,
@@ -228,12 +243,14 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
         : temperature.value.toFahrenheit();
 
     if (state is WeatherSuccess) {
+      final Weather updatedWeather = weather.copyWith(
+        temperature: Temperature(value: value),
+        temperatureUnits: units,
+      );
+
       emit(
         (state as WeatherSuccess).copyWith(
-          weather: weather.copyWith(
-            temperature: Temperature(value: value),
-            temperatureUnits: units,
-          ),
+          weather: updatedWeather,
         ),
       );
     } else if (state is WeatherInitial) {
@@ -263,31 +280,31 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     }
 
     try {
-      // Set the group ID.
-      HomeWidget.setAppGroupId(constants.appleAppGroupId);
+      _homeWidgetService.setAppGroupId(constants.appleAppGroupId);
 
-      // Save weather data to the widget.
-      HomeWidget.saveWidgetData<String>(
+      _homeWidgetService.saveWidgetData<String>(
         HomeWidgetKey.textEmoji.stringValue,
         state.emoji,
       );
 
-      HomeWidget.saveWidgetData<String>(
+      _homeWidgetService.saveWidgetData<String>(
         HomeWidgetKey.textLocation.stringValue,
         state.locationName,
       );
 
-      HomeWidget.saveWidgetData<String>(
+      _homeWidgetService.saveWidgetData<String>(
         HomeWidgetKey.textTemperature.stringValue,
         state.formattedTemperature,
       );
 
-      HomeWidget.saveWidgetData<String>(
+      _homeWidgetService.saveWidgetData<String>(
         HomeWidgetKey.textLastUpdated.stringValue,
-        'Last Updated on\n${state.formattedLastUpdatedDateTime}',
+        '${translate(
+          'last_updated_on_label',
+        )}\n${state.formattedLastUpdatedDateTime}',
       );
 
-      HomeWidget.saveWidgetData<String>(
+      _homeWidgetService.saveWidgetData<String>(
         HomeWidgetKey.textRecommendation.stringValue,
         state.outfitRecommendation,
       );
@@ -301,14 +318,12 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
       }
       final String filePath = await _downloadAndSaveImage(assetPath);
 
-      // Save the image path if it's valid.
-      HomeWidget.saveWidgetData<String>(
+      _homeWidgetService.saveWidgetData<String>(
         HomeWidgetKey.imageWeather.stringValue,
         filePath,
       );
 
-      // Update the widget.
-      HomeWidget.updateWidget(
+      _homeWidgetService.updateWidget(
         iOSName: constants.iOSWidgetName,
         androidName: constants.androidWidgetName,
       );
@@ -328,20 +343,16 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     final Weather weather = event.weather;
 
     if (weather.isEmpty) {
-      emit(const WeatherInitial());
+      emit(WeatherInitial(locale: _locale));
       return;
     }
 
-    emit(const WeatherLoadingState());
+    emit(WeatherLoadingState(locale: _locale, weather: state.weather));
     try {
       final TemperatureUnits units = state.temperatureUnits;
 
-      final double temperatureValue = units.isFahrenheit
-          ? weather.temperature.value.toFahrenheit()
-          : weather.temperature.value;
-
       final Weather updatedWeather = weather.copyWith(
-        temperature: Temperature(value: temperatureValue),
+        temperature: Temperature(value: weather.temperature.value),
         temperatureUnits: units,
       );
 
@@ -351,6 +362,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
 
       emit(
         LoadingOutfitState(
+          locale: _locale,
           weather: updatedWeather,
           outfitRecommendation: outfitRecommendation,
         ),
@@ -369,9 +381,16 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
         if (!kIsWeb && !Platform.isMacOS) {
           add(const UpdateWeatherOnMobileHomeScreenEvent());
         }
+        final bool isLocationSaved = await _localDataSource.saveLocation(
+          weather.location,
+        );
+        if (isLocationSaved) {
+          //   TODO: add notification to user that location has been saved.
+        }
       } else {
         emit(
           WeatherSuccess(
+            locale: _locale,
             weather: updatedWeather,
             outfitRecommendation: outfitRecommendation,
           ),
@@ -381,19 +400,15 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
       if (e is http.ClientException && kDebugMode && kIsWeb) {
         emit(
           LocalWebCorsFailure(
-            message: 'Error: Local Environment Setup Required\nTo run this '
-                'application locally on web, please use the following '
-                'command:\n\nflutter run -d chrome --web-browser-flag '
-                '"--disable-web-security"\n\nThis step is necessary to '
-                'bypass CORS restrictions during local development. '
-                'Please note that this flag should only be used in a '
-                'development environment and never in production.',
+            locale: _locale,
+            message: translate('error.cors'),
             outfitRecommendation: state.outfitRecommendation,
           ),
         );
       } else {
         emit(
           WeatherFailure(
+            locale: _locale,
             message: '$e',
             outfitRecommendation: state.outfitRecommendation,
           ),

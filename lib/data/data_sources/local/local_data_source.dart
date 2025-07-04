@@ -1,17 +1,25 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_translate/flutter_translate.dart';
+import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/entities/enums/temperature_units.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
+import 'package:weather_fit/res/enums/settings.dart';
 import 'package:weather_repository/weather_repository.dart';
 
 class LocalDataSource {
-  const LocalDataSource();
+  const LocalDataSource(this._preferences);
+
+  final SharedPreferences _preferences;
 
   String getOutfitImageAssetPath(Weather weather) {
     final WeatherCondition condition = weather.condition;
@@ -61,28 +69,23 @@ class LocalDataSource {
     final TemperatureUnits units = weather.temperatureUnits;
 
     if (condition.isRainy) {
-      return '🌧️\nIt\'s rainy! Consider wearing a waterproof jacket and '
-          'boots.';
+      return translate('outfit.rainy');
     } else if (condition.isSnowy) {
-      return '❄️\nIt\'s snowy! Dress warmly with a heavy coat, hat, gloves, '
-          'and scarf.';
+      return translate('outfit.snowy');
     } else if (temperature < 10 && units.isCelsius ||
         temperature < 50 && units.isFahrenheit) {
-      return '🥶\nIt\'s cold! Wear a warm jacket, sweater, and consider a hat '
-          'and gloves.';
+      return translate('outfit.cold');
     } else if (temperature >= 10 && temperature < 20 && units.isCelsius ||
         temperature >= 50 && temperature < 68 && units.isFahrenheit) {
-      return '🧥\nIt\'s cool. A light jacket or sweater should be comfortable.';
+      return translate('outfit.cool');
     } else if (temperature >= 20 && temperature < 30 && units.isCelsius ||
         temperature >= 68 && temperature < 86 && units.isFahrenheit) {
-      return '👕\nIt\'s warm. Shorts, t-shirts, and light dresses are great '
-          'options.';
+      return translate('outfit.warm');
     } else if (temperature >= 30 && units.isCelsius ||
         temperature >= 86 && units.isFahrenheit) {
-      return '☀️\nIt\'s hot! Wear light, breathable clothing like tank tops '
-          'and shorts.';
+      return translate('outfit.hot');
     } else {
-      return '🌤️\nThe weather is moderate. You can wear a variety of outfits.';
+      return translate('outfit.moderate');
     }
   }
 
@@ -126,7 +129,7 @@ class LocalDataSource {
     } catch (e) {
       // Handle potential errors (e.g., asset not found)
       debugPrint('Error saving asset image to file: $e');
-      throw Exception('Failed to save asset image: $e');
+      throw Exception('${translate('error.save_asset_image_failed')}: $e');
     }
   }
 
@@ -143,6 +146,66 @@ class LocalDataSource {
     } else {
       // On Android or other platforms, fallback to Documents directory.
       return getApplicationDocumentsDirectory();
+    }
+  }
+
+  Future<bool> saveLanguageIsoCode(String languageIsoCode) {
+    return _preferences.setString(
+      Settings.languageIsoCode.key,
+      languageIsoCode,
+    );
+  }
+
+  String getLanguageIsoCode() {
+    final String? savedLanguageIsoCode = _preferences.getString(
+      Settings.languageIsoCode.key,
+    );
+
+    String defaultLanguageCode =
+        PlatformDispatcher.instance.locale.languageCode;
+
+    final String host = Uri.base.host;
+    if (host.startsWith('${Language.uk.isoLanguageCode}.')) {
+      // Sets the default locale for the intl package in Dart/Flutter to
+      // Ukrainian.
+      Intl.defaultLocale = Language.uk.isoLanguageCode;
+      defaultLanguageCode = Language.uk.isoLanguageCode;
+    }
+
+    return savedLanguageIsoCode ?? defaultLanguageCode;
+  }
+
+  /// Saves the provided [location] to persistent storage as a JSON string.
+  ///
+  /// Returns a [Future] that completes with `true` if the value was
+  /// successfully written to [SharedPreferences], or `false` if the operation
+  /// failed.
+  ///
+  /// This is useful for caching the last selected or confirmed location
+  /// locally, so the app can restore it on next launch without requiring user
+  /// input.
+  Future<bool> saveLocation(Location location) {
+    final String json = jsonEncode(location.toJson());
+    return _preferences.setString(Settings.location.key, json);
+  }
+
+  Location getLastSavedLocation() {
+    final String jsonString = _preferences.getString(
+          Settings.location.key,
+        ) ??
+        '';
+    if (jsonString.isEmpty) {
+      return const Location.empty();
+    } else {
+      try {
+        final Object? decoded = jsonDecode(jsonString);
+        if (decoded is Map<String, Object?>) {
+          return Location.fromJson(decoded);
+        }
+      } catch (e) {
+        debugPrint('Error parsing last saved location: $e');
+      }
+      return const Location.empty();
     }
   }
 }

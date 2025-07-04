@@ -1,4 +1,6 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:intl/intl.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:weather_fit/entities/enums/temperature_units.dart';
@@ -16,25 +18,36 @@ class Weather extends Equatable {
     required this.temperature,
     required this.temperatureUnits,
     required this.countryCode,
+    required this.description,
+    required this.code,
+    required this.locale,
     this.lastUpdatedDateTime,
   });
 
-  factory Weather.fromJson(Map<String, Object?> json) =>
-      _$WeatherFromJson(json);
+  factory Weather.fromJson(Map<String, Object?> json) {
+    return _$WeatherFromJson(json);
+  }
 
-  factory Weather.fromRepository(WeatherDomain weather) {
+  factory Weather.fromRepository(WeatherDomain weatherDomain) {
     final DateTime now = DateTime.now();
-    final String formattedNow = DateFormat('yyyy-MM-dd HH:mm').format(now);
-    final DateTime parsedDateTime =
-        DateFormat('yyyy-MM-dd HH:mm').parse(formattedNow);
+    final DateTime parsedDateTime = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      now.hour,
+      now.minute,
+    );
 
     return Weather(
-      condition: weather.condition,
+      condition: weatherDomain.condition,
       lastUpdatedDateTime: parsedDateTime,
-      location: weather.location,
-      temperature: Temperature(value: weather.temperature),
+      location: weatherDomain.location,
+      temperature: Temperature(value: weatherDomain.temperature),
       temperatureUnits: TemperatureUnits.celsius,
-      countryCode: weather.countryCode,
+      countryCode: weatherDomain.countryCode,
+      description: weatherDomain.description,
+      code: weatherDomain.weatherCode,
+      locale: weatherDomain.locale,
     );
   }
 
@@ -44,6 +57,9 @@ class Weather extends Equatable {
   final Temperature temperature;
   final TemperatureUnits temperatureUnits;
   final String countryCode;
+  final String description;
+  final int code;
+  final String locale;
 
   static const Weather empty = Weather(
     condition: WeatherCondition.unknown,
@@ -51,6 +67,9 @@ class Weather extends Equatable {
     location: Location.empty(),
     temperatureUnits: TemperatureUnits.celsius,
     countryCode: '',
+    description: '',
+    code: 0,
+    locale: '',
   );
 
   @override
@@ -61,6 +80,9 @@ class Weather extends Equatable {
         temperature,
         temperatureUnits,
         countryCode,
+        description,
+        code,
+        locale,
       ];
 
   @override
@@ -71,7 +93,10 @@ class Weather extends Equatable {
         'temperature: $temperature, '
         'temperatureUnits: $temperatureUnits, '
         'countryCode: $countryCode,'
-        'lastUpdatedDateTime: $lastUpdatedDateTime'
+        'lastUpdatedDateTime: $lastUpdatedDateTime,'
+        'description: $description,'
+        'code: $code,'
+        'locale: $locale'
         '}';
   }
 
@@ -84,23 +109,32 @@ class Weather extends Equatable {
     Temperature? temperature,
     TemperatureUnits? temperatureUnits,
     String? countryCode,
-  }) =>
-      Weather(
-        condition: condition ?? this.condition,
-        lastUpdatedDateTime: lastUpdatedDateTime ?? this.lastUpdatedDateTime,
-        location: location ?? this.location,
-        temperature: temperature ?? this.temperature,
-        temperatureUnits: temperatureUnits ?? this.temperatureUnits,
-        countryCode: countryCode ?? this.countryCode,
-      );
+    String? description,
+    int? code,
+    String? locale,
+  }) {
+    return Weather(
+      condition: condition ?? this.condition,
+      lastUpdatedDateTime: lastUpdatedDateTime ?? this.lastUpdatedDateTime,
+      location: location ?? this.location,
+      temperature: temperature ?? this.temperature,
+      temperatureUnits: temperatureUnits ?? this.temperatureUnits,
+      countryCode: countryCode ?? this.countryCode,
+      description: description ?? this.description,
+      code: code ?? this.code,
+      locale: locale ?? this.locale,
+    );
+  }
 
-  String get formattedTemperature =>
-      '''${temperature.value.toStringAsPrecision(2)}°${temperatureUnits.isCelsius ? 'C' : 'F'}''';
+  String get formattedTemperature {
+    return '''${temperature.value.toStringAsPrecision(2)}°${temperatureUnits.isCelsius ? 'C' : 'F'}''';
+  }
 
   String get emoji => condition.toEmoji;
 
-  bool get isUnknown =>
-      condition == WeatherCondition.unknown || location.isEmpty;
+  bool get isUnknown {
+    return condition.isUnknown || location.isEmpty;
+  }
 
   bool get needsRefresh {
     final int difference = DateTime.now()
@@ -112,12 +146,29 @@ class Weather extends Equatable {
   }
 
   /// Output: e.g., "Dec 12, Monday at 03:45 PM".
-  String get formattedLastUpdatedDateTime {
+  String getFormattedLastUpdatedDateTime(String locale) {
     if (lastUpdatedDateTime != null) {
-      final DateFormat formatter = DateFormat('MMM dd, EEEE \'at\' hh:mm a');
-      return formatter.format(lastUpdatedDateTime ?? DateTime(0));
+      try {
+        final DateFormat formatter = DateFormat(
+          'MMM dd, EEEE \'-\' hh:mm a',
+          locale,
+        );
+        return formatter.format(lastUpdatedDateTime ?? DateTime(0));
+      } catch (e, stackTrace) {
+        debugPrint(
+          'Weather.formattedLastUpdatedDateTime:\n'
+          'Failed to format date with locale "$countryCode".\n'
+          'Falling back to default locale formatting.\n'
+          'Error: ${e.toString()}\n'
+          'StackTrace: $stackTrace',
+        );
+        final DateFormat formatter = DateFormat(
+          'MMM dd, EEEE \'at\' hh:mm a',
+        );
+        return formatter.format(lastUpdatedDateTime ?? DateTime(0));
+      }
     } else {
-      return 'Never updated';
+      return translate('never_updated');
     }
   }
 
@@ -135,7 +186,9 @@ class Weather extends Equatable {
   }
 
   String get locationName => location.name.isEmpty
-      ? 'Lat: ${location.latitude.toStringAsFixed(2)}, '
-          'Lon: ${location.longitude.toStringAsFixed(2)}'
+      ? '${translate('lat')}: ${location.latitude.toStringAsFixed(2)}, '
+          '${translate('lon')}: ${location.longitude.toStringAsFixed(2)}'
       : location.name;
+
+  bool get isCelsius => temperatureUnits.isCelsius;
 }

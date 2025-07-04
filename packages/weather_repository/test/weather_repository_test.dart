@@ -30,7 +30,9 @@ void main() {
 
       test('calls locationSearch with correct city', () async {
         try {
-          await weatherRepository.getWeather(city);
+          await weatherRepository.getWeatherByLocation(
+            Location(latitude: latitude, longitude: longitude, locale: 'en'),
+          );
         } catch (_) {}
         verify(() => weatherApiClient.locationSearch(city)).called(1);
       });
@@ -39,7 +41,9 @@ void main() {
         final Exception exception = Exception('oops');
         when(() => weatherApiClient.locationSearch(any())).thenThrow(exception);
         expect(
-          () async => weatherRepository.getWeather(city),
+          () async => weatherRepository.getWeatherByLocation(
+            Location(latitude: latitude, longitude: longitude, locale: 'en'),
+          ),
           throwsA(exception),
         );
       });
@@ -52,7 +56,9 @@ void main() {
           (_) async => location,
         );
         try {
-          await weatherRepository.getWeather(city);
+          await weatherRepository.getWeatherByLocation(
+            Location(latitude: latitude, longitude: longitude, locale: 'en'),
+          );
         } catch (_) {}
         verify(
           () => weatherApiClient.getWeather(
@@ -77,7 +83,9 @@ void main() {
           ),
         ).thenThrow(exception);
         expect(
-          () async => weatherRepository.getWeather(city),
+          () async => weatherRepository.getWeatherByLocation(
+            Location(latitude: latitude, longitude: longitude, locale: 'en'),
+          ),
           throwsA(exception),
         );
       });

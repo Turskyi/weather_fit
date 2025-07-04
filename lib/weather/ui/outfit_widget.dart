@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:weather_fit/weather/ui/text_recommendation_widget.dart';
 
 class OutfitWidget extends StatelessWidget {
@@ -17,24 +18,30 @@ class OutfitWidget extends StatelessWidget {
   final String outfitRecommendation;
   final RefreshCallback onRefresh;
 
-  static final List<String> _defaultMessages = <String>[
-    '🛑 Oops! No outfit suggestion available.',
-    '🤷 Looks like we couldn’t pick an outfit this time.',
-    '🎨 No recommendation? Time to mix & match your own style!',
-    '✨ Your fashion instincts take the lead today!',
-    '🤖 AI is taking a fashion break. Try again!',
-    '😴 No outfit picked—maybe today is a pajama day?',
-    '👕 No outfit available.',
-    '🚫 no recommendation.',
+  static final List<String> _defaultMessageKeys = <String>[
+    'outfit.oops',
+    'outfit.could_not_pick',
+    'outfit.mix_and_match',
+    'outfit.fashion_instincts',
+    'outfit.pajama_day',
+    'outfit.unavailable_short',
+    'outfit.no_recommendation_short',
   ];
 
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final ColorScheme colorScheme = theme.colorScheme;
-    final String displayText = outfitRecommendation.isNotEmpty
-        ? outfitRecommendation
-        : _defaultMessages[Random().nextInt(_defaultMessages.length)];
+
+    String displayText;
+    if (outfitRecommendation.isNotEmpty) {
+      displayText = outfitRecommendation;
+    } else {
+      final String randomKey = _defaultMessageKeys[Random().nextInt(
+        _defaultMessageKeys.length,
+      )];
+      displayText = translate(randomKey);
+    }
 
     final double screenWidth = MediaQuery.sizeOf(context).width;
     final bool isNarrowScreen = screenWidth < 500;
@@ -102,7 +109,9 @@ class OutfitWidget extends StatelessWidget {
                                       ),
                                       const SizedBox(height: 12),
                                       Text(
-                                        'Unable to load outfit image.',
+                                        translate(
+                                          'unable_to_load_outfit_image',
+                                        ),
                                         style: textTheme.titleMedium?.copyWith(
                                           fontWeight: FontWeight.bold,
                                           color: theme.colorScheme.onSurface,
@@ -111,7 +120,9 @@ class OutfitWidget extends StatelessWidget {
                                       ),
                                       const SizedBox(height: 8),
                                       Text(
-                                        'Please try refreshing the weather.',
+                                        translate(
+                                          'please_try_refreshing_weather',
+                                        ),
                                         style: textTheme.bodyMedium?.copyWith(
                                           color: theme.colorScheme.onSurface
                                               .withValues(
@@ -123,8 +134,10 @@ class OutfitWidget extends StatelessWidget {
                                       const SizedBox(height: 12),
                                       ElevatedButton(
                                         onPressed: onRefresh,
-                                        child: const Text(
-                                          'Get New Outfit Suggestion',
+                                        child: Text(
+                                          translate(
+                                            'get_new_outfit_suggestion',
+                                          ),
                                         ),
                                       ),
                                     ],
@@ -181,8 +194,8 @@ class OutfitWidget extends StatelessWidget {
                                 alignment: Alignment.center,
                                 child: ElevatedButton(
                                   onPressed: onRefresh,
-                                  child: const Text(
-                                    'Get New Outfit Suggestion',
+                                  child: Text(
+                                    translate('get_new_outfit_suggestion'),
                                   ),
                                 ),
                               );

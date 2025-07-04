@@ -3,93 +3,107 @@ import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
 import 'package:weather_fit/res/widgets/leading_widget.dart';
 import 'package:weather_fit/router/app_route.dart';
 
 class AboutPage extends StatelessWidget {
-  const AboutPage({super.key});
+  const AboutPage({
+    required this.languageIsoCode,
+    super.key,
+  });
+
+  final String languageIsoCode;
 
   bool get _showWidgetsFeature {
     if (kIsWeb) return false;
     return Platform.isAndroid || Platform.isIOS;
   }
 
+  // Helper to get the correct translation key for location support.
+  String get _locationSupportKey {
+    if (kIsWeb) {
+      return 'about.feature_location_support_web';
+    }
+    if (Platform.isMacOS) {
+      return 'about.feature_location_support_macos';
+    }
+    return 'about.feature_location_support_default';
+  }
+
   @override
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    final List<String> features = <String>[
+      translate('about.feature_outfit_suggestions'),
+      translate('about.feature_location_forecast'),
+      translate(_locationSupportKey),
+      translate('about.feature_privacy_friendly'),
+    ];
+
+    if (_showWidgetsFeature) {
+      features.add(translate('about.feature_home_widgets'));
+    }
 
     return Scaffold(
       appBar: AppBar(
-        leading: kIsWeb ? const LeadingWidget() : null,
-        title: const Text('About ${constants.appName}'),
+        leading: kIsWeb
+            ? LeadingWidget(
+                languageIsoCode: languageIsoCode,
+              )
+            : null,
+        title: Text(
+          '${translate('about.title')} «${translate('title')}»',
+          maxLines: 2,
+        ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         child: ListView(
           children: <Widget>[
-            Text(
-              constants.appName,
-              style: textTheme.headlineMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
             const SizedBox(height: 12),
             Text(
-              'Your stylish weather companion.',
-              style: textTheme.titleMedium?.copyWith(
-                fontStyle: FontStyle.italic,
-                color: colorScheme.primary,
-              ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              '${constants.appName} helps you dress for the weather with '
-              'carefully crafted outfit suggestions. Just enter a location, '
-              'and the app will show you the current forecast along with a '
-              'visual and text-based recommendation on what to wear.',
+              translate('app_description'),
               style: textTheme.bodyLarge,
             ),
             const SizedBox(height: 24),
             Text(
-              '🌟 Features',
+              '🌟 ${translate('features')}',
               style: textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              '• Outfit suggestions based on weather\n'
-              '• Location-based weather forecast\n'
-              '• ${_getLocationSupportText()}\n'
-              '• Privacy-friendly (no tracking, no accounts)'
-              '${_showWidgetsFeature ? '\n'
-                  '• Home screen widgets for mobile devices' : ''}',
+              features.join('\n'),
               style: textTheme.bodyMedium,
             ),
             const SizedBox(height: 24),
             Text(
-              '🎨 Artwork',
+              '🎨 ${translate('artwork')}',
               style: textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 8),
-            RichText(
-              text: TextSpan(
+            SelectableText.rich(
+              TextSpan(
                 style: textTheme.bodyMedium,
                 children: <InlineSpan>[
-                  const TextSpan(text: 'The outfit illustrations in '),
                   TextSpan(
-                    text: constants.appName,
+                    text: '${translate("about.outfit_illustrations_in")} ',
+                  ),
+                  TextSpan(
+                    text: translate('title'),
                     style: textTheme.bodyMedium
                         ?.copyWith(fontWeight: FontWeight.bold),
                   ),
-                  const TextSpan(text: ' were hand-drawn by artist '),
+                  TextSpan(text: ' ${translate('about.were_created_by')} '),
                   TextSpan(
-                    text: 'Anna Turska',
+                    text: translate('anna_turska'),
                     style: textTheme.bodyMedium?.copyWith(
                       color: Colors.blue,
                       decoration: TextDecoration.underline,
@@ -97,38 +111,34 @@ class AboutPage extends StatelessWidget {
                     recognizer: TapGestureRecognizer()
                       ..onTap = () {
                         launchUrl(
-                          Uri.parse('https://www.instagram.com/anartistart/'),
+                          Uri.parse(constants.artistInstagramUrl),
                           mode: LaunchMode.externalApplication,
                         );
                       },
                   ),
-                  const TextSpan(
-                    text: ', whose style brings charm and personality to the '
-                        'app.',
-                  ),
+                  TextSpan(text: translate('about.artwork_artist_outro')),
                 ],
               ),
             ),
             const SizedBox(height: 24),
             Text(
-              '🔒 Privacy & Data',
+              '🔒 ${translate('about.privacy_title')}',
               style: textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              '${constants.appName} does not collect or store any personal '
-              'data. Your approximate location is used only to show the local '
-              'weather and is never shared. Outfit suggestions are generated '
-              'on-device based on the weather conditions. You can read the '
-              'full privacy policy below.',
+              translate(
+                'about.privacy_description',
+                args: <String, Object?>{'appName': translate('title')},
+              ),
               style: textTheme.bodyMedium,
             ),
             const SizedBox(height: 12),
             TextButton.icon(
               icon: const Icon(Icons.privacy_tip_outlined),
-              label: const Text('View Privacy Policy'),
+              label: Text(translate('about.view_privacy_policy')),
               onPressed: () => Navigator.pushNamed(
                 context,
                 defaultTargetPlatform == TargetPlatform.android
@@ -138,31 +148,28 @@ class AboutPage extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             Text(
-              '📬 Support & Feedback',
+              '📬 ${translate('support_and_feedback')}',
               style: textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              'Having trouble? Need help or want to suggest a feature? '
-              'Join the community or contact the developer directly.',
+              translate('about.support_description'),
               style: textTheme.bodyMedium,
             ),
             const SizedBox(height: 12),
             TextButton.icon(
               icon: const Icon(Icons.chat),
-              label: const Text('Telegram Support Group'),
-              onPressed: () => launchUrl(
-                Uri.parse('https://t.me/+J3nrwxVrxVE2MDdi'),
-              ),
+              label: Text(translate('telegram_group')),
+              onPressed: () => launchUrl(Uri.parse(constants.telegramUrl)),
             ),
             const SizedBox(height: 4),
             TextButton.icon(
               icon: const Icon(Icons.email_outlined),
-              label: const Text('Developer Contact Form'),
+              label: Text(translate('developer_contact_form')),
               onPressed: () => launchUrl(
-                Uri.parse('https://${constants.developerDomain}/#/support'),
+                Uri.parse(constants.developerSupportUrl),
               ),
             ),
             const SizedBox(height: 32),
@@ -170,15 +177,5 @@ class AboutPage extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  String _getLocationSupportText() {
-    if (kIsWeb) {
-      return 'Approximate location support (browser permission required)';
-    }
-    if (Platform.isMacOS) {
-      return 'Approximate location support (location permission required)';
-    }
-    return 'Approximate location support (no GPS required)';
   }
 }

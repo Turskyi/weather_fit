@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:weather_fit/res/widgets/background.dart';
 import 'package:weather_fit/search/bloc/search_bloc.dart';
 import 'package:weather_repository/weather_repository.dart';
@@ -20,10 +21,10 @@ class _SearchPageState extends State<SearchPage> {
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
     return Semantics(
-      label: 'City or country search page',
+      label: translate('search.page_semantics_label'),
       child: Scaffold(
         extendBodyBehindAppBar: true,
-        appBar: AppBar(title: const Text('City or country search')),
+        appBar: AppBar(title: Text(translate('search.page_app_bar_title'))),
         body: Stack(
           children: <Widget>[
             const Background(),
@@ -40,13 +41,12 @@ class _SearchPageState extends State<SearchPage> {
                     ),
                   ),
                   Text(
-                    'Let\'s explore the weather! ',
+                    translate('explore_weather_prompt'),
                     style: textTheme.headlineMedium,
                     textAlign: TextAlign.center,
                   ),
                   Text(
-                    'Type the city or country name and tap "Submit" to see the'
-                    ' weather.',
+                    translate('search.instructions'),
                     style: textTheme.titleSmall,
                     textAlign: TextAlign.center,
                   ),
@@ -54,8 +54,8 @@ class _SearchPageState extends State<SearchPage> {
                   TextField(
                     controller: _textController,
                     decoration: InputDecoration(
-                      labelText: 'City or country',
-                      hintText: 'Enter city or country name',
+                      labelText: translate('search.city_or_country'),
+                      hintText: translate('search.enter_city_or_country'),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8.0),
                       ),
@@ -85,24 +85,24 @@ class _SearchPageState extends State<SearchPage> {
                                 width: 20,
                                 child: CircularProgressIndicator(),
                               )
-                            : const Text('Submit', semanticsLabel: 'Submit'),
+                            : Text(
+                                translate('submit'),
+                                semanticsLabel: translate('submit'),
+                              ),
                         builder: (
                           BuildContext context,
                           TextEditingValue value,
                           Widget? textSubmit,
                         ) {
-                          return SizedBox(
-                            width: 100,
-                            child: ElevatedButton(
-                              key: const Key('searchPage_search_iconButton'),
-                              onPressed: state is! SearchLoading &&
-                                      value.text.trim().isNotEmpty
-                                  ? () => context
-                                      .read<SearchBloc>()
-                                      .add(SearchLocation(_text))
-                                  : null,
-                              child: textSubmit,
-                            ),
+                          return ElevatedButton(
+                            key: const Key('searchPage_search_iconButton'),
+                            onPressed: state is! SearchLoading &&
+                                    value.text.trim().isNotEmpty
+                                ? () => context
+                                    .read<SearchBloc>()
+                                    .add(SearchLocation(_text))
+                                : null,
+                            child: textSubmit,
                           );
                         },
                       );
@@ -124,24 +124,39 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   Future<void> _showLocationConfirmationDialog(Location location) {
+    // Build a list of non-empty location parts.
+    final List<String> parts = <String>[];
+
+    // Assuming location.name will always be present and not empty based on
+    // typical API responses.
+    parts.add(location.name);
+
+    if (location.province.isNotEmpty) {
+      parts.add(location.province);
+    }
+
+    if (location.country.isNotEmpty) {
+      parts.add(location.country);
+    }
+
+    // Join the parts with a comma and a space.
+    final String displayLocation = parts.join(', ');
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Is this your location?'),
-          content: Text(
-            '${location.name}, ${location.province}, ${location.country}',
-          ),
+          title: Text(translate('search.confirm_location_dialog_title')),
+          content: Text(displayLocation),
           actions: <Widget>[
             TextButton(
-              child: const Text('No'),
+              child: Text(translate('no')),
               onPressed: () {
                 Navigator.of(context).pop();
                 _showLocationIcon();
               },
             ),
             TextButton(
-              child: const Text('Yes'),
+              child: Text(translate('yes')),
               onPressed: () {
                 Navigator.of(context).pop();
                 context.read<SearchBloc>().add(ConfirmLocation(location));
@@ -158,18 +173,17 @@ class _SearchPageState extends State<SearchPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Use your current location?'),
-          content: const Text(
-            'We couldn\'t find the correct location. Would you like to use '
-            'your current location instead?',
+          title: Text(translate('search.use_current_location_dialog_title')),
+          content: Text(
+            translate('search.location_not_found_use_current_dialog_content'),
           ),
           actions: <Widget>[
             TextButton(
               onPressed: Navigator.of(context).pop,
-              child: const Text('Cancel'),
+              child: Text(translate('cancel')),
             ),
             TextButton(
-              child: const Text('Yes'),
+              child: Text(translate('yes')),
               onPressed: () async {
                 Navigator.of(context).pop();
 

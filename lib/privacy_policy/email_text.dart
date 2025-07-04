@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:weather_fit/res/constants.dart' as constants;
 
 class EmailText extends StatelessWidget {
   const EmailText(this.email, {super.key});
@@ -10,11 +12,13 @@ class EmailText extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       child: SelectableText(
-        'Email: $email',
-        style: const TextStyle(fontSize: 16),
+        '${translate('email')}: $email',
+        style: TextStyle(
+          fontSize: Theme.of(context).textTheme.bodyLarge?.fontSize,
+        ),
         onTap: () async {
           final Uri emailLaunchUri = Uri(
-            scheme: 'mailto',
+            scheme: constants.mailToScheme,
             path: email,
           );
           if (await canLaunchUrl(emailLaunchUri)) {
@@ -23,7 +27,10 @@ class EmailText extends StatelessWidget {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
-                  'Could not launch email app to send an email to $email',
+                  translate(
+                    'error.launch_email_app_to_address',
+                    args: <String, Object?>{'emailAddress': email},
+                  ),
                 ),
               ),
             );

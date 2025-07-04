@@ -20,7 +20,7 @@ LocationResponse _$LocationResponseFromJson(Map<String, dynamic> json) =>
           longitude: $checkedConvert('longitude', (v) => (v as num).toDouble()),
           countryCode: $checkedConvert('country_code', (v) => v as String),
           country: $checkedConvert('country', (v) => v as String),
-          admin1: $checkedConvert('admin1', (v) => v as String),
+          admin1: $checkedConvert('admin1', (v) => v as String? ?? ''),
         );
         return val;
       },

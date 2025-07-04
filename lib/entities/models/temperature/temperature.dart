@@ -7,8 +7,9 @@ part 'temperature.g.dart';
 class Temperature extends Equatable {
   const Temperature({required this.value});
 
-  factory Temperature.fromJson(Map<String, dynamic> json) =>
-      _$TemperatureFromJson(json);
+  factory Temperature.fromJson(Map<String, Object?> json) {
+    return _$TemperatureFromJson(json);
+  }
 
   final double value;
 

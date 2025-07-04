@@ -20,6 +20,9 @@ Weather _$WeatherFromJson(Map<String, dynamic> json) => $checkedCreate(
           temperatureUnits: $checkedConvert('temperature_units',
               (v) => $enumDecode(_$TemperatureUnitsEnumMap, v)),
           countryCode: $checkedConvert('country_code', (v) => v as String),
+          description: $checkedConvert('description', (v) => v as String),
+          code: $checkedConvert('code', (v) => (v as num).toInt()),
+          locale: $checkedConvert('locale', (v) => v as String),
           lastUpdatedDateTime: $checkedConvert('last_updated_date_time',
               (v) => v == null ? null : DateTime.parse(v as String)),
         );
@@ -40,6 +43,9 @@ Map<String, dynamic> _$WeatherToJson(Weather instance) => <String, dynamic>{
       'temperature_units':
           _$TemperatureUnitsEnumMap[instance.temperatureUnits]!,
       'country_code': instance.countryCode,
+      'description': instance.description,
+      'code': instance.code,
+      'locale': instance.locale,
     };
 
 const _$WeatherConditionEnumMap = {
