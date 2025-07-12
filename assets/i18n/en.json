@@ -55,6 +55,7 @@
   "get_new_outfit_suggestion": "Get New Outfit Suggestion",
   "please_try_refreshing_weather": "Please try refreshing the weather.",
   "unable_to_load_outfit_image": "Unable to load outfit image.",
+  "ok": "OK",
   "feedback": {
     "title": "Feedback",
     "app_feedback": "App Feedback",
@@ -83,7 +84,15 @@
     "getting_weather_generic": "Could not get weather information. Please try again.",
     "launch_email_app_to_address": "Could not launch email app to send an email to {emailAddress}",
     "launch_email_failed": "Could not launch the email application.",
-    "save_asset_image_failed": "Failed to save image to device storage"
+    "save_asset_image_failed": "Failed to save image to device storage",
+    "certificate_validation_failed_user_message": "Your device's security settings are preventing a secure connection to our services. This may be due to an outdated operating system or incorrect date & time settings on your device. Please ensure your operating system is up-to-date and that your device's date and time are set correctly. If the issue persists, please contact support.",
+    "network_error": "A network error occurred. Please check your internet connection and try again.",
+    "report": "Report",
+    "connection_security_issue_title": "Connection Security Issue",
+    "what_you_can_do": "What you can try:",
+    "ensure_os_updated": "Ensure your device's operating system is up to date.",
+    "check_date_time": "Check that your device's date and time are set correctly.",
+    "report_issue_button": "Report Issue"
   },
   "settings": {
     "title": "Settings",

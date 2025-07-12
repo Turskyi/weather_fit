@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -7,6 +8,7 @@ import 'package:flutter_translate/flutter_translate.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
 import 'package:weather_fit/data/repositories/location_repository.dart';
+import 'package:weather_fit/entities/enums/search_error_type.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_repository/weather_repository.dart';
 
@@ -55,7 +57,11 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         'error.getting_weather_generic',
       );
 
-      emit(SearchError(userFriendlyErrorMessage));
+      emit(
+        SearchError(
+          errorMessage: userFriendlyErrorMessage,
+        ),
+      );
     }
   }
 
@@ -81,7 +87,11 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         'error.getting_weather_generic',
       );
 
-      emit(SearchError(userFriendlyErrorMessage));
+      emit(
+        SearchError(
+          errorMessage: userFriendlyErrorMessage,
+        ),
+      );
     }
   }
 
@@ -96,12 +106,14 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
 
       final Position position = await Geolocator.getCurrentPosition();
 
+      final String languageIsoCode = _localDataSource.getLanguageIsoCode();
+
       final WeatherDomain weather =
           await _weatherRepository.getWeatherByLocation(
         Location(
           latitude: position.latitude,
           longitude: position.longitude,
-          locale: _localDataSource.getLanguageIsoCode(),
+          locale: languageIsoCode,
         ),
       );
 
@@ -133,7 +145,11 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         // Generic error message for other cases.
         userFriendlyErrorMessage = translate('error.getting_weather_generic');
       }
-      emit(SearchError(userFriendlyErrorMessage));
+      emit(
+        SearchError(
+          errorMessage: userFriendlyErrorMessage,
+        ),
+      );
     }
   }
 
@@ -149,8 +165,33 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       );
 
       emit(SearchLocationFound(location));
-    } catch (e) {
-      emit(SearchError('${translate('error.searching_location')}: $e'));
+    } catch (e, stackTrace) {
+      String userFriendlyMessage;
+      SearchErrorType errorType;
+      final String detailedMessage = e.toString();
+
+      if (e is HandshakeException &&
+          detailedMessage.contains('CERTIFICATE_VERIFY_FAILED')) {
+        userFriendlyMessage = translate(
+          'error.certificate_validation_failed_user_message',
+        );
+        errorType = SearchErrorType.certificateValidationFailed;
+      } else if (e is SocketException) {
+        userFriendlyMessage = translate('error.network_error');
+        errorType = SearchErrorType.network;
+      } else {
+        userFriendlyMessage = '${translate(
+          'error.searching_location',
+        )}: ${e.runtimeType}';
+        errorType = SearchErrorType.unknown;
+      }
+      debugPrint('[_searchLocation] Error: $detailedMessage\n$stackTrace');
+      emit(
+        SearchError(
+          errorMessage: userFriendlyMessage,
+          errorType: errorType,
+        ),
+      );
     }
   }
 

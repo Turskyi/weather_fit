@@ -14,6 +14,7 @@ import 'package:weather_fit/entities/enums/temperature_units.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
 import 'package:weather_fit/res/enums/settings.dart';
+import 'package:weather_fit/res/extensions/double_extension.dart';
 import 'package:weather_repository/weather_repository.dart';
 
 class LocalDataSource {
@@ -23,7 +24,13 @@ class LocalDataSource {
 
   String getOutfitImageAssetPath(Weather weather) {
     final WeatherCondition condition = weather.condition;
-    final double temperatureValue = weather.temperature.value;
+    double temperatureValue = weather.temperature.value;
+    final TemperatureUnits units = weather.temperatureUnits;
+
+    if (units.isFahrenheit) {
+      temperatureValue = temperatureValue.toCelsius();
+    }
+
     if (temperatureValue < -40) {
       return '${constants.outfitImagePath}-40.png';
     }

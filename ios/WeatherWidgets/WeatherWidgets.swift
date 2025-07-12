@@ -161,11 +161,11 @@ struct WeatherWidgetsEntryView: View {
                                     .fontWeight(.semibold)
                                     .foregroundColor(.primary)
                                     .padding(6)
-                                    .background(Color.black.opacity(0.5))
+                                    .background(.background.opacity(0.5))
                                     .cornerRadius(8)
                                     .multilineTextAlignment(.leading)
                                     .lineLimit(2)
-                                    .padding([.top, .leading], 8)
+                                    .padding([.top, .leading], 4)
                                 Spacer()
                             }
                             
@@ -184,12 +184,12 @@ struct WeatherWidgetsEntryView: View {
                                         .foregroundColor(.primary)
                                 }
                                 .padding(6)
-                                .background(Color.black.opacity(0.7))
+                                .background(.background.opacity(0.7))
                                 .cornerRadius(8)
                                 // Limit width to wrap nicely.
                                 .frame(maxWidth: 100, alignment: .trailing)
                                 .multilineTextAlignment(.trailing)
-                                .padding([.bottom, .trailing], 8)
+                                .padding([.bottom, .trailing], 4)
                             }
                         }
                     )
