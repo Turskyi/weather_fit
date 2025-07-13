@@ -90,7 +90,6 @@ class _WeatherPageState extends State<WeatherPage> {
 
                 if (state.outfitRecommendation.isNotEmpty) {
                   outfitImageWidget = OutfitWidget(
-                    needsRefresh: state.weather.needsRefresh,
                     assetPath: state.outfitAssetPath,
                     outfitRecommendation: state.outfitRecommendation,
                     onRefresh: () => _refresh(context),

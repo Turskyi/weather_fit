@@ -130,8 +130,7 @@ class _WeatherContentState extends State<WeatherContent> {
             BlocBuilder<WeatherBloc, WeatherState>(
               builder: (BuildContext _, WeatherState state) {
                 if (state is! LoadingOutfitState &&
-                    state is! WeatherLoadingState &&
-                    widget.weather.needsRefresh) {
+                    state is! WeatherLoadingState) {
                   return ElevatedButton(
                     onPressed: widget.onRefresh,
                     child: Text(translate('weather.check_latest_button')),

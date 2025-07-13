@@ -37,11 +37,21 @@ Future<void> injectDependencies() async {
   }
 
   Bloc.observer = const WeatherBlocObserver();
-  HydratedBloc.storage = await HydratedStorage.build(
-    storageDirectory: kIsWeb
-        ? HydratedStorageDirectory.web
-        : HydratedStorageDirectory((await getTemporaryDirectory()).path),
-  );
+
+  if (kIsWeb) {
+    final HydratedStorage hydratedStorage = await HydratedStorage.build(
+      storageDirectory: HydratedStorageDirectory.web,
+    );
+    HydratedBloc.storage = hydratedStorage;
+  } else {
+    // We cannot specify `Directory` type here, otherwise it will not work on
+    // Web.
+    final dynamic temporaryDirectory = await getTemporaryDirectory();
+    final HydratedStorage hydratedStorage = await HydratedStorage.build(
+      storageDirectory: HydratedStorageDirectory(temporaryDirectory.path),
+    );
+    HydratedBloc.storage = hydratedStorage;
+  }
 }
 
 /// Used for Background Updates using [Workmanager] Plugin.

@@ -45,10 +45,6 @@ sealed class WeatherState extends Equatable {
 
   String get locationName => weather.location.locationName;
 
-  bool get needsRefresh => weather.needsRefresh;
-
-  int get remainingMinutes => weather.remainingMinutes;
-
   String get formattedLastUpdatedDateTime {
     return weather.getFormattedLastUpdatedDateTime(locale);
   }

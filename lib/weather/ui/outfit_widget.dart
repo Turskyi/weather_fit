@@ -6,14 +6,12 @@ import 'package:weather_fit/weather/ui/text_recommendation_widget.dart';
 
 class OutfitWidget extends StatelessWidget {
   const OutfitWidget({
-    required this.needsRefresh,
     required this.assetPath,
     required this.onRefresh,
     this.outfitRecommendation = '',
     super.key,
   });
 
-  final bool needsRefresh;
   final String assetPath;
   final String outfitRecommendation;
   final RefreshCallback onRefresh;
