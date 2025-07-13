@@ -172,7 +172,11 @@ class OutfitWidget extends StatelessWidget {
                           child: Image.asset(
                             assetPath,
                             fit: BoxFit.cover,
-                            errorBuilder: (_, Object error, ___) {
+                            errorBuilder: (
+                              BuildContext _,
+                              Object error,
+                              StackTrace? ___,
+                            ) {
                               debugPrint(
                                 '⚠️ Failed to load outfit image on wide '
                                 'screen: "$assetPath". '

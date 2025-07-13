@@ -20,9 +20,27 @@ final class SearchLocationFound extends SearchState {
 }
 
 final class SearchError extends SearchState {
-  const SearchError(this.errorMessage);
+  const SearchError({
+    required this.errorMessage,
+    this.errorType = SearchErrorType.unknown,
+  });
 
   final String errorMessage;
+  final SearchErrorType errorType;
+
+  /// Returns `true` if the error is due to a certificate validation failure.
+  bool get isCertificateValidationError {
+    return errorType.isCertificateValidationError;
+  }
+
+  /// Returns `true` if the error is due to a network failure.
+  bool get isNetworkError => errorType.isNetworkError;
+
+  /// Returns `true` if the error is due to permanently denied location
+  /// permissions.
+  bool get isPermissionDeniedError {
+    return errorType.isPermissionDeniedPermanentlyError;
+  }
 }
 
 final class SearchWeatherLoaded extends SearchState {

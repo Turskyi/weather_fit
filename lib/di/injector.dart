@@ -29,8 +29,8 @@ Future<void> injectDependencies() async {
       Workmanager().registerPeriodicTask(
         'weatherfit_background_update',
         'updateWidgetTask',
-        // Every 4 hours.
-        frequency: const Duration(hours: 4),
+        // Every 2 hours.
+        frequency: const Duration(hours: 2),
         constraints: Constraints(networkType: NetworkType.connected),
       );
     });
@@ -44,12 +44,14 @@ Future<void> injectDependencies() async {
   );
 }
 
-/// Used for Background Updates using Workmanager Plugin.
+/// Used for Background Updates using [Workmanager] Plugin.
 @pragma('vm:entry-point')
 void _callbackDispatcher() {
+  //TODO: change implementation to how it is done in
+  // https://github.com/ABausG/home_widget/blob/main/packages/home_widget/example/lib/main.dart
   Workmanager().executeTask((
-    String taskName,
-    Map<String, Object?>? inputData,
+    String __,
+    Map<String, Object?>? _,
   ) async {
     try {
       // Must initialize Flutter binding.
