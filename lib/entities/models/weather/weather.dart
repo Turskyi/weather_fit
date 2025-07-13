@@ -5,7 +5,6 @@ import 'package:intl/intl.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:weather_fit/entities/enums/temperature_units.dart';
 import 'package:weather_fit/entities/models/temperature/temperature.dart';
-import 'package:weather_fit/res/constants.dart' as constants;
 import 'package:weather_repository/weather_repository.dart';
 
 part 'weather.g.dart';
@@ -136,15 +135,6 @@ class Weather extends Equatable {
     return condition.isUnknown || location.isEmpty;
   }
 
-  bool get needsRefresh {
-    final int difference = DateTime.now()
-        .difference(
-          lastUpdatedDateTime ?? DateTime(0),
-        )
-        .inMinutes;
-    return difference > constants.weatherRefreshDelayMinutes;
-  }
-
   /// Output: e.g., "Dec 12, Monday at 03:45 PM".
   String getFormattedLastUpdatedDateTime(String locale) {
     if (lastUpdatedDateTime != null) {
@@ -177,13 +167,6 @@ class Weather extends Equatable {
   bool get isNotEmpty => this != empty;
 
   bool get isEmpty => this == empty;
-
-  int get remainingMinutes {
-    final int difference = constants.weatherRefreshDelayMinutes -
-        DateTime.now().difference(lastUpdatedDateTime ?? DateTime(0)).inMinutes;
-
-    return difference > 0 ? difference : 0;
-  }
 
   String get locationName => location.name.isEmpty
       ? '${translate('lat')}: ${location.latitude.toStringAsFixed(2)}, '
