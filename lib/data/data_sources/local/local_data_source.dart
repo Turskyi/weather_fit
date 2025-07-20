@@ -76,7 +76,12 @@ class LocalDataSource {
     final TemperatureUnits units = weather.temperatureUnits;
 
     if (condition.isRainy) {
-      return translate('outfit.rainy');
+      if (temperature >= 30 && units.isCelsius ||
+          temperature >= 86 && units.isFahrenheit) {
+        return translate('outfit.rainy_hot');
+      } else {
+        return translate('outfit.rainy');
+      }
     } else if (condition.isSnowy) {
       return translate('outfit.snowy');
     } else if (temperature < 10 && units.isCelsius ||
