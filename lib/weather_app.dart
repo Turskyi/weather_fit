@@ -8,6 +8,7 @@ import 'package:weather_fit/data/repositories/location_repository.dart';
 import 'package:weather_fit/data/repositories/outfit_repository.dart';
 import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
+import 'package:weather_fit/res/resources.dart';
 import 'package:weather_fit/res/theme/cubit/theme_cubit.dart';
 import 'package:weather_fit/router/app_route.dart';
 import 'package:weather_fit/router/routes.dart' as routes;
@@ -80,38 +81,42 @@ class WeatherApp extends StatelessWidget {
             // Assume darkness from 10 PM to 6 AM
             final bool completeDarkness = hour < 6 || hour > 21;
 
-            return MaterialApp(
-              debugShowCheckedModeBanner: false,
-              title: constants.appName,
-              initialRoute: AppRoute.weather.path,
-              routes: routes.getRouteMap(_localDataSource.getLanguageIsoCode()),
-              theme: ThemeData(
-                appBarTheme: const AppBarTheme(
-                  backgroundColor: Colors.transparent,
-                  elevation: 0,
+            return Resources(
+              child: MaterialApp(
+                debugShowCheckedModeBanner: false,
+                title: constants.appName,
+                initialRoute: AppRoute.weather.path,
+                routes: routes.getRouteMap(
+                  _localDataSource.getLanguageIsoCode(),
                 ),
-                colorScheme: ColorScheme.fromSeed(seedColor: color),
-                textTheme: GoogleFonts.montserratTextTheme(),
-                // This font is probably not needed, I added it to avoid a
-                // "Could not find a set of Noto fonts to display all missing
-                // characters" error, but it still did not help.
-                fontFamily: 'NotoSans',
+                theme: ThemeData(
+                  appBarTheme: const AppBarTheme(
+                    backgroundColor: Colors.transparent,
+                    elevation: 0,
+                  ),
+                  colorScheme: ColorScheme.fromSeed(seedColor: color),
+                  textTheme: GoogleFonts.montserratTextTheme(),
+                  // This font is probably not needed, I added it to avoid a
+                  // "Could not find a set of Noto fonts to display all missing
+                  // characters" error, but it still did not help.
+                  fontFamily: 'NotoSans',
+                ),
+                darkTheme: ThemeData(
+                  appBarTheme: const AppBarTheme(
+                    backgroundColor: Colors.transparent,
+                    elevation: 0,
+                  ),
+                  colorScheme: ColorScheme.fromSeed(
+                    seedColor: color,
+                    brightness: Brightness.dark,
+                  ),
+                  textTheme: GoogleFonts.montserratTextTheme(
+                    ThemeData.dark().textTheme,
+                  ),
+                  fontFamily: 'NotoSans',
+                ),
+                themeMode: completeDarkness ? ThemeMode.dark : ThemeMode.light,
               ),
-              darkTheme: ThemeData(
-                appBarTheme: const AppBarTheme(
-                  backgroundColor: Colors.transparent,
-                  elevation: 0,
-                ),
-                colorScheme: ColorScheme.fromSeed(
-                  seedColor: color,
-                  brightness: Brightness.dark,
-                ),
-                textTheme: GoogleFonts.montserratTextTheme(
-                  ThemeData.dark().textTheme,
-                ),
-                fontFamily: 'NotoSans',
-              ),
-              themeMode: completeDarkness ? ThemeMode.dark : ThemeMode.light,
             );
           },
         ),

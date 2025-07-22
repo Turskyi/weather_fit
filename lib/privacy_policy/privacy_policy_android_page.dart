@@ -4,11 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:weather_fit/privacy_policy/email_text.dart';
+import 'package:weather_fit/privacy_policy/language_selector.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
 import 'package:weather_fit/res/widgets/leading_widget.dart';
 import 'package:weather_fit/utils/date_util.dart';
 
-class PrivacyPolicyAndroidPage extends StatelessWidget {
+class PrivacyPolicyAndroidPage extends StatefulWidget {
   const PrivacyPolicyAndroidPage({
     required this.languageIsoCode,
     super.key,
@@ -16,6 +17,12 @@ class PrivacyPolicyAndroidPage extends StatelessWidget {
 
   final String languageIsoCode;
 
+  @override
+  State<PrivacyPolicyAndroidPage> createState() =>
+      _PrivacyPolicyAndroidPageState();
+}
+
+class _PrivacyPolicyAndroidPageState extends State<PrivacyPolicyAndroidPage> {
   @override
   Widget build(BuildContext context) {
     final int age = 6;
@@ -31,9 +38,16 @@ class PrivacyPolicyAndroidPage extends StatelessWidget {
         ),
         leading: kIsWeb
             ? LeadingWidget(
-                languageIsoCode: languageIsoCode,
+                languageIsoCode: widget.languageIsoCode,
               )
             : null,
+        actions: <Widget>[
+          LanguageSelector(
+            // Update state of the whole page to show text from another
+            // language.
+            onLanguageSelected: () => setState(() {}),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -43,7 +57,7 @@ class PrivacyPolicyAndroidPage extends StatelessWidget {
           children: <Widget>[
             Text(
               '${translate('last_update')}: ${getPrivacyLastUpdatedDate(
-                languageIsoCode,
+                widget.languageIsoCode,
               )}',
               style: TextStyle(fontSize: bodySize),
             ),
