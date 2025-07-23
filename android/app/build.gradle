@@ -118,3 +118,18 @@ android {
 flutter {
     source = "../.."
 }
+
+subprojects {
+    afterEvaluate {
+        if (project.name.contains("geocoding_android") ||
+                project.name.contains("flutter_email_sender") ||
+                project.name.contains("home_widget")) {
+
+            android {
+                defaultConfig {
+                    minSdkVersion 23
+                }
+            }
+        }
+    }
+}
