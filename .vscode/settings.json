@@ -6,15 +6,11 @@
   "prettier.printWidth": 80,
   "java.compile.nullAnalysis.mode": "automatic",
   "prettier.trailingComma": "all",
-  "editor.rulers": [
-    80
-  ],
+  "editor.rulers": [80],
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "spellright.language": [
-    "en"
-  ],
+  "spellright.language": ["en"],
   "spellright.documentTypes": [
     "markdown",
     "latex",
@@ -32,5 +28,6 @@
     "dart": {
       "parser": "code"
     }
-  }
+  },
+  "java.configuration.updateBuildConfiguration": "automatic"
 }
