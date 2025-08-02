@@ -162,9 +162,17 @@ class LocalDataSource {
   }
 
   Future<bool> saveLanguageIsoCode(String languageIsoCode) {
+    final bool isSupported = Language.values.any(
+      (Language lang) => lang.isoLanguageCode == languageIsoCode,
+    );
+
+    final String safeLanguageCode = isSupported
+        ? languageIsoCode
+        : Language.en.isoLanguageCode;
+
     return _preferences.setString(
       Settings.languageIsoCode.key,
-      languageIsoCode,
+      safeLanguageCode,
     );
   }
 
@@ -173,18 +181,31 @@ class LocalDataSource {
       Settings.languageIsoCode.key,
     );
 
-    String defaultLanguageCode =
+    final bool isSavedLanguageSupported =
+        savedLanguageIsoCode != null &&
+        Language.values.any(
+          (Language lang) => lang.isoLanguageCode == savedLanguageIsoCode,
+        );
+
+    final String systemLanguageCode =
         PlatformDispatcher.instance.locale.languageCode;
+
+    String defaultLanguageCode =
+        Language.values.any(
+          (Language lang) => lang.isoLanguageCode == systemLanguageCode,
+        )
+        ? systemLanguageCode
+        : Language.en.isoLanguageCode;
 
     final String host = Uri.base.host;
     if (host.startsWith('${Language.uk.isoLanguageCode}.')) {
-      // Sets the default locale for the intl package in Dart/Flutter to
-      // Ukrainian.
       Intl.defaultLocale = Language.uk.isoLanguageCode;
       defaultLanguageCode = Language.uk.isoLanguageCode;
     }
 
-    return savedLanguageIsoCode ?? defaultLanguageCode;
+    return isSavedLanguageSupported
+        ? savedLanguageIsoCode
+        : defaultLanguageCode;
   }
 
   /// Saves the provided [location] to persistent storage as a JSON string.
@@ -202,10 +223,8 @@ class LocalDataSource {
   }
 
   Location getLastSavedLocation() {
-    final String jsonString = _preferences.getString(
-          Settings.location.key,
-        ) ??
-        '';
+    final String jsonString =
+        _preferences.getString(Settings.location.key) ?? '';
     if (jsonString.isEmpty) {
       return const Location.empty();
     } else {

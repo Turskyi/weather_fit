@@ -5,10 +5,7 @@ import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 import 'loading_outfit_text_widget.dart';
 
 class TextRecommendationWidget extends StatelessWidget {
-  const TextRecommendationWidget({
-    required this.displayText,
-    super.key,
-  });
+  const TextRecommendationWidget({required this.displayText, super.key});
 
   final String displayText;
 

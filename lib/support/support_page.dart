@@ -6,10 +6,7 @@ import 'package:weather_fit/res/constants.dart' as constants;
 import 'package:weather_fit/res/widgets/leading_widget.dart';
 
 class SupportPage extends StatelessWidget {
-  const SupportPage({
-    required this.languageIsoCode,
-    super.key,
-  });
+  const SupportPage({required this.languageIsoCode, super.key});
 
   final String languageIsoCode;
 
@@ -20,9 +17,7 @@ class SupportPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         leading: kIsWeb
-            ? LeadingWidget(
-                languageIsoCode: languageIsoCode,
-              )
+            ? LeadingWidget(languageIsoCode: languageIsoCode)
             : null,
         title: Text(translate('support.title')),
       ),
@@ -37,10 +32,7 @@ class SupportPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            Text(
-              translate('support.intro_line'),
-              style: textTheme.bodyLarge,
-            ),
+            Text(translate('support.intro_line'), style: textTheme.bodyLarge),
             const SizedBox(height: 32),
             Text(
               '📌 ${translate('faq')}',
@@ -55,9 +47,7 @@ class SupportPage extends StatelessWidget {
                 children: <TextSpan>[
                   TextSpan(
                     text: '${translate('support.faq_hourly_forecast_q')}\n  ',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   TextSpan(
                     text: '${translate('support.faq_hourly_forecast_a')}\n',
@@ -166,12 +156,12 @@ class SupportPage extends StatelessWidget {
   }
 
   String? _encodeQueryParameters(Map<String, String> params) {
-    return params.entries.map(
-      (MapEntry<String, String> entry) {
-        return '${Uri.encodeComponent(entry.key)}='
-            '${Uri.encodeComponent(entry.value)}';
-      },
-    ).join('&');
+    return params.entries
+        .map((MapEntry<String, String> entry) {
+          return '${Uri.encodeComponent(entry.key)}='
+              '${Uri.encodeComponent(entry.value)}';
+        })
+        .join('&');
   }
 
   Future<void> _launchEmail(BuildContext context) async {

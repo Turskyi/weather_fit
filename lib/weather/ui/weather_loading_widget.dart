@@ -16,11 +16,7 @@ class WeatherLoadingWidget extends StatelessWidget {
             color: theme.primaryColor.withAlpha(99),
           ),
           padding: const EdgeInsets.all(16.0),
-          child: const Icon(
-            Icons.cloud,
-            size: 64,
-            color: Colors.white,
-          ),
+          child: const Icon(Icons.cloud, size: 64, color: Colors.white),
         ),
         const SizedBox(height: 16.0),
         Text(

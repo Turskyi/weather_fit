@@ -35,9 +35,6 @@ class HomeWidgetServiceImpl implements HomeWidgetService {
     String? iOSName,
     String? qualifiedAndroidName,
   }) {
-    return HomeWidget.updateWidget(
-      iOSName: iOSName,
-      androidName: androidName,
-    );
+    return HomeWidget.updateWidget(iOSName: iOSName, androidName: androidName);
   }
 }

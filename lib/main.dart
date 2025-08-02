@@ -9,6 +9,7 @@ import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
 import 'package:weather_fit/data/repositories/location_repository.dart';
 import 'package:weather_fit/data/repositories/outfit_repository.dart';
 import 'package:weather_fit/di/injector.dart';
+import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/feedback/feedback_form.dart';
 import 'package:weather_fit/localization/localization_delelegate_getter.dart'
     as locale;
@@ -33,25 +34,39 @@ void main() async {
 
   final LocalDataSource localDataSource = LocalDataSource(preferences);
 
-  final LocalizationDelegate localizationDelegate =
-      await locale.getLocalizationDelegate(
-    localDataSource,
+  final String savedIsoCode = localDataSource.getLanguageIsoCode();
+  final Language savedLanguage = Language.fromIsoLanguageCode(savedIsoCode);
+
+  final LocalizationDelegate localizationDelegate = await locale
+      .getLocalizationDelegate(localDataSource);
+
+  final Language currentLanguage = Language.fromIsoLanguageCode(
+    localizationDelegate.currentLocale.languageCode,
   );
+
+  if (savedLanguage != currentLanguage) {
+    final Locale locale = localeFromString(savedLanguage.isoLanguageCode);
+
+    localizationDelegate.changeLocale(locale);
+
+    localizationDelegate.onLocaleChanged?.call(locale);
+  }
 
   runApp(
     LocalizedApp(
       localizationDelegate,
       BetterFeedback(
-        feedbackBuilder: (
-          BuildContext _,
-          OnSubmit onSubmit,
-          ScrollController? scrollController,
-        ) {
-          return FeedbackForm(
-            onSubmit: onSubmit,
-            scrollController: scrollController,
-          );
-        },
+        feedbackBuilder:
+            (
+              BuildContext _,
+              OnSubmit onSubmit,
+              ScrollController? scrollController,
+            ) {
+              return FeedbackForm(
+                onSubmit: onSubmit,
+                scrollController: scrollController,
+              );
+            },
         theme: FeedbackThemeData(feedbackSheetColor: Colors.grey.shade50),
         child: WeatherApp(
           weatherRepository: WeatherRepository(),
@@ -62,6 +77,7 @@ void main() async {
           ),
           outfitRepository: OutfitRepository(localDataSource),
           localDataSource: localDataSource,
+          initialLanguage: currentLanguage,
         ),
       ),
     ),

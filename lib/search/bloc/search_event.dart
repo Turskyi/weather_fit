@@ -27,10 +27,7 @@ final class ConfirmLocation extends SearchEvent {
 }
 
 final class SearchByLocation extends SearchEvent {
-  const SearchByLocation({
-    required this.latitude,
-    required this.longitude,
-  });
+  const SearchByLocation({required this.latitude, required this.longitude});
 
   /// The latitude of this position in degrees normalized to the interval -90.0
   /// to +90.0 (both inclusive).

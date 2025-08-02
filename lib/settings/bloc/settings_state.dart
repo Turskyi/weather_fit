@@ -16,9 +16,7 @@ sealed class SettingsState {
 final class SettingsInitial extends SettingsState {
   const SettingsInitial({required super.language});
 
-  SettingsState copyWith({
-    Language? language,
-  }) {
+  SettingsState copyWith({Language? language}) {
     return SettingsInitial(language: language ?? this.language);
   }
 
@@ -56,10 +54,7 @@ final class SettingsError extends SettingsState {
 
   final String errorMessage;
 
-  SettingsError copyWith({
-    String? errorMessage,
-    Language? language,
-  }) {
+  SettingsError copyWith({String? errorMessage, Language? language}) {
     return SettingsError(
       errorMessage: errorMessage ?? this.errorMessage,
       language: language ?? this.language,

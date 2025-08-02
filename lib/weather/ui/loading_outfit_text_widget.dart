@@ -2,10 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
 class LoadingOutfitTextWidget extends StatelessWidget {
-  const LoadingOutfitTextWidget({
-    required this.displayText,
-    super.key,
-  });
+  const LoadingOutfitTextWidget({required this.displayText, super.key});
 
   final String displayText;
 

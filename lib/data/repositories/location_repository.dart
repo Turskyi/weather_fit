@@ -25,16 +25,12 @@ class LocationRepository {
   Future<Location> getLocation(String query) async {
     final String locale = _localDataSource.getLanguageIsoCode();
     if (_shouldUseNominatim(query)) {
-      final NominatimLocationResponse response =
-          await _nominatimApiClient.locationSearch(
-        query,
-      );
+      final NominatimLocationResponse response = await _nominatimApiClient
+          .locationSearch(query);
 
       final List<String> parts = response.displayName
           .split(',')
-          .map(
-            (String e) => e.trim(),
-          )
+          .map((String e) => e.trim())
           .toList();
 
       final String responseName = response.name;
@@ -42,10 +38,10 @@ class LocationRepository {
       final String countryName = response.isCountry
           ? responseName
           : parts.isNotEmpty
-              ? parts.last
-              : '';
+          ? parts.last
+          : '';
 
-// Try to get oblast or similar.
+      // Try to get oblast or similar.
       final String province = parts.reversed.firstWhere(
         (String part) => part.toLowerCase().contains('область'),
         orElse: () {
@@ -66,10 +62,8 @@ class LocationRepository {
         locale: locale,
       );
     } else {
-      final LocationResponse response =
-          await _openMeteoApiClient.locationSearch(
-        query,
-      );
+      final LocationResponse response = await _openMeteoApiClient
+          .locationSearch(query);
 
       return Location(
         id: response.id,

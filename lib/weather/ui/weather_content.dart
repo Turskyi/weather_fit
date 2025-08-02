@@ -55,23 +55,22 @@ class _WeatherContentState extends State<WeatherContent> {
                 Flexible(
                   child: FittedBox(
                     child: BlocListener<SettingsBloc, SettingsState>(
-                      listenWhen: (
-                        SettingsState previousState,
-                        SettingsState currentState,
-                      ) {
-                        final String languageCode = LocalizedApp.of(
-                          context,
-                        ).delegate.currentLocale.languageCode;
+                      listenWhen:
+                          (
+                            SettingsState previousState,
+                            SettingsState currentState,
+                          ) {
+                            final String languageCode = LocalizedApp.of(
+                              context,
+                            ).delegate.currentLocale.languageCode;
 
-                        final Language currentLanguage =
-                            Language.fromIsoLanguageCode(
-                          languageCode,
-                        );
-                        return previousState.language !=
-                                currentState.language ||
-                            currentLanguage != currentState.language;
-                      },
-                      listener: (BuildContext _, SettingsState __) {
+                            final Language currentLanguage =
+                                Language.fromIsoLanguageCode(languageCode);
+                            return previousState.language !=
+                                    currentState.language ||
+                                currentLanguage != currentState.language;
+                          },
+                      listener: (BuildContext _, SettingsState _) {
                         setState(() {});
                       },
                       child: Text(
@@ -109,11 +108,11 @@ class _WeatherContentState extends State<WeatherContent> {
             else
               BlocBuilder<SettingsBloc, SettingsState>(
                 builder: (BuildContext _, SettingsState state) {
+                  final String lastUpdatedDateTime = widget.weather
+                      .getFormattedLastUpdatedDateTime(state.locale);
                   return Text(
                     '${translate('last_updated_on_label')} '
-                    '${widget.weather.getFormattedLastUpdatedDateTime(
-                      state.locale,
-                    )}',
+                    '$lastUpdatedDateTime',
                   );
                 },
               ),

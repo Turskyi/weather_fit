@@ -35,9 +35,8 @@ class OutfitWidget extends StatelessWidget {
     if (outfitRecommendation.isNotEmpty) {
       displayText = outfitRecommendation;
     } else {
-      final String randomKey = _defaultMessageKeys[Random().nextInt(
-        _defaultMessageKeys.length,
-      )];
+      final String randomKey =
+          _defaultMessageKeys[Random().nextInt(_defaultMessageKeys.length)];
       displayText = translate(randomKey);
     }
 
@@ -69,20 +68,21 @@ class OutfitWidget extends StatelessWidget {
           child: assetPath.isEmpty
               ? TextRecommendationWidget(displayText: displayText)
               : isNarrowScreen
-                  ? ColoredBox(
-                      color: colorScheme.surface,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: <Widget>[
-                          Expanded(
-                            flex: 5,
-                            child: Image.asset(
-                              assetPath,
-                              fit: BoxFit.fitHeight,
-                              errorBuilder: (
+              ? ColoredBox(
+                  color: colorScheme.surface,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      Expanded(
+                        flex: 5,
+                        child: Image.asset(
+                          assetPath,
+                          fit: BoxFit.fitHeight,
+                          errorBuilder:
+                              (
                                 BuildContext context,
                                 Object error,
-                                __,
+                                StackTrace? _,
                               ) {
                                 debugPrint(
                                   '⚠️ Failed to load outfit image on narrow '
@@ -123,9 +123,7 @@ class OutfitWidget extends StatelessWidget {
                                         ),
                                         style: textTheme.bodyMedium?.copyWith(
                                           color: theme.colorScheme.onSurface
-                                              .withValues(
-                                            alpha: 0.7,
-                                          ),
+                                              .withValues(alpha: 0.7),
                                         ),
                                         textAlign: TextAlign.center,
                                       ),
@@ -142,39 +140,36 @@ class OutfitWidget extends StatelessWidget {
                                   ),
                                 );
                               },
-                            ),
-                          ),
-                          Expanded(
-                            flex: 2,
-                            child: Container(
-                              padding: const EdgeInsets.all(10),
-                              alignment: Alignment.center,
-                              child: SelectableText(
-                                displayText,
-                                style: theme.textTheme.bodyMedium?.copyWith(
-                                  fontWeight: FontWeight.w500,
-                                  height: 1.3,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
-                    )
-                  : Row(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: <Widget>[
-                        Expanded(
-                          flex: 3,
-                          child: Image.asset(
-                            assetPath,
-                            fit: BoxFit.cover,
-                            errorBuilder: (
-                              BuildContext _,
-                              Object error,
-                              StackTrace? ___,
-                            ) {
+                      Expanded(
+                        flex: 2,
+                        child: Container(
+                          padding: const EdgeInsets.all(10),
+                          alignment: Alignment.center,
+                          child: SelectableText(
+                            displayText,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.w500,
+                              height: 1.3,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              : Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    Expanded(
+                      flex: 3,
+                      child: Image.asset(
+                        assetPath,
+                        fit: BoxFit.cover,
+                        errorBuilder:
+                            (BuildContext _, Object error, StackTrace? _) {
                               debugPrint(
                                 '⚠️ Failed to load outfit image on wide '
                                 'screen: "$assetPath". '
@@ -202,27 +197,27 @@ class OutfitWidget extends StatelessWidget {
                                 ),
                               );
                             },
-                          ),
-                        ),
-                        Expanded(
-                          flex: 2,
-                          child: Container(
-                            color: theme.colorScheme.surface,
-                            padding: const EdgeInsets.all(10),
-                            child: Center(
-                              child: SelectableText(
-                                displayText,
-                                style: theme.textTheme.bodyMedium?.copyWith(
-                                  fontWeight: FontWeight.w500,
-                                  height: 1.3,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
+                    Expanded(
+                      flex: 2,
+                      child: Container(
+                        color: theme.colorScheme.surface,
+                        padding: const EdgeInsets.all(10),
+                        child: Center(
+                          child: SelectableText(
+                            displayText,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.w500,
+                              height: 1.3,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
         ),
       ),
     );

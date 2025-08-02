@@ -101,12 +101,14 @@ class _SearchPageState extends State<SearchPage> {
                                         Text(
                                           translate('error.what_you_can_do'),
                                         ),
-                                        Text("- ${translate(
-                                          'error.ensure_os_updated',
-                                        )}"),
-                                        Text("- ${translate(
-                                          'error.check_date_time',
-                                        )}"),
+                                        Text(
+                                          "- ${translate('error.'
+                                          'ensure_os_updated')}",
+                                        ),
+                                        Text(
+                                          "- ${translate('error.'
+                                          'check_date_time')}",
+                                        ),
                                       ],
                                     ),
                                   ),
@@ -116,9 +118,9 @@ class _SearchPageState extends State<SearchPage> {
                                         translate('error.report_issue_button'),
                                       ),
                                       onPressed: () {
-                                        context
-                                            .read<SettingsBloc>()
-                                            .add(const BugReportPressedEvent());
+                                        context.read<SettingsBloc>().add(
+                                          const BugReportPressedEvent(),
+                                        );
 
                                         // Close the dialog.
                                         Navigator.of(dialogContext).pop();
@@ -146,8 +148,9 @@ class _SearchPageState extends State<SearchPage> {
                                     // Helper from geolocator to open app
                                     // settings.
                                     geolocator.openAppSettings();
-                                    ScaffoldMessenger.of(context)
-                                        .hideCurrentSnackBar();
+                                    ScaffoldMessenger.of(
+                                      context,
+                                    ).hideCurrentSnackBar();
                                   },
                                 ),
                               ),
@@ -160,11 +163,12 @@ class _SearchPageState extends State<SearchPage> {
                                 action: SnackBarAction(
                                   label: translate('error.report'),
                                   onPressed: () {
-                                    context
-                                        .read<SettingsBloc>()
-                                        .add(const BugReportPressedEvent());
-                                    ScaffoldMessenger.of(context)
-                                        .hideCurrentSnackBar();
+                                    context.read<SettingsBloc>().add(
+                                      const BugReportPressedEvent(),
+                                    );
+                                    ScaffoldMessenger.of(
+                                      context,
+                                    ).hideCurrentSnackBar();
                                   },
                                 ),
                               ),
@@ -185,22 +189,26 @@ class _SearchPageState extends State<SearchPage> {
                                   translate('submit'),
                                   semanticsLabel: translate('submit'),
                                 ),
-                          builder: (
-                            BuildContext context,
-                            TextEditingValue value,
-                            Widget? textSubmit,
-                          ) {
-                            return ElevatedButton(
-                              key: const Key('searchPage_search_iconButton'),
-                              onPressed: state is! SearchLoading &&
-                                      value.text.trim().isNotEmpty
-                                  ? () => context
-                                      .read<SearchBloc>()
-                                      .add(SearchLocation(_text))
-                                  : null,
-                              child: textSubmit,
-                            );
-                          },
+                          builder:
+                              (
+                                BuildContext context,
+                                TextEditingValue value,
+                                Widget? textSubmit,
+                              ) {
+                                return ElevatedButton(
+                                  key: const Key(
+                                    'searchPage_search_iconButton',
+                                  ),
+                                  onPressed:
+                                      state is! SearchLoading &&
+                                          value.text.trim().isNotEmpty
+                                      ? () => context.read<SearchBloc>().add(
+                                          SearchLocation(_text),
+                                        )
+                                      : null,
+                                  child: textSubmit,
+                                );
+                              },
                         );
                       },
                     ),
@@ -293,8 +301,8 @@ class _SearchPageState extends State<SearchPage> {
                 Navigator.of(context).pop();
 
                 context.read<SearchBloc>().add(
-                      const RequestPermissionAndSearchByLocation(),
-                    );
+                  const RequestPermissionAndSearchByLocation(),
+                );
               },
             ),
           ],
@@ -326,9 +334,8 @@ class _SearchPageState extends State<SearchPage> {
     }
     if (_feedbackController != null) {
       _feedbackController?.show(
-        (UserFeedback feedback) => context.read<SettingsBloc>().add(
-              SubmitFeedbackEvent(feedback),
-            ),
+        (UserFeedback feedback) =>
+            context.read<SettingsBloc>().add(SubmitFeedbackEvent(feedback)),
       );
       _feedbackController?.addListener(_onFeedbackChanged);
     }
@@ -341,9 +348,7 @@ class _SearchPageState extends State<SearchPage> {
       _feedbackController?.removeListener(_onFeedbackChanged);
       _feedbackController = null;
       _isFeedbackControllerInitialized = false;
-      context.read<SettingsBloc>().add(
-            const ClosingFeedbackEvent(),
-          );
+      context.read<SettingsBloc>().add(const ClosingFeedbackEvent());
     }
   }
 

@@ -37,10 +37,12 @@ void main() {
     mockWeatherRepository = MockWeatherRepository();
     mockOutfitRepository = MockOutfitRepository();
     // Stub the methods of mockHomeWidgetService that will be called.
-    when(() => mockHomeWidgetService.setAppGroupId(any()))
-        .thenAnswer((_) async {});
-    when(() => mockHomeWidgetService.saveWidgetData<String>(any(), any()))
-        .thenAnswer((_) async => true);
+    when(
+      () => mockHomeWidgetService.setAppGroupId(any()),
+    ).thenAnswer((_) async {});
+    when(
+      () => mockHomeWidgetService.saveWidgetData<String>(any(), any()),
+    ).thenAnswer((_) async => true);
     when(
       () => mockHomeWidgetService.updateWidget(
         iOSName: any(named: 'iOSName'),
@@ -67,41 +69,35 @@ void main() {
     setUp(() async {
       weatherDomain = MockWeatherDomain();
 
-      when(() => weatherDomain.condition).thenReturn(
-        dummy_constants.dummyWeatherCondition,
-      );
-      when(() => weatherDomain.location).thenReturn(
-        dummy_constants.dummyLocation,
-      );
-      when(() => weatherDomain.temperature).thenReturn(
-        dummy_constants.dummyWeatherTemperature,
-      );
-      when(() => weatherDomain.countryCode).thenReturn(
-        dummy_constants.dummyCountryCode,
-      );
-      when(() => weatherDomain.description).thenReturn(
-        dummy_constants.dummyWeatherDescription,
-      );
-      when(() => weatherDomain.weatherCode).thenReturn(
-        dummy_constants.dummyWeatherCode,
-      );
-      when(() => weatherDomain.locale).thenReturn(
-        dummy_constants.dummyLocale,
-      );
+      when(
+        () => weatherDomain.condition,
+      ).thenReturn(dummy_constants.dummyWeatherCondition);
+      when(
+        () => weatherDomain.location,
+      ).thenReturn(dummy_constants.dummyLocation);
+      when(
+        () => weatherDomain.temperature,
+      ).thenReturn(dummy_constants.dummyWeatherTemperature);
+      when(
+        () => weatherDomain.countryCode,
+      ).thenReturn(dummy_constants.dummyCountryCode);
+      when(
+        () => weatherDomain.description,
+      ).thenReturn(dummy_constants.dummyWeatherDescription);
+      when(
+        () => weatherDomain.weatherCode,
+      ).thenReturn(dummy_constants.dummyWeatherCode);
+      when(() => weatherDomain.locale).thenReturn(dummy_constants.dummyLocale);
       when(
         () => mockWeatherRepository.getWeatherByLocation(any()),
       ).thenAnswer((_) async => weatherDomain);
 
       when(
-        () => mockOutfitRepository.getOutfitRecommendation(
-          any(),
-        ),
+        () => mockOutfitRepository.getOutfitRecommendation(any()),
       ).thenAnswer((Invocation _) => 'Wear a T-shirt and shorts');
 
       when(
-        () => mockOutfitRepository.getOutfitImageAssetPath(
-          any(),
-        ),
+        () => mockOutfitRepository.getOutfitImageAssetPath(any()),
       ).thenReturn('assets/images/outfits/clear_0.png');
 
       final SharedPreferences preferences =
@@ -128,10 +124,7 @@ void main() {
         mockHomeWidgetService,
         locale,
       );
-      expect(
-        weatherBloc.state,
-        WeatherInitial(locale: locale),
-      );
+      expect(weatherBloc.state, WeatherInitial(locale: locale));
     });
 
     group('toJson/fromJson', () {
@@ -147,10 +140,7 @@ void main() {
           mockHomeWidgetService,
           locale,
         );
-        expect(
-          WeatherInitial(locale: locale),
-          weatherBloc.state,
-        );
+        expect(WeatherInitial(locale: locale), weatherBloc.state);
       });
     });
 

@@ -4,18 +4,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:weather_fit/privacy_policy/email_text.dart';
+import 'package:weather_fit/privacy_policy/language_selector.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
 import 'package:weather_fit/res/widgets/leading_widget.dart';
 import 'package:weather_fit/utils/date_util.dart';
 
-class PrivacyPolicyAndroidPage extends StatelessWidget {
-  const PrivacyPolicyAndroidPage({
-    required this.languageIsoCode,
-    super.key,
-  });
+class PrivacyPolicyAndroidPage extends StatefulWidget {
+  const PrivacyPolicyAndroidPage({required this.languageIsoCode, super.key});
 
   final String languageIsoCode;
 
+  @override
+  State<PrivacyPolicyAndroidPage> createState() =>
+      _PrivacyPolicyAndroidPageState();
+}
+
+class _PrivacyPolicyAndroidPageState extends State<PrivacyPolicyAndroidPage> {
   @override
   Widget build(BuildContext context) {
     final int age = 6;
@@ -23,17 +27,36 @@ class PrivacyPolicyAndroidPage extends StatelessWidget {
     final TextTheme textTheme = themeData.textTheme;
     final double? titleSize = textTheme.titleLarge?.fontSize;
     final double? bodySize = textTheme.bodyLarge?.fontSize;
+    final String privacyLastUpdatedDate = getPrivacyLastUpdatedDate(
+      widget.languageIsoCode,
+    );
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          '${translate('privacy_policy')} ${kIsWeb ? '${translate('for')} '
-              '«${translate('title')}» ${translate('android_app')}' : ''}',
+        title: LayoutBuilder(
+          builder: (BuildContext _, BoxConstraints constraints) {
+            return ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: constraints.maxWidth),
+              child: Text(
+                '${translate('privacy_policy')} '
+                '${kIsWeb ? '${translate('for')} «${translate('title')}» '
+                          '${translate('android_app')}' : ''}',
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                softWrap: true,
+              ),
+            );
+          },
         ),
         leading: kIsWeb
-            ? LeadingWidget(
-                languageIsoCode: languageIsoCode,
-              )
+            ? LeadingWidget(languageIsoCode: widget.languageIsoCode)
             : null,
+        actions: <Widget>[
+          LanguageSelector(
+            // Update state of the whole page to show text from another
+            // language.
+            onLanguageSelected: () => setState(() {}),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -42,9 +65,7 @@ class PrivacyPolicyAndroidPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(
-              '${translate('last_update')}: ${getPrivacyLastUpdatedDate(
-                languageIsoCode,
-              )}',
+              '${translate('last_update')}: $privacyLastUpdatedDate',
               style: TextStyle(fontSize: bodySize),
             ),
             const SizedBox(height: 10),
@@ -178,9 +199,9 @@ class PrivacyPolicyAndroidPage extends StatelessWidget {
                 ),
                 children: <TextSpan>[
                   TextSpan(
-                    text: '${translate(
-                      'privacy.outfit_illustrations_created_by',
-                    )} ',
+                    text:
+                        '${translate('privacy.'
+                        'outfit_illustrations_created_by')} ',
                   ),
                   TextSpan(
                     text: translate('anna_turska'),
@@ -189,13 +210,10 @@ class PrivacyPolicyAndroidPage extends StatelessWidget {
                       color: Colors.blue,
                     ),
                     recognizer: TapGestureRecognizer()
-                      ..onTap = () => launchUrl(
-                            Uri.parse(constants.artistInstagramUrl),
-                          ),
+                      ..onTap = () =>
+                          launchUrl(Uri.parse(constants.artistInstagramUrl)),
                   ),
-                  TextSpan(
-                    text: translate('privacy.artwork_creation_method'),
-                  ),
+                  TextSpan(text: translate('privacy.artwork_creation_method')),
                 ],
               ),
             ),
@@ -214,8 +232,10 @@ class PrivacyPolicyAndroidPage extends StatelessWidget {
             const SizedBox(height: 10),
             Text(
               translate('contact_us'),
-              style:
-                  TextStyle(fontSize: titleSize, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: titleSize,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             Text(
               translate('privacy.contact_us_invitation'),
