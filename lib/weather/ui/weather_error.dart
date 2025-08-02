@@ -24,10 +24,7 @@ class WeatherError extends StatelessWidget {
         Container(
           alignment: Alignment.center,
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: SelectableText(
-            message,
-            style: textTheme.headlineSmall,
-          ),
+          child: SelectableText(message, style: textTheme.headlineSmall),
         ),
       ],
     );

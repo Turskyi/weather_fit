@@ -37,14 +37,14 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
   ) async {
     emit(const SearchLoading());
     try {
-      final WeatherDomain weather =
-          await _weatherRepository.getWeatherByLocation(
-        Location(
-          latitude: event.latitude,
-          longitude: event.longitude,
-          locale: _localDataSource.getLanguageIsoCode(),
-        ),
-      );
+      final WeatherDomain weather = await _weatherRepository
+          .getWeatherByLocation(
+            Location(
+              latitude: event.latitude,
+              longitude: event.longitude,
+              locale: _localDataSource.getLanguageIsoCode(),
+            ),
+          );
       emit(SearchWeatherLoaded(Weather.fromRepository(weather)));
     } catch (e, stackTrace) {
       // 1. Log the detailed error with function name for debugging.
@@ -52,16 +52,12 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
           '[_searchByLocation] Error getting weather: $e';
       debugPrint('$debugErrorMessage\n$stackTrace');
 
-      // 2. Determine the user-facing error message
+      // 2. Determine the user-facing error message.
       final String userFriendlyErrorMessage = translate(
         'error.getting_weather_generic',
       );
 
-      emit(
-        SearchError(
-          errorMessage: userFriendlyErrorMessage,
-        ),
-      );
+      emit(SearchError(errorMessage: userFriendlyErrorMessage));
     }
   }
 
@@ -71,10 +67,8 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
   ) async {
     emit(const SearchLoading());
     try {
-      final WeatherDomain weather =
-          await _weatherRepository.getWeatherByLocation(
-        event.location,
-      );
+      final WeatherDomain weather = await _weatherRepository
+          .getWeatherByLocation(event.location);
       emit(SearchWeatherLoaded(Weather.fromRepository(weather)));
     } catch (e, stackTrace) {
       // 1. Log the detailed error with function name for debugging.
@@ -87,11 +81,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         'error.getting_weather_generic',
       );
 
-      emit(
-        SearchError(
-          errorMessage: userFriendlyErrorMessage,
-        ),
-      );
+      emit(SearchError(errorMessage: userFriendlyErrorMessage));
     }
   }
 
@@ -108,14 +98,14 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
 
       final String languageIsoCode = _localDataSource.getLanguageIsoCode();
 
-      final WeatherDomain weather =
-          await _weatherRepository.getWeatherByLocation(
-        Location(
-          latitude: position.latitude,
-          longitude: position.longitude,
-          locale: languageIsoCode,
-        ),
-      );
+      final WeatherDomain weather = await _weatherRepository
+          .getWeatherByLocation(
+            Location(
+              latitude: position.latitude,
+              longitude: position.longitude,
+              locale: languageIsoCode,
+            ),
+          );
 
       emit(SearchWeatherLoaded(Weather.fromRepository(weather)));
     } catch (e, stackTrace) {
@@ -127,17 +117,17 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       // 2. Determine the user-facing error message.
       String userFriendlyErrorMessage;
       if (e.toString().contains(
-            translate(
-              // Check if the error is one of our translated permission errors.
-              'error.location_permission_permanently_denied_cannot_request',
-            ),
-          )) {
+        translate(
+          // Check if the error is one of our translated permission errors.
+          'error.location_permission_permanently_denied_cannot_request',
+        ),
+      )) {
         userFriendlyErrorMessage = translate(
           'error.location_permission_permanently_denied_cannot_request',
         );
       } else if (e.toString().contains(
-            translate('error.location_permission_denied'),
-          )) {
+        translate('error.location_permission_denied'),
+      )) {
         userFriendlyErrorMessage = translate(
           'error.location_permission_denied',
         );
@@ -145,11 +135,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         // Generic error message for other cases.
         userFriendlyErrorMessage = translate('error.getting_weather_generic');
       }
-      emit(
-        SearchError(
-          errorMessage: userFriendlyErrorMessage,
-        ),
-      );
+      emit(SearchError(errorMessage: userFriendlyErrorMessage));
     }
   }
 
@@ -180,17 +166,13 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         userFriendlyMessage = translate('error.network_error');
         errorType = SearchErrorType.network;
       } else {
-        userFriendlyMessage = '${translate(
-          'error.searching_location',
-        )}: ${e.runtimeType}';
+        userFriendlyMessage =
+            '${translate('error.searching_location')}: ${e.runtimeType}';
         errorType = SearchErrorType.unknown;
       }
       debugPrint('[_searchLocation] Error: $detailedMessage\n$stackTrace');
       emit(
-        SearchError(
-          errorMessage: userFriendlyMessage,
-          errorType: errorType,
-        ),
+        SearchError(errorMessage: userFriendlyMessage, errorType: errorType),
       );
     }
   }

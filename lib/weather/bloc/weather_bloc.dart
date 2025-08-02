@@ -71,10 +71,8 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
 
     emit(WeatherLoadingState(locale: _locale, weather: state.weather));
     try {
-      final WeatherDomain domainWeather =
-          await _weatherRepository.getWeatherByLocation(
-        eventLocation,
-      );
+      final WeatherDomain domainWeather = await _weatherRepository
+          .getWeatherByLocation(eventLocation);
 
       final Weather weather = Weather.fromRepository(domainWeather);
 
@@ -106,9 +104,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           weather,
         );
 
-        emit(
-          (state as WeatherSuccess).copyWith(outfitAssetPath: assetPath),
-        );
+        emit((state as WeatherSuccess).copyWith(outfitAssetPath: assetPath));
 
         // Only add the event if it's NOT web AND NOT macOS.
         // For context, see issue:
@@ -177,10 +173,8 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     );
 
     try {
-      final WeatherDomain updatedWeather =
-          await _weatherRepository.getWeatherByLocation(
-        state.location,
-      );
+      final WeatherDomain updatedWeather = await _weatherRepository
+          .getWeatherByLocation(state.location);
 
       final Weather weather = Weather.fromRepository(updatedWeather);
 
@@ -209,9 +203,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           weather,
         );
 
-        emit(
-          (state as WeatherSuccess).copyWith(outfitAssetPath: filePath),
-        );
+        emit((state as WeatherSuccess).copyWith(outfitAssetPath: filePath));
 
         // Only add the event if it's NOT web AND NOT macOS.
         // For context, see issue:
@@ -248,11 +240,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
         temperatureUnits: units,
       );
 
-      emit(
-        (state as WeatherSuccess).copyWith(
-          weather: updatedWeather,
-        ),
-      );
+      emit((state as WeatherSuccess).copyWith(weather: updatedWeather));
     } else if (state is WeatherInitial) {
       emit(
         (state as WeatherInitial).copyWith(
@@ -299,9 +287,8 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
 
       _homeWidgetService.saveWidgetData<String>(
         HomeWidgetKey.textLastUpdated.stringValue,
-        '${translate(
-          'last_updated_on_label',
-        )}\n${state.formattedLastUpdatedDateTime}',
+        '${translate('last_updated_on_label')}\n'
+        '${state.formattedLastUpdatedDateTime}',
       );
 
       _homeWidgetService.saveWidgetData<String>(
@@ -372,9 +359,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
         final String assetPath = _outfitRepository.getOutfitImageAssetPath(
           weather,
         );
-        emit(
-          (state as WeatherSuccess).copyWith(outfitAssetPath: assetPath),
-        );
+        emit((state as WeatherSuccess).copyWith(outfitAssetPath: assetPath));
         // Only add the event if it's NOT web AND NOT macOS.
         // For context, see issue:
         // https://github.com/ABausG/home_widget/issues/137.

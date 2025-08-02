@@ -38,9 +38,7 @@ void main() {
 
     final LocalDataSource localDataSource = LocalDataSource(preferences);
     await setUpFlutterTranslateForTests();
-    localizationDelegate = await getLocalizationDelegate(
-      localDataSource,
-    );
+    localizationDelegate = await getLocalizationDelegate(localDataSource);
   });
   late WeatherRepository weatherRepository;
   late OutfitRepository outfitRepository;
@@ -54,9 +52,9 @@ void main() {
 
     settingsBloc = MockSettingsBloc();
 
-    when(() => settingsBloc.state).thenReturn(
-      const SettingsInitial(language: Language.en),
-    );
+    when(
+      () => settingsBloc.state,
+    ).thenReturn(const SettingsInitial(language: Language.en));
   });
 
   group('WeatherPage', () {
@@ -76,8 +74,9 @@ void main() {
             providers: <SingleChildWidget>[
               BlocProvider<WeatherBloc>(
                 create: (BuildContext _) {
-                  final LocalDataSource localDataSource =
-                      LocalDataSource(preferences);
+                  final LocalDataSource localDataSource = LocalDataSource(
+                    preferences,
+                  );
                   return WeatherBloc(
                     weatherRepository,
                     outfitRepository,
@@ -89,8 +88,9 @@ void main() {
               ),
               BlocProvider<SearchBloc>(
                 create: (BuildContext _) {
-                  final LocalDataSource localDataSource =
-                      LocalDataSource(preferences);
+                  final LocalDataSource localDataSource = LocalDataSource(
+                    preferences,
+                  );
                   return SearchBloc(
                     weatherRepository,
                     LocationRepository(
@@ -133,8 +133,9 @@ void main() {
       weatherBloc = MockWeatherBloc();
     });
 
-    testWidgets('renders WeatherError for WeatherStatus.failure',
-        (WidgetTester tester) async {
+    testWidgets('renders WeatherError for WeatherStatus.failure', (
+      WidgetTester tester,
+    ) async {
       when(() => weatherBloc.state).thenReturn(
         const WeatherFailure(
           message: 'Error',

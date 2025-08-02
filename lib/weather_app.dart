@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_translate/flutter_translate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:nested/nested.dart';
 import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
@@ -20,31 +19,28 @@ import 'package:weather_repository/weather_repository.dart';
 
 class WeatherApp extends StatelessWidget {
   const WeatherApp({
-    required WeatherRepository weatherRepository,
-    required LocationRepository locationRepository,
-    required OutfitRepository outfitRepository,
-    required LocalDataSource localDataSource,
+    required this.weatherRepository,
+    required this.locationRepository,
+    required this.outfitRepository,
+    required this.localDataSource,
+    required this.initialLanguage,
     super.key,
-  })  : _weatherRepository = weatherRepository,
-        _locationRepository = locationRepository,
-        _localDataSource = localDataSource,
-        _outfitRepository = outfitRepository;
+  });
 
-  final WeatherRepository _weatherRepository;
-  final LocationRepository _locationRepository;
-  final OutfitRepository _outfitRepository;
-  final LocalDataSource _localDataSource;
+  final WeatherRepository weatherRepository;
+  final LocationRepository locationRepository;
+  final OutfitRepository outfitRepository;
+  final LocalDataSource localDataSource;
+  final Language initialLanguage;
 
   @override
   Widget build(BuildContext context) {
-    // Use the `MultiRepositoryProvider` widget to provide two repositories.
-    final Language initialLanguage = _getInitialLanguage(context);
     return MultiRepositoryProvider(
       providers: <SingleChildWidget>[
         // Provide the weather repository.
-        RepositoryProvider<WeatherRepository>.value(value: _weatherRepository),
+        RepositoryProvider<WeatherRepository>.value(value: weatherRepository),
         // Provide the AI repository.
-        RepositoryProvider<OutfitRepository>.value(value: _outfitRepository),
+        RepositoryProvider<OutfitRepository>.value(value: outfitRepository),
       ],
       child: MultiBlocProvider(
         providers: <SingleChildWidget>[
@@ -53,24 +49,24 @@ class WeatherApp extends StatelessWidget {
           BlocProvider<WeatherBloc>(
             create: (BuildContext _) {
               return WeatherBloc(
-                _weatherRepository,
-                _outfitRepository,
-                _localDataSource,
+                weatherRepository,
+                outfitRepository,
+                localDataSource,
                 const HomeWidgetServiceImpl(),
-                _localDataSource.getLanguageIsoCode(),
+                initialLanguage.isoLanguageCode,
               );
             },
           ),
           BlocProvider<SettingsBloc>(
             create: (BuildContext _) {
-              return SettingsBloc(_localDataSource, initialLanguage);
+              return SettingsBloc(localDataSource, initialLanguage);
             },
           ),
           BlocProvider<SearchBloc>(
             create: (BuildContext _) => SearchBloc(
-              _weatherRepository,
-              _locationRepository,
-              _localDataSource,
+              weatherRepository,
+              locationRepository,
+              localDataSource,
             ),
           ),
         ],
@@ -86,9 +82,7 @@ class WeatherApp extends StatelessWidget {
                 debugShowCheckedModeBanner: false,
                 title: constants.appName,
                 initialRoute: AppRoute.weather.path,
-                routes: routes.getRouteMap(
-                  _localDataSource.getLanguageIsoCode(),
-                ),
+                routes: routes.getRouteMap(initialLanguage.isoLanguageCode),
                 theme: ThemeData(
                   appBarTheme: const AppBarTheme(
                     backgroundColor: Colors.transparent,
@@ -122,19 +116,5 @@ class WeatherApp extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Language _getInitialLanguage(BuildContext context) {
-    final Language currentLanguage = Language.fromIsoLanguageCode(
-      LocalizedApp.of(context).delegate.currentLocale.languageCode,
-    );
-    final Language savedLanguage = Language.fromIsoLanguageCode(
-      _localDataSource.getLanguageIsoCode(),
-    );
-
-    if (currentLanguage != savedLanguage) {
-      changeLocale(context, savedLanguage.isoLanguageCode);
-    }
-    return savedLanguage;
   }
 }

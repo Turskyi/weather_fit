@@ -10,10 +10,7 @@ import 'package:weather_fit/res/widgets/leading_widget.dart';
 import 'package:weather_fit/utils/date_util.dart';
 
 class PrivacyPolicyAndroidPage extends StatefulWidget {
-  const PrivacyPolicyAndroidPage({
-    required this.languageIsoCode,
-    super.key,
-  });
+  const PrivacyPolicyAndroidPage({required this.languageIsoCode, super.key});
 
   final String languageIsoCode;
 
@@ -30,16 +27,28 @@ class _PrivacyPolicyAndroidPageState extends State<PrivacyPolicyAndroidPage> {
     final TextTheme textTheme = themeData.textTheme;
     final double? titleSize = textTheme.titleLarge?.fontSize;
     final double? bodySize = textTheme.bodyLarge?.fontSize;
+    final String privacyLastUpdatedDate = getPrivacyLastUpdatedDate(
+      widget.languageIsoCode,
+    );
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          '${translate('privacy_policy')} ${kIsWeb ? '${translate('for')} '
-              '«${translate('title')}» ${translate('android_app')}' : ''}',
+        title: LayoutBuilder(
+          builder: (BuildContext _, BoxConstraints constraints) {
+            return ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: constraints.maxWidth),
+              child: Text(
+                '${translate('privacy_policy')} '
+                '${kIsWeb ? '${translate('for')} «${translate('title')}» '
+                          '${translate('android_app')}' : ''}',
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                softWrap: true,
+              ),
+            );
+          },
         ),
         leading: kIsWeb
-            ? LeadingWidget(
-                languageIsoCode: widget.languageIsoCode,
-              )
+            ? LeadingWidget(languageIsoCode: widget.languageIsoCode)
             : null,
         actions: <Widget>[
           LanguageSelector(
@@ -56,9 +65,7 @@ class _PrivacyPolicyAndroidPageState extends State<PrivacyPolicyAndroidPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(
-              '${translate('last_update')}: ${getPrivacyLastUpdatedDate(
-                widget.languageIsoCode,
-              )}',
+              '${translate('last_update')}: $privacyLastUpdatedDate',
               style: TextStyle(fontSize: bodySize),
             ),
             const SizedBox(height: 10),
@@ -192,9 +199,9 @@ class _PrivacyPolicyAndroidPageState extends State<PrivacyPolicyAndroidPage> {
                 ),
                 children: <TextSpan>[
                   TextSpan(
-                    text: '${translate(
-                      'privacy.outfit_illustrations_created_by',
-                    )} ',
+                    text:
+                        '${translate('privacy.'
+                        'outfit_illustrations_created_by')} ',
                   ),
                   TextSpan(
                     text: translate('anna_turska'),
@@ -203,13 +210,10 @@ class _PrivacyPolicyAndroidPageState extends State<PrivacyPolicyAndroidPage> {
                       color: Colors.blue,
                     ),
                     recognizer: TapGestureRecognizer()
-                      ..onTap = () => launchUrl(
-                            Uri.parse(constants.artistInstagramUrl),
-                          ),
+                      ..onTap = () =>
+                          launchUrl(Uri.parse(constants.artistInstagramUrl)),
                   ),
-                  TextSpan(
-                    text: translate('privacy.artwork_creation_method'),
-                  ),
+                  TextSpan(text: translate('privacy.artwork_creation_method')),
                 ],
               ),
             ),
@@ -228,8 +232,10 @@ class _PrivacyPolicyAndroidPageState extends State<PrivacyPolicyAndroidPage> {
             const SizedBox(height: 10),
             Text(
               translate('contact_us'),
-              style:
-                  TextStyle(fontSize: titleSize, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: titleSize,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             Text(
               translate('privacy.contact_us_invitation'),

@@ -16,10 +16,7 @@ import 'package:weather_fit/weather/ui/outfit_widget.dart';
 import 'package:weather_fit/weather/ui/weather.dart';
 
 class WeatherPage extends StatefulWidget {
-  const WeatherPage({
-    required this.languageIsoCode,
-    super.key,
-  });
+  const WeatherPage({required this.languageIsoCode, super.key});
 
   final String languageIsoCode;
 
@@ -49,18 +46,15 @@ class _WeatherPageState extends State<WeatherPage> {
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
-              Navigator.pushNamed(
-                context,
-                AppRoute.settings.path,
-              ).whenComplete(() {
-                if (context.mounted) {
-                  context.read<WeatherBloc>().add(
-                        GetOutfitEvent(
-                          context.read<WeatherBloc>().state.weather,
-                        ),
-                      );
-                }
-              });
+              Navigator.pushNamed(context, AppRoute.settings.path).whenComplete(
+                () {
+                  if (context.mounted) {
+                    context.read<WeatherBloc>().add(
+                      GetOutfitEvent(context.read<WeatherBloc>().state.weather),
+                    );
+                  }
+                },
+              );
             },
           ),
         ],
@@ -159,8 +153,9 @@ class _WeatherPageState extends State<WeatherPage> {
         child: const Icon(Icons.search, semanticLabel: 'Search'),
       ),
       persistentFooterAlignment: AlignmentDirectional.center,
-      persistentFooterButtons:
-          (kIsWeb && isLargeScreen) ? _buildSettingsButtons(context) : null,
+      persistentFooterButtons: (kIsWeb && isLargeScreen)
+          ? _buildSettingsButtons(context)
+          : null,
     );
   }
 
@@ -192,22 +187,20 @@ class _WeatherPageState extends State<WeatherPage> {
     }
   }
 
-  Future<void> _refresh(BuildContext context) => Future<void>.delayed(
-        Duration.zero,
-        () {
-          if (context.mounted) {
-            context.read<WeatherBloc>().add(const RefreshWeather());
-          }
-        },
-      );
+  Future<void> _refresh(BuildContext context) =>
+      Future<void>.delayed(Duration.zero, () {
+        if (context.mounted) {
+          context.read<WeatherBloc>().add(const RefreshWeather());
+        }
+      });
 
   void _weatherBlocStateListener(BuildContext context, WeatherState state) {
     if (state is WeatherSuccess) {
       context.read<ThemeCubit>().updateTheme(state.weather);
       if (state.message.isNotEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(state.message)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(state.message)));
       }
     }
   }
@@ -219,9 +212,8 @@ class _WeatherPageState extends State<WeatherPage> {
         child: BlocListener<SettingsBloc, SettingsState>(
           listener: _settingsBlocStateListener,
           child: ElevatedButton.icon(
-            onPressed: () => context.read<SettingsBloc>().add(
-                  const BugReportPressedEvent(),
-                ),
+            onPressed: () =>
+                context.read<SettingsBloc>().add(const BugReportPressedEvent()),
             icon: const Icon(Icons.feedback),
             label: Text(translate('feedback.title')),
           ),
@@ -294,9 +286,8 @@ class _WeatherPageState extends State<WeatherPage> {
     if (_isDisposing) return;
     if (_feedbackController != null) {
       _feedbackController?.show(
-        (UserFeedback feedback) => context.read<SettingsBloc>().add(
-              SubmitFeedbackEvent(feedback),
-            ),
+        (UserFeedback feedback) =>
+            context.read<SettingsBloc>().add(SubmitFeedbackEvent(feedback)),
       );
       _feedbackController?.addListener(_onFeedbackChanged);
     }
@@ -307,9 +298,7 @@ class _WeatherPageState extends State<WeatherPage> {
     bool? isVisible = _feedbackController?.isVisible;
     if (isVisible == false) {
       _feedbackController?.removeListener(_onFeedbackChanged);
-      context.read<SettingsBloc>().add(
-            const ClosingFeedbackEvent(),
-          );
+      context.read<SettingsBloc>().add(const ClosingFeedbackEvent());
     }
   }
 

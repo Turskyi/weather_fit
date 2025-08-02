@@ -73,16 +73,16 @@ class Weather extends Equatable {
 
   @override
   List<Object?> get props => <Object?>[
-        condition,
-        lastUpdatedDateTime,
-        location,
-        temperature,
-        temperatureUnits,
-        countryCode,
-        description,
-        code,
-        locale,
-      ];
+    condition,
+    lastUpdatedDateTime,
+    location,
+    temperature,
+    temperatureUnits,
+    countryCode,
+    description,
+    code,
+    locale,
+  ];
 
   @override
   String toString() {
@@ -152,9 +152,7 @@ class Weather extends Equatable {
           'Error: ${e.toString()}\n'
           'StackTrace: $stackTrace',
         );
-        final DateFormat formatter = DateFormat(
-          'MMM dd, EEEE \'at\' hh:mm a',
-        );
+        final DateFormat formatter = DateFormat('MMM dd, EEEE \'at\' hh:mm a');
         return formatter.format(lastUpdatedDateTime ?? DateTime(0));
       }
     } else {
@@ -170,7 +168,7 @@ class Weather extends Equatable {
 
   String get locationName => location.name.isEmpty
       ? '${translate('lat')}: ${location.latitude.toStringAsFixed(2)}, '
-          '${translate('lon')}: ${location.longitude.toStringAsFixed(2)}'
+            '${translate('lon')}: ${location.longitude.toStringAsFixed(2)}'
       : location.name;
 
   bool get isCelsius => temperatureUnits.isCelsius;

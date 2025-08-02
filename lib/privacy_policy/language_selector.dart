@@ -8,10 +8,7 @@ import 'package:weather_fit/settings/bloc/settings_bloc.dart';
 
 /// A widget that builds the language selector dropdown.
 class LanguageSelector extends StatelessWidget {
-  const LanguageSelector({
-    required this.onLanguageSelected,
-    super.key,
-  });
+  const LanguageSelector({required this.onLanguageSelected, super.key});
 
   final VoidCallback onLanguageSelected;
 
@@ -54,15 +51,13 @@ class LanguageSelector extends StatelessWidget {
                   (Language language) => Center(
                     child: AnimatedSwitcher(
                       duration: resources.durations.animatedSwitcher,
-                      transitionBuilder: (
-                        Widget child,
-                        Animation<double> animation,
-                      ) {
-                        return FadeTransition(
-                          opacity: animation,
-                          child: child,
-                        );
-                      },
+                      transitionBuilder:
+                          (Widget child, Animation<double> animation) {
+                            return FadeTransition(
+                              opacity: animation,
+                              child: child,
+                            );
+                          },
                       child: Text(
                         key: ValueKey<String>(language.flag),
                         language.flag,
@@ -89,12 +84,12 @@ class LanguageSelector extends StatelessWidget {
             // language.
             if (language != null) {
               changeLocale(context, language.isoLanguageCode)
-                  // The returned value is always `null`.
-                  .then((Object? _) {
+              // The returned value is always `null`.
+              .then((Object? _) {
                 if (context.mounted) {
-                  context
-                      .read<SettingsBloc>()
-                      .add(ChangeLanguageEvent(language));
+                  context.read<SettingsBloc>().add(
+                    ChangeLanguageEvent(language),
+                  );
                   onLanguageSelected();
                 }
               });

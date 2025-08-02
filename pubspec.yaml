@@ -37,7 +37,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 0.2.5+25
 
 environment:
-  sdk: '>=3.2.6 <4.0.0'
+  sdk: '>=3.8.0 <4.0.0'
 
 # Dependencies specify other packages that your package needs to work.
 # To automatically upgrade your package dependencies to the latest versions,
@@ -63,7 +63,7 @@ dependencies:
   flutter_translate: any
   geocoding: ^4.0.0
   geolocator: ^14.0.2
-  google_fonts: ^6.2.1
+  google_fonts: ^6.3.0
   # Tested home_widget: ^0.8.0 and it does not compile on iOS and Android.
   home_widget: ^0.7.0+1
   http: ^1.4.0
@@ -85,7 +85,7 @@ dependencies:
   url_launcher: ^6.3.2
   weather_repository:
     path: packages/weather_repository
-    # Tested workmanager: ^0.8.0 and it does not compile on iOS.
+    # Tested workmanager: ^0.9.0 and it does not compile on iOS.
   workmanager: ^0.7.0
 
 dev_dependencies:

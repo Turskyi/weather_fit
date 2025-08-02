@@ -5,9 +5,7 @@ import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/settings/bloc/settings_bloc.dart';
 
 class WeatherEmpty extends StatefulWidget {
-  const WeatherEmpty({
-    super.key,
-  });
+  const WeatherEmpty({super.key});
 
   @override
   State<WeatherEmpty> createState() => _WeatherEmptyState();
@@ -31,16 +29,24 @@ class _WeatherEmptyState extends State<WeatherEmpty> {
         return previousState.language != currentState.language ||
             currentLanguage != currentState.language;
       },
-      listener: (BuildContext _, SettingsState __) {
+      listener: (BuildContext _, SettingsState _) {
         setState(() {});
       },
       child: Column(
         mainAxisSize: MainAxisSize.min,
+        spacing: 4,
         children: <Widget>[
-          const Text('🏙️', style: TextStyle(fontSize: 64)),
           Text(
-            translate('explore_weather_prompt'),
-            style: theme.textTheme.headlineMedium,
+            '🏙️',
+            style: TextStyle(fontSize: theme.textTheme.displayLarge?.fontSize),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Text(
+              translate('explore_weather_prompt'),
+              textAlign: TextAlign.center,
+              style: theme.textTheme.headlineMedium,
+            ),
           ),
           Text(
             translate('weather.empty_search_prompt'),

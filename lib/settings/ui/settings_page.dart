@@ -45,10 +45,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     buildWhen: (SettingsState previous, SettingsState current) {
                       return previous.language != current.language;
                     },
-                    builder: (
-                      BuildContext _,
-                      SettingsState settingsState,
-                    ) {
+                    builder: (BuildContext _, SettingsState settingsState) {
                       final bool isEnglishSelected = settingsState.isEnglish;
 
                       // Approximate width of the Switch.
@@ -130,7 +127,9 @@ class _SettingsPageState extends State<SettingsPage> {
                                               ? colorScheme.primary
                                               : Colors.transparent,
                                           fontSize: themeData
-                                              .textTheme.labelSmall?.fontSize,
+                                              .textTheme
+                                              .labelSmall
+                                              ?.fontSize,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
@@ -192,10 +191,8 @@ class _SettingsPageState extends State<SettingsPage> {
                       ),
                       subtitle: Text(translate('settings.about_app_subtitle')),
                       trailing: const Icon(Icons.info_outline),
-                      onTap: () => Navigator.pushNamed(
-                        context,
-                        AppRoute.about.path,
-                      ),
+                      onTap: () =>
+                          Navigator.pushNamed(context, AppRoute.about.path),
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -238,9 +235,9 @@ class _SettingsPageState extends State<SettingsPage> {
                       ),
                       subtitle: Text(translate('settings.feedback_subtitle')),
                       trailing: const Icon(Icons.feedback),
-                      onTap: () => context
-                          .read<SettingsBloc>()
-                          .add(const BugReportPressedEvent()),
+                      onTap: () => context.read<SettingsBloc>().add(
+                        const BugReportPressedEvent(),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -259,10 +256,8 @@ class _SettingsPageState extends State<SettingsPage> {
                       ),
                       subtitle: Text(translate('settings.support_subtitle')),
                       trailing: const Icon(Icons.help_outline),
-                      onTap: () => Navigator.pushNamed(
-                        context,
-                        AppRoute.support.path,
-                      ),
+                      onTap: () =>
+                          Navigator.pushNamed(context, AppRoute.support.path),
                     ),
                   ),
                 ],
@@ -297,8 +292,8 @@ class _SettingsPageState extends State<SettingsPage> {
   void _changeLanguage(bool isEnglish) {
     final Language newLanguage = isEnglish ? Language.en : Language.uk;
     changeLocale(context, newLanguage.isoLanguageCode)
-        // The returned value is always `null`.
-        .then((Object? _) {
+    // The returned value is always `null`.
+    .then((Object? _) {
       if (mounted) {
         context.read<SettingsBloc>().add(ChangeLanguageEvent(newLanguage));
       }
@@ -337,9 +332,8 @@ class _SettingsPageState extends State<SettingsPage> {
     }
     if (_feedbackController != null) {
       _feedbackController?.show(
-        (UserFeedback feedback) => context.read<SettingsBloc>().add(
-              SubmitFeedbackEvent(feedback),
-            ),
+        (UserFeedback feedback) =>
+            context.read<SettingsBloc>().add(SubmitFeedbackEvent(feedback)),
       );
       _feedbackController?.addListener(_onFeedbackChanged);
     }
@@ -352,9 +346,7 @@ class _SettingsPageState extends State<SettingsPage> {
       _feedbackController?.removeListener(_onFeedbackChanged);
       _feedbackController = null;
       _isFeedbackControllerInitialized = false;
-      context.read<SettingsBloc>().add(
-            const ClosingFeedbackEvent(),
-          );
+      context.read<SettingsBloc>().add(const ClosingFeedbackEvent());
     }
   }
 

@@ -7,10 +7,7 @@ import 'package:weather_fit/res/widgets/leading_widget.dart';
 import 'package:weather_fit/utils/date_util.dart';
 
 class PrivacyPolicyPage extends StatelessWidget {
-  const PrivacyPolicyPage({
-    required this.languageIsoCode,
-    super.key,
-  });
+  const PrivacyPolicyPage({required this.languageIsoCode, super.key});
 
   final String languageIsoCode;
 
@@ -20,12 +17,11 @@ class PrivacyPolicyPage extends StatelessWidget {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final double? titleSize = textTheme.titleLarge?.fontSize;
     final double? bodySize = textTheme.bodyLarge?.fontSize;
+    final String updatedDate = getPrivacyLastUpdatedDate(languageIsoCode);
     return Scaffold(
       appBar: AppBar(
         leading: kIsWeb
-            ? LeadingWidget(
-                languageIsoCode: languageIsoCode,
-              )
+            ? LeadingWidget(languageIsoCode: languageIsoCode)
             : null,
         title: Text(translate('privacy_policy')),
       ),
@@ -43,9 +39,7 @@ class PrivacyPolicyPage extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              '${translate('last_updated')}: ${getPrivacyLastUpdatedDate(
-                languageIsoCode,
-              )}',
+              '${translate('last_updated')}: $updatedDate',
               style: TextStyle(fontSize: bodySize),
             ),
             const SizedBox(height: 20),
@@ -215,9 +209,7 @@ class PrivacyPolicyPage extends StatelessWidget {
                 'privacy.children_description',
                 args: <String, Object?>{'age': age},
               ),
-              style: TextStyle(
-                fontSize: bodySize,
-              ),
+              style: TextStyle(fontSize: bodySize),
             ),
             const SizedBox(height: 24),
             Text(

@@ -10,10 +10,7 @@ import 'package:weather_fit/res/widgets/leading_widget.dart';
 import 'package:weather_fit/router/app_route.dart';
 
 class AboutPage extends StatelessWidget {
-  const AboutPage({
-    required this.languageIsoCode,
-    super.key,
-  });
+  const AboutPage({required this.languageIsoCode, super.key});
 
   final String languageIsoCode;
 
@@ -51,9 +48,7 @@ class AboutPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         leading: kIsWeb
-            ? LeadingWidget(
-                languageIsoCode: languageIsoCode,
-              )
+            ? LeadingWidget(languageIsoCode: languageIsoCode)
             : null,
         title: Text(
           '${translate('about.title')} «${translate('title')}»',
@@ -65,10 +60,7 @@ class AboutPage extends StatelessWidget {
         child: ListView(
           children: <Widget>[
             const SizedBox(height: 12),
-            Text(
-              translate('app_description'),
-              style: textTheme.bodyLarge,
-            ),
+            Text(translate('app_description'), style: textTheme.bodyLarge),
             const SizedBox(height: 24),
             Text(
               '🌟 ${translate('features')}',
@@ -77,10 +69,7 @@ class AboutPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-            Text(
-              features.join('\n'),
-              style: textTheme.bodyMedium,
-            ),
+            Text(features.join('\n'), style: textTheme.bodyMedium),
             const SizedBox(height: 24),
             Text(
               '🎨 ${translate('artwork')}',
@@ -98,8 +87,9 @@ class AboutPage extends StatelessWidget {
                   ),
                   TextSpan(
                     text: translate('title'),
-                    style: textTheme.bodyMedium
-                        ?.copyWith(fontWeight: FontWeight.bold),
+                    style: textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   TextSpan(text: ' ${translate('about.were_created_by')} '),
                   TextSpan(
@@ -168,9 +158,8 @@ class AboutPage extends StatelessWidget {
             TextButton.icon(
               icon: const Icon(Icons.email_outlined),
               label: Text(translate('developer_contact_form')),
-              onPressed: () => launchUrl(
-                Uri.parse(constants.developerSupportUrl),
-              ),
+              onPressed: () =>
+                  launchUrl(Uri.parse(constants.developerSupportUrl)),
             ),
             const SizedBox(height: 32),
           ],

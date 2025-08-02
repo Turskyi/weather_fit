@@ -20,10 +20,8 @@ part 'settings_event.dart';
 part 'settings_state.dart';
 
 class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
-  SettingsBloc(
-    this._localDataSource,
-    Language initialLanguage,
-  ) : super(SettingsInitial(language: initialLanguage)) {
+  SettingsBloc(this._localDataSource, Language initialLanguage)
+    : super(SettingsInitial(language: initialLanguage)) {
     on<ClosingFeedbackEvent>(_onFeedbackDialogDismissed);
 
     on<BugReportPressedEvent>(_onFeedbackRequested);
@@ -83,16 +81,14 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         ..writeln()
         ..writeln(feedback.text.isEmpty ? feedbackText : '')
         ..writeln()
-        ..writeln('${isFeedbackRating ? translate('feedback.rating') : ''}'
-            '${isFeedbackRating ? ':' : ''}'
-            ' ${isFeedbackRating ? rating.value : ''}')
+        ..writeln(
+          '${isFeedbackRating ? translate('feedback.rating') : ''}'
+          '${isFeedbackRating ? ':' : ''}'
+          ' ${isFeedbackRating ? rating.value : ''}',
+        )
         ..writeln()
-        ..writeln(
-          '${translate('app_id')}: ${packageInfo.packageName}',
-        )
-        ..writeln(
-          '${translate('app_version')}: ${packageInfo.version}',
-        )
+        ..writeln('${translate('app_id')}: ${packageInfo.packageName}')
+        ..writeln('${translate('app_version')}: ${packageInfo.version}')
         ..writeln('${translate('build_number')}: ${packageInfo.buildNumber}')
         ..writeln()
         ..writeln('${translate('platform')}: $platform')
@@ -102,7 +98,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
           scheme: constants.mailToScheme,
           path: constants.supportEmail,
           queryParameters: <String, Object?>{
-            constants.subjectParameter: '${translate('feedback.app_feedback')}:'
+            constants.subjectParameter:
+                '${translate('feedback.app_feedback')}:'
                 ' ${packageInfo.appName}',
             constants.bodyParameter: feedbackBody.toString(),
           },
@@ -129,9 +126,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
           feedback.screenshot,
         );
         final Email email = Email(
-          subject: '${translate(
-            'feedback.app_feedback',
-          )}: ${packageInfo.appName}',
+          subject:
+              '${translate('feedback.app_feedback')}: ${packageInfo.appName}',
           body: feedbackBody.toString(),
           recipients: <String>[constants.supportEmail],
           attachmentPaths: <String>[screenshotFilePath],
@@ -146,9 +142,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       }
     } catch (e, stackTrace) {
       debugPrint('SettingsErrorEvent: $e\nStackTrace: $stackTrace');
-      add(
-        SettingsErrorEvent(translate('error.unexpected_error')),
-      );
+      add(SettingsErrorEvent(translate('error.unexpected_error')));
     }
   }
 
@@ -188,9 +182,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       if (isSaved && state is SettingsInitial) {
         emit((state as SettingsInitial).copyWith(language: language));
       } else {
-        add(
-          SettingsErrorEvent(translate('error.unexpected_error')),
-        );
+        add(SettingsErrorEvent(translate('error.unexpected_error')));
       }
     }
   }

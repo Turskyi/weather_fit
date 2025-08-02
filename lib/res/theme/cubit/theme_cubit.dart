@@ -44,7 +44,8 @@ class ThemeCubit extends HydratedCubit<Color> {
   @override
   Map<String, Object?> toJson(Color state) {
     return <String, String>{
-      _jsonColorKey: '#${state.intAlpha.toRadixString(16).padLeft(2, '0')}'
+      _jsonColorKey:
+          '#${state.intAlpha.toRadixString(16).padLeft(2, '0')}'
           '${state.intRed.toRadixString(16).padLeft(2, '0')}'
           '${state.intGreen.toRadixString(16).padLeft(2, '0')}'
           '${state.intBlue.toRadixString(16).padLeft(2, '0')}',

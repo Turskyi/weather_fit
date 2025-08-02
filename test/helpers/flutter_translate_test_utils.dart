@@ -13,9 +13,9 @@ const Map<String, Object?> _enTestTranslations = <String, Object?>{
   'build_number': 'Build number',
   'app_description':
       '«WeatherFit» helps you dress for the weather with carefully crafted '
-          'outfit suggestions. Just enter a location, and the app will show '
-          'you the current forecast along with a visual and text-based '
-          'recommendation on what to wear.',
+      'outfit suggestions. Just enter a location, and the app will show '
+      'you the current forecast along with a visual and text-based '
+      'recommendation on what to wear.',
   'features': 'Features',
   'artwork': 'Artwork',
   'anna_turska': 'Anna Turska',
@@ -81,10 +81,11 @@ const Map<String, Object?> _enTestTranslations = <String, Object?>{
   'error': <String, String>{
     'please_check_internet':
         'An error occurred. Please check your internet connection and try '
-            'again.',
+        'again.',
     'unexpected_error': 'An unexpected error occurred. Please try again.',
     'oops': 'Oops! Something went wrong. Please try again later.',
-    'cors': 'Error: Local Environment Setup Required\nTo run this application '
+    'cors':
+        'Error: Local Environment Setup Required\nTo run this application '
         'locally on web, please use the following command:\nflutter run -d '
         'chrome --web-browser-flag "--disable-web-security"\nThis step is '
         'necessary to bypass CORS restrictions during local development. '
@@ -96,7 +97,7 @@ const Map<String, Object?> _enTestTranslations = <String, Object?>{
     'location_permission_denied': 'Location permissions are denied',
     'location_permission_permanently_denied_cannot_request':
         'Location permissions are permanently denied, we cannot request '
-            'permissions.',
+        'permissions.',
     'getting_weather_generic':
         'Could not get weather information. Please try again.',
     'launch_email_app_to_address':
@@ -115,7 +116,7 @@ const Map<String, Object?> _enTestTranslations = <String, Object?>{
     'about_app_subtitle': 'Learn more about «WeatherFit».',
     'feedback_subtitle':
         'Let us know your thoughts and suggestions. You can also report any '
-            'issues with the app’s content.',
+        'issues with the app’s content.',
     'support_subtitle':
         'Visit our support page for help and frequently asked questions.',
   },
@@ -130,7 +131,7 @@ const Map<String, Object?> _enTestTranslations = <String, Object?>{
     'use_current_location_dialog_title': 'Use your current location?',
     'location_not_found_use_current_dialog_content':
         "We couldn't find the correct location. Would you like to use your "
-            'current location instead?',
+        'current location instead?',
   },
   'about': <String, String>{
     'title': 'About',
@@ -148,129 +149,129 @@ const Map<String, Object?> _enTestTranslations = <String, Object?>{
     'were_created_by': 'were hand-drawn by artist',
     'artwork_artist_outro':
         ', whose style brings charm and personality to the app. In addition to '
-            'being a talented illustrator, Anna is a professionally trained '
-            'fashion designer. Every outfit reflects not just artistic vision '
-            'but also real-world styling expertise - like receiving fashion '
-            'guidance from a qualified stylist, built right into the app.',
+        'being a talented illustrator, Anna is a professionally trained '
+        'fashion designer. Every outfit reflects not just artistic vision '
+        'but also real-world styling expertise - like receiving fashion '
+        'guidance from a qualified stylist, built right into the app.',
     'privacy_title': 'Privacy & Data',
     'privacy_description':
         '«{appName}» does not collect or store any personal data. Your '
-            'approximate location is used only to show the local weather and '
-            'is never shared. Outfit suggestions are generated on-device based '
-            'on the weather conditions. You can read the full privacy policy '
-            'below.',
+        'approximate location is used only to show the local weather and '
+        'is never shared. Outfit suggestions are generated on-device based '
+        'on the weather conditions. You can read the full privacy policy '
+        'below.',
     'view_privacy_policy': 'View Privacy Policy',
     'support_description':
         'Having trouble? Need help or want to suggest a feature? Join the '
-            'community or contact the developer directly.',
+        'community or contact the developer directly.',
     'contact_support': 'Contact Support',
   },
   'privacy': <String, String>{
     'policy_intro':
         "Your privacy is important to us. It is {appName}'s policy to respect "
-            'your privacy and comply with any applicable law and regulation '
-            'regarding any personal information we may collect about you, '
-            'including across our app, «{appName}», and its associated '
-            'services.',
+        'your privacy and comply with any applicable law and regulation '
+        'regarding any personal information we may collect about you, '
+        'including across our app, «{appName}», and its associated '
+        'services.',
     'information_we_collect': 'Information We Collect',
     'no_personal_data_collection':
         'We do not collect any personal information such as name, email '
-            'address, or phone number.',
+        'address, or phone number.',
     'location_access_request':
         "«{appName}» may optionally request access to your device's "
-            'approximate location (coarse location). This access is only '
-            'requested if the app cannot automatically determine your location '
-            'based on your entered city name. You will be asked to grant '
-            'permission before the app attempts to access your location.',
+        'approximate location (coarse location). This access is only '
+        'requested if the app cannot automatically determine your location '
+        'based on your entered city name. You will be asked to grant '
+        'permission before the app attempts to access your location.',
     'location_data_usage':
         'If you grant location permission, this data is used locally within '
-            'the app to help find relevant weather information for your '
-            'current location. This location data is not stored or transmitted '
-            'anywhere outside of your device and is used only temporarily to '
-            'find your current location. After finding weather for current '
-            'location it is discarded. You can choose not to provide your '
-            'location, in which case you can continue using the app by '
-            'manually entering your city name.',
+        'the app to help find relevant weather information for your '
+        'current location. This location data is not stored or transmitted '
+        'anywhere outside of your device and is used only temporarily to '
+        'find your current location. After finding weather for current '
+        'location it is discarded. You can choose not to provide your '
+        'location, in which case you can continue using the app by '
+        'manually entering your city name.',
     'third_party_services_info':
         '«{appName}» uses third-party services that may collect information '
-            'used to identify you. These services include Firebase Crashlytics '
-            'and Google Analytics. The data collected by these services is '
-            'used to improve app stability and user experience. You can find '
-            'more information about their privacy practices at their '
-            'respective websites.',
+        'used to identify you. These services include Firebase Crashlytics '
+        'and Google Analytics. The data collected by these services is '
+        'used to improve app stability and user experience. You can find '
+        'more information about their privacy practices at their '
+        'respective websites.',
     'consent_agreement':
         'By using our services, you consent to the collection and use of your '
-            'information as described in this privacy policy.',
+        'information as described in this privacy policy.',
     'security_measures': 'Security Measures',
     'security_measures_description':
         'We take reasonable measures to protect your information from '
-            'unauthorized access, disclosure, or modification.',
+        'unauthorized access, disclosure, or modification.',
     'children_description':
         'Our services are not directed towards children under the age of '
-            '{age}. We do not knowingly collect personal information from '
-            'children under {age}. While we strive to minimize data '
-            'collection, third-party services we use (such as Firebase '
-            'Crashlytics and Google Analytics) may collect some data. However, '
-            'this data is collected anonymously and is not linked to any '
-            'personal information. If you believe that a child under {age} has '
-            'provided us with personal information, please contact us, and we '
-            'will investigate the matter.',
+        '{age}. We do not knowingly collect personal information from '
+        'children under {age}. While we strive to minimize data '
+        'collection, third-party services we use (such as Firebase '
+        'Crashlytics and Google Analytics) may collect some data. However, '
+        'this data is collected anonymously and is not linked to any '
+        'personal information. If you believe that a child under {age} has '
+        'provided us with personal information, please contact us, and we '
+        'will investigate the matter.',
     'crashlytics_description':
         '«{appName}» uses Firebase Crashlytics, a service by Google, to '
-            'collect crash reports anonymously to help us improve app '
-            'stability and fix bugs. The data collected by Crashlytics does '
-            'not include any personal information.',
+        'collect crash reports anonymously to help us improve app '
+        'stability and fix bugs. The data collected by Crashlytics does '
+        'not include any personal information.',
     'ai_content_description':
         '«{appName}» no longer uses artificial intelligence (AI) to generate '
-            'outfit images in real time. Instead, all images are now pre-drawn '
-            'and bundled with the app. While some images may have been '
-            'assisted by AI tools during the design process, no user data is '
-            'sent to external AI services during usage.\n\nIf you have '
-            'concerns or wish to provide feedback on any content, please use '
-            'the "Feedback" option in the app’s settings.',
+        'outfit images in real time. Instead, all images are now pre-drawn '
+        'and bundled with the app. While some images may have been '
+        'assisted by AI tools during the design process, no user data is '
+        'sent to external AI services during usage.\n\nIf you have '
+        'concerns or wish to provide feedback on any content, please use '
+        'the "Feedback" option in the app’s settings.',
     'outfit_illustrations_created_by': 'Outfit illustrations were created by',
     'artwork_creation_method':
         ', using a mix of hand-drawn elements and AI tools.',
     'updates_and_notifications_description':
         'This privacy policy may be updated periodically. Any changes to the '
-            'policy will be communicated to you through app updates or '
-            'notifications.',
+        'policy will be communicated to you through app updates or '
+        'notifications.',
     'contact_us_invitation':
         'For any questions or concerns regarding your privacy, you may contact '
-            'us using the following details:',
+        'us using the following details:',
     'platform_specific_intro':
         '«{appName}» offers different features depending on the platform you '
-            'are using (mobile, macOS, or web). Please note the following '
-            'platform-specific details:',
+        'are using (mobile, macOS, or web). Please note the following '
+        'platform-specific details:',
     'platform_mobile_description':
         'On mobile devices, «{appName}» provides visual outfit recommendations '
-            'based on current weather conditions. These images are not '
-            'generated in real time by AI, but instead are pre-drawn and '
-            'stored locally within the app. No weather or user data is sent to '
-            'external services to generate these outfits.',
+        'based on current weather conditions. These images are not '
+        'generated in real time by AI, but instead are pre-drawn and '
+        'stored locally within the app. No weather or user data is sent to '
+        'external services to generate these outfits.',
     'platform_macos_description':
         'On macOS, the app uses approximate location (with permission) to '
-            'provide local weather and corresponding outfit recommendations, '
-            'similar to mobile.',
+        'provide local weather and corresponding outfit recommendations, '
+        'similar to mobile.',
     'platform_image_generation_explanation':
         'On mobile and desktop platforms, outfit images are not generated in '
-            'real time using AI. Instead, they are pre-drawn illustrations '
-            'bundled with the app. Some of these assets may have been '
-            'initially drafted or refined with the help of AI tools during the '
-            'creative process, but no user data is shared with AI services '
-            'during app usage.',
+        'real time using AI. Instead, they are pre-drawn illustrations '
+        'bundled with the app. Some of these assets may have been '
+        'initially drafted or refined with the help of AI tools during the '
+        'creative process, but no user data is shared with AI services '
+        'during app usage.',
     'platform_web_description':
         'On the web, «{appName}» displays both text and visual outfit '
-            'recommendations, just like on mobile and desktop platforms. '
-            'However, home screen widgets are not available on the web due to '
-            'current technical limitations.',
+        'recommendations, just like on mobile and desktop platforms. '
+        'However, home screen widgets are not available on the web due to '
+        'current technical limitations.',
     'image_attribution_and_rights_description':
         'All outfit illustrations in «{appName}» were created and edited by '
-            'artist Anna Turska, using a combination of original design work '
-            'and AI-assisted drafts (e.g., Bing Image Creator). These images '
-            'are bundled with the app and not fetched from any external source '
-            'during use. All rights to the final images are reserved by the '
-            'developer.',
+        'artist Anna Turska, using a combination of original design work '
+        'and AI-assisted drafts (e.g., Bing Image Creator). These images '
+        'are bundled with the app and not fetched from any external source '
+        'during use. All rights to the final images are reserved by the '
+        'developer.',
   },
   'support': <String, String>{
     'title': 'Support',
@@ -279,14 +280,14 @@ const Map<String, Object?> _enTestTranslations = <String, Object?>{
     'faq_hourly_forecast_q': '• Why is there no hourly forecast?',
     'faq_hourly_forecast_a':
         'Hourly weather is currently not supported, but may be added in the '
-            'future.',
+        'future.',
     'faq_change_location_q': '• Can I change my location later?',
     'faq_change_location_a':
         'Yes, the app lets you confirm and update your location during use.',
     'faq_theme_change_q': '• Why does the theme change at night?',
     'faq_theme_change_a':
         'The app automatically switches to a moon-themed dark mode between '
-            '11pm and 5am for a more natural look.',
+        '11pm and 5am for a more natural look.',
     'contact_intro': 'If you’re experiencing issues or have suggestions:',
     'contact_us_via_email_button': 'Contact Us via Email',
     'join_telegram_support_button': 'Join Telegram Support Group',
@@ -338,15 +339,17 @@ const Map<String, Object?> _enTestTranslations = <String, Object?>{
     'unavailable_short': '👕 No outfit available.',
     'no_recommendation_short': '🚫 no recommendation.',
     'rainy': "🌧️\nIt's rainy! Consider wearing a waterproof jacket and boots.",
-    'snowy': "❄️\nIt's snowy! Dress warmly with a heavy coat, hat, gloves, and "
+    'snowy':
+        "❄️\nIt's snowy! Dress warmly with a heavy coat, hat, gloves, and "
         'scarf.',
     'cold':
         "🥶\nIt's cold! Wear a warm jacket, sweater, and consider a hat and "
-            'gloves.',
+        'gloves.',
     'cool': "🧥\nIt's cool. A light jacket or sweater should be comfortable.",
     'warm':
         "👕\nIt's warm. Shorts, t-shirts, and light dresses are great options.",
-    'hot': "☀️\nIt's hot! Wear light, breathable clothing like tank tops and "
+    'hot':
+        "☀️\nIt's hot! Wear light, breathable clothing like tank tops and "
         'shorts.',
     'moderate':
         '🌤️\nThe weather is moderate. You can wear a variety of outfits.',
@@ -359,7 +362,8 @@ const Map<String, Object?> _ukTestTranslations = <String, Object?>{
   'app_id': 'Ідентифікатор програми',
   'app_version': 'Версія програми',
   'build_number': 'Номер збірки',
-  'app_description': '«WeatherFit» допоможе вам одягнутися по погоді за '
+  'app_description':
+      '«WeatherFit» допоможе вам одягнутися по погоді за '
       'допомогою ретельно підібраних рекомендацій щодо одягу. Просто введіть '
       'місцезнаходження, і програма покаже поточний прогноз разом із '
       'візуальною та текстовою рекомендацією, що одягнути.',
@@ -385,7 +389,8 @@ const Map<String, Object?> _ukTestTranslations = <String, Object?>{
   'mobile': 'Мобільні пристрої (Андроїд, Айос)',
   'macos': 'Макось',
   'web': 'Веб (Інтернет)',
-  'image_attribution_and_rights_title': 'Зазначення авторства та права на '
+  'image_attribution_and_rights_title':
+      'Зазначення авторства та права на '
       'зображення',
   'never_updated': 'Ніколи не оновлювався',
   'lat': 'Широта',
@@ -393,7 +398,8 @@ const Map<String, Object?> _ukTestTranslations = <String, Object?>{
   'could_not_launch': 'Не вдалося відкрити',
   'faq': 'Часті запитання',
   'contact_support': 'Звернутися до служби підтримки',
-  'legal_and_app_info_title': '📄 Правова інформація та інформація про '
+  'legal_and_app_info_title':
+      '📄 Правова інформація та інформація про '
       'програму',
   'developer': 'Розробник',
   'developer_name': 'Дмитро Турський',
@@ -429,47 +435,60 @@ const Map<String, Object?> _ukTestTranslations = <String, Object?>{
     'good': 'Добре',
   },
   'error': <String, String>{
-    'please_check_internet': 'Виникла помилка. Будьласка, перевірте '
+    'please_check_internet':
+        'Виникла помилка. Будьласка, перевірте '
         'підключення до Інтернету та спробуйте ще раз.',
-    'unexpected_error': 'Виникла неочікувана помилка. Будь ласка, спробуйте ще '
+    'unexpected_error':
+        'Виникла неочікувана помилка. Будь ласка, спробуйте ще '
         'раз.',
     'oops': 'Ой лишенько! Щось пішло не так. Будь ласка, спробуйте пізніше.',
-    'cors': 'Помилка: Необхідне налаштування локального середовища\nДля '
+    'cors':
+        'Помилка: Необхідне налаштування локального середовища\nДля '
         'локального запуску цього веб додатку в браузері, будь ласка, '
         'використовуйте наступну команду:\n'
         'flutter run -d chrome --web-browser-flag "--disable-web-security"\n'
         'Цей крок необхідний для обходу обмежень CORS під час локальної '
         'розробки. Зверніть увагу, що цей прапорець слід використовувати '
         'тільки в середовищі розробки і ніколи в продакшні.',
-    'launch_email_or_support_page': 'Не вдалося запустити електронну пошту або '
+    'launch_email_or_support_page':
+        'Не вдалося запустити електронну пошту або '
         'сторінку підтримки.',
     'something_went_wrong': 'Щось пішло не так!',
     'searching_location': 'Помилка пошуку місцезнаходження',
-    'location_permission_denied': 'Дозволи на доступ до місцезнаходження '
+    'location_permission_denied':
+        'Дозволи на доступ до місцезнаходження '
         'відхилено',
-    'location_permission_permanently_denied_cannot_request': 'Дозволи на '
+    'location_permission_permanently_denied_cannot_request':
+        'Дозволи на '
         'доступ до місцезнаходження відхилено назавжди, ми не можемо '
         'запитувати дозволи.',
-    'getting_weather_generic': 'Не вдалося отримати інформацію про погоду. '
+    'getting_weather_generic':
+        'Не вдалося отримати інформацію про погоду. '
         'Будь ласка, спробуйте ще раз.',
-    'launch_email_app_to_address': 'Не вдалося запустити поштовий клієнт, щоб '
+    'launch_email_app_to_address':
+        'Не вдалося запустити поштовий клієнт, щоб '
         'надіслати листа на адресу {emailAddress}',
     'launch_email_failed': 'Не вдалося запустити поштову програму.',
-    'save_asset_image_failed': 'Не вдалося зберегти зображення у сховищі '
+    'save_asset_image_failed':
+        'Не вдалося зберегти зображення у сховищі '
         'пристрою',
   },
   'settings': <String, String>{
     'title': 'Налаштування',
     'language': 'Мова',
     'temperature_units': 'Одиниці вимірювання температури',
-    'temperature_units_subtitle_metric': 'Використовувати метричну систему для '
+    'temperature_units_subtitle_metric':
+        'Використовувати метричну систему для '
         'одиниць температури.',
-    'temperature_units_subtitle_imperial': 'Використовувати імперську систему '
+    'temperature_units_subtitle_imperial':
+        'Використовувати імперську систему '
         'для одиниць температури.',
     'about_app_subtitle': 'Дізнайтеся більше про «WeatherFit».',
-    'feedback_subtitle': 'Поділіться своїми думками та пропозиціями. Ви також '
+    'feedback_subtitle':
+        'Поділіться своїми думками та пропозиціями. Ви також '
         'можете повідомити про будь-які проблеми з вмістом програми.',
-    'support_subtitle': 'Відвідайте нашу сторінку підтримки для допомоги та '
+    'support_subtitle':
+        'Відвідайте нашу сторінку підтримки для допомоги та '
         'поширених запитань.',
   },
   'search': <String, String>{
@@ -477,12 +496,15 @@ const Map<String, Object?> _ukTestTranslations = <String, Object?>{
     'enter_city_or_country': 'Введіть місто або країну',
     'page_semantics_label': 'Сторінка пошуку міста або країни',
     'page_app_bar_title': 'Пошук міста або країни',
-    'instructions': 'Введіть назву міста чи країни та натисніть "Відправити", '
+    'instructions':
+        'Введіть назву міста чи країни та натисніть "Відправити", '
         'щоб побачити погоду.',
     'confirm_location_dialog_title': 'Це ваше місцезнаходження?',
-    'use_current_location_dialog_title': 'Використати ваше поточне '
+    'use_current_location_dialog_title':
+        'Використати ваше поточне '
         'місцезнаходження?',
-    'location_not_found_use_current_dialog_content': 'Нам не вдалося знайти '
+    'location_not_found_use_current_dialog_content':
+        'Нам не вдалося знайти '
         'правильне місцезнаходження. Бажаєте натомість використати ваше '
         'поточне місцезнаходження?',
   },
@@ -490,52 +512,64 @@ const Map<String, Object?> _ukTestTranslations = <String, Object?>{
     'title': 'Про застосунок',
     'feature_outfit_suggestions': '• Пропозиції одягу відповідно до погоди',
     'feature_location_forecast': '• Прогноз погоди на основі місцезнаходження',
-    'feature_location_support_web': '• Підтримка приблизного місцезнаходження '
+    'feature_location_support_web':
+        '• Підтримка приблизного місцезнаходження '
         '(потрібен дозвіл браузера)',
-    'feature_location_support_macos': '• Підтримка приблизного '
+    'feature_location_support_macos':
+        '• Підтримка приблизного '
         'місцезнаходження (потрібен дозвіл на доступ до геопозиції)',
-    'feature_location_support_default': '• Підтримка приблизного '
+    'feature_location_support_default':
+        '• Підтримка приблизного '
         'місцезнаходження (GPS не потрібен)',
-    'feature_privacy_friendly': '• Дбайливе ставлення до приватності '
+    'feature_privacy_friendly':
+        '• Дбайливе ставлення до приватності '
         '(без відстеження, без облікових записів)',
-    'feature_home_widgets': '• Віджети головного екрана для мобільних '
+    'feature_home_widgets':
+        '• Віджети головного екрана для мобільних '
         'пристроїв',
     'outfit_illustrations_in': 'Ілюстрації одягу в',
     'were_created_by': 'були намальовані вручну художницею',
-    'artwork_artist_outro': ', чий стиль додає шарму та індивідуальності '
+    'artwork_artist_outro':
+        ', чий стиль додає шарму та індивідуальності '
         'додатку. Кожен образ у додатку - це не просто гарна картинка, а й '
         'продумана стилізація від професійної дизайнерки одягу. Це наче '
         'безкоштовна порада від стиліста - просто у вас під рукою.',
     'privacy_title': 'Приватність і дані',
-    'privacy_description': '«{appName}» не збирає та не зберігає жодних '
+    'privacy_description':
+        '«{appName}» не збирає та не зберігає жодних '
         'персональних даних. Ваше приблизне місцезнаходження використовується '
         'лише для відображення місцевої погоди та ніколи не передається іншим. '
         'Пропозиції щодо одягу генеруються на пристрої на основі погодних '
         'умов. Ви можете ознайомитися з повною політикою конфіденційності '
         'нижче.',
     'view_privacy_policy': 'Переглянути Політику конфіденційності',
-    'support_description': 'Виникли проблеми? Потрібна допомога або хочете '
+    'support_description':
+        'Виникли проблеми? Потрібна допомога або хочете '
         "запропонувати нову функцію? Приєднуйтесь до спільноти або зв'яжіться "
         'з розробником напряму.',
   },
   'privacy': <String, String>{
-    'policy_intro': 'Ваша конфіденційність важлива для нас. Політика {appName} '
+    'policy_intro':
+        'Ваша конфіденційність важлива для нас. Політика {appName} '
         'полягає в повазі до вашої конфіденційності та дотриманні всіх чинних '
         'законів і нормативних актів щодо будь-якої особистої інформації, яку '
         'ми можемо збирати про вас, у тому числі в нашому додатку «{appName}» '
         "та пов'язаних з ним сервісах.",
     'information_we_collect': 'Ми збираємо такі дані',
-    'no_personal_data_collection': 'Ми не збираємо жодної особистої '
+    'no_personal_data_collection':
+        'Ми не збираємо жодної особистої '
         "інформації, такої як ім'я, адреса електронної пошти або номер "
         'телефону.',
-    'location_access_request': '«{appName}» може додатково запитувати доступ '
+    'location_access_request':
+        '«{appName}» може додатково запитувати доступ '
         'до приблизного місцезнаходження вашого пристрою '
         '(приблизне місцезнаходження). Цей доступ запитується лише в тому '
         'випадку, якщо програма не може автоматично визначити ваше '
         'місцезнаходження на основі введеної назви міста. Перш ніж програма '
         'спробує отримати доступ до вашого місцезнаходження, вам буде '
         'запропоновано надати дозвіл.',
-    'location_data_usage': 'Якщо ви надаєте дозвіл на доступ до '
+    'location_data_usage':
+        'Якщо ви надаєте дозвіл на доступ до '
         'місцезнаходження, ці дані використовуються локально в додатку для '
         'пошуку відповідної інформації про погоду для вашого поточного '
         'місцезнаходження. Дані про місцезнаходження не зберігаються та не '
@@ -544,21 +578,25 @@ const Map<String, Object?> _ukTestTranslations = <String, Object?>{
         'визначення погоди для поточного місцезнаходження вони видаляються. Ви '
         'можете не надавати своє місцезнаходження, у такому випадку ви зможете '
         'продовжувати користуватися додатком, вводячи назву міста вручну.',
-    'third_party_services_info': '«{appName}» використовує сторонні сервіси, '
+    'third_party_services_info':
+        '«{appName}» використовує сторонні сервіси, '
         'які можуть збирати інформацію, що використовується для вашої '
         'ідентифікації. До таких сервісів належать Firebase Crashlytics та '
         'Google Analytics. Дані, зібрані цими сервісами, використовуються для '
         'покращення стабільності програми та взаємодії з користувачем. Більше '
         'інформації про їхню політику конфіденційності ви можете знайти на '
         'їхніх відповідних веб-сайтах.',
-    'consent_agreement': 'Використовуючи наші сервіси, ви погоджуєтеся на збір '
+    'consent_agreement':
+        'Використовуючи наші сервіси, ви погоджуєтеся на збір '
         'та використання вашої інформації, як описано в цій політиці '
         'конфіденційності.',
     'security_measures': 'Заходи безпеки',
-    'security_measures_description': 'Ми вживаємо розумних заходів для захисту '
+    'security_measures_description':
+        'Ми вживаємо розумних заходів для захисту '
         'вашої інформації від несанкціонованого доступу, розголошення або '
         'зміни.',
-    'children_description': 'Наші послуги не призначені для дітей віком до '
+    'children_description':
+        'Наші послуги не призначені для дітей віком до '
         '{age} років. Ми свідомо не збираємо особисту інформацію від дітей '
         'віком до {age} років. Хоча ми прагнемо мінімізувати збір даних, '
         'сторонні сервіси, які ми використовуємо (наприклад, Firebase '
@@ -567,86 +605,87 @@ const Map<String, Object?> _ukTestTranslations = <String, Object?>{
         'інформацією. Якщо ви вважаєте, що дитина віком до {age} років надала '
         "нам особисту інформацію, будь ласка, зв'яжіться з нами, і ми "
         'розслідуємо це питання.',
-    'crashlytics_description': '«{appName}» використовує Firebase Crashlytics, '
+    'crashlytics_description':
+        '«{appName}» використовує Firebase Crashlytics, '
         'сервіс від Google, для анонімного збору звітів про збої, що допомагає '
         'нам покращувати стабільність програми та виправляти помилки. Дані, '
         'зібрані Crashlytics, не містять жодної особистої інформації.',
     'ai_content_description':
         '«{appName}» більше не використовує штучний інтелект (ШІ) для '
-            'генерації зображень одягу в реальному часі. Натомість, усі '
-            'зображення тепер попередньо намальовані та входять до комплекту '
-            'програми. Хоча деякі зображення могли бути створені за допомогою '
-            'інструментів ШІ під час процесу дизайну, жодні дані користувача '
-            'не надсилаються до зовнішніх сервісів ШІ під час використання.\n\n'
-            'Якщо у вас є занепокоєння або ви бажаєте надати відгук щодо '
-            'будь-якого вмісту, будь ласка, скористайтеся опцією «Відгук» у '
-            'налаштуваннях програми.',
+        'генерації зображень одягу в реальному часі. Натомість, усі '
+        'зображення тепер попередньо намальовані та входять до комплекту '
+        'програми. Хоча деякі зображення могли бути створені за допомогою '
+        'інструментів ШІ під час процесу дизайну, жодні дані користувача '
+        'не надсилаються до зовнішніх сервісів ШІ під час використання.\n\n'
+        'Якщо у вас є занепокоєння або ви бажаєте надати відгук щодо '
+        'будь-якого вмісту, будь ласка, скористайтеся опцією «Відгук» у '
+        'налаштуваннях програми.',
     'outfit_illustrations_created_by': 'Ілюстрації одягу створила',
     'artwork_creation_method':
         ', з використанням поєднання мальованих вручну елементів та '
-            'інструментів ШІ.',
+        'інструментів ШІ.',
     'updates_and_notifications_description':
         'Ця політика конфіденційності може періодично оновлюватися. Про '
-            'будь-які зміни в політиці вам буде повідомлено через оновлення '
-            'програми або сповіщення.',
+        'будь-які зміни в політиці вам буде повідомлено через оновлення '
+        'програми або сповіщення.',
     'contact_us_invitation':
         'З будь-яких питань або занепокоєнь щодо вашої конфіденційності, ви '
-            "можете зв'язатися з нами за наступними контактними даними:",
+        "можете зв'язатися з нами за наступними контактними даними:",
     'platform_specific_intro':
         '«{appName}» пропонує різні функції залежно від платформи, яку ви '
-            'використовуєте (мобільна, macOS або веб). Будь ласка, зверніть '
-            'увагу на наступні деталі, специфічні для платформи:',
+        'використовуєте (мобільна, macOS або веб). Будь ласка, зверніть '
+        'увагу на наступні деталі, специфічні для платформи:',
     'platform_mobile_description':
         'На мобільних пристроях «{appName}» надає візуальні рекомендації щодо '
-            'одягу на основі поточних погодних умов. Ці зображення не '
-            'генеруються штучним інтелектом у реальному часі, а натомість є '
-            'попередньо намальованими та зберігаються локально в додатку. '
-            'Жодні дані про погоду або користувача не надсилаються до '
-            'зовнішніх сервісів для генерації цього одягу.',
+        'одягу на основі поточних погодних умов. Ці зображення не '
+        'генеруються штучним інтелектом у реальному часі, а натомість є '
+        'попередньо намальованими та зберігаються локально в додатку. '
+        'Жодні дані про погоду або користувача не надсилаються до '
+        'зовнішніх сервісів для генерації цього одягу.',
     'platform_macos_description':
         'У macOS програма використовує приблизне місцезнаходження (з дозволу) '
-            'для надання місцевої погоди та відповідних рекомендацій щодо '
-            'одягу, подібно до мобільної версії.',
+        'для надання місцевої погоди та відповідних рекомендацій щодо '
+        'одягу, подібно до мобільної версії.',
     'platform_image_generation_explanation':
         'На мобільних та настільних платформах зображення одягу не генеруються '
-            'в реальному часі за допомогою ШІ. Замість цього, це попередньо '
-            'намальовані ілюстрації, що входять до комплекту програми. Деякі з '
-            'цих ресурсів могли бути спочатку створені або вдосконалені за '
-            'допомогою інструментів ШІ під час творчого процесу, але жодні '
-            'дані користувача не передаються сервісам ШІ під час використання '
-            'програми.',
+        'в реальному часі за допомогою ШІ. Замість цього, це попередньо '
+        'намальовані ілюстрації, що входять до комплекту програми. Деякі з '
+        'цих ресурсів могли бути спочатку створені або вдосконалені за '
+        'допомогою інструментів ШІ під час творчого процесу, але жодні '
+        'дані користувача не передаються сервісам ШІ під час використання '
+        'програми.',
     'platform_web_description':
         'У веб-версії «{appName}» відображає як текстові, так і візуальні '
-            'рекомендації щодо одягу, так само як на мобільних та настільних '
-            'платформах. Однак віджети головного екрана недоступні у '
-            'веб-версії через поточні технічні обмеження.',
+        'рекомендації щодо одягу, так само як на мобільних та настільних '
+        'платформах. Однак віджети головного екрана недоступні у '
+        'веб-версії через поточні технічні обмеження.',
     'image_attribution_and_rights_description':
         'Усі ілюстрації одягу в «{appName}» були створені та відредаговані '
-            'художницею Анною Турською з використанням поєднання оригінальної '
-            'дизайнерської роботи та чернеток, створених за допомогою ШІ '
-            '(наприклад, Bing Image Creator). Ці зображення входять до '
-            'комплекту програми та не завантажуються з будь-яких зовнішніх '
-            'джерел під час використання. Усі права на кінцеві зображення '
-            'належать розробнику.',
+        'художницею Анною Турською з використанням поєднання оригінальної '
+        'дизайнерської роботи та чернеток, створених за допомогою ШІ '
+        '(наприклад, Bing Image Creator). Ці зображення входять до '
+        'комплекту програми та не завантажуються з будь-яких зовнішніх '
+        'джерел під час використання. Усі права на кінцеві зображення '
+        'належать розробнику.',
   },
   'support': <String, String>{
     'title': 'Підтримка',
     'intro_line':
         'Потрібна допомога або бажаєте залишити відгук? Ви у правильному '
-            'місці.',
+        'місці.',
     'faq_hourly_forecast_q': '• Чому немає погодинного прогнозу?',
     'faq_hourly_forecast_a':
         'Погодинний прогноз наразі не підтримується, але може бути доданий у '
-            'майбутньому.',
+        'майбутньому.',
     'faq_change_location_q':
         '• Чи можу я змінити своє місцезнаходження пізніше?',
     'faq_change_location_a':
         'Так, програма дозволяє підтверджувати та оновлювати ваше '
-            'місцезнаходження під час використання.',
+        'місцезнаходження під час використання.',
     'faq_theme_change_q': '• Чому тема змінюється вночі?',
     'faq_theme_change_a':
         'Програма автоматично перемикається на темний режим у місячній '
-            'тематиці між 23:00 та 5:00 для більш природного вигляду.',
+        'тематиці між 23:00 та 5:00 для більш природного вигляду.',
     'contact_intro': 'Якщо у вас виникають проблеми або є пропозиції:',
     'contact_us_via_email_button': "Зв'язатися з нами електронною поштою",
     'join_telegram_support_button': 'Приєднатися до групи підтримки в Telegram',
@@ -700,11 +739,13 @@ const Map<String, Object?> _ukTestTranslations = <String, Object?>{
     'rainy': '🌧️\nДощить! Подумайте про водонепроникну куртку та черевики.',
     'snowy':
         '❄️\nСніжно! Одягніться тепло: важке пальто, шапка, рукавички та шарф.',
-    'cold': '🥶\nХолодно! Одягніть теплу куртку, светр, а також подумайте про '
+    'cold':
+        '🥶\nХолодно! Одягніть теплу куртку, светр, а також подумайте про '
         'шапку та рукавички.',
     'cool': '🧥\nПрохолодно. Легка куртка або светр будуть комфортними.',
     'warm': '👕\nТепло. Шорти, футболки та легкі сукні – чудові варіанти.',
-    'hot': '☀️\nСпекотно! Носіть легкий, дихаючий одяг, наприклад, майки та '
+    'hot':
+        '☀️\nСпекотно! Носіть легкий, дихаючий одяг, наприклад, майки та '
         'шорти.',
     'moderate': '🌤️\nПогода помірна. Ви можете носити різноманітний одяг.',
   },
@@ -713,9 +754,7 @@ const Map<String, Object?> _ukTestTranslations = <String, Object?>{
 Future<LocalizationDelegate> setUpFlutterTranslateForTests({
   Locale startLocale = const Locale('en'),
 }) async {
-  SharedPreferences.setMockInitialValues(
-    <String, Object>{},
-  );
+  SharedPreferences.setMockInitialValues(<String, Object>{});
 
   final LocalizationDelegate delegate = await LocalizationDelegate.create(
     fallbackLocale: 'en',

@@ -5,10 +5,7 @@ import 'package:weather_fit/weather/ui/weather_page.dart';
 import '../constants.dart' as constants;
 
 class LeadingWidget extends StatelessWidget {
-  const LeadingWidget({
-    required this.languageIsoCode,
-    super.key,
-  });
+  const LeadingWidget({required this.languageIsoCode, super.key});
 
   final String languageIsoCode;
 

@@ -26,14 +26,14 @@ Future<void> injectDependencies() async {
     Workmanager()
         .initialize(_callbackDispatcher, isInDebugMode: kDebugMode)
         .then((void _) {
-      Workmanager().registerPeriodicTask(
-        'weatherfit_background_update',
-        'updateWidgetTask',
-        // Every 2 hours.
-        frequency: const Duration(hours: 2),
-        constraints: Constraints(networkType: NetworkType.connected),
-      );
-    });
+          Workmanager().registerPeriodicTask(
+            'weatherfit_background_update',
+            'updateWidgetTask',
+            // Every 2 hours.
+            frequency: const Duration(hours: 2),
+            constraints: Constraints(networkType: NetworkType.connected),
+          );
+        });
   }
 
   Bloc.observer = const WeatherBlocObserver();
@@ -59,10 +59,8 @@ Future<void> injectDependencies() async {
 void _callbackDispatcher() {
   //TODO: change implementation to how it is done in
   // https://github.com/ABausG/home_widget/blob/main/packages/home_widget/example/lib/main.dart
-  Workmanager().executeTask((
-    String __,
-    Map<String, Object?>? _,
-  ) async {
+  // and according to new documentation https://docs.page/abausg/home_widget.
+  Workmanager().executeTask((String _, Map<String, Object?>? _) async {
     try {
       // Must initialize Flutter binding.
       WidgetsFlutterBinding.ensureInitialized();
@@ -80,10 +78,8 @@ void _callbackDispatcher() {
 
       final Location lastSavedLocation = localDataSource.getLastSavedLocation();
 
-      final WeatherDomain domainWeather =
-          await weatherRepository.getWeatherByLocation(
-        lastSavedLocation,
-      );
+      final WeatherDomain domainWeather = await weatherRepository
+          .getWeatherByLocation(lastSavedLocation);
 
       final Weather weather = Weather.fromRepository(domainWeather);
 
@@ -102,10 +98,8 @@ void _callbackDispatcher() {
         localDataSource,
       );
 
-      final String outfitRecommendation =
-          outfitRepository.getOutfitRecommendation(
-        updatedWeather,
-      );
+      final String outfitRecommendation = outfitRepository
+          .getOutfitRecommendation(updatedWeather);
 
       final String outfitAssetPath = outfitRepository.getOutfitImageAssetPath(
         weather,
@@ -136,12 +130,12 @@ void _callbackDispatcher() {
         outfitRecommendation,
       );
 
+      final String savedLanguageIsoCode = localDataSource.getLanguageIsoCode();
+
       await HomeWidget.saveWidgetData(
         HomeWidgetKey.textLastUpdated.stringValue,
         '${translate('last_updated_on_label')}\n'
-        '${weather.getFormattedLastUpdatedDateTime(
-          localDataSource.getLanguageIsoCode(),
-        )}',
+        '${weather.getFormattedLastUpdatedDateTime(savedLanguageIsoCode)}',
       );
 
       await HomeWidget.saveWidgetData(

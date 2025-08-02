@@ -22,13 +22,13 @@ sealed class WeatherState extends Equatable {
 
   @override
   List<Object> get props => <Object>[
-        weather,
-        outfitRecommendation,
-        outfitAssetPath,
-        message,
-        locale,
-        isCelsius,
-      ];
+    weather,
+    outfitRecommendation,
+    outfitAssetPath,
+    message,
+    locale,
+    isCelsius,
+  ];
 
   Map<String, Object?> toJson() {
     return <String, Object?>{
@@ -109,20 +109,19 @@ class WeatherLoadingState extends WeatherState {
     String? locale,
     Weather? weather,
     String? outfitRecommendation,
-  }) =>
-      WeatherLoadingState(
-        locale: locale ?? this.locale,
-        weather: weather ?? this.weather,
-        outfitRecommendation: outfitRecommendation ?? this.outfitRecommendation,
-      );
+  }) => WeatherLoadingState(
+    locale: locale ?? this.locale,
+    weather: weather ?? this.weather,
+    outfitRecommendation: outfitRecommendation ?? this.outfitRecommendation,
+  );
 
   @override
   List<Object> get props => <Object>[
-        locale,
-        weather,
-        outfitRecommendation,
-        outfitAssetPath,
-      ];
+    locale,
+    weather,
+    outfitRecommendation,
+    outfitAssetPath,
+  ];
 }
 
 @JsonSerializable()
@@ -148,23 +147,22 @@ class WeatherSuccess extends WeatherState {
     String? outfitRecommendation,
     String? outfitAssetPath,
     String? message,
-  }) =>
-      WeatherSuccess(
-        locale: locale ?? this.locale,
-        weather: weather ?? this.weather,
-        outfitRecommendation: outfitRecommendation ?? this.outfitRecommendation,
-        outfitAssetPath: outfitAssetPath ?? this.outfitAssetPath,
-        message: message ?? this.message,
-      );
+  }) => WeatherSuccess(
+    locale: locale ?? this.locale,
+    weather: weather ?? this.weather,
+    outfitRecommendation: outfitRecommendation ?? this.outfitRecommendation,
+    outfitAssetPath: outfitAssetPath ?? this.outfitAssetPath,
+    message: message ?? this.message,
+  );
 
   @override
   List<Object> get props => <Object>[
-        locale,
-        weather,
-        outfitRecommendation,
-        outfitAssetPath,
-        message,
-      ];
+    locale,
+    weather,
+    outfitRecommendation,
+    outfitAssetPath,
+    message,
+  ];
 }
 
 @JsonSerializable()
@@ -198,11 +196,11 @@ class WeatherFailure extends WeatherState {
 
   @override
   List<Object> get props => <Object>[
-        locale,
-        outfitRecommendation,
-        outfitAssetPath,
-        message,
-      ];
+    locale,
+    outfitRecommendation,
+    outfitAssetPath,
+    message,
+  ];
 }
 
 @JsonSerializable()

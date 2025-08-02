@@ -10,9 +10,6 @@ class WeatherIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      condition.toEmoji,
-      style: const TextStyle(fontSize: _iconSize),
-    );
+    return Text(condition.toEmoji, style: const TextStyle(fontSize: _iconSize));
   }
 }
