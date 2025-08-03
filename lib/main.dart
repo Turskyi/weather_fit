@@ -77,7 +77,7 @@ void main() async {
           ),
           outfitRepository: OutfitRepository(localDataSource),
           localDataSource: localDataSource,
-          initialLanguage: currentLanguage,
+          initialLanguage: savedLanguage,
         ),
       ),
     ),

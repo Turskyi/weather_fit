@@ -1,6 +1,5 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_translate/flutter_translate.dart';
 import 'package:intl/intl.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:weather_fit/entities/enums/temperature_units.dart';
@@ -136,27 +135,30 @@ class Weather extends Equatable {
   }
 
   /// Output: e.g., "Dec 12, Monday at 03:45 PM".
-  String getFormattedLastUpdatedDateTime(String locale) {
+  String getFormattedLastUpdatedDateTime(String languageIsoCode) {
     if (lastUpdatedDateTime != null) {
       try {
         final DateFormat formatter = DateFormat(
           'MMM dd, EEEE \'-\' hh:mm a',
-          locale,
+          languageIsoCode.isEmpty ? locale : languageIsoCode,
         );
         return formatter.format(lastUpdatedDateTime ?? DateTime(0));
       } catch (e, stackTrace) {
+        // We will get here if user does not have any of the app supported
+        // languages on his device.
         debugPrint(
-          'Weather.formattedLastUpdatedDateTime:\n'
-          'Failed to format date with locale "$countryCode".\n'
+          'Error in `Weather.formattedLastUpdatedDateTime`:\n'
+          'Failed to format date with locale "$languageIsoCode".\n'
           'Falling back to default locale formatting.\n'
-          'Error: ${e.toString()}\n'
+          'Error: $e\n'
           'StackTrace: $stackTrace',
         );
+
         final DateFormat formatter = DateFormat('MMM dd, EEEE \'at\' hh:mm a');
         return formatter.format(lastUpdatedDateTime ?? DateTime(0));
       }
     } else {
-      return translate('never_updated');
+      return _localeTranslate('never_updated', languageIsoCode);
     }
   }
 
@@ -167,9 +169,25 @@ class Weather extends Equatable {
   bool get isEmpty => this == empty;
 
   String get locationName => location.name.isEmpty
-      ? '${translate('lat')}: ${location.latitude.toStringAsFixed(2)}, '
-            '${translate('lon')}: ${location.longitude.toStringAsFixed(2)}'
+      ? '${_localeTranslate('lat', locale)}: '
+            '${location.latitude.toStringAsFixed(2)}, '
+            '${_localeTranslate('lon', locale)}: '
+            '${location.longitude.toStringAsFixed(2)}'
       : location.name;
 
   bool get isCelsius => temperatureUnits.isCelsius;
+
+  Map<String, Map<String, String>> get _localizedStrings =>
+      <String, Map<String, String>>{
+        'never_updated': <String, String>{
+          'en': 'Never updated',
+          'uk': 'Ще не оновлювалося',
+        },
+        'lat': <String, String>{'en': 'Lat', 'uk': 'Широта'},
+        'lon': <String, String>{'en': 'Lon', 'uk': 'Довгота'},
+      };
+
+  String _localeTranslate(String key, String locale) {
+    return _localizedStrings[key]?[locale] ?? key;
+  }
 }

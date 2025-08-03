@@ -75,6 +75,8 @@ class _SearchPageState extends State<SearchPage> {
                       listener: (BuildContext context, SearchState state) {
                         if (state is SearchLocationFound) {
                           _showLocationConfirmationDialog(state.location);
+                        } else if (state is SearchLocationNotFound) {
+                          _showLocationNotFoundDialog();
                         } else if (state is SearchWeatherLoaded) {
                           // Navigate to the weather details page.
                           Navigator.pop(context, state.weather);
@@ -360,6 +362,44 @@ class _SearchPageState extends State<SearchPage> {
         content: Text(translate('feedback.sent')),
         duration: const Duration(seconds: 2),
       ),
+    );
+  }
+
+  Future<void> _showLocationNotFoundDialog() {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: Text(translate('search.location_not_found_dialog_title')),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Text(
+                translate('search.location_not_found_suggestion_spell_check'),
+              ),
+              // Example translation key
+              const SizedBox(height: 16),
+              Text(translate('search.location_not_found_suggestion_use_gps')),
+              // Example translation key
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: Navigator.of(dialogContext).pop,
+              child: Text(translate('cancel')),
+            ),
+            TextButton(
+              child: Text(translate('search.use_gps_button')),
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+                context.read<SearchBloc>().add(
+                  const RequestPermissionAndSearchByLocation(),
+                );
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

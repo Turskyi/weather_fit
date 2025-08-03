@@ -111,8 +111,9 @@ class _WeatherContentState extends State<WeatherContent> {
                   final String lastUpdatedDateTime = widget.weather
                       .getFormattedLastUpdatedDateTime(state.locale);
                   return Text(
-                    '${translate('last_updated_on_label')} '
+                    '${translate('last_updated_on_label')}\n'
                     '$lastUpdatedDateTime',
+                    textAlign: TextAlign.center,
                   );
                 },
               ),

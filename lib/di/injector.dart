@@ -2,13 +2,14 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_translate/flutter_translate.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
 import 'package:weather_fit/data/repositories/outfit_repository.dart';
+import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/entities/enums/temperature_units.dart';
 import 'package:weather_fit/entities/models/temperature/temperature.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
@@ -21,7 +22,12 @@ import 'package:workmanager/workmanager.dart';
 
 Future<void> injectDependencies() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  // I added `initializeDateFormatting` to avoid
+  // "LocaleDataException: Locale data has not been initialized, call
+  // initializeDateFormatting(<locale>).", but that did not help, but probably
+  // does not haem either, so let it be.
+  initializeDateFormatting(Language.uk.isoLanguageCode, null);
+  initializeDateFormatting(Language.en.isoLanguageCode, null);
   if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
     Workmanager()
         .initialize(_callbackDispatcher, isInDebugMode: kDebugMode)
@@ -29,8 +35,8 @@ Future<void> injectDependencies() async {
           Workmanager().registerPeriodicTask(
             'weatherfit_background_update',
             'updateWidgetTask',
-            // Every 2 hours.
-            frequency: const Duration(hours: 2),
+            // Home widget will be updated every hour.
+            frequency: const Duration(hours: 1),
             constraints: Constraints(networkType: NetworkType.connected),
           );
         });
@@ -57,12 +63,8 @@ Future<void> injectDependencies() async {
 /// Used for Background Updates using [Workmanager] Plugin.
 @pragma('vm:entry-point')
 void _callbackDispatcher() {
-  //TODO: change implementation to how it is done in
-  // https://github.com/ABausG/home_widget/blob/main/packages/home_widget/example/lib/main.dart
-  // and according to new documentation https://docs.page/abausg/home_widget.
   Workmanager().executeTask((String _, Map<String, Object?>? _) async {
     try {
-      // Must initialize Flutter binding.
       WidgetsFlutterBinding.ensureInitialized();
 
       // Set app group ID.
@@ -134,8 +136,7 @@ void _callbackDispatcher() {
 
       await HomeWidget.saveWidgetData(
         HomeWidgetKey.textLastUpdated.stringValue,
-        '${translate('last_updated_on_label')}\n'
-        '${weather.getFormattedLastUpdatedDateTime(savedLanguageIsoCode)}',
+        weather.getFormattedLastUpdatedDateTime(savedLanguageIsoCode),
       );
 
       await HomeWidget.saveWidgetData(
@@ -151,8 +152,14 @@ void _callbackDispatcher() {
 
       return true;
     } catch (e) {
-      debugPrint('Background widget update failed: $e');
+      debugPrint('Deb: Background widget update failed: $e');
       return false;
     }
   });
+}
+
+/// Called when Doing Background Work initiated from Widget
+@pragma('vm:entry-point')
+Future<void> _interactiveCallback(Uri? data) async {
+  //TODO: add implementation.
 }
