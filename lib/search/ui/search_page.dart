@@ -72,112 +72,7 @@ class _SearchPageState extends State<SearchPage> {
                     ),
                     const SizedBox(height: 16.0),
                     BlocConsumer<SearchBloc, SearchState>(
-                      listener: (BuildContext context, SearchState state) {
-                        if (state is SearchLocationFound) {
-                          _showLocationConfirmationDialog(state.location);
-                        } else if (state is SearchLocationNotFound) {
-                          _showLocationNotFoundDialog();
-                        } else if (state is SearchWeatherLoaded) {
-                          // Navigate to the weather details page.
-                          Navigator.pop(context, state.weather);
-                        } else if (state is SearchError) {
-                          if (state.isCertificateValidationError) {
-                            // Show a more detailed, blocking dialog for
-                            // this specific error.
-                            showDialog(
-                              context: context,
-                              // User must interact with the dialog.
-                              barrierDismissible: false,
-                              builder: (BuildContext dialogContext) {
-                                return AlertDialog(
-                                  title: Text(
-                                    translate(
-                                      'error.connection_security_issue_title',
-                                    ),
-                                  ),
-                                  content: SingleChildScrollView(
-                                    child: ListBody(
-                                      children: <Widget>[
-                                        Text(state.errorMessage),
-                                        const SizedBox(height: 16),
-                                        Text(
-                                          translate('error.what_you_can_do'),
-                                        ),
-                                        Text(
-                                          "- ${translate('error.'
-                                          'ensure_os_updated')}",
-                                        ),
-                                        Text(
-                                          "- ${translate('error.'
-                                          'check_date_time')}",
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  actions: <Widget>[
-                                    TextButton(
-                                      child: Text(
-                                        translate('error.report_issue_button'),
-                                      ),
-                                      onPressed: () {
-                                        context.read<SettingsBloc>().add(
-                                          const BugReportPressedEvent(),
-                                        );
-
-                                        // Close the dialog.
-                                        Navigator.of(dialogContext).pop();
-                                      },
-                                    ),
-                                    TextButton(
-                                      child: Text(translate('ok')),
-                                      onPressed: () {
-                                        // Close the dialog.
-                                        Navigator.of(dialogContext).pop();
-                                      },
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          } else if (state.isPermissionDeniedError) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(state.errorMessage),
-                                duration: const Duration(seconds: 7),
-                                action: SnackBarAction(
-                                  label: translate('settings.title'),
-                                  onPressed: () {
-                                    // Helper from geolocator to open app
-                                    // settings.
-                                    geolocator.openAppSettings();
-                                    ScaffoldMessenger.of(
-                                      context,
-                                    ).hideCurrentSnackBar();
-                                  },
-                                ),
-                              ),
-                            );
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(state.errorMessage),
-                                duration: const Duration(seconds: 7),
-                                action: SnackBarAction(
-                                  label: translate('error.report'),
-                                  onPressed: () {
-                                    context.read<SettingsBloc>().add(
-                                      const BugReportPressedEvent(),
-                                    );
-                                    ScaffoldMessenger.of(
-                                      context,
-                                    ).hideCurrentSnackBar();
-                                  },
-                                ),
-                              ),
-                            );
-                          }
-                        }
-                      },
+                      listener: _searchStateListener,
                       builder: (BuildContext context, SearchState state) {
                         return ValueListenableBuilder<TextEditingValue>(
                           valueListenable: _textController,
@@ -401,5 +296,98 @@ class _SearchPageState extends State<SearchPage> {
         );
       },
     );
+  }
+
+  void _searchStateListener(BuildContext context, SearchState state) {
+    if (state is SearchLocationFound) {
+      _showLocationConfirmationDialog(state.location);
+    } else if (state is SearchLocationNotFound) {
+      _showLocationNotFoundDialog();
+    } else if (state is SearchWeatherLoaded) {
+      // Navigate to the weather details page.
+      Navigator.pop(context, state.weather);
+    } else if (state is SearchError) {
+      if (state.isCertificateValidationError) {
+        // Show a more detailed, blocking dialog for
+        // this specific error.
+        showDialog(
+          context: context,
+          // User must interact with the dialog.
+          barrierDismissible: false,
+          builder: (BuildContext dialogContext) {
+            return AlertDialog(
+              title: Text(translate('error.connection_security_issue_title')),
+              content: SingleChildScrollView(
+                child: ListBody(
+                  children: <Widget>[
+                    Text(state.errorMessage),
+                    const SizedBox(height: 16),
+                    Text(translate('error.what_you_can_do')),
+                    Text(
+                      "- ${translate('error.'
+                      'ensure_os_updated')}",
+                    ),
+                    Text(
+                      "- ${translate('error.'
+                      'check_date_time')}",
+                    ),
+                  ],
+                ),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: Text(translate('error.report_issue_button')),
+                  onPressed: () {
+                    context.read<SettingsBloc>().add(
+                      const BugReportPressedEvent(),
+                    );
+
+                    // Close the dialog.
+                    Navigator.of(dialogContext).pop();
+                  },
+                ),
+                TextButton(
+                  child: Text(translate('ok')),
+                  onPressed: () {
+                    // Close the dialog.
+                    Navigator.of(dialogContext).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      } else if (state.isPermissionDeniedError) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(state.errorMessage),
+            duration: const Duration(seconds: 7),
+            action: SnackBarAction(
+              label: translate('settings.title'),
+              onPressed: () {
+                // Helper from geolocator to open app
+                // settings.
+                geolocator.openAppSettings();
+                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              },
+            ),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(state.errorMessage),
+            duration: const Duration(seconds: 7),
+            action: SnackBarAction(
+              label: translate('error.report'),
+              onPressed: () {
+                context.read<SettingsBloc>().add(const BugReportPressedEvent());
+                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              },
+            ),
+          ),
+        );
+      }
+    }
   }
 }

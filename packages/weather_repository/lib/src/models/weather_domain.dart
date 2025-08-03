@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:weather_repository/src/models/enums/language.dart';
 import 'package:weather_repository/weather_repository.dart';
 
 part 'weather_domain.g.dart';
@@ -30,10 +31,27 @@ class WeatherDomain extends Equatable {
   final int weatherCode;
   final String locale;
 
-  String get locationName => location.name.isEmpty
-      ? 'Lat: ${location.latitude.toStringAsFixed(2)}, '
-          'Lon: ${location.longitude.toStringAsFixed(2)}'
-      : location.name;
+  String get locationName {
+    final Map<String, String> latLabels = <String, String>{
+      'en': 'Lat',
+      'uk': 'Шир',
+    };
+
+    final Map<String, String> lonLabels = <String, String>{
+      'en': 'Lon',
+      'uk': 'Дов',
+    };
+
+    final String lang = (locale == Language.uk.isoLanguageCode)
+        ? Language.uk.isoLanguageCode
+        : Language.en.isoLanguageCode;
+
+    final String weatherLocationName = location.name;
+    return weatherLocationName.isEmpty
+        ? '${latLabels[lang]}: ${location.latitude.toStringAsFixed(2)}, '
+            '${lonLabels[lang]}: ${location.longitude.toStringAsFixed(2)}'
+        : weatherLocationName;
+  }
 
   @override
   List<Object> get props => <Object>[

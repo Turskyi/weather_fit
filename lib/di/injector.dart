@@ -21,13 +21,8 @@ import 'package:weather_repository/weather_repository.dart';
 import 'package:workmanager/workmanager.dart';
 
 Future<void> injectDependencies() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  // I added `initializeDateFormatting` to avoid
-  // "LocaleDataException: Locale data has not been initialized, call
-  // initializeDateFormatting(<locale>).", but that did not help, but probably
-  // does not haem either, so let it be.
-  initializeDateFormatting(Language.uk.isoLanguageCode, null);
-  initializeDateFormatting(Language.en.isoLanguageCode, null);
+  await _initializeAllDateFormatting();
+
   if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
     Workmanager()
         .initialize(_callbackDispatcher, isInDebugMode: kDebugMode)
@@ -36,7 +31,7 @@ Future<void> injectDependencies() async {
             'weatherfit_background_update',
             'updateWidgetTask',
             // Home widget will be updated every hour.
-            frequency: const Duration(hours: 1),
+            frequency: const Duration(minutes: 60),
             constraints: Constraints(networkType: NetworkType.connected),
           );
         });
@@ -67,8 +62,10 @@ void _callbackDispatcher() {
     try {
       WidgetsFlutterBinding.ensureInitialized();
 
+      await _initializeAllDateFormatting();
+
       // Set app group ID.
-      HomeWidget.setAppGroupId(constants.appleAppGroupId);
+      await HomeWidget.setAppGroupId(constants.appleAppGroupId);
 
       // Get latest weather.
       final WeatherRepository weatherRepository = WeatherRepository();
@@ -80,69 +77,69 @@ void _callbackDispatcher() {
 
       final Location lastSavedLocation = localDataSource.getLastSavedLocation();
 
-      final WeatherDomain domainWeather = await weatherRepository
-          .getWeatherByLocation(lastSavedLocation);
+      if (lastSavedLocation.isNotEmpty) {
+        final WeatherDomain domainWeather = await weatherRepository
+            .getWeatherByLocation(lastSavedLocation);
+        final Weather weather = Weather.fromRepository(domainWeather);
 
-      final Weather weather = Weather.fromRepository(domainWeather);
+        final TemperatureUnits units = weather.temperatureUnits;
 
-      final TemperatureUnits units = weather.temperatureUnits;
+        final double temperatureValue = units.isFahrenheit
+            ? weather.temperature.value.toFahrenheit()
+            : weather.temperature.value;
+        final Weather updatedWeather = weather.copyWith(
+          temperature: Temperature(value: temperatureValue),
+          temperatureUnits: units,
+        );
 
-      final double temperatureValue = units.isFahrenheit
-          ? weather.temperature.value.toFahrenheit()
-          : weather.temperature.value;
+        final OutfitRepository outfitRepository = OutfitRepository(
+          localDataSource,
+        );
 
-      final Weather updatedWeather = weather.copyWith(
-        temperature: Temperature(value: temperatureValue),
-        temperatureUnits: units,
-      );
+        final String outfitRecommendation = outfitRepository
+            .getOutfitRecommendation(updatedWeather);
 
-      final OutfitRepository outfitRepository = OutfitRepository(
-        localDataSource,
-      );
+        final String outfitAssetPath = outfitRepository.getOutfitImageAssetPath(
+          weather,
+        );
 
-      final String outfitRecommendation = outfitRepository
-          .getOutfitRecommendation(updatedWeather);
+        final String outfitFilePath = await outfitRepository
+            .downloadAndSaveImage(outfitAssetPath);
 
-      final String outfitAssetPath = outfitRepository.getOutfitImageAssetPath(
-        weather,
-      );
+        // Save data.
+        await HomeWidget.saveWidgetData(
+          HomeWidgetKey.textEmoji.stringValue,
+          weather.condition.toEmoji,
+        );
 
-      final String outfitFilePath = await outfitRepository.downloadAndSaveImage(
-        outfitAssetPath,
-      );
+        await HomeWidget.saveWidgetData(
+          HomeWidgetKey.textLocation.stringValue,
+          weather.locationName,
+        );
 
-      // Save data.
-      await HomeWidget.saveWidgetData(
-        HomeWidgetKey.textEmoji.stringValue,
-        weather.condition.toEmoji,
-      );
+        await HomeWidget.saveWidgetData(
+          HomeWidgetKey.textTemperature.stringValue,
+          weather.formattedTemperature,
+        );
 
-      await HomeWidget.saveWidgetData(
-        HomeWidgetKey.textLocation.stringValue,
-        weather.locationName,
-      );
+        await HomeWidget.saveWidgetData(
+          HomeWidgetKey.textRecommendation.stringValue,
+          outfitRecommendation,
+        );
 
-      await HomeWidget.saveWidgetData(
-        HomeWidgetKey.textTemperature.stringValue,
-        weather.formattedTemperature,
-      );
+        final String savedLanguageIsoCode = localDataSource
+            .getLanguageIsoCode();
 
-      await HomeWidget.saveWidgetData(
-        HomeWidgetKey.textRecommendation.stringValue,
-        outfitRecommendation,
-      );
+        await HomeWidget.saveWidgetData(
+          HomeWidgetKey.textLastUpdated.stringValue,
+          weather.getFormattedLastUpdatedDateTime(savedLanguageIsoCode),
+        );
 
-      final String savedLanguageIsoCode = localDataSource.getLanguageIsoCode();
-
-      await HomeWidget.saveWidgetData(
-        HomeWidgetKey.textLastUpdated.stringValue,
-        weather.getFormattedLastUpdatedDateTime(savedLanguageIsoCode),
-      );
-
-      await HomeWidget.saveWidgetData(
-        HomeWidgetKey.imageWeather.stringValue,
-        outfitFilePath,
-      );
+        await HomeWidget.saveWidgetData(
+          HomeWidgetKey.imageWeather.stringValue,
+          outfitFilePath,
+        );
+      }
 
       // Update the widget.
       await HomeWidget.updateWidget(
@@ -152,10 +149,24 @@ void _callbackDispatcher() {
 
       return true;
     } catch (e) {
-      debugPrint('Deb: Background widget update failed: $e');
+      debugPrint('Background widget update failed: $e');
       return false;
     }
   });
+}
+
+Future<void> _initializeAllDateFormatting() async {
+  for (Language lang in Language.values) {
+    try {
+      await initializeDateFormatting(lang.isoLanguageCode, null);
+    } catch (e, stackTrace) {
+      debugPrint(
+        'Failed to initialize date formatting for ${lang.isoLanguageCode}.\n'
+        'Error: $e\n'
+        'StackTrace: $stackTrace',
+      );
+    }
+  }
 }
 
 /// Called when Doing Background Work initiated from Widget

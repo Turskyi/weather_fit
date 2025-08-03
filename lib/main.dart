@@ -28,6 +28,9 @@ import 'package:weather_repository/weather_repository.dart';
 /// components in the system. They don’t know about [main], and they don’t care
 /// when it changes.
 void main() async {
+  // We need to call `WidgetsFlutterBinding.ensureInitialized` before any
+  // `await` operation, otherwise app may stuck on black/white screen.
+  WidgetsFlutterBinding.ensureInitialized();
   await injectDependencies();
 
   final SharedPreferences preferences = await SharedPreferences.getInstance();

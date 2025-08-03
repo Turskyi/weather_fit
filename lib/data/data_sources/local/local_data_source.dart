@@ -70,7 +70,7 @@ class LocalDataSource {
   }
 
   String getOutfitRecommendation(Weather weather) {
-    final String locale = weather.locale;
+    final String locale = getLanguageIsoCode();
     final double temperature = weather.temperature.value;
     final WeatherCondition condition = weather.condition;
     final TemperatureUnits units = weather.temperatureUnits;
@@ -97,9 +97,8 @@ class LocalDataSource {
       'outfit.moderate': 'Сьогодні комфортна погода',
     };
 
-    final Map<String, String> outfit = locale.startsWith('uk')
-        ? outfitUk
-        : outfitEn;
+    final Map<String, String> outfit =
+        locale.startsWith(Language.uk.isoLanguageCode) ? outfitUk : outfitEn;
 
     String localeTranslate(String key) => outfit[key] ?? key;
 

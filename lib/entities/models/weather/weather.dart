@@ -168,12 +168,14 @@ class Weather extends Equatable {
 
   bool get isEmpty => this == empty;
 
-  String get locationName => location.name.isEmpty
-      ? '${_localeTranslate('lat', locale)}: '
-            '${location.latitude.toStringAsFixed(2)}, '
-            '${_localeTranslate('lon', locale)}: '
-            '${location.longitude.toStringAsFixed(2)}'
-      : location.name;
+  String get locationName {
+    return location.name.isEmpty
+        ? '${_localeTranslate('lat', locale)}: '
+              '${location.latitude.toStringAsFixed(2)}, '
+              '${_localeTranslate('lon', locale)}: '
+              '${location.longitude.toStringAsFixed(2)}'
+        : location.name;
+  }
 
   bool get isCelsius => temperatureUnits.isCelsius;
 

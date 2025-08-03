@@ -99,7 +99,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
 
       final String languageIsoCode = _localDataSource.getLanguageIsoCode();
 
-      final WeatherDomain weather = await _weatherRepository
+      final WeatherDomain domainWeather = await _weatherRepository
           .getWeatherByLocation(
             Location(
               latitude: position.latitude,
@@ -107,8 +107,8 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
               locale: languageIsoCode,
             ),
           );
-
-      emit(SearchWeatherLoaded(Weather.fromRepository(weather)));
+      final Weather weather = Weather.fromRepository(domainWeather);
+      emit(SearchWeatherLoaded(weather));
     } catch (e, stackTrace) {
       // 1. Log the detailed error with function name for debugging
       final String debugErrorMessage =
@@ -206,5 +206,6 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         ),
       );
     }
+    // We expect here LocationPermission.whileInUse.
   }
 }
