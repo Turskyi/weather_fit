@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:weather_repository/src/models/enums/language.dart';
 
 class Location extends Equatable {
   const Location({
@@ -42,7 +43,7 @@ class Location extends Equatable {
       countryCode: countryCode is String ? countryCode : '',
       country: country is String ? country : '',
       province: province is String ? province : '',
-      locale: locale is String ? locale : '',
+      locale: locale is String ? locale : Language.en.isoLanguageCode,
     );
   }
 
@@ -66,6 +67,62 @@ class Location extends Equatable {
       'province': province,
       'locale': locale,
     };
+  }
+
+  Location copyWith({
+    int? id,
+    String? name,
+    double? latitude,
+    double? longitude,
+    String? countryCode,
+    String? country,
+    String? province,
+    String? locale,
+  }) {
+    return Location(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
+      countryCode: countryCode ?? this.countryCode,
+      country: country ?? this.country,
+      province: province ?? this.province,
+      locale: locale ?? this.locale,
+    );
+  }
+
+  bool get isEmpty =>
+      id == 0 &&
+      name.isEmpty &&
+      latitude == 0.0 &&
+      longitude == 0.0 &&
+      countryCode.isEmpty &&
+      country.isEmpty &&
+      province.isEmpty;
+
+  bool get isNotEmpty => !isEmpty;
+
+  String get locationName {
+    final String locationLocale = locale;
+
+    final Map<String, String> latLabels = <String, String>{
+      'en': 'Lat',
+      'uk': 'Шир',
+    };
+
+    final Map<String, String> lonLabels = <String, String>{
+      'en': 'Lon',
+      'uk': 'Дов',
+    };
+
+    final String lang = (locationLocale == Language.uk.isoLanguageCode)
+        ? Language.uk.isoLanguageCode
+        : Language.en.isoLanguageCode;
+
+    return name.isEmpty
+        ? '${latLabels[lang]}: ${latitude.toStringAsFixed(2)}, '
+            '${lonLabels[lang]}: ${longitude.toStringAsFixed(2)}'
+        : name;
   }
 
   @override
@@ -93,18 +150,4 @@ class Location extends Equatable {
         'locale: $locale'
         '}';
   }
-
-  bool get isEmpty =>
-      id == 0 &&
-      name.isEmpty &&
-      latitude == 0.0 &&
-      longitude == 0.0 &&
-      countryCode.isEmpty &&
-      country.isEmpty &&
-      province.isEmpty;
-
-  String get locationName => name.isEmpty
-      ? 'Lat: ${latitude.toStringAsFixed(2)}, '
-          'Lon: ${longitude.toStringAsFixed(2)}'
-      : name;
 }

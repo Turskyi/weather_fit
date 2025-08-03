@@ -19,6 +19,12 @@ final class SearchLocationFound extends SearchState {
   final Location location;
 }
 
+final class SearchLocationNotFound extends SearchState {
+  const SearchLocationNotFound(this.query);
+
+  final String query;
+}
+
 final class SearchError extends SearchState {
   const SearchError({
     required this.errorMessage,

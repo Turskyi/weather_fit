@@ -6,6 +6,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:open_meteo_api/open_meteo_api.dart';
 import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
 import 'package:weather_fit/data/repositories/location_repository.dart';
 import 'package:weather_fit/entities/enums/search_error_type.dart';
@@ -98,7 +99,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
 
       final String languageIsoCode = _localDataSource.getLanguageIsoCode();
 
-      final WeatherDomain weather = await _weatherRepository
+      final WeatherDomain domainWeather = await _weatherRepository
           .getWeatherByLocation(
             Location(
               latitude: position.latitude,
@@ -106,8 +107,8 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
               locale: languageIsoCode,
             ),
           );
-
-      emit(SearchWeatherLoaded(Weather.fromRepository(weather)));
+      final Weather weather = Weather.fromRepository(domainWeather);
+      emit(SearchWeatherLoaded(weather));
     } catch (e, stackTrace) {
       // 1. Log the detailed error with function name for debugging
       final String debugErrorMessage =
@@ -144,10 +145,10 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     Emitter<SearchState> emit,
   ) async {
     emit(const SearchLoading());
-
+    final String eventQuery = event.query;
     try {
       final Location location = await _locationRepository.getLocation(
-        event.query,
+        eventQuery,
       );
 
       emit(SearchLocationFound(location));
@@ -165,15 +166,17 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       } else if (e is SocketException) {
         userFriendlyMessage = translate('error.network_error');
         errorType = SearchErrorType.network;
+      } else if (e is LocationNotFoundFailure) {
+        emit(SearchLocationNotFound(eventQuery));
       } else {
         userFriendlyMessage =
             '${translate('error.searching_location')}: ${e.runtimeType}';
         errorType = SearchErrorType.unknown;
+        emit(
+          SearchError(errorMessage: userFriendlyMessage, errorType: errorType),
+        );
       }
       debugPrint('[_searchLocation] Error: $detailedMessage\n$stackTrace');
-      emit(
-        SearchError(errorMessage: userFriendlyMessage, errorType: errorType),
-      );
     }
   }
 
@@ -203,5 +206,6 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         ),
       );
     }
+    // We expect here LocationPermission.whileInUse.
   }
 }

@@ -2,13 +2,14 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_translate/flutter_translate.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
 import 'package:weather_fit/data/repositories/outfit_repository.dart';
+import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/entities/enums/temperature_units.dart';
 import 'package:weather_fit/entities/models/temperature/temperature.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
@@ -20,7 +21,7 @@ import 'package:weather_repository/weather_repository.dart';
 import 'package:workmanager/workmanager.dart';
 
 Future<void> injectDependencies() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  await _initializeAllDateFormatting();
 
   if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
     Workmanager()
@@ -29,8 +30,8 @@ Future<void> injectDependencies() async {
           Workmanager().registerPeriodicTask(
             'weatherfit_background_update',
             'updateWidgetTask',
-            // Every 2 hours.
-            frequency: const Duration(hours: 2),
+            // Home widget will be updated every hour.
+            frequency: const Duration(minutes: 60),
             constraints: Constraints(networkType: NetworkType.connected),
           );
         });
@@ -57,16 +58,14 @@ Future<void> injectDependencies() async {
 /// Used for Background Updates using [Workmanager] Plugin.
 @pragma('vm:entry-point')
 void _callbackDispatcher() {
-  //TODO: change implementation to how it is done in
-  // https://github.com/ABausG/home_widget/blob/main/packages/home_widget/example/lib/main.dart
-  // and according to new documentation https://docs.page/abausg/home_widget.
   Workmanager().executeTask((String _, Map<String, Object?>? _) async {
     try {
-      // Must initialize Flutter binding.
       WidgetsFlutterBinding.ensureInitialized();
 
+      await _initializeAllDateFormatting();
+
       // Set app group ID.
-      HomeWidget.setAppGroupId(constants.appleAppGroupId);
+      await HomeWidget.setAppGroupId(constants.appleAppGroupId);
 
       // Get latest weather.
       final WeatherRepository weatherRepository = WeatherRepository();
@@ -78,70 +77,69 @@ void _callbackDispatcher() {
 
       final Location lastSavedLocation = localDataSource.getLastSavedLocation();
 
-      final WeatherDomain domainWeather = await weatherRepository
-          .getWeatherByLocation(lastSavedLocation);
+      if (lastSavedLocation.isNotEmpty) {
+        final WeatherDomain domainWeather = await weatherRepository
+            .getWeatherByLocation(lastSavedLocation);
+        final Weather weather = Weather.fromRepository(domainWeather);
 
-      final Weather weather = Weather.fromRepository(domainWeather);
+        final TemperatureUnits units = weather.temperatureUnits;
 
-      final TemperatureUnits units = weather.temperatureUnits;
+        final double temperatureValue = units.isFahrenheit
+            ? weather.temperature.value.toFahrenheit()
+            : weather.temperature.value;
+        final Weather updatedWeather = weather.copyWith(
+          temperature: Temperature(value: temperatureValue),
+          temperatureUnits: units,
+        );
 
-      final double temperatureValue = units.isFahrenheit
-          ? weather.temperature.value.toFahrenheit()
-          : weather.temperature.value;
+        final OutfitRepository outfitRepository = OutfitRepository(
+          localDataSource,
+        );
 
-      final Weather updatedWeather = weather.copyWith(
-        temperature: Temperature(value: temperatureValue),
-        temperatureUnits: units,
-      );
+        final String outfitRecommendation = outfitRepository
+            .getOutfitRecommendation(updatedWeather);
 
-      final OutfitRepository outfitRepository = OutfitRepository(
-        localDataSource,
-      );
+        final String outfitAssetPath = outfitRepository.getOutfitImageAssetPath(
+          weather,
+        );
 
-      final String outfitRecommendation = outfitRepository
-          .getOutfitRecommendation(updatedWeather);
+        final String outfitFilePath = await outfitRepository
+            .downloadAndSaveImage(outfitAssetPath);
 
-      final String outfitAssetPath = outfitRepository.getOutfitImageAssetPath(
-        weather,
-      );
+        // Save data.
+        await HomeWidget.saveWidgetData(
+          HomeWidgetKey.textEmoji.stringValue,
+          weather.condition.toEmoji,
+        );
 
-      final String outfitFilePath = await outfitRepository.downloadAndSaveImage(
-        outfitAssetPath,
-      );
+        await HomeWidget.saveWidgetData(
+          HomeWidgetKey.textLocation.stringValue,
+          weather.locationName,
+        );
 
-      // Save data.
-      await HomeWidget.saveWidgetData(
-        HomeWidgetKey.textEmoji.stringValue,
-        weather.condition.toEmoji,
-      );
+        await HomeWidget.saveWidgetData(
+          HomeWidgetKey.textTemperature.stringValue,
+          weather.formattedTemperature,
+        );
 
-      await HomeWidget.saveWidgetData(
-        HomeWidgetKey.textLocation.stringValue,
-        weather.locationName,
-      );
+        await HomeWidget.saveWidgetData(
+          HomeWidgetKey.textRecommendation.stringValue,
+          outfitRecommendation,
+        );
 
-      await HomeWidget.saveWidgetData(
-        HomeWidgetKey.textTemperature.stringValue,
-        weather.formattedTemperature,
-      );
+        final String savedLanguageIsoCode = localDataSource
+            .getLanguageIsoCode();
 
-      await HomeWidget.saveWidgetData(
-        HomeWidgetKey.textRecommendation.stringValue,
-        outfitRecommendation,
-      );
+        await HomeWidget.saveWidgetData(
+          HomeWidgetKey.textLastUpdated.stringValue,
+          weather.getFormattedLastUpdatedDateTime(savedLanguageIsoCode),
+        );
 
-      final String savedLanguageIsoCode = localDataSource.getLanguageIsoCode();
-
-      await HomeWidget.saveWidgetData(
-        HomeWidgetKey.textLastUpdated.stringValue,
-        '${translate('last_updated_on_label')}\n'
-        '${weather.getFormattedLastUpdatedDateTime(savedLanguageIsoCode)}',
-      );
-
-      await HomeWidget.saveWidgetData(
-        HomeWidgetKey.imageWeather.stringValue,
-        outfitFilePath,
-      );
+        await HomeWidget.saveWidgetData(
+          HomeWidgetKey.imageWeather.stringValue,
+          outfitFilePath,
+        );
+      }
 
       // Update the widget.
       await HomeWidget.updateWidget(
@@ -155,4 +153,24 @@ void _callbackDispatcher() {
       return false;
     }
   });
+}
+
+Future<void> _initializeAllDateFormatting() async {
+  for (Language lang in Language.values) {
+    try {
+      await initializeDateFormatting(lang.isoLanguageCode, null);
+    } catch (e, stackTrace) {
+      debugPrint(
+        'Failed to initialize date formatting for ${lang.isoLanguageCode}.\n'
+        'Error: $e\n'
+        'StackTrace: $stackTrace',
+      );
+    }
+  }
+}
+
+/// Called when Doing Background Work initiated from Widget
+@pragma('vm:entry-point')
+Future<void> _interactiveCallback(Uri? data) async {
+  //TODO: add implementation.
 }

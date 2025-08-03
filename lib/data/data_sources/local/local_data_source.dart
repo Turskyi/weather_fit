@@ -5,7 +5,6 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_translate/flutter_translate.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -71,33 +70,61 @@ class LocalDataSource {
   }
 
   String getOutfitRecommendation(Weather weather) {
+    final String locale = getLanguageIsoCode();
     final double temperature = weather.temperature.value;
     final WeatherCondition condition = weather.condition;
     final TemperatureUnits units = weather.temperatureUnits;
 
+    final Map<String, String> outfitEn = <String, String>{
+      'outfit.rainy': 'Take an umbrella',
+      'outfit.rainy_hot': 'Hot & rainy — light clothes + umbrella',
+      'outfit.snowy': 'Dress warmly, it\'s snowing!',
+      'outfit.cold': 'Wear a warm jacket',
+      'outfit.cool': 'Maybe bring a light jacket',
+      'outfit.warm': 'Light clothing should be fine',
+      'outfit.hot': 'It\'s hot! Dress lightly',
+      'outfit.moderate': 'Comfortable weather today',
+    };
+
+    final Map<String, String> outfitUk = <String, String>{
+      'outfit.rainy': 'Візьміть парасольку',
+      'outfit.rainy_hot': 'Спекотно й дощ — легкий одяг і парасолька',
+      'outfit.snowy': 'Одягніться тепло, йде сніг!',
+      'outfit.cold': 'Одягніться тепло',
+      'outfit.cool': 'Можливо, знадобиться легка куртка',
+      'outfit.warm': 'Легкий одяг буде доречний',
+      'outfit.hot': 'Спекотно! Одягайтесь легко',
+      'outfit.moderate': 'Сьогодні комфортна погода',
+    };
+
+    final Map<String, String> outfit =
+        locale.startsWith(Language.uk.isoLanguageCode) ? outfitUk : outfitEn;
+
+    String localeTranslate(String key) => outfit[key] ?? key;
+
     if (condition.isRainy) {
       if (temperature >= 30 && units.isCelsius ||
           temperature >= 86 && units.isFahrenheit) {
-        return translate('outfit.rainy_hot');
+        return localeTranslate('outfit.rainy_hot');
       } else {
-        return translate('outfit.rainy');
+        return localeTranslate('outfit.rainy');
       }
     } else if (condition.isSnowy) {
-      return translate('outfit.snowy');
+      return localeTranslate('outfit.snowy');
     } else if (temperature < 10 && units.isCelsius ||
         temperature < 50 && units.isFahrenheit) {
-      return translate('outfit.cold');
+      return localeTranslate('outfit.cold');
     } else if (temperature >= 10 && temperature < 20 && units.isCelsius ||
         temperature >= 50 && temperature < 68 && units.isFahrenheit) {
-      return translate('outfit.cool');
+      return localeTranslate('outfit.cool');
     } else if (temperature >= 20 && temperature < 30 && units.isCelsius ||
         temperature >= 68 && temperature < 86 && units.isFahrenheit) {
-      return translate('outfit.warm');
+      return localeTranslate('outfit.warm');
     } else if (temperature >= 30 && units.isCelsius ||
         temperature >= 86 && units.isFahrenheit) {
-      return translate('outfit.hot');
+      return localeTranslate('outfit.hot');
     } else {
-      return translate('outfit.moderate');
+      return localeTranslate('outfit.moderate');
     }
   }
 
@@ -141,7 +168,10 @@ class LocalDataSource {
     } catch (e) {
       // Handle potential errors (e.g., asset not found)
       debugPrint('Error saving asset image to file: $e');
-      throw Exception('${translate('error.save_asset_image_failed')}: $e');
+      final String locale = PlatformDispatcher.instance.locale.languageCode;
+      throw Exception(
+        '${_translateError('error.save_asset_image_failed', locale)}: $e',
+      );
     }
   }
 
@@ -199,7 +229,17 @@ class LocalDataSource {
 
     final String host = Uri.base.host;
     if (host.startsWith('${Language.uk.isoLanguageCode}.')) {
-      Intl.defaultLocale = Language.uk.isoLanguageCode;
+      try {
+        Intl.defaultLocale = Language.uk.isoLanguageCode;
+      } catch (e, stackTrace) {
+        debugPrint(
+          'Failed to set Intl.defaultLocale to '
+          '"${Language.uk.isoLanguageCode}".\n'
+          'Error: $e\n'
+          'StackTrace: $stackTrace\n'
+          'Proceeding with previously set default locale or system default.',
+        );
+      }
       defaultLanguageCode = Language.uk.isoLanguageCode;
     }
 
@@ -238,5 +278,16 @@ class LocalDataSource {
       }
       return const Location.empty();
     }
+  }
+
+  String _translateError(String key, String locale) {
+    final Map<String, Map<String, String>> localizedErrors =
+        <String, Map<String, String>>{
+          'error.save_asset_image_failed': <String, String>{
+            'en': 'Failed to save asset image',
+            'uk': 'Не вдалося зберегти зображення',
+          },
+        };
+    return localizedErrors[key]?[locale] ?? key;
   }
 }
