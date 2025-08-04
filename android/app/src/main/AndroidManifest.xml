@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.turskyi.weather_fit"
-    android:versionCode="26"
-    android:versionName="0.2.6">
+    android:versionCode="27"
+    android:versionName="0.2.7">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- Grants approximate location access using Wi-Fi and mobile networks.
@@ -77,10 +77,12 @@
         </activity>
 
         <!-- Used for Background Work -->
+        <!--suppress AndroidDomInspection -->
         <service
             android:name="es.antonborri.home_widget.HomeWidgetBackgroundService"
             android:exported="true"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            tools:ignore="MissingClass" />
 
         <!--
  Don't delete the meta-data below.

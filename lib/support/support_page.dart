@@ -4,12 +4,18 @@ import 'package:flutter_translate/flutter_translate.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
 import 'package:weather_fit/res/widgets/leading_widget.dart';
+import 'package:weather_fit/widgets/language_selector.dart';
 
-class SupportPage extends StatelessWidget {
+class SupportPage extends StatefulWidget {
   const SupportPage({required this.languageIsoCode, super.key});
 
   final String languageIsoCode;
 
+  @override
+  State<SupportPage> createState() => _SupportPageState();
+}
+
+class _SupportPageState extends State<SupportPage> {
   @override
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
@@ -17,9 +23,16 @@ class SupportPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         leading: kIsWeb
-            ? LeadingWidget(languageIsoCode: languageIsoCode)
+            ? LeadingWidget(languageIsoCode: widget.languageIsoCode)
             : null,
         title: Text(translate('support.title')),
+        actions: <Widget>[
+          LanguageSelector(
+            // Update state of the whole page to show text from another
+            // language.
+            onLanguageSelected: () => setState(() {}),
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

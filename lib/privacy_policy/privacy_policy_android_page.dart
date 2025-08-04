@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:weather_fit/privacy_policy/email_text.dart';
-import 'package:weather_fit/privacy_policy/language_selector.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
 import 'package:weather_fit/res/widgets/leading_widget.dart';
 import 'package:weather_fit/utils/date_util.dart';
+import 'package:weather_fit/widgets/language_selector.dart';
 
 class PrivacyPolicyAndroidPage extends StatefulWidget {
   const PrivacyPolicyAndroidPage({required this.languageIsoCode, super.key});
@@ -32,6 +32,9 @@ class _PrivacyPolicyAndroidPageState extends State<PrivacyPolicyAndroidPage> {
     );
     return Scaffold(
       appBar: AppBar(
+        leading: kIsWeb
+            ? LeadingWidget(languageIsoCode: widget.languageIsoCode)
+            : null,
         title: LayoutBuilder(
           builder: (BuildContext _, BoxConstraints constraints) {
             return ConstrainedBox(
@@ -47,9 +50,7 @@ class _PrivacyPolicyAndroidPageState extends State<PrivacyPolicyAndroidPage> {
             );
           },
         ),
-        leading: kIsWeb
-            ? LeadingWidget(languageIsoCode: widget.languageIsoCode)
-            : null,
+
         actions: <Widget>[
           LanguageSelector(
             // Update state of the whole page to show text from another

@@ -34,6 +34,7 @@
   "lon": "Lon",
   "could_not_launch": "Could not launch",
   "faq": "Frequently Asked Questions",
+  "contact_support": "Contact Support",
   "legal_and_app_info_title": "📄 Legal & App Info",
   "developer": "Developer",
   "developer_name": "Dmytro Turskyi",
@@ -134,8 +135,7 @@
     "privacy_title": "Privacy & Data",
     "privacy_description": "«{appName}» does not collect or store any personal data. Your approximate location is used only to show the local weather and is never shared. Outfit suggestions are generated on-device based on the weather conditions. You can read the full privacy policy below.",
     "view_privacy_policy": "View Privacy Policy",
-    "support_description": "Having trouble? Need help or want to suggest a feature? Join the community or contact the developer directly.",
-    "contact_support": "Contact Support"
+    "support_description": "Having trouble? Need help or want to suggest a feature? Join the community or contact the developer directly."
   },
   "privacy": {
     "policy_intro": "Your privacy is important to us. It is {appName}'s policy to respect your privacy and comply with any applicable law and regulation regarding any personal information we may collect about you, including across our app, «{appName}», and its associated services.",
