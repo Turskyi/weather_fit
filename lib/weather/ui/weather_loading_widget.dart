@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
+import 'package:weather_fit/extensions/build_context_extensions.dart';
 
 class WeatherLoadingWidget extends StatelessWidget {
   const WeatherLoadingWidget({super.key});
@@ -7,6 +8,9 @@ class WeatherLoadingWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
+    final TextStyle? textStyle = context.isExtraSmallScreen
+        ? theme.textTheme.bodySmall
+        : theme.textTheme.titleLarge;
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
@@ -21,9 +25,7 @@ class WeatherLoadingWidget extends StatelessWidget {
         const SizedBox(height: 16.0),
         Text(
           translate('weather.loading_weather'),
-          style: theme.textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
+          style: textStyle?.copyWith(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8.0),
         CircularProgressIndicator(

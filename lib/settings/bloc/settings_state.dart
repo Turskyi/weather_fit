@@ -29,10 +29,19 @@ final class SettingsInitial extends SettingsState {
 }
 
 final class FeedbackState extends SettingsState {
-  const FeedbackState({required super.language});
+  const FeedbackState({required this.errorMessage, required super.language});
+
+  final String errorMessage;
 
   @override
   String toString() => 'FeedbackState()';
+
+  FeedbackState copyWith({String? errorMessage, Language? language}) {
+    return FeedbackState(
+      errorMessage: errorMessage ?? this.errorMessage,
+      language: language ?? this.language,
+    );
+  }
 }
 
 final class FeedbackSent extends SettingsState {
@@ -40,6 +49,10 @@ final class FeedbackSent extends SettingsState {
 
   @override
   String toString() => 'FeedbackSent()';
+
+  FeedbackSent copyWith({Language? language}) {
+    return FeedbackSent(language: language ?? this.language);
+  }
 }
 
 final class LoadingSettingsState extends SettingsState {
@@ -72,5 +85,5 @@ final class SettingsError extends SettingsState {
   int get hashCode => errorMessage.hashCode;
 
   @override
-  String toString() => 'ChatError(errorMessage: $errorMessage)';
+  String toString() => 'SettingsError(errorMessage: $errorMessage)';
 }

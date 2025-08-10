@@ -43,13 +43,20 @@ class NominatimApiClient {
       throw NominatimLocationRequestFailure();
     }
 
-    final List<dynamic> body = jsonDecode(response.body);
-    if (body.isEmpty || body.first is! Map<String, dynamic>) {
-      throw NominatimLocationRequestFailure();
-    }
+    final Object? body = jsonDecode(response.body);
 
-    return NominatimLocationResponse.fromJson(
-      body.first as Map<String, dynamic>,
-    );
+    if (body is List) {
+      if (body.isEmpty || body.firstOrNull is! Map<String, Object?>) {
+        throw NominatimLocationRequestFailure();
+      }
+
+      if (body.isNotEmpty) {
+        final Object? object = body.firstOrNull;
+        if (object is Map<String, Object?>) {
+          return NominatimLocationResponse.fromJson(object);
+        }
+      }
+    }
+    throw NominatimLocationRequestFailure();
   }
 }

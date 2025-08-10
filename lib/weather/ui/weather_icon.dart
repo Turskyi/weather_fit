@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:weather_fit/extensions/build_context_extensions.dart';
 import 'package:weather_repository/weather_repository.dart';
 
 class WeatherIcon extends StatelessWidget {
@@ -10,6 +11,9 @@ class WeatherIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(condition.toEmoji, style: const TextStyle(fontSize: _iconSize));
+    return Text(
+      condition.toEmoji,
+      style: TextStyle(fontSize: context.isExtraSmallScreen ? 32 : _iconSize),
+    );
   }
 }

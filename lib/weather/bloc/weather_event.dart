@@ -9,16 +9,22 @@ sealed class WeatherEvent extends Equatable {
 }
 
 final class FetchWeather extends WeatherEvent {
-  const FetchWeather({required this.location});
+  const FetchWeather({required this.location, required this.origin});
 
   final Location location;
+  final WeatherFetchOrigin origin;
 
   @override
-  List<Object> get props => <Object>[location];
+  List<Object> get props => <Object>[location, origin];
 }
 
 final class RefreshWeather extends WeatherEvent {
-  const RefreshWeather();
+  const RefreshWeather(this.origin);
+
+  final WeatherFetchOrigin origin;
+
+  @override
+  List<Object> get props => <Object>[origin];
 }
 
 final class ToggleUnits extends WeatherEvent {
@@ -26,11 +32,20 @@ final class ToggleUnits extends WeatherEvent {
 }
 
 final class UpdateWeatherOnMobileHomeScreenEvent extends WeatherEvent {
-  const UpdateWeatherOnMobileHomeScreenEvent();
+  const UpdateWeatherOnMobileHomeScreenEvent(this.origin);
+
+  final WeatherFetchOrigin origin;
+
+  @override
+  List<Object> get props => <Object>[origin];
 }
 
 final class GetOutfitEvent extends WeatherEvent {
-  const GetOutfitEvent(this.weather);
+  const GetOutfitEvent({required this.weather, required this.origin});
 
   final Weather weather;
+  final WeatherFetchOrigin origin;
+
+  @override
+  List<Object> get props => <Object>[weather, origin];
 }

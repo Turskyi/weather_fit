@@ -1,0 +1,222 @@
+import 'dart:ui';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_translate/flutter_translate.dart';
+import 'package:weather_fit/res/constants.dart' as constant;
+import 'package:weather_fit/res/widgets/leading_widget.dart';
+import 'package:weather_fit/settings/bloc/settings_bloc.dart';
+import 'package:weather_fit/settings/ui/blurred_fab_with_border.dart';
+import 'package:weather_fit/weather/bloc/weather_bloc.dart';
+
+class SettingsPageExtraSmallLayout extends StatelessWidget {
+  const SettingsPageExtraSmallLayout({
+    required this.rebuildSettingsWhen,
+    required this.onLanguageChanged,
+    required this.rebuildUnitsWhen,
+    required this.onUnitsChanged,
+    required this.onAboutTap,
+    required this.onPrivacyTap,
+    required this.onFeedbackTap,
+    required this.onSupportTap,
+    required this.languageIsoCode,
+    required this.onSearchPressed,
+    super.key,
+  });
+
+  final BlocBuilderCondition<SettingsState> rebuildSettingsWhen;
+  final ValueChanged<bool> onLanguageChanged;
+  final BlocBuilderCondition<WeatherState> rebuildUnitsWhen;
+  final ValueChanged<bool> onUnitsChanged;
+  final GestureTapCallback onAboutTap;
+  final GestureTapCallback onPrivacyTap;
+  final GestureTapCallback onFeedbackTap;
+  final GestureTapCallback onSupportTap;
+  final String languageIsoCode;
+
+  /// The callback that is called when the "Search" button is tapped or
+  /// otherwise activated.
+  final VoidCallback onSearchPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.transparent,
+      appBar: AppBar(
+        title: Padding(
+          padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+          child: LeadingWidget(languageIsoCode: languageIsoCode),
+        ),
+        centerTitle: true,
+        automaticallyImplyLeading: false,
+        flexibleSpace: ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(
+              sigmaX: constant.blurSigma,
+              sigmaY: constant.blurSigma,
+            ),
+            child: Container(color: Colors.transparent),
+          ),
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+        child: ListView(
+          padding: const EdgeInsets.only(bottom: 60, top: kToolbarHeight),
+          children: <Widget>[
+            // Language toggle.
+            BlocBuilder<SettingsBloc, SettingsState>(
+              buildWhen: rebuildSettingsWhen,
+              builder: (BuildContext _, SettingsState settingsState) {
+                final int selectedIndex = settingsState.isEnglish ? 0 : 1;
+                return _SettingSegmentedToggle(
+                  label: translate('settings.language'),
+                  selectedIndex: selectedIndex,
+                  options: <String>[translate('en'), translate('uk')],
+                  onSelected: (int index) {
+                    final bool isEnglish = index == 0;
+                    onLanguageChanged(isEnglish);
+                  }, // true if English
+                );
+              },
+            ),
+            const SizedBox(height: 8),
+
+            // Temperature units toggle.
+            BlocBuilder<WeatherBloc, WeatherState>(
+              buildWhen: rebuildUnitsWhen,
+              builder: (BuildContext context, WeatherState state) {
+                final int selectedIndex =
+                    state.weather.temperatureUnits.isCelsius ? 0 : 1;
+                return _SettingSegmentedToggle(
+                  label: translate('settings.temperature_units'),
+                  options: const <String>['°C', '°F'],
+                  selectedIndex: selectedIndex,
+                  onSelected: (int index) {
+                    final bool isCelsius = index == 0;
+                    onUnitsChanged(isCelsius);
+                  }, // true if Celsius
+                );
+              },
+            ),
+            // TODO: complete adjusting layout for following screens.
+            // const SizedBox(height: 8),
+            // // Actions.
+            // _SettingButton(label: translate('about.title'),
+            // onTap: onAboutTap),
+            // _SettingButton(
+            //   label: translate('privacy_policy'),
+            //   onTap: onPrivacyTap,
+            // ),
+            // _SettingButton(
+            //   label: translate('feedback.title'),
+            //   onTap: onFeedbackTap,
+            // ),
+            // _SettingButton(
+            //   label: translate('support.title'),
+            //   onTap: onSupportTap,
+            // ),
+          ],
+        ),
+      ),
+      floatingActionButton: BlurredFabWithBorder(
+        onPressed: onSearchPressed,
+        tooltip: translate('search.label'),
+        icon: Icons.search,
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+    );
+  }
+}
+
+//TODO: complete adjusting layout for following screens.
+/// Reusable button widget for smartwatch.
+// class _SettingButton extends StatelessWidget {
+//   const _SettingButton({required this.label, required this.onTap});
+//
+//   final String label;
+//   final VoidCallback onTap;
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       margin: const EdgeInsets.only(top: 4),
+//       decoration: BoxDecoration(
+//         color: Theme.of(context).colorScheme.surface,
+//         borderRadius: BorderRadius.circular(8),
+//       ),
+//       child: ListTile(
+//         dense: true,
+//         title: Text(label, textAlign: TextAlign.center),
+//         onTap: onTap,
+//       ),
+//     );
+//   }
+// }
+
+class _SettingSegmentedToggle extends StatelessWidget {
+  const _SettingSegmentedToggle({
+    required this.label,
+    required this.options,
+    required this.selectedIndex,
+    required this.onSelected,
+  });
+
+  final String label;
+  final List<String> options;
+  final int selectedIndex;
+  final ValueChanged<int> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    return Column(
+      children: <Widget>[
+        Text(
+          label,
+          style: Theme.of(context).textTheme.bodyMedium,
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 4),
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            color: colorScheme.surfaceContainerHighest,
+          ),
+          padding: const EdgeInsets.all(4),
+          child: Row(
+            children: List<Widget>.generate(options.length, (int index) {
+              final bool isSelected = index == selectedIndex;
+              return Expanded(
+                child: GestureDetector(
+                  onTap: () => onSelected(index),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? colorScheme.primary
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Text(
+                      options[index],
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: isSelected
+                            ? colorScheme.onPrimary
+                            : colorScheme.onSurface,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }),
+          ),
+        ),
+      ],
+    );
+  }
+}

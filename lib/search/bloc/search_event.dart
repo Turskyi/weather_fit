@@ -39,5 +39,6 @@ final class SearchByLocation extends SearchEvent {
 }
 
 final class RequestPermissionAndSearchByLocation extends SearchEvent {
-  const RequestPermissionAndSearchByLocation();
+  const RequestPermissionAndSearchByLocation(this.query);
+  final String query;
 }

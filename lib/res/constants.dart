@@ -28,3 +28,11 @@ const String appStoreBadgeAssetPath =
 const String feedbackTypeProperty = 'feedback_type';
 const String feedbackTextProperty = 'feedback_text';
 const String ratingProperty = 'rating';
+const String screenSizeProperty = 'screenSize';
+const String searchError = 'searchError';
+
+// Expires Mar 13, 2026.
+const String resendEmailDomain = 'kima.website';
+
+/// Blur intensity constant.
+const double blurSigma = 1.5;

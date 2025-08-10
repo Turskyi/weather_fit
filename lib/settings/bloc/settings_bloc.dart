@@ -8,9 +8,11 @@ import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:resend/resend.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
 import 'package:weather_fit/entities/enums/feedback_rating.dart';
+import 'package:weather_fit/entities/enums/feedback_submission_type.dart';
 import 'package:weather_fit/entities/enums/feedback_type.dart';
 import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/entities/models/exceptions/email_launch_exception.dart';
@@ -46,111 +48,156 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     SubmitFeedbackEvent event,
     Emitter<SettingsState> emit,
   ) async {
-    emit(LoadingSettingsState(language: state.language));
-    final UserFeedback feedback = event.feedback;
-    try {
-      final PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    if (state is LoadingSettingsState || state is FeedbackSent) {
+      return;
+    } else {
+      emit(LoadingSettingsState(language: state.language));
+      final UserFeedback feedback = event.feedback;
+      try {
+        final PackageInfo packageInfo = await PackageInfo.fromPlatform();
 
-      final String platform = kIsWeb
-          ? translate('web')
-          : switch (defaultTargetPlatform) {
-              TargetPlatform.android => translate('android'),
-              TargetPlatform.iOS => translate('ios'),
-              TargetPlatform.macOS => translate('macos'),
-              TargetPlatform.windows => translate('windows'),
-              TargetPlatform.linux => translate('linux'),
-              _ => translate('unknown'),
-            };
+        final String platform = kIsWeb
+            ? translate('web')
+            : switch (defaultTargetPlatform) {
+                TargetPlatform.android => translate('android'),
+                TargetPlatform.iOS => translate('ios'),
+                TargetPlatform.macOS => translate('macos'),
+                TargetPlatform.windows => translate('windows'),
+                TargetPlatform.linux => translate('linux'),
+                _ => translate('unknown'),
+              };
 
-      final Map<String, Object?>? extra = feedback.extra;
-      final Object? rating = extra?[constants.ratingProperty];
-      final Object? type = extra?[constants.feedbackTypeProperty];
-      // `extra?[constants.feedbackTextProperty]` is usually same as
-      // `feedback.text`.
-      final Object feedbackText =
-          extra?[constants.feedbackTextProperty] ?? feedback.text;
+        final Map<String, Object?>? extra = feedback.extra;
+        final Object? rating = extra?[constants.ratingProperty];
+        final Object? type = extra?[constants.feedbackTypeProperty];
+        final Object? screenSize = extra?[constants.screenSizeProperty];
+        final String feedbackText = feedback.text;
 
-      final bool isFeedbackType = type is FeedbackType;
-      final bool isFeedbackRating = rating is FeedbackRating;
-      // Construct the feedback text with details from `extra'.
-      final StringBuffer feedbackBody = StringBuffer()
-        ..writeln(
-          '${isFeedbackType ? translate('feedback.type') : ''}:'
-          ' ${isFeedbackType ? type.value : ''}',
-        )
-        ..writeln()
-        ..writeln(feedback.text.isEmpty ? feedbackText : '')
-        ..writeln()
-        ..writeln(
-          '${isFeedbackRating ? translate('feedback.rating') : ''}'
-          '${isFeedbackRating ? ':' : ''}'
-          ' ${isFeedbackRating ? rating.value : ''}',
-        )
-        ..writeln()
-        ..writeln('${translate('app_id')}: ${packageInfo.packageName}')
-        ..writeln('${translate('app_version')}: ${packageInfo.version}')
-        ..writeln('${translate('build_number')}: ${packageInfo.buildNumber}')
-        ..writeln()
-        ..writeln('${translate('platform')}: $platform')
-        ..writeln();
-      if (kIsWeb || Platform.isMacOS) {
-        final Uri emailLaunchUri = Uri(
-          scheme: constants.mailToScheme,
-          path: constants.supportEmail,
-          queryParameters: <String, Object?>{
-            constants.subjectParameter:
-                '${translate('feedback.app_feedback')}:'
-                ' ${packageInfo.appName}',
-            constants.bodyParameter: feedbackBody.toString(),
-          },
-        );
-        try {
-          if (await canLaunchUrl(emailLaunchUri)) {
-            await launchUrl(emailLaunchUri);
+        // `extra?[constants.feedbackTextProperty]` is usually same as
+        // `feedback.text`.
+        final Object feedbackExtraText =
+            extra?[constants.feedbackTextProperty] ?? feedbackText;
+
+        final bool isFeedbackType = type is FeedbackType;
+        final bool isFeedbackRating = rating is FeedbackRating;
+        // Construct the feedback text with details from `extra'.
+        final StringBuffer feedbackBody = StringBuffer()
+          ..writeln(
+            '${isFeedbackType ? translate('feedback.type') : ''}:'
+            ' ${isFeedbackType ? type.value : ''}',
+          )
+          ..writeln(feedbackText.isEmpty ? feedbackExtraText : feedbackText)
+          ..writeln(
+            '${isFeedbackRating ? translate('feedback.rating') : ''}'
+            '${isFeedbackRating ? ':' : ''}'
+            ' ${isFeedbackRating ? rating.value : ''}',
+          )
+          ..writeln()
+          ..writeln('${translate('app_id')}: ${packageInfo.packageName}')
+          ..writeln('${translate('app_version')}: ${packageInfo.version}')
+          ..writeln('${translate('build_number')}: ${packageInfo.buildNumber}')
+          ..writeln()
+          ..writeln('${translate('platform')}: $platform')
+          ..writeln(
+            '${translate('screen_size')}: '
+            '${screenSize ?? translate('unknown')}',
+          )
+          ..writeln();
+
+        if (event.submissionType.isAutomatic) {
+          // TODO: move this thing to "data".
+          final Resend resend = Resend.instance;
+          await resend.sendEmail(
+            from:
+                'Do Not Reply ${constants.appName} '
+                '<no-reply@${constants.resendEmailDomain}>',
+            to: <String>[constants.supportEmail],
+            subject:
+                '${translate('feedback.app_feedback')}: ${packageInfo.appName}',
+            text: feedbackBody.toString(),
+          );
+        } else if (kIsWeb || Platform.isMacOS) {
+          final Uri emailLaunchUri = Uri(
+            scheme: constants.mailToScheme,
+            path: constants.supportEmail,
+            queryParameters: <String, Object?>{
+              constants.subjectParameter:
+                  '${translate('feedback.app_feedback')}: '
+                  '${packageInfo.appName}',
+              constants.bodyParameter: feedbackBody.toString(),
+            },
+          );
+          try {
+            if (await canLaunchUrl(emailLaunchUri)) {
+              await launchUrl(emailLaunchUri);
+              debugPrint(
+                'Feedback email launched successfully via url_launcher.',
+              );
+            } else {
+              throw const EmailLaunchException('error.launch_email_failed');
+            }
+          } catch (urlLauncherError, urlLauncherStackTrace) {
+            final String urlLauncherErrorMessage =
+                'Error launching email via url_launcher: $urlLauncherError';
             debugPrint(
-              'Feedback email launched successfully via url_launcher.',
+              '$urlLauncherErrorMessage\nStackTrace: $urlLauncherStackTrace',
             );
-          } else {
-            throw const EmailLaunchException('error.launch_email_failed');
+
+            final String errorMessage = translate('error.launch_email_failed');
+            emit(
+              SettingsError(
+                errorMessage: errorMessage,
+                language: state.language,
+              ),
+            );
           }
-        } catch (urlLauncherError, urlLauncherStackTrace) {
-          final String urlLauncherErrorMessage =
-              'Error launching email via url_launcher: $urlLauncherError';
-          debugPrint(
-            '$urlLauncherErrorMessage\nStackTrace: $urlLauncherStackTrace',
+        } else {
+          final String screenshotFilePath = await _writeImageToStorage(
+            feedback.screenshot,
           );
-          // TODO: show an error message to the user.
-        }
-      } else {
-        final String screenshotFilePath = await _writeImageToStorage(
-          feedback.screenshot,
-        );
-        final Email email = Email(
-          subject:
-              '${translate('feedback.app_feedback')}: ${packageInfo.appName}',
-          body: feedbackBody.toString(),
-          recipients: <String>[constants.supportEmail],
-          attachmentPaths: <String>[screenshotFilePath],
-        );
-        try {
-          await FlutterEmailSender.send(email);
-        } catch (e, stackTrace) {
-          debugPrint(
-            'Warning: an error occurred in $this: $e;\nStackTrace: $stackTrace',
+          final Email email = Email(
+            subject:
+                '${translate('feedback.app_feedback')}: ${packageInfo.appName}',
+            body: feedbackBody.toString(),
+            recipients: <String>[constants.supportEmail],
+            attachmentPaths: <String>[screenshotFilePath],
           );
+          try {
+            await FlutterEmailSender.send(email);
+          } catch (e, stackTrace) {
+            debugPrint(
+              'Warning: an error occurred in $this: $e;\n'
+              'StackTrace: $stackTrace',
+            );
+          }
         }
+
+        emit(FeedbackSent(language: state.language));
+      } catch (e, stackTrace) {
+        debugPrint('SettingsErrorEvent:$e\nStackTrace: $stackTrace');
+        emit(
+          SettingsError(
+            errorMessage: translate('error.unexpected_error'),
+            language: state.language,
+          ),
+        );
       }
-    } catch (e, stackTrace) {
-      debugPrint('SettingsErrorEvent: $e\nStackTrace: $stackTrace');
-      add(SettingsErrorEvent(translate('error.unexpected_error')));
     }
   }
 
   FutureOr<void> _onFeedbackRequested(
-    BugReportPressedEvent _,
+    BugReportPressedEvent event,
     Emitter<SettingsState> emit,
   ) {
-    emit(FeedbackState(language: state.language));
+    String errorMessage = event.errorText;
+
+    final SettingsState state = this.state;
+    if (state is SettingsError) {
+      errorMessage = state.errorMessage;
+    } else if (state is FeedbackState) {
+      errorMessage = state.errorMessage;
+    }
+    emit(FeedbackState(language: state.language, errorMessage: errorMessage));
   }
 
   Future<String> _writeImageToStorage(Uint8List feedbackScreenshot) async {
@@ -174,15 +221,20 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   ) async {
     final Language language = event.language;
 
+    final SettingsState state = this.state;
+
     if (language != state.language) {
       final bool isSaved = await _localDataSource.saveLanguageIsoCode(
         language.isoLanguageCode,
       );
-
-      if (isSaved && state is SettingsInitial) {
-        emit((state as SettingsInitial).copyWith(language: language));
+      if (isSaved) {
+        if (state is SettingsInitial) {
+          emit(state.copyWith(language: language));
+        } else {
+          SettingsInitial(language: language);
+        }
       } else {
-        add(SettingsErrorEvent(translate('error.unexpected_error')));
+        //TODO: no sure what to do.
       }
     }
   }

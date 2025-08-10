@@ -58,7 +58,13 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         'error.getting_weather_generic',
       );
 
-      emit(SearchError(errorMessage: userFriendlyErrorMessage));
+      emit(
+        SearchError(
+          errorMessage: userFriendlyErrorMessage,
+          errorType: SearchErrorType.unknown,
+          query: '${event.latitude}, ${event.longitude}',
+        ),
+      );
     }
   }
 
@@ -82,12 +88,18 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         'error.getting_weather_generic',
       );
 
-      emit(SearchError(errorMessage: userFriendlyErrorMessage));
+      emit(
+        SearchError(
+          errorMessage: userFriendlyErrorMessage,
+          query: '${event.location}',
+          errorType: SearchErrorType.unknown,
+        ),
+      );
     }
   }
 
   Future<void> _onRequestLocationPermission(
-    RequestPermissionAndSearchByLocation _,
+    RequestPermissionAndSearchByLocation event,
     Emitter<SearchState> emit,
   ) async {
     emit(const SearchLoading());
@@ -95,8 +107,9 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     try {
       await _requestLocationPermission();
 
+      // When we reach here, permissions are granted and we can
+      // continue accessing the position of the device.
       final Position position = await Geolocator.getCurrentPosition();
-
       final String languageIsoCode = _localDataSource.getLanguageIsoCode();
 
       final WeatherDomain domainWeather = await _weatherRepository
@@ -116,8 +129,20 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       debugPrint('error: $debugErrorMessage\n$stackTrace');
 
       // 2. Determine the user-facing error message.
-      String userFriendlyErrorMessage;
-      if (e.toString().contains(
+      String userFriendlyErrorMessage = translate(
+        'error.getting_weather_generic',
+      );
+      SearchErrorType searchErrorType = SearchErrorType.unknown;
+
+      if (e is LocationServiceDisabledException) {
+        // TODO: implement displaying a full screen dialog where we would
+        //  explain, that if we get here and location permission is enabled
+        //  means app cannot find the location and we are very sorry. Suggest
+        //  to "type" another city, or country or report the error to developer
+        //  or uninstall the app.
+        userFriendlyErrorMessage = translate('error.location_unavailable');
+        searchErrorType = SearchErrorType.locationServiceDisabled;
+      } else if (e.toString().contains(
         translate(
           // Check if the error is one of our translated permission errors.
           'error.location_permission_permanently_denied_cannot_request',
@@ -126,17 +151,23 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         userFriendlyErrorMessage = translate(
           'error.location_permission_permanently_denied_cannot_request',
         );
+        searchErrorType = SearchErrorType.permissionDeniedPermanently;
       } else if (e.toString().contains(
         translate('error.location_permission_denied'),
       )) {
         userFriendlyErrorMessage = translate(
           'error.location_permission_denied',
         );
-      } else {
-        // Generic error message for other cases.
-        userFriendlyErrorMessage = translate('error.getting_weather_generic');
+        searchErrorType = SearchErrorType.permissionDenied;
       }
-      emit(SearchError(errorMessage: userFriendlyErrorMessage));
+
+      emit(
+        SearchError(
+          errorMessage: userFriendlyErrorMessage,
+          errorType: searchErrorType,
+          query: event.query,
+        ),
+      );
     }
   }
 
@@ -146,41 +177,84 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
   ) async {
     emit(const SearchLoading());
     final String eventQuery = event.query;
-    try {
-      final Location location = await _locationRepository.getLocation(
-        eventQuery,
+
+    if (eventQuery.isEmpty) {
+      throw Exception(
+        'For some reason the query is empty. This should not have happened.',
       );
-
-      emit(SearchLocationFound(location));
-    } catch (e, stackTrace) {
-      String userFriendlyMessage;
-      SearchErrorType errorType;
-      final String detailedMessage = e.toString();
-
-      if (e is HandshakeException &&
-          detailedMessage.contains('CERTIFICATE_VERIFY_FAILED')) {
-        userFriendlyMessage = translate(
-          'error.certificate_validation_failed_user_message',
+    } else {
+      try {
+        final Location location = await _locationRepository.getLocation(
+          eventQuery,
         );
-        errorType = SearchErrorType.certificateValidationFailed;
-      } else if (e is SocketException) {
-        userFriendlyMessage = translate('error.network_error');
-        errorType = SearchErrorType.network;
-      } else if (e is LocationNotFoundFailure) {
-        emit(SearchLocationNotFound(eventQuery));
-      } else {
-        userFriendlyMessage =
-            '${translate('error.searching_location')}: ${e.runtimeType}';
-        errorType = SearchErrorType.unknown;
-        emit(
-          SearchError(errorMessage: userFriendlyMessage, errorType: errorType),
-        );
+
+        emit(SearchLocationFound(location));
+      } catch (e, stackTrace) {
+        // The logging of this error in in the end of this block.
+        String userFriendlyMessage = translate('error.searching_location');
+        SearchErrorType errorType = SearchErrorType.unknown;
+        final String detailedMessage = e.toString();
+
+        if (e is HandshakeException &&
+            detailedMessage.contains('CERTIFICATE_VERIFY_FAILED')) {
+          userFriendlyMessage = translate(
+            'error.certificate_validation_failed_user_message',
+          );
+          errorType = SearchErrorType.certificateValidationFailed;
+        } else if (e is SocketException) {
+          debugPrint(
+            '[_searchLocation] SocketException: $e\nquery: $eventQuery\n'
+            '$stackTrace.',
+          );
+
+          userFriendlyMessage = translate('error.network_error');
+          errorType = SearchErrorType.network;
+          emit(
+            SearchError(
+              errorMessage: userFriendlyMessage,
+              errorType: errorType,
+              query: eventQuery,
+            ),
+          );
+        } else if (e is LocationNotFoundFailure) {
+          emit(SearchLocationNotFound(eventQuery));
+        } else {
+          emit(
+            SearchError(
+              errorMessage: userFriendlyMessage,
+              errorType: errorType,
+              query: eventQuery,
+            ),
+          );
+        }
+        debugPrint('[_searchLocation] Error: $detailedMessage\n$stackTrace');
       }
-      debugPrint('[_searchLocation] Error: $detailedMessage\n$stackTrace');
     }
   }
 
   Future<void> _requestLocationPermission() async {
+    try {
+      // Test if location services are enabled.
+      final bool isServiceEnabled = await Geolocator.isLocationServiceEnabled();
+
+      if (!isServiceEnabled) {
+        // TODO: implement another dialog to inform user that we will open
+        //  system location settings with a call
+        //  `await Geolocator.openLocationSettings();`
+
+        // Location services are not enabled don't continue
+        // accessing the position and request users of the
+        // App to enable the location services.
+        return Future<void>.error('Location services are disabled.');
+      }
+    } catch (e) {
+      if (e.toString().contains('LOCATION_SERVICES_DISABLED')) {
+        // TODO: implement another dialog to inform user that we will open
+        //  system location settings with a call
+        //  `await Geolocator.openLocationSettings();`
+        return Future<void>.error('Location services are disabled.');
+      }
+    }
     LocationPermission permission = await Geolocator.checkPermission();
 
     if (permission == LocationPermission.denied) {
@@ -206,6 +280,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         ),
       );
     }
-    // We expect here LocationPermission.whileInUse.
+    // We expect here `LocationPermission.whileInUse`.
+    debugPrint('Location permission granted with value: $permission.');
   }
 }

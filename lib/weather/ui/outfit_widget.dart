@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
+import 'package:weather_fit/extensions/build_context_extensions.dart';
 import 'package:weather_fit/weather/ui/text_recommendation_widget.dart';
 
 class OutfitWidget extends StatelessWidget {
@@ -40,10 +41,11 @@ class OutfitWidget extends StatelessWidget {
       displayText = translate(randomKey);
     }
 
-    final double screenWidth = MediaQuery.sizeOf(context).width;
-    final bool isNarrowScreen = screenWidth < 500;
+    final bool isNarrowScreen = context.isNarrowScreen;
 
     final BorderRadius borderRadius = BorderRadius.circular(20.0);
+
+    final Size outfitSize = _getOutfitImageSize(context);
     return DecoratedBox(
       decoration: BoxDecoration(
         // Match the ClipRRect's radius.
@@ -61,8 +63,8 @@ class OutfitWidget extends StatelessWidget {
         ],
       ),
       child: SizedBox(
-        width: isNarrowScreen ? 400 : 520,
-        height: isNarrowScreen ? 520 : 400,
+        width: outfitSize.width,
+        height: outfitSize.height,
         child: ClipRRect(
           borderRadius: borderRadius,
           child: assetPath.isEmpty
@@ -221,5 +223,15 @@ class OutfitWidget extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Size _getOutfitImageSize(BuildContext context) {
+    if (context.isExtraSmallScreen) {
+      return const Size(180, 236);
+    } else if (context.isNarrowScreen) {
+      return const Size(400, 520);
+    } else {
+      return const Size(520, 400);
+    }
   }
 }

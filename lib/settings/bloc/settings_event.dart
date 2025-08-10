@@ -6,13 +6,19 @@ sealed class SettingsEvent {
 }
 
 final class BugReportPressedEvent extends SettingsEvent {
-  const BugReportPressedEvent();
+  const BugReportPressedEvent(this.errorText);
+
+  final String errorText;
 }
 
 final class SubmitFeedbackEvent extends SettingsEvent {
-  const SubmitFeedbackEvent(this.feedback);
+  const SubmitFeedbackEvent({
+    required this.feedback,
+    this.submissionType = FeedbackSubmissionType.manual,
+  });
 
   final UserFeedback feedback;
+  final FeedbackSubmissionType submissionType;
 }
 
 final class ClosingFeedbackEvent extends SettingsEvent {

@@ -11,6 +11,7 @@ import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
 import 'package:weather_fit/data/repositories/outfit_repository.dart';
 import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/entities/enums/temperature_units.dart';
+import 'package:weather_fit/entities/enums/weather_fetch_origin.dart';
 import 'package:weather_fit/entities/models/temperature/temperature.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
@@ -106,11 +107,12 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
 
         emit((state as WeatherSuccess).copyWith(outfitAssetPath: assetPath));
 
+        final WeatherFetchOrigin eventOrigin = event.origin;
         // Only add the event if it's NOT web AND NOT macOS.
         // For context, see issue:
         // https://github.com/ABausG/home_widget/issues/137.
-        if (!kIsWeb && !Platform.isMacOS) {
-          add(const UpdateWeatherOnMobileHomeScreenEvent());
+        if (!kIsWeb && !Platform.isMacOS && eventOrigin.isNotWearable) {
+          add(UpdateWeatherOnMobileHomeScreenEvent(eventOrigin));
         }
       } else {
         emit(
@@ -145,7 +147,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
   }
 
   FutureOr<void> _onRefreshWeather(
-    RefreshWeather _,
+    RefreshWeather event,
     Emitter<WeatherState> emit,
   ) async {
     final Weather stateWeather = state.weather;
@@ -215,11 +217,12 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
 
         emit((state as WeatherSuccess).copyWith(outfitAssetPath: filePath));
 
+        final WeatherFetchOrigin eventOrigin = event.origin;
         // Only add the event if it's NOT web AND NOT macOS.
         // For context, see issue:
         // https://github.com/ABausG/home_widget/issues/137.
-        if (!kIsWeb && !Platform.isMacOS) {
-          add(const UpdateWeatherOnMobileHomeScreenEvent());
+        if (!kIsWeb && !Platform.isMacOS && eventOrigin.isNotWearable) {
+          add(UpdateWeatherOnMobileHomeScreenEvent(eventOrigin));
         }
       }
     } on Exception catch (e) {
@@ -278,7 +281,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
   ) async {
     // Check if the platform is web OR macOS. If so, return early.
     // See issue: https://github.com/ABausG/home_widget/issues/137.
-    if (kIsWeb || (!kIsWeb && Platform.isMacOS)) {
+    if (kIsWeb || (!kIsWeb && Platform.isMacOS) || event.origin.isWearable) {
       return;
     }
 
@@ -381,11 +384,12 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           eventWeather,
         );
         emit((state as WeatherSuccess).copyWith(outfitAssetPath: assetPath));
+        final WeatherFetchOrigin eventOrigin = event.origin;
         // Only add the event if it's NOT web AND NOT macOS.
         // For context, see issue:
         // https://github.com/ABausG/home_widget/issues/137.
-        if (!kIsWeb && !Platform.isMacOS) {
-          add(const UpdateWeatherOnMobileHomeScreenEvent());
+        if (!kIsWeb && !Platform.isMacOS && eventOrigin.isNotWearable) {
+          add(UpdateWeatherOnMobileHomeScreenEvent(eventOrigin));
         }
         final bool isLocationSaved = await _localDataSource.saveLocation(
           eventWeather.location,

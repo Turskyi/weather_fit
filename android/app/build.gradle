@@ -30,6 +30,8 @@ def signingKeyReleaseKeyPassword = keyProperties.getProperty('SIGNING_KEY_RELEAS
 android {
     namespace = rootProject.application_id
     compileSdk = flutter.compileSdkVersion
+    // Requirement for the https://pub.dev/packages/geolocator at least 25.
+    compileSdkVersion 36
     //TODO: replace with "ndkVersion flutter.ndkVersion" when the error "One or more plugins require a higher Android NDK version." is gone.
     ndkVersion = "27.0.12077973"
 
@@ -46,6 +48,7 @@ android {
         applicationId = rootProject.application_id
         //TODO: change to dynamic "flutter.minSdkVersion" value, when it will be possible.
         minSdk = 23
+        minSdkVersion 23
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
@@ -138,6 +141,6 @@ subprojects {
                 }
             }
         }
-        
+
     }
 }

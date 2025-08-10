@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
 import 'package:weather_fit/data/repositories/outfit_repository.dart';
 import 'package:weather_fit/entities/enums/temperature_units.dart';
+import 'package:weather_fit/entities/enums/weather_fetch_origin.dart';
 import 'package:weather_fit/entities/models/temperature/temperature.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/res/extensions/double_extension.dart';
@@ -150,7 +151,10 @@ void main() {
         'valid location',
         build: () => weatherBloc,
         act: (WeatherBloc bloc) => bloc.add(
-          const FetchWeather(location: dummy_constants.dummyLocation),
+          const FetchWeather(
+            location: dummy_constants.dummyLocation,
+            origin: WeatherFetchOrigin.defaultDevice,
+          ),
         ),
         expect: () => <Matcher>[
           isA<WeatherLoadingState>(),
@@ -178,7 +182,9 @@ void main() {
         blocTest<WeatherBloc, WeatherState>(
           'emits initial when status is not success',
           build: () => weatherBloc,
-          act: (WeatherBloc bloc) => bloc.add(const RefreshWeather()),
+          act: (WeatherBloc bloc) {
+            bloc.add(const RefreshWeather(WeatherFetchOrigin.wearable));
+          },
           expect: () => <Matcher>[
             isA<WeatherState>().having(
               (WeatherState w) => w,
@@ -198,7 +204,9 @@ void main() {
             weather: Weather.empty,
             locale: dummy_constants.dummyLocale,
           ),
-          act: (WeatherBloc bloc) => bloc.add(const RefreshWeather()),
+          act: (WeatherBloc bloc) {
+            bloc.add(const RefreshWeather(WeatherFetchOrigin.wearable));
+          },
           expect: () => <Matcher>[
             isA<WeatherState>().having(
               (WeatherState w) => w,

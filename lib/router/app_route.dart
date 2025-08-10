@@ -5,7 +5,8 @@ enum AppRoute {
   about('/about'),
   settings('/settings'),
   privacyPolicyAndroid('/privacy-policy-android'),
-  privacyPolicy('/privacy-policy');
+  privacyPolicy('/privacy-policy'),
+  unableToConnect('/unable-to-connect');
 
   const AppRoute(this.path);
 
