@@ -6,6 +6,7 @@ import 'package:weather_fit/extensions/build_context_extensions.dart';
 import 'package:weather_fit/res/widgets/background.dart';
 import 'package:weather_fit/res/widgets/leading_widget.dart';
 import 'package:weather_fit/search/bloc/search_bloc.dart';
+import 'package:weather_fit/widgets/keyboard_visibility_builder.dart';
 
 class SearchLayoutDefault extends StatelessWidget {
   const SearchLayoutDefault({
@@ -26,12 +27,25 @@ class SearchLayoutDefault extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         leading: kIsWeb
             ? LeadingWidget(languageIsoCode: languageIsoCode)
             : null,
+        title: KeyboardVisibilityBuilder(
+          builder: (bool isKeyboardVisible) {
+            final Orientation orientation = MediaQuery.of(context).orientation;
+            final bool isLandscapeOrientation =
+                orientation == Orientation.landscape;
+            return Text(
+              isLandscapeOrientation && isKeyboardVisible
+                  ? ''
+                  : translate('search.page_app_bar_title'),
+            );
+          },
+        ),
       ),
       body: Stack(
         alignment: Alignment.topCenter,
