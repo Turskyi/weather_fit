@@ -353,7 +353,11 @@ class _SearchPageState extends State<SearchPage> {
             barrierDismissible: true,
             barrierLabel: translate('close'),
             pageBuilder:
-                (BuildContext context, Animation<double> _, Animation<double> _) {
+                (
+                  BuildContext context,
+                  Animation<double> _,
+                  Animation<double> _,
+                ) {
                   return Center(
                     child: Container(
                       constraints: const BoxConstraints(maxWidth: 200),
