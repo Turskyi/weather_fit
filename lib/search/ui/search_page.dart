@@ -347,16 +347,60 @@ class _SearchPageState extends State<SearchPage> {
           );
         }
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(state.errorMessage),
-            duration: const Duration(seconds: 7),
-            action: SnackBarAction(
-              label: translate('error.report'),
-              onPressed: _handleReportErrorSnackBarAction,
+        if (context.isExtraSmallScreen) {
+          showGeneralDialog<void>(
+            context: context,
+            barrierDismissible: true,
+            barrierLabel: translate('close'),
+            pageBuilder:
+                (BuildContext context, Animation<double> _, Animation<double> _) {
+                  return Center(
+                    child: Container(
+                      constraints: const BoxConstraints(maxWidth: 200),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: SingleChildScrollView(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            const Text('📍', style: TextStyle(fontSize: 28)),
+                            const SizedBox(height: 8),
+                            Text(
+                              translate('error.gps_unavailable_watch'),
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.labelSmall,
+                            ),
+                            const SizedBox(height: 12),
+                            ElevatedButton(
+                              onPressed: _handleReportErrorSnackBarAction,
+                              child: Text(translate('error.report_issue')),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(),
+                              child: Text(translate('close')),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.errorMessage),
+              duration: const Duration(seconds: 7),
+              action: SnackBarAction(
+                label: translate('error.report'),
+                onPressed: _handleReportErrorSnackBarAction,
+              ),
             ),
-          ),
-        );
+          );
+        }
       }
     }
   }
@@ -372,11 +416,13 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   void _handleReportErrorSnackBarAction() {
-    final SearchState state = context.read<SearchBloc>().state;
+    if (mounted) {
+      final SearchState state = context.read<SearchBloc>().state;
 
-    context.read<SettingsBloc>().add(
-      BugReportPressedEvent(state is SearchError ? state.errorMessage : ''),
-    );
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      context.read<SettingsBloc>().add(
+        BugReportPressedEvent(state is SearchError ? state.errorMessage : ''),
+      );
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    }
   }
 }

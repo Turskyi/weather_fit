@@ -110,7 +110,8 @@
     "unable_to_connect_short": "Can’t connect. Try again?",
     "location_unavailable": "We couldn't get your location.",
     "location_unavailable_details": "Location permission is enabled, but the app still cannot detect your position. We’re very sorry for the inconvenience.",
-    "location_unavailable_suggestions": "You can type the name of another city or country, report the issue to the developer, or uninstall the app."
+    "location_unavailable_suggestions": "You can type the name of another city or country, report the issue to the developer, or uninstall the app.",
+    "gps_unavailable_watch": "It looks like your watch’s GPS isn’t available for this app. You can try typing another city or country, report the issue, or uninstall the app."
   },
   "settings": {
     "title": "Settings",
