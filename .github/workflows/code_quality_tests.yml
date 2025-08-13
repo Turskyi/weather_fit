@@ -1,8 +1,6 @@
 name: Code Quality and Tests
 
-on:
-  push:
-    branches: [ master, '**' ]
+on: [ push ]
 
 jobs:
   check-code-quality-and-tests:
