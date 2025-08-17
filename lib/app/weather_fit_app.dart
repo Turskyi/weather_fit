@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:nested/nested.dart';
 import 'package:resend/resend.dart';
@@ -81,11 +83,21 @@ class WeatherFitApp extends StatelessWidget {
             final int hour = now.hour;
             // Assume darkness from 10 PM to 6 AM.
             final bool completeDarkness = hour < 6 || hour > 21;
+            final LocalizationDelegate localizationDelegate = LocalizedApp.of(
+              context,
+            ).delegate;
             return Resources(
               child: MaterialApp(
                 navigatorKey: navigatorKey,
                 debugShowCheckedModeBanner: false,
                 title: constants.appName,
+                localizationsDelegates: <LocalizationsDelegate<Object>>[
+                  GlobalMaterialLocalizations.delegate,
+                  GlobalWidgetsLocalizations.delegate,
+                  localizationDelegate,
+                ],
+                supportedLocales: localizationDelegate.supportedLocales,
+                locale: localizationDelegate.currentLocale,
                 initialRoute: AppRoute.weather.path,
                 routes: routes.getRouteMap(initialLanguage.isoLanguageCode),
                 builder: (BuildContext _, Widget? child) {

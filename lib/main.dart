@@ -54,6 +54,7 @@ void main() async {
 
     localizationDelegate.changeLocale(locale);
 
+    // Notify listeners that the locale has changed so they can update.
     localizationDelegate.onLocaleChanged?.call(locale);
   }
 
