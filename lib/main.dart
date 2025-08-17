@@ -9,7 +9,7 @@ import 'package:weather_fit/app/weather_fit_app.dart';
 import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
 import 'package:weather_fit/data/repositories/location_repository.dart';
 import 'package:weather_fit/data/repositories/outfit_repository.dart';
-import 'package:weather_fit/di/injector.dart';
+import 'package:weather_fit/di/injector.dart' as di;
 import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/feedback/feedback_form.dart';
 import 'package:weather_fit/localization/localization_delelegate_getter.dart'
@@ -31,13 +31,15 @@ void main() async {
   // We need to call `WidgetsFlutterBinding.ensureInitialized` before any
   // `await` operation, otherwise app may stuck on black/white screen.
   WidgetsFlutterBinding.ensureInitialized();
-  await injectDependencies();
+
+  await di.injectDependencies();
 
   final SharedPreferences preferences = await SharedPreferences.getInstance();
 
   final LocalDataSource localDataSource = LocalDataSource(preferences);
 
   final String savedIsoCode = localDataSource.getLanguageIsoCode();
+
   final Language savedLanguage = Language.fromIsoLanguageCode(savedIsoCode);
 
   final LocalizationDelegate localizationDelegate = await locale

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:feedback/feedback.dart';
@@ -27,14 +28,13 @@ class _SettingsStateListenerContentState
   FeedbackController? _feedbackController;
   bool _isFeedbackControllerInitialized = false;
   bool _isDisposing = false;
+  OverlayEntry? _temporaryMessageOverlayEntry;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: BlocListener<SettingsBloc, SettingsState>(
-        listener: _settingsBlocStateListener,
-        child: widget.child,
-      ),
+    return BlocListener<SettingsBloc, SettingsState>(
+      listener: _settingsBlocStateListener,
+      child: widget.child,
     );
   }
 
@@ -48,6 +48,10 @@ class _SettingsStateListenerContentState
     _feedbackController?.dispose();
     _feedbackController = null;
     _isFeedbackControllerInitialized = false;
+
+    // Ensure the overlay entry is removed if the widget is disposed,
+    // especially if the `Future.delayed` hasn't completed.
+    _removeTemporaryMessageOverlay();
     super.dispose();
   }
 
@@ -64,7 +68,7 @@ class _SettingsStateListenerContentState
       _notifyFeedbackSent();
 
       Future<void>.delayed(const Duration(seconds: 1), () {
-        // CRITICAL: Use the navigatorKey's context for dialogs/navigation.
+        // CRITICAL: Use the `navigatorKey`'s context for dialogs/navigation.
         final BuildContext? dialogContext = navigatorKey.currentContext;
         if (dialogContext != null &&
             dialogContext.mounted &&
@@ -73,12 +77,7 @@ class _SettingsStateListenerContentState
         }
       });
     } else if (state is SettingsError) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(state.errorMessage),
-          duration: const Duration(seconds: 2),
-        ),
-      );
+      _showTemporaryMessage(state.errorMessage);
     }
   }
 
@@ -112,7 +111,7 @@ class _SettingsStateListenerContentState
       debugPrint(
         'Error sending automatic feedback in SettingsPage: $e\n$stack',
       );
-      _showTemporaryFailedMessage();
+      _showTemporaryMessage(translate('feedback.failed_short'));
       if (mounted) {
         // CRITICAL: Use the navigatorKey's context for dialogs/navigation.
         final BuildContext? dialogContext = navigatorKey.currentContext;
@@ -126,7 +125,7 @@ class _SettingsStateListenerContentState
   }
 
   void _showFeedbackSendingLoadingDialog() {
-    // CRITICAL: Use the navigatorKey's context for dialogs/navigation
+    // CRITICAL: Use the `navigatorKey`'s context for dialogs/navigation
     final BuildContext? dialogContext = navigatorKey.currentContext;
 
     if (dialogContext != null) {
@@ -184,12 +183,7 @@ class _SettingsStateListenerContentState
   void _notifyFeedbackSent() {
     _feedbackController?.hide();
     // Let user know that his feedback is sent.
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(translate('feedback.sent'), textAlign: TextAlign.center),
-        duration: const Duration(seconds: 2),
-      ),
-    );
+    _showTemporaryMessage(translate('feedback.sent'));
   }
 
   void _showFeedbackUi() {
@@ -219,15 +213,88 @@ class _SettingsStateListenerContentState
     }
   }
 
-  void _showTemporaryFailedMessage() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          translate('feedback.failed_short'),
-          textAlign: TextAlign.center,
-        ),
-        duration: const Duration(seconds: 2),
-      ),
-    );
+  void _showTemporaryMessage(String message) {
+    // Ensure we have access to an `OverlayState`.
+    final OverlayState? overlayState = navigatorKey.currentState?.overlay;
+
+    if (overlayState != null) {
+      // Remove any existing temporary message overlay to prevent stacking.
+      _removeTemporaryMessageOverlay();
+
+      _temporaryMessageOverlayEntry = OverlayEntry(
+        builder: (BuildContext overlayContext) {
+          final ThemeData theme = Theme.of(overlayContext);
+          final ColorScheme colorScheme = theme.colorScheme;
+          final TextTheme textTheme = theme.textTheme;
+
+          // It's good practice to use a `Material` widget as the root of the
+          // overlay entry.
+          return Material(
+            color: Colors.transparent,
+            // Makes the Material widget itself transparent.
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: Container(
+                margin: const EdgeInsets.only(
+                  bottom: 50.0,
+                  left: 24.0,
+                  right: 24.0,
+                ),
+                // Adjust margin as needed
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24.0,
+                  vertical: 14.0,
+                ),
+                decoration: BoxDecoration(
+                  color: colorScheme.inverseSurface.withValues(alpha: 0.9),
+                  // Similar to SnackBar background.
+                  borderRadius: BorderRadius.circular(8.0),
+                  boxShadow: <BoxShadow>[
+                    BoxShadow(
+                      color: colorScheme.shadow.withValues(alpha: 0.26),
+                      blurRadius: 10.0,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Text(
+                  message,
+                  textAlign: TextAlign.center,
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onInverseSurface,
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      );
+
+      overlayState.insert(_temporaryMessageOverlayEntry!);
+
+      // Use `Future.delayed` for self-dismissal.
+      Future<void>.delayed(const Duration(seconds: 2), () {
+        _removeTemporaryMessageOverlay();
+      });
+    } else {
+      // If `overlayState` is truly null, this is a critical issue with app
+      // setup.
+      // We can't show the overlay-based message.
+      // Logging an error is appropriate here.
+      debugPrint(
+        'CRITICAL: OverlayState not found. Cannot display temporary message.',
+      );
+    }
+  }
+
+  void _removeTemporaryMessageOverlay() {
+    // Check if the entry is still part of an overlay and `mounted`.
+    // While `_temporaryMessageOverlayEntry?.remove()` is generally safe,
+    // being explicit can prevent errors if `remove()` was called rapidly
+    // or if the state changes unexpectedly.
+    if (_temporaryMessageOverlayEntry?.mounted == true) {
+      _temporaryMessageOverlayEntry?.remove();
+    }
+    _temporaryMessageOverlayEntry = null;
   }
 }

@@ -70,8 +70,8 @@ Future<void> injectDependencies() async {
         storageDirectory: HydratedStorageDirectory(temporaryDirectory.path),
       );
       HydratedBloc.storage = hydratedStorage;
-    } catch (e) {
-      debugPrint('Failed to initialize hydrated storage: $e');
+    } catch (e, s) {
+      debugPrint('Failed to initialize hydrated storage: $e.\nStackTrace: $s');
     }
   }
 }
