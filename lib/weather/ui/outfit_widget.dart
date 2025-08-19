@@ -147,7 +147,7 @@ class OutfitWidget extends StatelessWidget {
                       Expanded(
                         flex: 2,
                         child: Container(
-                          padding: const EdgeInsets.all(10),
+                          padding: const EdgeInsets.all(6),
                           alignment: Alignment.center,
                           child: SelectableText(
                             displayText,

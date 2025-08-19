@@ -94,6 +94,7 @@ class WeatherFitApp extends StatelessWidget {
                 localizationsDelegates: <LocalizationsDelegate<Object>>[
                   GlobalMaterialLocalizations.delegate,
                   GlobalWidgetsLocalizations.delegate,
+                  GlobalCupertinoLocalizations.delegate,
                   localizationDelegate,
                 ],
                 supportedLocales: localizationDelegate.supportedLocales,
