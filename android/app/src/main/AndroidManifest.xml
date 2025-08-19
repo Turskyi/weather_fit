@@ -20,11 +20,6 @@
 
     <uses-permission android:name="android.permission.VIBRATE" />
 
-    <!-- Required for ambient mode support -->
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-
-    <uses-feature android:name="android.hardware.type.watch" />
-
     <queries>
         <intent>
             <action android:name="android.intent.action.SENDTO" />
@@ -58,7 +53,6 @@
             android:exported="true"
             android:hardwareAccelerated="true"
             android:launchMode="singleTop"
-            android:taskAffinity="com.turskyi.weather_fit"
             android:theme="@style/LaunchTheme"
             android:windowSoftInputMode="adjustResize"
             tools:ignore="ObsoleteSdkInt"
@@ -97,10 +91,6 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
-
-        <meta-data
-            android:name="com.google.android.wearable.standalone"
-            android:value="true" />
 
     </application>
 </manifest>

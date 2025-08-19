@@ -100,23 +100,6 @@ class SettingsPageExtraSmallLayout extends StatelessWidget {
                 );
               },
             ),
-            // TODO: complete adjusting layout for following screens.
-            // const SizedBox(height: 8),
-            // // Actions.
-            // _SettingButton(label: translate('about.title'),
-            // onTap: onAboutTap),
-            // _SettingButton(
-            //   label: translate('privacy_policy'),
-            //   onTap: onPrivacyTap,
-            // ),
-            // _SettingButton(
-            //   label: translate('feedback.title'),
-            //   onTap: onFeedbackTap,
-            // ),
-            // _SettingButton(
-            //   label: translate('support.title'),
-            //   onTap: onSupportTap,
-            // ),
           ],
         ),
       ),
@@ -129,31 +112,6 @@ class SettingsPageExtraSmallLayout extends StatelessWidget {
     );
   }
 }
-
-//TODO: complete adjusting layout for following screens.
-/// Reusable button widget for smartwatch.
-// class _SettingButton extends StatelessWidget {
-//   const _SettingButton({required this.label, required this.onTap});
-//
-//   final String label;
-//   final VoidCallback onTap;
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       margin: const EdgeInsets.only(top: 4),
-//       decoration: BoxDecoration(
-//         color: Theme.of(context).colorScheme.surface,
-//         borderRadius: BorderRadius.circular(8),
-//       ),
-//       child: ListTile(
-//         dense: true,
-//         title: Text(label, textAlign: TextAlign.center),
-//         onTap: onTap,
-//       ),
-//     );
-//   }
-// }
 
 class _SettingSegmentedToggle extends StatelessWidget {
   const _SettingSegmentedToggle({
