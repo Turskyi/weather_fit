@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:weather_fit/about/about_page.dart';
+import 'package:weather_fit/error/unable_to_connect.dart';
 import 'package:weather_fit/privacy_policy/privacy_policy_android_page.dart';
 import 'package:weather_fit/privacy_policy/privacy_policy_page.dart';
 import 'package:weather_fit/router/app_route.dart';
@@ -13,11 +14,15 @@ Map<String, WidgetBuilder> getRouteMap(String languageIsoCode) {
     AppRoute.weather.path: (BuildContext _) {
       return WeatherPage(languageIsoCode: languageIsoCode);
     },
-    AppRoute.search.path: (BuildContext _) => const SearchPage(),
+    AppRoute.search.path: (BuildContext context) {
+      return SearchPage(languageIsoCode: languageIsoCode);
+    },
+    AppRoute.settings.path: (BuildContext context) {
+      return SettingsPage(languageIsoCode: languageIsoCode);
+    },
     AppRoute.support.path: (BuildContext _) {
       return SupportPage(languageIsoCode: languageIsoCode);
     },
-    AppRoute.settings.path: (BuildContext _) => const SettingsPage(),
     AppRoute.about.path: (BuildContext _) {
       return AboutPage(languageIsoCode: languageIsoCode);
     },
@@ -26,6 +31,9 @@ Map<String, WidgetBuilder> getRouteMap(String languageIsoCode) {
     },
     AppRoute.privacyPolicy.path: (BuildContext _) {
       return PrivacyPolicyPage(languageIsoCode: languageIsoCode);
+    },
+    AppRoute.unableToConnect.path: (BuildContext _) {
+      return const UnableToConnect();
     },
   };
 }

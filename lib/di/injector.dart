@@ -24,135 +24,162 @@ Future<void> injectDependencies() async {
   await _initializeAllDateFormatting();
 
   if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
-    Workmanager()
-        .initialize(_callbackDispatcher, isInDebugMode: kDebugMode)
-        .then((void _) {
-          Workmanager().registerPeriodicTask(
-            'weatherfit_background_update',
-            'updateWidgetTask',
-            // Home widget will be updated every hour.
-            frequency: const Duration(minutes: 60),
-            constraints: Constraints(networkType: NetworkType.connected),
-          );
-        });
+    try {
+      Workmanager()
+          .initialize(_callbackDispatcher, isInDebugMode: kDebugMode)
+          .then((void _) {
+            try {
+              Workmanager().registerPeriodicTask(
+                'weatherfit_background_update',
+                'updateWidgetTask',
+                // Home widget will be updated every two hours.
+                frequency: const Duration(minutes: 120),
+                constraints: Constraints(networkType: NetworkType.connected),
+              );
+            } catch (e) {
+              debugPrint(
+                'Background widget update failed in '
+                'Workmanager.registerPeriodicTask: $e',
+              );
+            }
+          });
+    } catch (e) {
+      debugPrint(
+        'Background widget update failed in Workmanager.initialize: $e',
+      );
+    }
   }
 
   Bloc.observer = const WeatherBlocObserver();
 
   if (kIsWeb) {
-    final HydratedStorage hydratedStorage = await HydratedStorage.build(
-      storageDirectory: HydratedStorageDirectory.web,
-    );
-    HydratedBloc.storage = hydratedStorage;
+    try {
+      final HydratedStorage hydratedStorage = await HydratedStorage.build(
+        storageDirectory: HydratedStorageDirectory.web,
+      );
+      HydratedBloc.storage = hydratedStorage;
+    } catch (e) {
+      debugPrint('Failed to initialize hydrated storage on web: $e');
+    }
   } else {
-    // We cannot specify `Directory` type here, otherwise it will not work on
-    // Web.
-    final dynamic temporaryDirectory = await getTemporaryDirectory();
-    final HydratedStorage hydratedStorage = await HydratedStorage.build(
-      storageDirectory: HydratedStorageDirectory(temporaryDirectory.path),
-    );
-    HydratedBloc.storage = hydratedStorage;
+    try {
+      // We cannot specify `Directory` type here, otherwise it will not work on
+      // Web.
+      final dynamic temporaryDirectory = await getTemporaryDirectory();
+      final HydratedStorage hydratedStorage = await HydratedStorage.build(
+        storageDirectory: HydratedStorageDirectory(temporaryDirectory.path),
+      );
+      HydratedBloc.storage = hydratedStorage;
+    } catch (e, s) {
+      debugPrint('Failed to initialize hydrated storage: $e.\nStackTrace: $s');
+    }
   }
 }
 
 /// Used for Background Updates using [Workmanager] Plugin.
 @pragma('vm:entry-point')
 void _callbackDispatcher() {
-  Workmanager().executeTask((String _, Map<String, Object?>? _) async {
-    try {
-      WidgetsFlutterBinding.ensureInitialized();
+  try {
+    Workmanager().executeTask((String _, Map<String, Object?>? _) async {
+      try {
+        WidgetsFlutterBinding.ensureInitialized();
 
-      await _initializeAllDateFormatting();
+        await _initializeAllDateFormatting();
 
-      // Set app group ID.
-      await HomeWidget.setAppGroupId(constants.appleAppGroupId);
+        // Set app group ID.
+        await HomeWidget.setAppGroupId(constants.appleAppGroupId);
 
-      // Get latest weather.
-      final WeatherRepository weatherRepository = WeatherRepository();
+        // Get latest weather.
+        final WeatherRepository weatherRepository = WeatherRepository();
 
-      final SharedPreferences preferences =
-          await SharedPreferences.getInstance();
+        final SharedPreferences preferences =
+            await SharedPreferences.getInstance();
 
-      final LocalDataSource localDataSource = LocalDataSource(preferences);
+        final LocalDataSource localDataSource = LocalDataSource(preferences);
 
-      final Location lastSavedLocation = localDataSource.getLastSavedLocation();
+        final Location lastSavedLocation = localDataSource
+            .getLastSavedLocation();
 
-      if (lastSavedLocation.isNotEmpty) {
-        final WeatherDomain domainWeather = await weatherRepository
-            .getWeatherByLocation(lastSavedLocation);
-        final Weather weather = Weather.fromRepository(domainWeather);
+        if (lastSavedLocation.isNotEmpty) {
+          final WeatherDomain domainWeather = await weatherRepository
+              .getWeatherByLocation(lastSavedLocation);
+          final Weather weather = Weather.fromRepository(domainWeather);
 
-        final TemperatureUnits units = weather.temperatureUnits;
+          final TemperatureUnits units = weather.temperatureUnits;
 
-        final double temperatureValue = units.isFahrenheit
-            ? weather.temperature.value.toFahrenheit()
-            : weather.temperature.value;
-        final Weather updatedWeather = weather.copyWith(
-          temperature: Temperature(value: temperatureValue),
-          temperatureUnits: units,
-        );
+          final double temperatureValue = units.isFahrenheit
+              ? weather.temperature.value.toFahrenheit()
+              : weather.temperature.value;
 
-        final OutfitRepository outfitRepository = OutfitRepository(
-          localDataSource,
-        );
+          final Weather updatedWeather = weather.copyWith(
+            temperature: Temperature(value: temperatureValue),
+            temperatureUnits: units,
+          );
 
-        final String outfitRecommendation = outfitRepository
-            .getOutfitRecommendation(updatedWeather);
+          final OutfitRepository outfitRepository = OutfitRepository(
+            localDataSource,
+          );
 
-        final String outfitAssetPath = outfitRepository.getOutfitImageAssetPath(
-          weather,
-        );
+          final String outfitRecommendation = outfitRepository
+              .getOutfitRecommendation(updatedWeather);
 
-        final String outfitFilePath = await outfitRepository
-            .downloadAndSaveImage(outfitAssetPath);
+          final String outfitAssetPath = outfitRepository
+              .getOutfitImageAssetPath(weather);
 
-        // Save data.
-        await HomeWidget.saveWidgetData(
-          HomeWidgetKey.textEmoji.stringValue,
-          weather.condition.toEmoji,
-        );
+          final String outfitFilePath = await outfitRepository
+              .downloadAndSaveImage(outfitAssetPath);
 
-        await HomeWidget.saveWidgetData(
-          HomeWidgetKey.textLocation.stringValue,
-          weather.locationName,
-        );
+          // Save data.
+          await HomeWidget.saveWidgetData(
+            HomeWidgetKey.textEmoji.stringValue,
+            weather.condition.toEmoji,
+          );
 
-        await HomeWidget.saveWidgetData(
-          HomeWidgetKey.textTemperature.stringValue,
-          weather.formattedTemperature,
-        );
+          await HomeWidget.saveWidgetData(
+            HomeWidgetKey.textLocation.stringValue,
+            weather.locationName,
+          );
 
-        await HomeWidget.saveWidgetData(
-          HomeWidgetKey.textRecommendation.stringValue,
-          outfitRecommendation,
-        );
+          await HomeWidget.saveWidgetData(
+            HomeWidgetKey.textTemperature.stringValue,
+            weather.formattedTemperature,
+          );
 
-        final String savedLanguageIsoCode = localDataSource
-            .getLanguageIsoCode();
+          await HomeWidget.saveWidgetData(
+            HomeWidgetKey.textRecommendation.stringValue,
+            outfitRecommendation,
+          );
 
-        await HomeWidget.saveWidgetData(
-          HomeWidgetKey.textLastUpdated.stringValue,
-          weather.getFormattedLastUpdatedDateTime(savedLanguageIsoCode),
-        );
+          final String savedLanguageIsoCode = localDataSource
+              .getLanguageIsoCode();
 
-        await HomeWidget.saveWidgetData(
-          HomeWidgetKey.imageWeather.stringValue,
-          outfitFilePath,
-        );
+          await HomeWidget.saveWidgetData(
+            HomeWidgetKey.textLastUpdated.stringValue,
+            weather.getFormattedLastUpdatedDateTime(savedLanguageIsoCode),
+          );
+
+          await HomeWidget.saveWidgetData(
+            HomeWidgetKey.imageWeather.stringValue,
+            outfitFilePath,
+          );
+
+          // Update the widget.
+          await HomeWidget.updateWidget(
+            iOSName: constants.iOSWidgetName,
+            androidName: constants.androidWidgetName,
+          );
+          return true;
+        } else {
+          return false;
+        }
+      } catch (e) {
+        debugPrint('Background widget update failed: $e');
+        return false;
       }
-
-      // Update the widget.
-      await HomeWidget.updateWidget(
-        iOSName: constants.iOSWidgetName,
-        androidName: constants.androidWidgetName,
-      );
-
-      return true;
-    } catch (e) {
-      debugPrint('Background widget update failed: $e');
-      return false;
-    }
-  });
+    });
+  } catch (e) {
+    debugPrint('Error while WorkManager.executeTask: $e');
+  }
 }
 
 Future<void> _initializeAllDateFormatting() async {

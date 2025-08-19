@@ -1,6 +1,7 @@
 import 'package:nominatim_api/nominatim_api.dart';
 import 'package:open_meteo_api/open_meteo_api.dart';
 import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
+import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_repository/weather_repository.dart';
 
 class LocationRepository {
@@ -24,6 +25,7 @@ class LocationRepository {
 
   Future<Location> getLocation(String query) async {
     final String locale = _localDataSource.getLanguageIsoCode();
+
     if (_shouldUseNominatim(query)) {
       final NominatimLocationResponse response = await _nominatimApiClient
           .locationSearch(query);
@@ -80,6 +82,9 @@ class LocationRepository {
 
   /// Use Nominatim if query contains Cyrillic characters.
   bool _shouldUseNominatim(String query) {
-    return RegExp(r'[а-яА-ЯіїєІЇЄ]').hasMatch(query);
+    final String locale = _localDataSource.getLanguageIsoCode();
+
+    return locale == Language.uk.isoLanguageCode ||
+        RegExp(r'[а-яА-ЯіїєІЇЄ]').hasMatch(query);
   }
 }

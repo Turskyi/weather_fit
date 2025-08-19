@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/res/widgets/background.dart';
-import 'package:weather_fit/weather/ui/weather_content.dart';
+import 'package:weather_fit/weather/ui/populated/weather_content.dart';
 
 class WeatherPopulated extends StatelessWidget {
   const WeatherPopulated({

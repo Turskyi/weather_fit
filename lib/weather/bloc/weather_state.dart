@@ -56,6 +56,11 @@ sealed class WeatherState extends Equatable {
   TemperatureUnits get temperatureUnits => weather.temperatureUnits;
 
   bool get isCelsius => weather.temperatureUnits.isCelsius;
+
+  bool get isNotLoading =>
+      this is! LoadingOutfitState && this is! WeatherLoadingState;
+
+  bool get isInitial => this is WeatherInitial;
 }
 
 @JsonSerializable()

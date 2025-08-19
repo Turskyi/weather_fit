@@ -7,6 +7,7 @@ enum SearchErrorType {
 
   /// For CERTIFICATE_VERIFY_FAILED.
   certificateValidationFailed,
+  locationServiceDisabled,
   unknown;
 
   /// Returns `true` if the error is due to a certificate validation failure.

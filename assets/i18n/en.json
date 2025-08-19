@@ -34,6 +34,7 @@
   "lon": "Lon",
   "could_not_launch": "Could not launch",
   "faq": "Frequently Asked Questions",
+  "contact_support": "Contact Support",
   "legal_and_app_info_title": "📄 Legal & App Info",
   "developer": "Developer",
   "developer_name": "Dmytro Turskyi",
@@ -57,6 +58,8 @@
   "please_try_refreshing_weather": "Please try refreshing the weather.",
   "unable_to_load_outfit_image": "Unable to load outfit image.",
   "ok": "OK",
+  "try_again": "Try again",
+  "screen_size": "Screen size",
   "feedback": {
     "title": "Feedback",
     "app_feedback": "App Feedback",
@@ -70,7 +73,14 @@
     "rating": "Rating",
     "bad": "Bad",
     "neutral": "Neutral",
-    "good": "Good"
+    "good": "Good",
+    "sending": "Sending your report…",
+    "sending_short": "Sending…",
+    "sent_short": "Sent ✔",
+    "failed": "Failed to send the report. Please try again later.",
+    "failed_short": "Send failed",
+    "button": "Report",
+    "button_short": "Report"
   },
   "error": {
     "please_check_internet": "An error occurred. Please check your internet connection and try again.",
@@ -93,7 +103,15 @@
     "what_you_can_do": "What you can try:",
     "ensure_os_updated": "Ensure your device's operating system is up to date.",
     "check_date_time": "Check that your device's date and time are set correctly.",
-    "report_issue_button": "Report Issue"
+    "report_issue_button": "Report Issue",
+    "unable_to_connect": "Unable to connect",
+    "connection_reset_suggestion": "The weather service closed the connection unexpectedly.\nPlease check your connection or try again later.",
+    "report_issue": "Report issue",
+    "unable_to_connect_short": "Can’t connect. Try again?",
+    "location_unavailable": "We couldn't get your location.",
+    "location_unavailable_details": "Location permission is enabled, but the app still cannot detect your position. We’re very sorry for the inconvenience.",
+    "location_unavailable_suggestions": "You can type the name of another city or country, report the issue to the developer, or uninstall the app.",
+    "gps_unavailable_watch": "It looks like your watch’s GPS isn’t available for this app. You can try typing another city or country, report the issue, or uninstall the app."
   },
   "settings": {
     "title": "Settings",
@@ -106,6 +124,7 @@
     "support_subtitle": "Visit our support page for help and frequently asked questions."
   },
   "search": {
+    "label": "Search",
     "city_or_country": "City or country",
     "enter_city_or_country": "Enter city or country",
     "page_semantics_label": "City or country search page",
@@ -134,8 +153,7 @@
     "privacy_title": "Privacy & Data",
     "privacy_description": "«{appName}» does not collect or store any personal data. Your approximate location is used only to show the local weather and is never shared. Outfit suggestions are generated on-device based on the weather conditions. You can read the full privacy policy below.",
     "view_privacy_policy": "View Privacy Policy",
-    "support_description": "Having trouble? Need help or want to suggest a feature? Join the community or contact the developer directly.",
-    "contact_support": "Contact Support"
+    "support_description": "Having trouble? Need help or want to suggest a feature? Join the community or contact the developer directly."
   },
   "privacy": {
     "policy_intro": "Your privacy is important to us. It is {appName}'s policy to respect your privacy and comply with any applicable law and regulation regarding any personal information we may collect about you, including across our app, «{appName}», and its associated services.",

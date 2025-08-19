@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 
-class WeatherError extends StatelessWidget {
-  const WeatherError(this.message, {super.key});
+class WeatherErrorDefault extends StatelessWidget {
+  const WeatherErrorDefault({required this.message, super.key});
 
   final String message;
 

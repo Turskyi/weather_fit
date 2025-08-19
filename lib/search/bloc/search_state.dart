@@ -28,11 +28,13 @@ final class SearchLocationNotFound extends SearchState {
 final class SearchError extends SearchState {
   const SearchError({
     required this.errorMessage,
-    this.errorType = SearchErrorType.unknown,
+    required this.query,
+    required this.errorType,
   });
 
   final String errorMessage;
   final SearchErrorType errorType;
+  final String query;
 
   /// Returns `true` if the error is due to a certificate validation failure.
   bool get isCertificateValidationError {

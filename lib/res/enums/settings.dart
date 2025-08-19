@@ -1,5 +1,5 @@
 enum Settings {
-  languageIsoCode('languageIsoCode'),
+  languageIsoCode('language_iso_code'),
   location('saved_location');
 
   const Settings(this.key);

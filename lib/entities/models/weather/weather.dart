@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:intl/intl.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:weather_fit/entities/enums/temperature_units.dart';
@@ -164,6 +165,8 @@ class Weather extends Equatable {
 
   bool get neverUpdated => lastUpdatedDateTime == null;
 
+  bool get wasUpdated => lastUpdatedDateTime != null;
+
   bool get isNotEmpty => this != empty;
 
   bool get isEmpty => this == empty;
@@ -191,5 +194,22 @@ class Weather extends Equatable {
 
   String _localeTranslate(String key, String locale) {
     return _localizedStrings[key]?[locale] ?? key;
+  }
+
+  String get translatedWeatherDescription {
+    final String specificKey = 'weather.code_$code';
+    final String fallbackKey = 'weather.code_unknown';
+
+    // Attempt to translate the specific key.
+    String translatedDescription = translate(specificKey);
+
+    // If `flutter_translate` returns the key itself, it means the key was not
+    // found.
+    // So, we use the fallback translation.
+    if (translatedDescription == specificKey) {
+      translatedDescription = translate(fallbackKey);
+    }
+
+    return translatedDescription;
   }
 }

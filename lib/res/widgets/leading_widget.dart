@@ -19,18 +19,25 @@ class LeadingWidget extends StatelessWidget {
           // Ensures the background remains unchanged.
           color: Colors.transparent,
           child: InkWell(
-            onTap: () => Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute<void>(
-                builder: (BuildContext _) {
-                  return WeatherPage(languageIsoCode: languageIsoCode);
-                },
-                settings: RouteSettings(name: AppRoute.weather.path),
+            onTap: () {
+              // TODO: change with route navigation or add a comment, why.
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute<void>(
+                  builder: (BuildContext _) {
+                    return WeatherPage(languageIsoCode: languageIsoCode);
+                  },
+                  settings: RouteSettings(name: AppRoute.weather.path),
+                ),
+                (Route<void> _) => false,
+              );
+            },
+            child: SizedBox(
+              height: kMinInteractiveDimension,
+              width: kMinInteractiveDimension,
+              child: Ink.image(
+                image: const AssetImage('${constants.imagePath}logo.jpeg'),
+                fit: BoxFit.cover,
               ),
-              (_) => false,
-            ),
-            child: Ink.image(
-              image: const AssetImage('${constants.imagePath}logo.jpeg'),
-              fit: BoxFit.cover,
             ),
           ),
         ),
