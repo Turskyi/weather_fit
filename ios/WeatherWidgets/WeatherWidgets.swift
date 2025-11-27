@@ -28,8 +28,7 @@ struct Provider: TimelineProvider {
             print("Could not load shared defaults.")
             return nil
         }
-        
-        // Use the correct keys, matching Android's SharedPreferences keys.
+
         let keys: [String: String] = [
             "emoji": "text_emoji",
             "location": "text_location",

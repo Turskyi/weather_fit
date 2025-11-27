@@ -49,3 +49,12 @@ final class GetOutfitEvent extends WeatherEvent {
   @override
   List<Object> get props => <Object>[weather, origin];
 }
+
+final class FetchDailyForecast extends WeatherEvent {
+  const FetchDailyForecast({required this.location});
+
+  final Location location;
+
+  @override
+  List<Object> get props => <Object>[location];
+}

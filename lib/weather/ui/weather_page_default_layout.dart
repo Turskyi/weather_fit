@@ -46,11 +46,13 @@ class WeatherPageDefaultLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery.sizeOf(context).width;
+    final double screenWidth = MediaQuery.widthOf(context);
     final bool isLargeScreen = screenWidth > 800;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
+        forceMaterialTransparency: true,
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.settings),
@@ -164,6 +166,16 @@ class WeatherPageDefaultLayout extends StatelessWidget {
       persistentFooterButtons: (kIsWeb && isLargeScreen)
           ? _buildSettingsButtons(context)
           : null,
+      persistentFooterDecoration: BoxDecoration(
+        color: colorScheme.surface,
+        boxShadow: <BoxShadow>[
+          BoxShadow(
+            color: colorScheme.shadow.withValues(alpha: 0.5),
+            blurRadius: 10,
+            offset: const Offset(5, 5),
+          ),
+        ],
+      ),
     );
   }
 

@@ -32,8 +32,7 @@ void main() {
       test('makes correct HTTP request', () async {
         final MockResponse response = MockResponse();
         when(() => response.statusCode).thenReturn(200);
-        when(() => response.body).thenReturn(
-          '''
+        when(() => response.body).thenReturn('''
           [
             {
               "place_id": 178260985,
@@ -46,10 +45,10 @@ void main() {
               }
             }
           ]
-          ''',
-        );
-        when(() => httpClient.get(any(), headers: any(named: 'headers')))
-            .thenAnswer((_) async => response);
+          ''');
+        when(
+          () => httpClient.get(any(), headers: any(named: 'headers')),
+        ).thenAnswer((_) async => response);
 
         await apiClient.locationSearch(query);
 
@@ -70,25 +69,27 @@ void main() {
         ).called(1);
       });
 
-      test('throws NominatimLocationRequestFailure on non-200 response',
-          () async {
-        final MockResponse response = MockResponse();
-        when(() => response.statusCode).thenReturn(200);
-        when(() => response.body).thenReturn('[]');
-        when(() => httpClient.get(any(), headers: any(named: 'headers')))
-            .thenAnswer((_) async => response);
+      test(
+        'throws NominatimLocationRequestFailure on non-200 response',
+        () async {
+          final MockResponse response = MockResponse();
+          when(() => response.statusCode).thenReturn(200);
+          when(() => response.body).thenReturn('[]');
+          when(
+            () => httpClient.get(any(), headers: any(named: 'headers')),
+          ).thenAnswer((_) async => response);
 
-        expect(
-          () => apiClient.locationSearch(query),
-          throwsA(isA<NominatimLocationRequestFailure>()),
-        );
-      });
+          expect(
+            () => apiClient.locationSearch(query),
+            throwsA(isA<NominatimLocationRequestFailure>()),
+          );
+        },
+      );
 
       test('returns NominatimLocationResponse on valid response', () async {
         final MockResponse response = MockResponse();
         when(() => response.statusCode).thenReturn(200);
-        when(() => response.body).thenReturn(
-          '''
+        when(() => response.body).thenReturn('''
 [
   {
     "place_id": 178260985,
@@ -101,10 +102,10 @@ void main() {
     }
   }
 ]
-          ''',
-        );
-        when(() => httpClient.get(any(), headers: any(named: 'headers')))
-            .thenAnswer((_) async => response);
+          ''');
+        when(
+          () => httpClient.get(any(), headers: any(named: 'headers')),
+        ).thenAnswer((_) async => response);
 
         final NominatimLocationResponse result = await apiClient.locationSearch(
           query,

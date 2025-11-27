@@ -77,6 +77,10 @@ class _WeatherPageState extends State<WeatherPage> {
 
     if (mounted && weather is Weather) {
       context.read<WeatherBloc>().add(
+        FetchDailyForecast(location: weather.location),
+      );
+
+      context.read<WeatherBloc>().add(
         GetOutfitEvent(weather: weather, origin: context.origin),
       );
     } else {

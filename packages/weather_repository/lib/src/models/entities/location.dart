@@ -14,16 +14,16 @@ class Location extends Equatable {
   });
 
   const Location.empty()
-      : this(
-          id: 0,
-          name: '',
-          latitude: 0.0,
-          longitude: 0.0,
-          countryCode: '',
-          country: '',
-          province: '',
-          locale: '',
-        );
+    : this(
+        id: 0,
+        name: '',
+        latitude: 0.0,
+        longitude: 0.0,
+        countryCode: '',
+        country: '',
+        province: '',
+        locale: '',
+      );
 
   factory Location.fromJson(Map<String, Object?> json) {
     final Object? id = json['id'];
@@ -121,21 +121,21 @@ class Location extends Equatable {
 
     return name.isEmpty
         ? '${latLabels[lang]}: ${latitude.toStringAsFixed(2)}, '
-            '${lonLabels[lang]}: ${longitude.toStringAsFixed(2)}'
+              '${lonLabels[lang]}: ${longitude.toStringAsFixed(2)}'
         : name;
   }
 
   @override
   List<Object?> get props => <Object?>[
-        id,
-        name,
-        latitude,
-        longitude,
-        countryCode,
-        country,
-        province,
-        locale,
-      ];
+    id,
+    name,
+    latitude,
+    longitude,
+    countryCode,
+    country,
+    province,
+    locale,
+  ];
 
   @override
   String toString() {

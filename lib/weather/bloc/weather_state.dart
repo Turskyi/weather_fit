@@ -7,6 +7,7 @@ sealed class WeatherState extends Equatable {
     this.outfitRecommendation = '',
     this.outfitAssetPath = '',
     this.message = '',
+    this.dailyForecast,
     Weather? weather,
   }) : weather = weather ?? Weather.empty;
 
@@ -19,15 +20,17 @@ sealed class WeatherState extends Equatable {
   final String message;
   final String outfitAssetPath;
   final String locale;
+  final DailyForecastDomain? dailyForecast;
 
   @override
-  List<Object> get props => <Object>[
+  List<Object?> get props => <Object?>[
     weather,
     outfitRecommendation,
     outfitAssetPath,
     message,
     locale,
     isCelsius,
+    dailyForecast,
   ];
 
   Map<String, Object?> toJson() {
@@ -70,6 +73,7 @@ final class WeatherInitial extends WeatherState {
     super.outfitRecommendation,
     super.weather,
     super.outfitAssetPath,
+    super.dailyForecast,
   });
 
   factory WeatherInitial.fromJson(Map<String, Object?> json) {
@@ -84,6 +88,7 @@ final class WeatherInitial extends WeatherState {
     Weather? weather,
     String? outfitRecommendation,
     String? outfitAssetPath,
+    DailyForecastDomain? dailyForecast,
     Language? language,
   }) {
     return WeatherInitial(
@@ -91,6 +96,7 @@ final class WeatherInitial extends WeatherState {
       weather: weather ?? this.weather,
       outfitRecommendation: outfitRecommendation ?? this.outfitRecommendation,
       outfitAssetPath: outfitAssetPath ?? this.outfitAssetPath,
+      dailyForecast: dailyForecast ?? this.dailyForecast,
     );
   }
 }
@@ -102,6 +108,7 @@ class WeatherLoadingState extends WeatherState {
     required super.weather,
     super.outfitRecommendation,
     super.outfitAssetPath,
+    super.dailyForecast,
   });
 
   factory WeatherLoadingState.fromJson(Map<String, Object?> json) =>
@@ -114,18 +121,21 @@ class WeatherLoadingState extends WeatherState {
     String? locale,
     Weather? weather,
     String? outfitRecommendation,
+    DailyForecastDomain? dailyForecast,
   }) => WeatherLoadingState(
     locale: locale ?? this.locale,
     weather: weather ?? this.weather,
     outfitRecommendation: outfitRecommendation ?? this.outfitRecommendation,
+    dailyForecast: dailyForecast ?? this.dailyForecast,
   );
 
   @override
-  List<Object> get props => <Object>[
+  List<Object?> get props => <Object?>[
     locale,
     weather,
     outfitRecommendation,
     outfitAssetPath,
+    dailyForecast,
   ];
 }
 
@@ -137,6 +147,7 @@ class WeatherSuccess extends WeatherState {
     super.outfitRecommendation,
     super.weather,
     super.message,
+    super.dailyForecast,
   });
 
   factory WeatherSuccess.fromJson(Map<String, Object?> json) {
@@ -152,21 +163,24 @@ class WeatherSuccess extends WeatherState {
     String? outfitRecommendation,
     String? outfitAssetPath,
     String? message,
+    DailyForecastDomain? dailyForecast,
   }) => WeatherSuccess(
     locale: locale ?? this.locale,
     weather: weather ?? this.weather,
     outfitRecommendation: outfitRecommendation ?? this.outfitRecommendation,
     outfitAssetPath: outfitAssetPath ?? this.outfitAssetPath,
     message: message ?? this.message,
+    dailyForecast: dailyForecast ?? this.dailyForecast,
   );
 
   @override
-  List<Object> get props => <Object>[
+  List<Object?> get props => <Object?>[
     locale,
     weather,
     outfitRecommendation,
     outfitAssetPath,
     message,
+    dailyForecast,
   ];
 }
 
@@ -177,6 +191,7 @@ final class LoadingOutfitState extends WeatherSuccess {
     super.outfitRecommendation = '',
     super.outfitAssetPath = '',
     super.weather,
+    super.dailyForecast,
   });
 
   factory LoadingOutfitState.fromJson(Map<String, Object?> json) =>
@@ -190,6 +205,7 @@ class WeatherFailure extends WeatherState {
     super.outfitAssetPath,
     super.outfitRecommendation,
     super.message,
+    super.dailyForecast,
   });
 
   factory WeatherFailure.fromJson(Map<String, Object?> json) {
@@ -200,11 +216,12 @@ class WeatherFailure extends WeatherState {
   Map<String, Object?> toJson() => _$WeatherFailureToJson(this);
 
   @override
-  List<Object> get props => <Object>[
+  List<Object?> get props => <Object?>[
     locale,
     outfitRecommendation,
     outfitAssetPath,
     message,
+    dailyForecast,
   ];
 }
 
@@ -214,6 +231,7 @@ class LocalWebCorsFailure extends WeatherFailure {
     required super.locale,
     super.outfitRecommendation,
     super.message,
+    super.dailyForecast,
   });
 
   factory LocalWebCorsFailure.fromJson(Map<String, Object?> json) {
@@ -224,5 +242,5 @@ class LocalWebCorsFailure extends WeatherFailure {
   Map<String, Object?> toJson() => _$LocalWebCorsFailureToJson(this);
 
   @override
-  List<Object> get props => <Object>[locale, message];
+  List<Object?> get props => <Object?>[locale, message, dailyForecast];
 }

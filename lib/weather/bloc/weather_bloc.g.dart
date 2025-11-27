@@ -26,12 +26,19 @@ WeatherInitial _$WeatherInitialFromJson(Map<String, dynamic> json) =>
             'outfit_asset_path',
             (v) => v as String? ?? '',
           ),
+          dailyForecast: $checkedConvert(
+            'daily_forecast',
+            (v) => v == null
+                ? null
+                : DailyForecastDomain.fromJson(v as Map<String, dynamic>),
+          ),
         );
         return val;
       },
       fieldKeyMap: const {
         'outfitRecommendation': 'outfit_recommendation',
         'outfitAssetPath': 'outfit_asset_path',
+        'dailyForecast': 'daily_forecast',
       },
     );
 
@@ -41,6 +48,7 @@ Map<String, dynamic> _$WeatherInitialToJson(WeatherInitial instance) =>
       'outfit_recommendation': instance.outfitRecommendation,
       'outfit_asset_path': instance.outfitAssetPath,
       'locale': instance.locale,
+      'daily_forecast': instance.dailyForecast?.toJson(),
     };
 
 WeatherLoadingState _$WeatherLoadingStateFromJson(Map<String, dynamic> json) =>
@@ -63,12 +71,19 @@ WeatherLoadingState _$WeatherLoadingStateFromJson(Map<String, dynamic> json) =>
             'outfit_asset_path',
             (v) => v as String? ?? '',
           ),
+          dailyForecast: $checkedConvert(
+            'daily_forecast',
+            (v) => v == null
+                ? null
+                : DailyForecastDomain.fromJson(v as Map<String, dynamic>),
+          ),
         );
         return val;
       },
       fieldKeyMap: const {
         'outfitRecommendation': 'outfit_recommendation',
         'outfitAssetPath': 'outfit_asset_path',
+        'dailyForecast': 'daily_forecast',
       },
     );
 
@@ -79,6 +94,7 @@ Map<String, dynamic> _$WeatherLoadingStateToJson(
   'outfit_recommendation': instance.outfitRecommendation,
   'outfit_asset_path': instance.outfitAssetPath,
   'locale': instance.locale,
+  'daily_forecast': instance.dailyForecast?.toJson(),
 };
 
 WeatherSuccess _$WeatherSuccessFromJson(Map<String, dynamic> json) =>
@@ -102,12 +118,19 @@ WeatherSuccess _$WeatherSuccessFromJson(Map<String, dynamic> json) =>
                 v == null ? null : Weather.fromJson(v as Map<String, dynamic>),
           ),
           message: $checkedConvert('message', (v) => v as String? ?? ''),
+          dailyForecast: $checkedConvert(
+            'daily_forecast',
+            (v) => v == null
+                ? null
+                : DailyForecastDomain.fromJson(v as Map<String, dynamic>),
+          ),
         );
         return val;
       },
       fieldKeyMap: const {
         'outfitAssetPath': 'outfit_asset_path',
         'outfitRecommendation': 'outfit_recommendation',
+        'dailyForecast': 'daily_forecast',
       },
     );
 
@@ -118,6 +141,7 @@ Map<String, dynamic> _$WeatherSuccessToJson(WeatherSuccess instance) =>
       'message': instance.message,
       'outfit_asset_path': instance.outfitAssetPath,
       'locale': instance.locale,
+      'daily_forecast': instance.dailyForecast?.toJson(),
     };
 
 LoadingOutfitState _$LoadingOutfitStateFromJson(Map<String, dynamic> json) =>
@@ -140,12 +164,19 @@ LoadingOutfitState _$LoadingOutfitStateFromJson(Map<String, dynamic> json) =>
             (v) =>
                 v == null ? null : Weather.fromJson(v as Map<String, dynamic>),
           ),
+          dailyForecast: $checkedConvert(
+            'daily_forecast',
+            (v) => v == null
+                ? null
+                : DailyForecastDomain.fromJson(v as Map<String, dynamic>),
+          ),
         );
         return val;
       },
       fieldKeyMap: const {
         'outfitRecommendation': 'outfit_recommendation',
         'outfitAssetPath': 'outfit_asset_path',
+        'dailyForecast': 'daily_forecast',
       },
     );
 
@@ -155,6 +186,7 @@ Map<String, dynamic> _$LoadingOutfitStateToJson(LoadingOutfitState instance) =>
       'outfit_recommendation': instance.outfitRecommendation,
       'outfit_asset_path': instance.outfitAssetPath,
       'locale': instance.locale,
+      'daily_forecast': instance.dailyForecast?.toJson(),
     };
 
 WeatherFailure _$WeatherFailureFromJson(Map<String, dynamic> json) =>
@@ -173,12 +205,19 @@ WeatherFailure _$WeatherFailureFromJson(Map<String, dynamic> json) =>
             (v) => v as String? ?? '',
           ),
           message: $checkedConvert('message', (v) => v as String? ?? ''),
+          dailyForecast: $checkedConvert(
+            'daily_forecast',
+            (v) => v == null
+                ? null
+                : DailyForecastDomain.fromJson(v as Map<String, dynamic>),
+          ),
         );
         return val;
       },
       fieldKeyMap: const {
         'outfitAssetPath': 'outfit_asset_path',
         'outfitRecommendation': 'outfit_recommendation',
+        'dailyForecast': 'daily_forecast',
       },
     );
 
@@ -188,6 +227,7 @@ Map<String, dynamic> _$WeatherFailureToJson(WeatherFailure instance) =>
       'message': instance.message,
       'outfit_asset_path': instance.outfitAssetPath,
       'locale': instance.locale,
+      'daily_forecast': instance.dailyForecast?.toJson(),
     };
 
 LocalWebCorsFailure _$LocalWebCorsFailureFromJson(Map<String, dynamic> json) =>
@@ -202,10 +242,19 @@ LocalWebCorsFailure _$LocalWebCorsFailureFromJson(Map<String, dynamic> json) =>
             (v) => v as String? ?? '',
           ),
           message: $checkedConvert('message', (v) => v as String? ?? ''),
+          dailyForecast: $checkedConvert(
+            'daily_forecast',
+            (v) => v == null
+                ? null
+                : DailyForecastDomain.fromJson(v as Map<String, dynamic>),
+          ),
         );
         return val;
       },
-      fieldKeyMap: const {'outfitRecommendation': 'outfit_recommendation'},
+      fieldKeyMap: const {
+        'outfitRecommendation': 'outfit_recommendation',
+        'dailyForecast': 'daily_forecast',
+      },
     );
 
 Map<String, dynamic> _$LocalWebCorsFailureToJson(
@@ -214,4 +263,5 @@ Map<String, dynamic> _$LocalWebCorsFailureToJson(
   'outfit_recommendation': instance.outfitRecommendation,
   'message': instance.message,
   'locale': instance.locale,
+  'daily_forecast': instance.dailyForecast?.toJson(),
 };

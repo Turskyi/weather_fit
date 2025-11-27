@@ -226,7 +226,9 @@
     "code_99": "Thunderstorm with heavy hail",
     "code_unknown": "Unknown weather",
     "empty_search_prompt": "Tap 🔍 to search for a city or country.",
-    "loading_weather": "Loading Weather"
+    "loading_weather": "Loading Weather",
+    "daily_forecast_title": "Full day forecast",
+    "loading_forecast": "Loading forecast"
   },
   "outfit": {
     "oops": "🛑 Oops! No outfit suggestion available.",

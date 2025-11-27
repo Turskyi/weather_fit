@@ -6,6 +6,7 @@ import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
 import 'package:weather_fit/settings/bloc/settings_bloc.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
+import 'package:weather_fit/weather/ui/populated/daily_forecast.dart';
 import 'package:weather_fit/weather/ui/weather_icon.dart';
 
 class WeatherContentDefault extends StatelessWidget {
@@ -37,7 +38,7 @@ class WeatherContentDefault extends StatelessWidget {
       child: Center(
         child: Column(
           children: <Widget>[
-            const SizedBox(height: 48),
+            const SizedBox(height: 8),
             if (weather.wasUpdated) WeatherIcon(condition: weather.condition),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -127,6 +128,9 @@ class WeatherContentDefault extends StatelessWidget {
                 }
               },
             ),
+            const SizedBox(height: 24),
+
+            const DailyForecast(),
             const SizedBox(height: 24),
           ],
         ),

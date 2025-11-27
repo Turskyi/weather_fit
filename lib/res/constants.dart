@@ -36,3 +36,8 @@ const String resendEmailDomain = 'kima.website';
 
 /// Blur intensity constant.
 const double blurSigma = 1.5;
+
+const String doNotReplySenderName = 'Do Not Reply';
+const String feedbackEmailSender =
+    '$doNotReplySenderName $appName <no-reply@$resendEmailDomain>';
+const String feedbackScreenshotFileName = 'feedback.png';

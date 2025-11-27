@@ -25,24 +25,22 @@ Future<void> injectDependencies() async {
 
   if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
     try {
-      Workmanager()
-          .initialize(_callbackDispatcher, isInDebugMode: kDebugMode)
-          .then((void _) {
-            try {
-              Workmanager().registerPeriodicTask(
-                'weatherfit_background_update',
-                'updateWidgetTask',
-                // Home widget will be updated every two hours.
-                frequency: const Duration(minutes: 120),
-                constraints: Constraints(networkType: NetworkType.connected),
-              );
-            } catch (e) {
-              debugPrint(
-                'Background widget update failed in '
-                'Workmanager.registerPeriodicTask: $e',
-              );
-            }
-          });
+      Workmanager().initialize(_callbackDispatcher).then((void _) {
+        try {
+          Workmanager().registerPeriodicTask(
+            'weatherfit_background_update',
+            'updateWidgetTask',
+            // Home widget will be updated every two hours.
+            frequency: const Duration(minutes: 120),
+            constraints: Constraints(networkType: NetworkType.connected),
+          );
+        } catch (e) {
+          debugPrint(
+            'Background widget update failed in '
+            'Workmanager.registerPeriodicTask: $e',
+          );
+        }
+      });
     } catch (e) {
       debugPrint(
         'Background widget update failed in Workmanager.initialize: $e',

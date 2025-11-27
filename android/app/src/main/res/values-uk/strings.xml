@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="appwidget_text">ПРИКЛАД</string>
+    <string name="add_widget">Додати віджет</string>
+    <string name="app_widget_description">Це опис віджета програми</string>
+    <string name="outfit_image">Зображення вбрання</string>
+    <string name="weatherfit">WeatherFit</string>
+    <string name="oops_no_outfit_suggestion_available">
+        👕 Ой! Немає пропозицій щодо вбрання.
+    </string>
+    <string name="looks_like_we_couldn_t_pick_an_outfit_this_time">
+        🤷 Схоже, цього разу нам не вдалося підібрати вбрання.
+    </string>
+    <string name="no_recommendation_time_to_mix_match_your_own_style">
+        <![CDATA[🎭 Немає рекомендацій? Час комбінувати та поєднувати свій власний стиль!]]>
+    </string>
+    <string name="your_fashion_instincts_take_the_lead_today">
+        💡 Сьогодні ваші модні інстинкти беруть гору!
+    </string>
+    <string name="ai_is_taking_a_fashion_break_try_again">
+        🚀 ШІ взяв модну перерву. Спробуйте ще раз!
+    </string>
+    <string name="no_outfit_picked_maybe_today_is_a_pajama_day">
+        🛌 Не вибрано жодного вбрання — можливо, сьогодні день піжами?
+    </string>
+    <string name="no_outfit_available">❌ Немає доступного вбрання</string>
+    <string name="no_recommendation">🤔 немає рекомендацій</string>
+</resources>

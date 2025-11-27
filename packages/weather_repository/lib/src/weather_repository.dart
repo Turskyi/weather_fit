@@ -4,9 +4,8 @@ import 'package:open_meteo_api/open_meteo_api.dart';
 import 'package:weather_repository/weather_repository.dart';
 
 class WeatherRepository {
-  WeatherRepository({
-    OpenMeteoApiClient? weatherApiClient,
-  }) : _openMeteoApiClient = weatherApiClient ?? OpenMeteoApiClient();
+  WeatherRepository({OpenMeteoApiClient? weatherApiClient})
+    : _openMeteoApiClient = weatherApiClient ?? OpenMeteoApiClient();
 
   final OpenMeteoApiClient _openMeteoApiClient;
 
@@ -14,11 +13,8 @@ class WeatherRepository {
     final double latitude = location.latitude;
     final double longitude = location.longitude;
 
-    final WeatherResponse weatherResponse =
-        await _openMeteoApiClient.getWeather(
-      latitude: latitude,
-      longitude: longitude,
-    );
+    final WeatherResponse weatherResponse = await _openMeteoApiClient
+        .getWeather(latitude: latitude, longitude: longitude);
 
     return WeatherDomain(
       temperature: weatherResponse.temperature,
@@ -29,6 +25,28 @@ class WeatherRepository {
       weatherCode: weatherResponse.code,
       locale: location.locale,
     );
+  }
+
+  Future<DailyForecastDomain> getDailyForecast(Location location) async {
+    final DailyForecastResponse dailyForecastResponse =
+        await _openMeteoApiClient.getDailyForecast(
+          latitude: location.latitude,
+          longitude: location.longitude,
+        );
+
+    final List<ForecastItemDomain> forecastItems = <ForecastItemDomain>[];
+
+    for (int i = 0; i < dailyForecastResponse.hourly.time.length; i++) {
+      forecastItems.add(
+        ForecastItemDomain(
+          time: dailyForecastResponse.hourly.time[i],
+          temperature: dailyForecastResponse.hourly.temperature2m[i],
+          weatherCode: dailyForecastResponse.hourly.weathercode[i],
+        ),
+      );
+    }
+
+    return DailyForecastDomain(forecast: forecastItems);
   }
 }
 

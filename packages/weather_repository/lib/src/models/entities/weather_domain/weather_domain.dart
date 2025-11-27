@@ -49,18 +49,18 @@ class WeatherDomain extends Equatable {
     final String weatherLocationName = location.name;
     return weatherLocationName.isEmpty
         ? '${latLabels[lang]}: ${location.latitude.toStringAsFixed(2)}, '
-            '${lonLabels[lang]}: ${location.longitude.toStringAsFixed(2)}'
+              '${lonLabels[lang]}: ${location.longitude.toStringAsFixed(2)}'
         : weatherLocationName;
   }
 
   @override
   List<Object> get props => <Object>[
-        location,
-        temperature,
-        condition,
-        countryCode,
-        description,
-        weatherCode,
-        locale,
-      ];
+    location,
+    temperature,
+    condition,
+    countryCode,
+    description,
+    weatherCode,
+    locale,
+  ];
 }

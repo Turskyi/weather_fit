@@ -37,6 +37,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     on<ToggleUnits>(_onToggleUnits);
     on<UpdateWeatherOnMobileHomeScreenEvent>(_updateWeatherOnMobileHomeScreen);
     on<GetOutfitEvent>(_onOutfitRecommendationRequested);
+    on<FetchDailyForecast>(_onFetchDailyForecast);
   }
 
   final WeatherRepository _weatherRepository;
@@ -58,6 +59,49 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     }
   }
 
+  FutureOr<void> _onFetchDailyForecast(
+    FetchDailyForecast event,
+    Emitter<WeatherState> emit,
+  ) async {
+    final String savedLocale = _localDataSource.getLanguageIsoCode();
+    emit(
+      WeatherLoadingState(
+        locale: savedLocale,
+        weather: state.weather,
+        dailyForecast: state.dailyForecast,
+        outfitRecommendation: state.outfitRecommendation,
+        outfitAssetPath: state.outfitAssetPath,
+      ),
+    );
+    try {
+      final DailyForecastDomain dailyForecast = await _weatherRepository
+          .getDailyForecast(event.location);
+
+      if (state is WeatherSuccess) {
+        emit((state as WeatherSuccess).copyWith(dailyForecast: dailyForecast));
+      } else {
+        emit(
+          WeatherSuccess(
+            locale: savedLocale,
+            weather: state.weather,
+            dailyForecast: dailyForecast,
+          ),
+        );
+      }
+    } on Exception catch (e) {
+      debugPrint('Failed to get daily forecast: $e');
+      emit(
+        WeatherFailure(
+          locale: savedLocale,
+          message: '$e',
+          outfitRecommendation: state.outfitRecommendation,
+          outfitAssetPath: state.outfitAssetPath,
+          dailyForecast: state.dailyForecast,
+        ),
+      );
+    }
+  }
+
   FutureOr<void> _onFetchWeather(
     FetchWeather event,
     Emitter<WeatherState> emit,
@@ -71,6 +115,9 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
 
     emit(WeatherLoadingState(locale: savedLocale, weather: state.weather));
     try {
+      final DailyForecastDomain dailyForecast = await _weatherRepository
+          .getDailyForecast(eventLocation);
+
       final WeatherDomain domainWeather = await _getWeatherByLocation(
         eventLocation,
       );
@@ -97,15 +144,17 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           locale: savedLocale,
           weather: updatedWeather,
           outfitRecommendation: outfitRecommendation,
+          dailyForecast: dailyForecast,
         ),
       );
 
-      if (state is WeatherSuccess) {
+      final WeatherState currentState = state;
+      if (currentState is WeatherSuccess) {
         final String assetPath = _outfitRepository.getOutfitImageAssetPath(
           weather,
         );
 
-        emit((state as WeatherSuccess).copyWith(outfitAssetPath: assetPath));
+        emit(currentState.copyWith(outfitAssetPath: assetPath));
 
         final WeatherFetchOrigin eventOrigin = event.origin;
         // Only add the event if it's NOT web AND NOT macOS.
@@ -120,6 +169,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
             locale: savedLocale,
             weather: updatedWeather,
             outfitRecommendation: outfitRecommendation,
+            dailyForecast: dailyForecast,
           ),
         );
       }
@@ -188,6 +238,9 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
 
       final Weather weather = Weather.fromRepository(updatedWeather);
 
+      final DailyForecastDomain dailyForecast = await _weatherRepository
+          .getDailyForecast(stateLocation);
+
       final TemperatureUnits units = stateWeather.temperatureUnits;
 
       final double temperatureValue = units.isFahrenheit
@@ -207,6 +260,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           ),
           outfitRecommendation: updatedOutfitRecommendation,
           outfitAssetPath: _outfitRepository.getOutfitImageAssetPath(weather),
+          dailyForecast: dailyForecast,
         ),
       );
 
@@ -376,6 +430,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           locale: savedLocale,
           weather: updatedWeather,
           outfitRecommendation: outfitRecommendation,
+          dailyForecast: state.dailyForecast,
         ),
       );
 
@@ -404,6 +459,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
             locale: savedLocale,
             weather: updatedWeather,
             outfitRecommendation: outfitRecommendation,
+            dailyForecast: state.dailyForecast,
           ),
         );
       }
