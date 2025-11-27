@@ -6,7 +6,7 @@ import 'package:flutter_translate/flutter_translate.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 import 'package:weather_repository/weather_repository.dart';
 
-import 'forecast_item.dart';
+import 'forecast_item_widget.dart';
 
 class DailyForecast extends StatelessWidget {
   const DailyForecast({super.key});
@@ -53,21 +53,17 @@ class DailyForecast extends StatelessWidget {
                       final List<ForecastItemDomain> forecastItems =
                           dailyForecast.forecast;
 
+                      final DateTime now = DateTime.now();
                       const List<int> desiredHours = <int>[8, 13, 19];
-                      final List<ForecastItemDomain> forecast =
-                          <ForecastItemDomain>[];
-                      for (final int hour in desiredHours) {
-                        try {
-                          final ForecastItemDomain item = forecastItems
-                              .firstWhere(
-                                (ForecastItemDomain item) =>
-                                    DateTime.parse(item.time).hour == hour,
-                              );
-                          forecast.add(item);
-                        } catch (_) {
-                          // Item not found for the desired hour, so we skip it.
-                        }
-                      }
+
+                      final List<ForecastItemDomain> forecast = forecastItems
+                          .where((ForecastItemDomain item) {
+                            final DateTime itemTime = DateTime.parse(item.time);
+                            return itemTime.isAfter(now) &&
+                                desiredHours.contains(itemTime.hour);
+                          })
+                          .take(3)
+                          .toList();
 
                       if (forecast.isEmpty) {
                         return Center(
@@ -82,7 +78,10 @@ class DailyForecast extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
                           for (final ForecastItemDomain item in forecast)
-                            ForecastItem(item: item, isCelsius: isCelsius),
+                            ForecastItemWidget(
+                              item: item,
+                              isCelsius: isCelsius,
+                            ),
                         ],
                       );
                     },

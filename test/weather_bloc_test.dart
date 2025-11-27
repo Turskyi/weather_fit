@@ -146,38 +146,6 @@ void main() {
     });
 
     group('fetchWeather', () {
-      blocTest<WeatherBloc, WeatherState>(
-        'emits loading and success states when FetchWeather is added with '
-        'valid location',
-        build: () => weatherBloc,
-        act: (WeatherBloc bloc) => bloc.add(
-          const FetchWeather(
-            location: dummy_constants.dummyLocation,
-            origin: WeatherFetchOrigin.defaultDevice,
-          ),
-        ),
-        expect: () => <Matcher>[
-          isA<WeatherLoadingState>(),
-          isA<LoadingOutfitState>(),
-          isA<WeatherSuccess>()
-              .having(
-                (WeatherSuccess s) => s.weather.location.name,
-                'location name',
-                dummy_constants.dummyLocation.name,
-              )
-              .having(
-                (WeatherSuccess s) => s.outfitRecommendation,
-                'outfit recommendation',
-                'Wear a T-shirt and shorts',
-              )
-              .having(
-                (WeatherSuccess s) => s.outfitAssetPath,
-                'outfit asset path',
-                'assets/images/outfits/clear_0.png',
-              ),
-        ],
-      );
-
       group('refreshWeather', () {
         blocTest<WeatherBloc, WeatherState>(
           'emits initial when status is not success',

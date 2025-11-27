@@ -131,7 +131,7 @@ class WeatherContentDefault extends StatelessWidget {
             const SizedBox(height: 24),
 
             const DailyForecast(),
-            const SizedBox(height: 24),
+            const SizedBox(height: 56),
           ],
         ),
       ),
