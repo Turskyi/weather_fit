@@ -60,103 +60,101 @@ class WeatherPageDefaultLayout extends StatelessWidget {
           ),
         ],
       ),
-      body: Center(
-        child: BlocConsumer<WeatherBloc, WeatherState>(
-          listener: weatherStateListener,
-          builder: (BuildContext context, WeatherState state) {
-            final Weather stateWeather = state.weather;
-            switch (state) {
-              case WeatherInitial():
-                return WeatherEmpty(key: key);
-              case WeatherLoadingState():
-                if (stateWeather.location.isEmpty) {
-                  return const WeatherLoadingWidget();
-                } else {
-                  return WeatherPopulated(
-                    weather: stateWeather,
-                    onRefresh: onRefresh,
-                    child: const WeatherLoadingWidget(),
-                  );
-                }
-              case WeatherSuccess():
-                if (stateWeather.isUnknown) {
-                  return const WeatherEmpty();
-                }
-                Widget outfitImageWidget = const SizedBox();
-                final String stateOutfitRecommendation =
-                    state.outfitRecommendation;
-                final ColorScheme colorScheme = Theme.of(context).colorScheme;
-                if (stateOutfitRecommendation.isNotEmpty) {
-                  outfitImageWidget = OutfitWidget(
-                    assetPath: state.outfitAssetPath,
-                    outfitRecommendation: stateOutfitRecommendation,
-                    onRefresh: onRefresh,
-                  );
-                } else if (state is LoadingOutfitState) {
-                  final bool isNarrowScreen = screenWidth < 500;
-                  final BorderRadius borderRadius = BorderRadius.circular(20.0);
-
-                  final Color surfaceColor = colorScheme.surface;
-                  // Image is still loading
-                  outfitImageWidget = DecoratedBox(
-                    decoration: BoxDecoration(
-                      // Match the ClipRRect's radius.
-                      borderRadius: borderRadius,
-                      boxShadow: <BoxShadow>[
-                        BoxShadow(
-                          color: colorScheme.onSurface.withValues(alpha: 0.2),
-                          // How far the shadow spreads.
-                          spreadRadius: 2,
-                          // How blurry the shadow is.
-                          blurRadius: 8,
-                          // Vertical offset (positive for down).
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: ClipRRect(
-                      borderRadius: borderRadius,
-                      child: SizedBox(
-                        width: 400,
-                        height: isNarrowScreen ? 460 : 400,
-                        child: Shimmer.fromColors(
-                          baseColor: colorScheme.surfaceContainerHighest,
-                          highlightColor: surfaceColor.withValues(alpha: 0.5),
-                          child: ColoredBox(color: surfaceColor),
-                        ),
-                      ),
-                    ),
-                  );
-                }
-
+      body: BlocConsumer<WeatherBloc, WeatherState>(
+        listener: weatherStateListener,
+        builder: (BuildContext context, WeatherState state) {
+          final Weather stateWeather = state.weather;
+          switch (state) {
+            case WeatherInitial():
+              return WeatherEmpty(key: key);
+            case WeatherLoadingState():
+              if (stateWeather.location.isEmpty) {
+                return const WeatherLoadingWidget();
+              } else {
                 return WeatherPopulated(
                   weather: stateWeather,
                   onRefresh: onRefresh,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      boxShadow: <BoxShadow>[
-                        BoxShadow(
-                          color: kIsWeb
-                              ? colorScheme.shadow.withValues(alpha: 0.5)
-                              : Colors.transparent,
-                          blurRadius: 10,
-                          offset: const Offset(5, 5),
-                        ),
-                      ],
+                  child: const WeatherLoadingWidget(),
+                );
+              }
+            case WeatherSuccess():
+              if (stateWeather.isUnknown) {
+                return const WeatherEmpty();
+              }
+              Widget outfitImageWidget = const SizedBox();
+              final String stateOutfitRecommendation =
+                  state.outfitRecommendation;
+              final ColorScheme colorScheme = Theme.of(context).colorScheme;
+              if (stateOutfitRecommendation.isNotEmpty) {
+                outfitImageWidget = OutfitWidget(
+                  assetPath: state.outfitAssetPath,
+                  outfitRecommendation: stateOutfitRecommendation,
+                  onRefresh: onRefresh,
+                );
+              } else if (state is LoadingOutfitState) {
+                final bool isNarrowScreen = screenWidth < 500;
+                final BorderRadius borderRadius = BorderRadius.circular(20.0);
+
+                final Color surfaceColor = colorScheme.surface;
+                // Image is still loading
+                outfitImageWidget = DecoratedBox(
+                  decoration: BoxDecoration(
+                    // Match the ClipRRect's radius.
+                    borderRadius: borderRadius,
+                    boxShadow: <BoxShadow>[
+                      BoxShadow(
+                        color: colorScheme.onSurface.withValues(alpha: 0.2),
+                        // How far the shadow spreads.
+                        spreadRadius: 2,
+                        // How blurry the shadow is.
+                        blurRadius: 8,
+                        // Vertical offset (positive for down).
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: borderRadius,
+                    child: SizedBox(
+                      width: 400,
+                      height: isNarrowScreen ? 460 : 400,
+                      child: Shimmer.fromColors(
+                        baseColor: colorScheme.surfaceContainerHighest,
+                        highlightColor: surfaceColor.withValues(alpha: 0.5),
+                        child: ColoredBox(color: surfaceColor),
+                      ),
                     ),
-                    child: outfitImageWidget,
                   ),
                 );
-              case LocalWebCorsFailure():
-                return const LocalWebCorsError();
-              case WeatherFailure():
-                return WeatherError(
-                  message: state.message,
-                  onReportPressed: onReportPressed,
-                );
-            }
-          },
-        ),
+              }
+
+              return WeatherPopulated(
+                weather: stateWeather,
+                onRefresh: onRefresh,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    boxShadow: <BoxShadow>[
+                      BoxShadow(
+                        color: kIsWeb
+                            ? colorScheme.shadow.withValues(alpha: 0.5)
+                            : Colors.transparent,
+                        blurRadius: 10,
+                        offset: const Offset(5, 5),
+                      ),
+                    ],
+                  ),
+                  child: outfitImageWidget,
+                ),
+              );
+            case LocalWebCorsFailure():
+              return const LocalWebCorsError();
+            case WeatherFailure():
+              return WeatherError(
+                message: state.message,
+                onReportPressed: onReportPressed,
+              );
+          }
+        },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: onSearchPressed,

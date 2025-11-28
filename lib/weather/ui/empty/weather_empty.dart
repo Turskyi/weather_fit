@@ -19,14 +19,16 @@ class _WeatherEmptyState extends State<WeatherEmpty> {
     final double screenWidth = MediaQuery.sizeOf(context).width;
     // 192.0 is the size of Kate's Pixel Watch 2.
     final bool isExtraSmallScreen = screenWidth <= 200.0;
-    return BlocListener<SettingsBloc, SettingsState>(
-      // `listenWhen` is crucial for performance:
-      // Only call the listener if the language property has actually changed.
-      listenWhen: _shouldRebuildOnLanguageChange,
-      listener: _settingsStateListener,
-      child: isExtraSmallScreen
-          ? WeatherEmptyExtraSmallLayout(key: widget.key)
-          : WeatherEmptyDefaultLayout(key: widget.key),
+    return Center(
+      child: BlocListener<SettingsBloc, SettingsState>(
+        // `listenWhen` is crucial for performance:
+        // Only call the listener if the language property has actually changed.
+        listenWhen: _shouldRebuildOnLanguageChange,
+        listener: _settingsStateListener,
+        child: isExtraSmallScreen
+            ? WeatherEmptyExtraSmallLayout(key: widget.key)
+            : WeatherEmptyDefaultLayout(key: widget.key),
+      ),
     );
   }
 

@@ -36,7 +36,13 @@ class WeatherContentDefault extends StatelessWidget {
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
       clipBehavior: Clip.none,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.only(
+        // This top padding is tricky, it might look off on one of the
+        // platforms, before changing check Android physical device.
+        top: 24,
+        left: 16,
+        right: 16,
+      ),
       child: Center(
         child: LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
@@ -44,7 +50,7 @@ class WeatherContentDefault extends StatelessWidget {
 
             final Widget mainWeatherInfo = Column(
               children: <Widget>[
-                const SizedBox(height: 8),
+                const SizedBox(height: 4),
                 if (weather.wasUpdated)
                   WeatherIcon(condition: weather.condition),
                 Row(
