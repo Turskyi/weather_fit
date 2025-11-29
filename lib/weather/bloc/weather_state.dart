@@ -143,11 +143,11 @@ class WeatherLoadingState extends WeatherState {
 class WeatherSuccess extends WeatherState {
   const WeatherSuccess({
     required super.locale,
+    required super.dailyForecast,
     super.outfitAssetPath,
     super.outfitRecommendation,
     super.weather,
     super.message,
-    super.dailyForecast,
   });
 
   factory WeatherSuccess.fromJson(Map<String, Object?> json) {
@@ -188,10 +188,10 @@ class WeatherSuccess extends WeatherState {
 final class LoadingOutfitState extends WeatherSuccess {
   const LoadingOutfitState({
     required super.locale,
+    required super.dailyForecast,
     super.outfitRecommendation = '',
     super.outfitAssetPath = '',
     super.weather,
-    super.dailyForecast,
   });
 
   factory LoadingOutfitState.fromJson(Map<String, Object?> json) =>

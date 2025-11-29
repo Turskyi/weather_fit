@@ -109,11 +109,19 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     final Location eventLocation = event.location;
     final String savedLocale = _localDataSource.getLanguageIsoCode();
     if (eventLocation.isEmpty) {
-      emit(WeatherInitial(locale: savedLocale));
+      emit(
+        WeatherInitial(locale: savedLocale, dailyForecast: state.dailyForecast),
+      );
       return;
     }
 
-    emit(WeatherLoadingState(locale: savedLocale, weather: state.weather));
+    emit(
+      WeatherLoadingState(
+        locale: savedLocale,
+        weather: state.weather,
+        dailyForecast: state.dailyForecast,
+      ),
+    );
     try {
       final DailyForecastDomain dailyForecast = await _weatherRepository
           .getDailyForecast(eventLocation);
@@ -182,6 +190,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
             locale: savedLocale,
             message: translate('error.cors'),
             outfitRecommendation: stateOutfitRecommendation,
+            dailyForecast: state.dailyForecast,
           ),
         );
       } else {
@@ -190,6 +199,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
             locale: savedLocale,
             message: '$e',
             outfitRecommendation: stateOutfitRecommendation,
+            dailyForecast: state.dailyForecast,
           ),
         );
       }
@@ -211,13 +221,16 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           weather: stateWeather,
           outfitRecommendation: stateOutfitRecommendation,
           outfitAssetPath: stateOutfitAssetPath,
+          dailyForecast: state.dailyForecast,
         ),
       );
       return;
     }
 
     if (stateWeather.isUnknown) {
-      emit(WeatherInitial(locale: savedLocale));
+      emit(
+        WeatherInitial(locale: savedLocale, dailyForecast: state.dailyForecast),
+      );
       return;
     }
 
@@ -227,6 +240,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
         weather: stateWeather,
         outfitRecommendation: stateOutfitRecommendation,
         outfitAssetPath: stateOutfitAssetPath,
+        dailyForecast: state.dailyForecast,
       ),
     );
 
@@ -287,6 +301,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           message: '$e',
           outfitRecommendation: stateOutfitRecommendation,
           outfitAssetPath: stateOutfitAssetPath,
+          dailyForecast: state.dailyForecast,
         ),
       );
     }
@@ -405,14 +420,22 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     final String savedLocale = _localDataSource.getLanguageIsoCode();
 
     if (eventWeather.isEmpty) {
-      emit(WeatherInitial(locale: savedLocale));
+      emit(
+        WeatherInitial(locale: savedLocale, dailyForecast: state.dailyForecast),
+      );
       return;
     }
     final Weather localizedWeather = eventWeather.copyWith(
       location: eventLocation.copyWith(locale: savedLocale),
       locale: savedLocale,
     );
-    emit(WeatherLoadingState(locale: savedLocale, weather: localizedWeather));
+    emit(
+      WeatherLoadingState(
+        locale: savedLocale,
+        weather: localizedWeather,
+        dailyForecast: state.dailyForecast,
+      ),
+    );
     try {
       final TemperatureUnits units = state.temperatureUnits;
 
@@ -472,6 +495,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
             locale: savedLocale,
             message: translate('error.cors'),
             outfitRecommendation: stateOutfitRecommendation,
+            dailyForecast: state.dailyForecast,
           ),
         );
       } else {
@@ -480,6 +504,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
             locale: savedLocale,
             message: '$e',
             outfitRecommendation: stateOutfitRecommendation,
+            dailyForecast: state.dailyForecast,
           ),
         );
       }

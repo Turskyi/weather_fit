@@ -168,10 +168,21 @@ void main() {
         blocTest<WeatherBloc, WeatherState>(
           'emits initial when location is empty',
           build: () => weatherBloc,
-          seed: () => const WeatherSuccess(
-            weather: Weather.empty,
-            locale: dummy_constants.dummyLocale,
-          ),
+          seed: () {
+            return const WeatherSuccess(
+              weather: Weather.empty,
+              locale: dummy_constants.dummyLocale,
+              dailyForecast: DailyForecastDomain(
+                forecast: <ForecastItemDomain>[
+                  ForecastItemDomain(
+                    time: dummy_constants.dummyForecastTime,
+                    temperature: dummy_constants.dummyWeatherTemperature,
+                    weatherCode: dummy_constants.dummyWeatherCode,
+                  ),
+                ],
+              ),
+            );
+          },
           act: (WeatherBloc bloc) {
             bloc.add(const RefreshWeather(WeatherFetchOrigin.wearable));
           },
@@ -233,6 +244,15 @@ void main() {
               code: 0,
               locale: 'en',
             ),
+            dailyForecast: const DailyForecastDomain(
+              forecast: <ForecastItemDomain>[
+                ForecastItemDomain(
+                  time: dummy_constants.dummyForecastTime,
+                  temperature: dummy_constants.dummyWeatherTemperature,
+                  weatherCode: dummy_constants.dummyWeatherCode,
+                ),
+              ],
+            ),
           ),
           act: (WeatherBloc bloc) => bloc.add(const ToggleUnits()),
           expect: () => <WeatherState>[
@@ -250,6 +270,15 @@ void main() {
                 description: '',
                 code: 0,
                 locale: 'en',
+              ),
+              dailyForecast: const DailyForecastDomain(
+                forecast: <ForecastItemDomain>[
+                  ForecastItemDomain(
+                    time: dummy_constants.dummyForecastTime,
+                    temperature: dummy_constants.dummyWeatherTemperature,
+                    weatherCode: dummy_constants.dummyWeatherCode,
+                  ),
+                ],
               ),
             ),
           ],
@@ -274,6 +303,15 @@ void main() {
               code: 0,
               locale: 'en',
             ),
+            dailyForecast: const DailyForecastDomain(
+              forecast: <ForecastItemDomain>[
+                ForecastItemDomain(
+                  time: dummy_constants.dummyForecastTime,
+                  temperature: dummy_constants.dummyWeatherTemperature,
+                  weatherCode: dummy_constants.dummyWeatherCode,
+                ),
+              ],
+            ),
           ),
           act: (WeatherBloc bloc) => bloc.add(const ToggleUnits()),
           expect: () => <WeatherState>[
@@ -291,6 +329,15 @@ void main() {
                 description: '',
                 code: 0,
                 locale: 'en',
+              ),
+              dailyForecast: const DailyForecastDomain(
+                forecast: <ForecastItemDomain>[
+                  ForecastItemDomain(
+                    time: dummy_constants.dummyForecastTime,
+                    temperature: dummy_constants.dummyWeatherTemperature,
+                    weatherCode: dummy_constants.dummyWeatherCode,
+                  ),
+                ],
               ),
             ),
           ],
