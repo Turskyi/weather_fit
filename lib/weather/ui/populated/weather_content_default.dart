@@ -141,7 +141,7 @@ class WeatherContentDefault extends StatelessWidget {
                       children: <Widget>[
                         mainWeatherInfo,
                         const SizedBox(height: 24),
-                        const DailyForecast(),
+                        DailyForecast(key: key),
                         const SizedBox(height: 16),
                         BlocBuilder<WeatherBloc, WeatherState>(
                           builder: (BuildContext _, WeatherState state) {
@@ -180,7 +180,7 @@ class WeatherContentDefault extends StatelessWidget {
                   const SizedBox(height: 24),
                   if (weather.wasUpdated) child,
                   const SizedBox(height: 24),
-                  const DailyForecast(),
+                  DailyForecast(key: key),
                   const SizedBox(height: 24),
                   BlocBuilder<WeatherBloc, WeatherState>(
                     builder: (BuildContext _, WeatherState state) {
