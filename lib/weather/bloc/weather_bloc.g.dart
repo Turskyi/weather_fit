@@ -104,6 +104,12 @@ WeatherSuccess _$WeatherSuccessFromJson(Map<String, dynamic> json) =>
       ($checkedConvert) {
         final val = WeatherSuccess(
           locale: $checkedConvert('locale', (v) => v as String),
+          dailyForecast: $checkedConvert(
+            'daily_forecast',
+            (v) => v == null
+                ? null
+                : DailyForecastDomain.fromJson(v as Map<String, dynamic>),
+          ),
           outfitAssetPath: $checkedConvert(
             'outfit_asset_path',
             (v) => v as String? ?? '',
@@ -118,19 +124,13 @@ WeatherSuccess _$WeatherSuccessFromJson(Map<String, dynamic> json) =>
                 v == null ? null : Weather.fromJson(v as Map<String, dynamic>),
           ),
           message: $checkedConvert('message', (v) => v as String? ?? ''),
-          dailyForecast: $checkedConvert(
-            'daily_forecast',
-            (v) => v == null
-                ? null
-                : DailyForecastDomain.fromJson(v as Map<String, dynamic>),
-          ),
         );
         return val;
       },
       fieldKeyMap: const {
+        'dailyForecast': 'daily_forecast',
         'outfitAssetPath': 'outfit_asset_path',
         'outfitRecommendation': 'outfit_recommendation',
-        'dailyForecast': 'daily_forecast',
       },
     );
 
@@ -151,6 +151,12 @@ LoadingOutfitState _$LoadingOutfitStateFromJson(Map<String, dynamic> json) =>
       ($checkedConvert) {
         final val = LoadingOutfitState(
           locale: $checkedConvert('locale', (v) => v as String),
+          dailyForecast: $checkedConvert(
+            'daily_forecast',
+            (v) => v == null
+                ? null
+                : DailyForecastDomain.fromJson(v as Map<String, dynamic>),
+          ),
           outfitRecommendation: $checkedConvert(
             'outfit_recommendation',
             (v) => v as String? ?? '',
@@ -164,19 +170,13 @@ LoadingOutfitState _$LoadingOutfitStateFromJson(Map<String, dynamic> json) =>
             (v) =>
                 v == null ? null : Weather.fromJson(v as Map<String, dynamic>),
           ),
-          dailyForecast: $checkedConvert(
-            'daily_forecast',
-            (v) => v == null
-                ? null
-                : DailyForecastDomain.fromJson(v as Map<String, dynamic>),
-          ),
         );
         return val;
       },
       fieldKeyMap: const {
+        'dailyForecast': 'daily_forecast',
         'outfitRecommendation': 'outfit_recommendation',
         'outfitAssetPath': 'outfit_asset_path',
-        'dailyForecast': 'daily_forecast',
       },
     );
 

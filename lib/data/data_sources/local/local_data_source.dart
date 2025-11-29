@@ -175,22 +175,6 @@ class LocalDataSource {
     }
   }
 
-  Future<Directory> _getAppDirectory() async {
-    if (!kIsWeb & Platform.isIOS) {
-      const MethodChannel channel = MethodChannel(
-        'weatherfit.shared/container',
-      );
-      final String path = await channel.invokeMethod(
-        'getAppleAppGroupDirectory',
-      );
-
-      return Directory(path);
-    } else {
-      // On Android or other platforms, fallback to Documents directory.
-      return getApplicationDocumentsDirectory();
-    }
-  }
-
   Future<bool> saveLanguageIsoCode(String languageIsoCode) {
     final bool isSupported = Language.values.any(
       (Language lang) => lang.isoLanguageCode == languageIsoCode,
@@ -248,6 +232,14 @@ class LocalDataSource {
         : defaultLanguageCode;
   }
 
+  Language getSavedLanguage() {
+    final String savedLanguageIsoCode = getLanguageIsoCode();
+    final Language savedLanguage = Language.fromIsoLanguageCode(
+      savedLanguageIsoCode,
+    );
+    return savedLanguage;
+  }
+
   /// Saves the provided [location] to persistent storage as a JSON string.
   ///
   /// Returns a [Future] that completes with `true` if the value was
@@ -277,6 +269,22 @@ class LocalDataSource {
         debugPrint('Error parsing last saved location: $e');
       }
       return const Location.empty();
+    }
+  }
+
+  Future<Directory> _getAppDirectory() async {
+    if (!kIsWeb & Platform.isIOS) {
+      const MethodChannel channel = MethodChannel(
+        'weatherfit.shared/container',
+      );
+      final String path = await channel.invokeMethod(
+        'getAppleAppGroupDirectory',
+      );
+
+      return Directory(path);
+    } else {
+      // On Android or other platforms, fallback to Documents directory.
+      return getApplicationDocumentsDirectory();
     }
   }
 

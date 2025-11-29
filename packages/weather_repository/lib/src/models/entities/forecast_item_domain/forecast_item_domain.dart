@@ -11,7 +11,7 @@ class ForecastItemDomain extends Equatable {
     required this.weatherCode,
   });
 
-  factory ForecastItemDomain.fromJson(Map<String, dynamic> json) {
+  factory ForecastItemDomain.fromJson(Map<String, Object?> json) {
     return _$ForecastItemDomainFromJson(json);
   }
 
@@ -19,7 +19,7 @@ class ForecastItemDomain extends Equatable {
   final double temperature;
   final int weatherCode;
 
-  Map<String, dynamic> toJson() => _$ForecastItemDomainToJson(this);
+  Map<String, Object?> toJson() => _$ForecastItemDomainToJson(this);
 
   @override
   List<Object> get props => <Object>[time, temperature, weatherCode];
