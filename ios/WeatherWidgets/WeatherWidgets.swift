@@ -3,6 +3,12 @@ import SwiftUI
 import UIKit
 
 // Data Model.
+struct ForecastItem: Codable, Hashable {
+    let time: String
+    let temperature: Double
+    let weatherCode: Int
+}
+
 struct WeatherData: Codable {
     let emoji: String?
     let location: String?
@@ -10,6 +16,7 @@ struct WeatherData: Codable {
     let recommendation: String?
     let lastUpdated: String?
     let imagePath: String?
+    let forecast: [ForecastItem]?
 }
 
 struct SimpleEntry: TimelineEntry {
@@ -36,6 +43,7 @@ struct Provider: TimelineProvider {
             "recommendation": "text_recommendation",
             "lastUpdated": "text_last_updated",
             "imagePath": "image_weather",
+            "forecastData": "forecast_data",
         ]
         
         // Retrieve data from Shared Defaults.
@@ -45,7 +53,19 @@ struct Provider: TimelineProvider {
         let recommendation = sharedDefaults.string(forKey: keys["recommendation"]!)
         let lastUpdated = sharedDefaults.string(forKey: keys["lastUpdated"]!)
         let imagePath = sharedDefaults.string(forKey: keys["imagePath"]!)
+        let forecastDataString = sharedDefaults.string(forKey: keys["forecastData"]!)
         
+        var forecast: [ForecastItem]?
+        if let forecastDataString = forecastDataString,
+           let data = forecastDataString.data(using: .utf8) {
+            do {
+                let forecastResponse = try JSONDecoder().decode([String: [ForecastItem]].self, from: data)
+                forecast = forecastResponse["forecast"]
+            } catch {
+                print("Error decoding forecast data: \(error)")
+            }
+        }
+
         // Create and return WeatherData struct.
         return WeatherData(
             emoji: emoji,
@@ -54,6 +74,7 @@ struct Provider: TimelineProvider {
             recommendation: recommendation,
             lastUpdated: lastUpdated,
             imagePath: imagePath,
+            forecast: forecast,
         )
     }
     
@@ -69,6 +90,7 @@ struct Provider: TimelineProvider {
                 recommendation: "Shorts and T-shirt",
                 lastUpdated: "Just now",
                 imagePath: nil,
+                forecast: [],
             ),
         )
     }
@@ -86,6 +108,7 @@ struct Provider: TimelineProvider {
                 recommendation: "Shorts and T-shirt",
                 lastUpdated: "Just now",
                 imagePath: nil,
+                forecast: [],
             ),
         )
         completion(entry)
@@ -106,6 +129,7 @@ struct Provider: TimelineProvider {
                 recommendation: "Shorts and T-shirt",
                 lastUpdated: "Just now",
                 imagePath: nil,
+                forecast: [],
             ),
         )
         
@@ -198,6 +222,7 @@ struct WeatherWidgetsEntryView: View {
                     .scaledToFit()
                     .padding()
             }
+
         }
         .widgetURL(URL(string: "weatherfit://open")!)
     }
@@ -206,6 +231,39 @@ struct WeatherWidgetsEntryView: View {
         guard let path = imagePath else { return true }
         let fileURL = URL(fileURLWithPath: path)
         return (try? Data(contentsOf: fileURL)) == nil
+    }
+    
+    func getDay(from dateString: String) -> String {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        guard let date = formatter.date(from: dateString) else { return "" }
+        let dayFormatter = DateFormatter()
+        dayFormatter.dateFormat = "EEE"
+        return dayFormatter.string(from: date)
+    }
+
+    func getTime(from dateString: String) -> String {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        guard let date = formatter.date(from: dateString) else { return "" }
+        let timeFormatter = DateFormatter()
+        timeFormatter.dateFormat = "ha"
+        return timeFormatter.string(from: date)
+    }
+    
+    func getWeatherEmoji(for code: Int) -> String {
+        switch code {
+            case 0: return "☀️"
+            case 1, 2, 3: return "☁️"
+            case 45, 48: return "🌫"
+            case 51, 53, 55, 56, 57: return "🌧"
+            case 61, 63, 65, 66, 67: return "🌧"
+            case 71, 73, 75, 77: return "❄️"
+            case 80, 81, 82: return "⛈"
+            case 85, 86: return "🌨"
+            case 95, 96, 99: return "🌪"
+            default: return "🤔"
+        }
     }
 }
 
@@ -247,6 +305,12 @@ struct WeatherWidgets: Widget {
             recommendation: "Shorts and T-shirt",
             lastUpdated: "Just now",
             imagePath: nil,
+            forecast: [
+                ForecastItem(time: "2023-10-27T12:00:00.000Z", temperature: 25.0, weatherCode: 0),
+                ForecastItem(time: "2023-10-28T12:00:00.000Z", temperature: 22.0, weatherCode: 1),
+                ForecastItem(time: "2023-10-29T12:00:00.000Z", temperature: 20.0, weatherCode: 80),
+                ForecastItem(time: "2023-10-30T12:00:00.000Z", temperature: 18.0, weatherCode: 61),
+            ]
         ),
     )
 }

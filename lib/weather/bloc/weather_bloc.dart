@@ -57,49 +57,6 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     }
   }
 
-  FutureOr<void> _onFetchDailyForecast(
-    FetchDailyForecast event,
-    Emitter<WeatherState> emit,
-  ) async {
-    final String savedLocale = _localDataSource.getLanguageIsoCode();
-    emit(
-      WeatherLoadingState(
-        locale: savedLocale,
-        weather: state.weather,
-        dailyForecast: state.dailyForecast,
-        outfitRecommendation: state.outfitRecommendation,
-        outfitAssetPath: state.outfitAssetPath,
-      ),
-    );
-    try {
-      final DailyForecastDomain dailyForecast = await _weatherRepository
-          .getDailyForecast(event.location);
-
-      if (state is WeatherSuccess) {
-        emit((state as WeatherSuccess).copyWith(dailyForecast: dailyForecast));
-      } else {
-        emit(
-          WeatherSuccess(
-            locale: savedLocale,
-            weather: state.weather,
-            dailyForecast: dailyForecast,
-          ),
-        );
-      }
-    } on Exception catch (e) {
-      debugPrint('Failed to get daily forecast: $e');
-      emit(
-        WeatherFailure(
-          locale: savedLocale,
-          message: '$e',
-          outfitRecommendation: state.outfitRecommendation,
-          outfitAssetPath: state.outfitAssetPath,
-          dailyForecast: state.dailyForecast,
-        ),
-      );
-    }
-  }
-
   FutureOr<void> _onFetchWeather(
     FetchWeather event,
     Emitter<WeatherState> emit,
@@ -443,6 +400,49 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     }
   }
 
+  FutureOr<void> _onFetchDailyForecast(
+    FetchDailyForecast event,
+    Emitter<WeatherState> emit,
+  ) async {
+    final String savedLocale = _localDataSource.getLanguageIsoCode();
+    emit(
+      WeatherLoadingState(
+        locale: savedLocale,
+        weather: state.weather,
+        dailyForecast: state.dailyForecast,
+        outfitRecommendation: state.outfitRecommendation,
+        outfitAssetPath: state.outfitAssetPath,
+      ),
+    );
+    try {
+      final DailyForecastDomain dailyForecast = await _weatherRepository
+          .getDailyForecast(event.location);
+
+      if (state is WeatherSuccess) {
+        emit((state as WeatherSuccess).copyWith(dailyForecast: dailyForecast));
+      } else {
+        emit(
+          WeatherSuccess(
+            locale: savedLocale,
+            weather: state.weather,
+            dailyForecast: dailyForecast,
+          ),
+        );
+      }
+    } on Exception catch (e) {
+      debugPrint('Failed to get daily forecast: $e');
+      emit(
+        WeatherFailure(
+          locale: savedLocale,
+          message: '$e',
+          outfitRecommendation: state.outfitRecommendation,
+          outfitAssetPath: state.outfitAssetPath,
+          dailyForecast: state.dailyForecast,
+        ),
+      );
+    }
+  }
+
   FutureOr<void> _updateWeatherOnMobileHomeScreen(
     UpdateWeatherOnMobileHomeScreenEvent event,
     Emitter<WeatherState> emit,
@@ -454,11 +454,15 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
         (Platform.isAndroid || Platform.isIOS)) {
       try {
         final Weather weather = state.weather;
+        final DailyForecastDomain? dailyForecastDomain = state.dailyForecast;
 
         await _homeWidgetService.updateHomeWidget(
           localDataSource: _localDataSource,
           weather: weather,
           outfitRepository: _outfitRepository,
+          forecast:
+              dailyForecastDomain ??
+              const DailyForecastDomain(forecast: <ForecastItemDomain>[]),
         );
       } catch (e) {
         debugPrint('Failed to update home screen widget: $e');

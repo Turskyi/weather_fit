@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:home_widget/home_widget.dart';
 import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
 import 'package:weather_fit/data/repositories/outfit_repository.dart';
@@ -7,6 +9,7 @@ import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
 import 'package:weather_fit/res/extensions/double_extension.dart';
 import 'package:weather_fit/res/home_widget_keys.dart';
+import 'package:weather_repository/weather_repository.dart';
 
 abstract class HomeWidgetService {
   const HomeWidgetService();
@@ -25,6 +28,7 @@ abstract class HomeWidgetService {
   Future<void> updateHomeWidget({
     required LocalDataSource localDataSource,
     required Weather weather,
+    required DailyForecastDomain forecast,
     required OutfitRepository outfitRepository,
   });
 }
@@ -56,6 +60,7 @@ class HomeWidgetServiceImpl implements HomeWidgetService {
   Future<void> updateHomeWidget({
     required LocalDataSource localDataSource,
     required Weather weather,
+    required DailyForecastDomain forecast,
     required OutfitRepository outfitRepository,
   }) async {
     final String savedLanguageIsoCode = localDataSource.getLanguageIsoCode();
@@ -114,6 +119,12 @@ class HomeWidgetServiceImpl implements HomeWidgetService {
     await saveWidgetData<String>(
       HomeWidgetKey.imageWeather.stringValue,
       outfitFilePath,
+    );
+
+    final String forecastData = jsonEncode(forecast.toJson());
+    await saveWidgetData<String>(
+      HomeWidgetKey.forecastData.stringValue,
+      forecastData,
     );
 
     // Update the widget.

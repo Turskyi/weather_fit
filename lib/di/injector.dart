@@ -95,6 +95,9 @@ void _callbackDispatcher() {
           final WeatherDomain domainWeather = await weatherRepository
               .getWeatherByLocation(lastSavedLocation);
 
+          final DailyForecastDomain dailyForecast = await weatherRepository
+              .getDailyForecast(lastSavedLocation);
+
           final OutfitRepository outfitRepository = OutfitRepository(
             localDataSource,
           );
@@ -108,6 +111,7 @@ void _callbackDispatcher() {
             localDataSource: localDataSource,
             weather: weather,
             outfitRepository: outfitRepository,
+            forecast: dailyForecast,
           );
 
           return true;
