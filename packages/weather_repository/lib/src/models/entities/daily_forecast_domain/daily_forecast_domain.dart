@@ -8,13 +8,13 @@ part 'daily_forecast_domain.g.dart';
 class DailyForecastDomain extends Equatable {
   const DailyForecastDomain({required this.forecast});
 
-  factory DailyForecastDomain.fromJson(Map<String, dynamic> json) {
+  factory DailyForecastDomain.fromJson(Map<String, Object?> json) {
     return _$DailyForecastDomainFromJson(json);
   }
 
   final List<ForecastItemDomain> forecast;
 
-  Map<String, dynamic> toJson() => _$DailyForecastDomainToJson(this);
+  Map<String, Object?> toJson() => _$DailyForecastDomainToJson(this);
 
   @override
   List<Object> get props => <Object>[forecast];

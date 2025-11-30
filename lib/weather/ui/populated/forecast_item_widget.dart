@@ -46,7 +46,7 @@ class ForecastItemWidget extends StatelessWidget {
 
     final DateTime itemDate = DateTime.parse(item.time);
     final String day = _getDay(itemDate);
-    final String time = DateFormat.j().format(itemDate);
+    final String time = _getTimeOfDay(DateTime.parse(item.time).hour);
     final String temp = '${temperature.round()}°$unit';
     final String emoji = item.weatherCode.toWeatherEmoji;
 
@@ -65,5 +65,15 @@ class ForecastItemWidget extends StatelessWidget {
         Text(temp, style: textTheme.labelMedium),
       ],
     );
+  }
+
+  String _getTimeOfDay(int hour) {
+    if (hour >= 5 && hour < 12) {
+      return translate('weather.time_of_day.morning');
+    } else if (hour >= 12 && hour < 17) {
+      return translate('weather.time_of_day.lunch');
+    } else {
+      return translate('weather.time_of_day.evening');
+    }
   }
 }

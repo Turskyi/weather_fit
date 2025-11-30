@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:collection/collection.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
 import 'package:weather_fit/data/repositories/outfit_repository.dart';
@@ -53,7 +54,12 @@ class HomeWidgetServiceImpl implements HomeWidgetService {
     String? iOSName,
     String? qualifiedAndroidName,
   }) {
-    return HomeWidget.updateWidget(iOSName: iOSName, androidName: androidName);
+    return HomeWidget.updateWidget(
+      name: name,
+      iOSName: iOSName,
+      androidName: androidName,
+      qualifiedAndroidName: qualifiedAndroidName,
+    );
   }
 
   @override
@@ -82,7 +88,6 @@ class HomeWidgetServiceImpl implements HomeWidgetService {
     final String outfitAssetPath = outfitRepository.getOutfitImageAssetPath(
       weather,
     );
-
     final String outfitFilePath = await outfitRepository.downloadAndSaveImage(
       outfitAssetPath,
     );
@@ -116,12 +121,18 @@ class HomeWidgetServiceImpl implements HomeWidgetService {
       outfitRecommendation,
     );
 
+    // The image feature is temporarily disabled.
     await saveWidgetData<String>(
       HomeWidgetKey.imageWeather.stringValue,
       outfitFilePath,
     );
 
-    final String forecastData = jsonEncode(forecast.toJson());
+    // Filter the forecast to send only the data the widget needs.
+    final DailyForecastDomain filteredForecast = DailyForecastDomain(
+      forecast: _filterForecastForWidget(forecast.forecast),
+    );
+    final String forecastData = jsonEncode(filteredForecast.toJson());
+
     await saveWidgetData<String>(
       HomeWidgetKey.forecastData.stringValue,
       forecastData,
@@ -132,5 +143,50 @@ class HomeWidgetServiceImpl implements HomeWidgetService {
       iOSName: constants.iOSWidgetName,
       androidName: constants.androidWidgetName,
     );
+  }
+
+  /// Filters the full forecast list to a few essential time points for the
+  /// widget to avoid exceeding data size limits for `saveWidgetData`.
+  List<ForecastItemDomain> _filterForecastForWidget(
+    List<ForecastItemDomain> fullForecast,
+  ) {
+    if (fullForecast.isNotEmpty) {
+      final DateTime now = DateTime.now();
+      // 1. Get all forecasts that are in the future.
+      final List<ForecastItemDomain> futureForecasts = fullForecast.where((
+        ForecastItemDomain item,
+      ) {
+        final DateTime? itemDate = DateTime.tryParse(item.time);
+        return itemDate != null && itemDate.isAfter(now);
+      }).toList();
+
+      // 2. Find the first available item for each time slot.
+      final ForecastItemDomain? morning = futureForecasts.firstWhereOrNull(
+        (ForecastItemDomain item) =>
+            DateTime.parse(item.time).hour >= 8 &&
+            DateTime.parse(item.time).hour <= 11,
+      );
+      final ForecastItemDomain? lunch = futureForecasts.firstWhereOrNull(
+        (ForecastItemDomain item) =>
+            DateTime.parse(item.time).hour >= 12 &&
+            DateTime.parse(item.time).hour <= 15,
+      );
+      final ForecastItemDomain? evening = futureForecasts.firstWhereOrNull(
+        (ForecastItemDomain item) =>
+            DateTime.parse(item.time).hour >= 17 &&
+            DateTime.parse(item.time).hour <= 20,
+      );
+
+      // 3. Build the result list, removing any nulls.
+      final List<ForecastItemDomain> result =
+          <ForecastItemDomain?>[morning, lunch, evening]
+              .where((ForecastItemDomain? item) => item != null)
+              .cast<ForecastItemDomain>()
+              .toList();
+
+      return result;
+    } else {
+      return <ForecastItemDomain>[];
+    }
   }
 }

@@ -227,11 +227,16 @@
     "code_unknown": "Unknown weather",
     "empty_search_prompt": "Tap 🔍 to search for a city or country.",
     "loading_weather": "Loading Weather",
-    "daily_forecast_title": "Full day forecast",
+    "daily_forecast_title": "Forecast",
     "loading_forecast": "Loading forecast",
     "forecast_unavailable": "Forecast unavailable",
     "today": "Today",
-    "tomorrow": "Tomorrow"
+    "tomorrow": "Tomorrow",
+    "time_of_day": {
+      "morning": "Morning",
+      "lunch": "Lunch",
+      "evening": "Evening"
+    }
   },
   "outfit": {
     "oops": "🛑 Oops! No outfit suggestion available.",

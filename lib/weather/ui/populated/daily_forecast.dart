@@ -13,7 +13,6 @@ class DailyForecast extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextTheme textTheme = Theme.of(context).textTheme;
     final ColorScheme colors = Theme.of(context).colorScheme;
 
     return Align(
@@ -34,13 +33,6 @@ class DailyForecast extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Text(
-                    translate('weather.daily_forecast_title'),
-                    style: textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
                   BlocBuilder<WeatherBloc, WeatherState>(
                     builder: (BuildContext context, WeatherState state) {
                       final DailyForecastDomain? dailyForecast =
