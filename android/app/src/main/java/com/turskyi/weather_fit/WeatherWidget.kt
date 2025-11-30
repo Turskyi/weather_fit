@@ -12,6 +12,7 @@ import android.view.View
 import android.widget.RemoteViews
 import androidx.annotation.RequiresApi
 import com.google.gson.Gson
+import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
 import com.turskyi.weather_fit.WeatherWidget.Companion.KEY_EMOJI
 import com.turskyi.weather_fit.WeatherWidget.Companion.KEY_FORECAST_DATA
@@ -32,7 +33,7 @@ import java.util.Locale
 data class ForecastItem(
     val time: String,
     val temperature: Double,
-    val weather_code: Int
+    @SerializedName("weather_code") val weatherCode: Int
 )
 
 data class ForecastData(val forecast: List<ForecastItem>)
@@ -199,7 +200,7 @@ private fun bindForecastItem(
         if (date != null) {
             views.setTextViewText(dayId, getDay(date))
             views.setTextViewText(timeId, getTimeOfDay(date))
-            views.setTextViewText(emojiId, getWeatherEmoji(item.weather_code))
+            views.setTextViewText(emojiId, getWeatherEmoji(item.weatherCode))
             views.setTextViewText(tempId, "${item.temperature.toInt()}°")
         }
     }
