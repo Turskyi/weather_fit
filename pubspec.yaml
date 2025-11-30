@@ -56,6 +56,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_bloc: ^9.1.1
+  # Do not upgrade to 8.0.0.
   flutter_email_sender: ^7.0.0
   flutter_localizations:
     sdk: flutter
@@ -69,7 +70,7 @@ dependencies:
   geocoding: ^4.0.0
   geolocator: ^14.0.2
   google_fonts: ^6.3.2
-  # Tested home_widget: ^0.8.0 and it does not compile on iOS and Android.
+  # Tested home_widget: ^0.8.1 and it does not compile on iOS and Android.
   home_widget: ^0.7.0+1
   http: ^1.6.0
   hydrated_bloc: ^10.1.1
@@ -82,7 +83,7 @@ dependencies:
     path: packages/nominatim_api
   open_meteo_api:
     path: packages/open_meteo_api
-  package_info_plus: ^8.3.0
+  package_info_plus: any
   path_provider: ^2.1.5
   permission_handler: ^12.0.1
   resend: ^1.0.0
@@ -92,8 +93,7 @@ dependencies:
   #  wear_plus: ^1.2.3
   weather_repository:
     path: packages/weather_repository
-    # Tested workmanager: ^0.9.0 and it does not compile on iOS.
-  workmanager: ^0.7.0
+  workmanager: ^0.9.0+3
 
 dev_dependencies:
   bloc_test: ^10.0.0
