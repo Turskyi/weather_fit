@@ -15,8 +15,7 @@ struct WeatherData: Codable {
     let temperature: String?
     let recommendation: String?
     let lastUpdated: String?
-    // imagePath is disabled to avoid the CFPrefsPlistSource error.
-    // let imagePath: String?
+    let imagePath: String?
     let forecast: [ForecastItem]?
 }
 
@@ -29,7 +28,6 @@ struct SimpleEntry: TimelineEntry {
 struct Provider: TimelineProvider {
     let appGroupIdentifier = "group.dmytrowidget"
     
-    // Helper function to fetch weather data from UserDefaults.
     func getWeatherData() -> WeatherData? {
         guard let sharedDefaults = UserDefaults(suiteName: appGroupIdentifier) else {
             print("Could not load shared defaults.")
@@ -46,7 +44,6 @@ struct Provider: TimelineProvider {
             "forecastData": "forecast_data",
         ]
         
-        // Retrieve data from Shared Defaults.
         let emoji = sharedDefaults.string(forKey: keys["emoji"]!)
         let location = sharedDefaults.string(forKey: keys["location"]!)
         let temperature = sharedDefaults.string(forKey: keys["temperature"]!)
@@ -67,7 +64,7 @@ struct Provider: TimelineProvider {
             }
         }
         
-        return WeatherData(emoji: emoji, location: location, temperature: temperature, recommendation: recommendation, lastUpdated: lastUpdated, forecast: forecast)
+        return WeatherData(emoji: emoji, location: location, temperature: temperature, recommendation: recommendation, lastUpdated: lastUpdated, imagePath: imagePath, forecast: forecast)
     }
     
     func placeholder(in context: Context) -> SimpleEntry {
@@ -107,6 +104,7 @@ struct ForecastItemView: View {
     }
 }
 
+// This view now ONLY contains the foreground content.
 struct WeatherWidgetsEntryView: View {
     var entry: Provider.Entry
     
@@ -141,7 +139,7 @@ struct WeatherWidgetsEntryView: View {
             
             Spacer()
             
-            // Bottom section: Forecast and Current Weather
+            // Bottom section: Forecast
             HStack(alignment: .bottom) {
                 if let forecast = entry.weatherData.forecast, !forecast.isEmpty {
                     HStack(alignment: .bottom) {
@@ -169,9 +167,25 @@ struct WeatherWidgets: Widget {
     
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: Provider()) { entry in
+            // The content view is passed here.
             WeatherWidgetsEntryView(entry: entry)
+            // The .containerBackground modifier handles the background for iOS 17+
                 .containerBackground(for: .widget) {
-                    WeatherHelper.getGradient(for: entry.weatherData.forecast?.first?.weatherCode ?? 0)
+                    // This ZStack provides either an image or a gradient fallback.
+                    ZStack {
+                        // NOTE: There is a persistent 'CFPrefsPlistSource' error that can prevent
+                        // the app from correctly reading the imagePath from the shared container.
+                        // When this happens, this 'if' condition will fail and the widget will
+                        // gracefully fall back to displaying the gradient background in the 'else' block.
+                        if let imagePath = entry.weatherData.imagePath, let uiImage = UIImage(contentsOfFile: imagePath) {
+                            Image(uiImage: uiImage)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        } else {
+                            WeatherHelper.getGradient(for: entry.weatherData.forecast?.first?.weatherCode ?? 0)
+                        }
+                    }
                 }
         }
         .configurationDisplayName("WeatherFit")
@@ -182,10 +196,9 @@ struct WeatherWidgets: Widget {
 // --- Helpers & Extensions ---
 
 struct DateHelper {
-    // This new parser is configured to handle the specific date format from Flutter.
     private static func parseDateTime(from string: String) -> Date? {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "en_US_POSIX") // Important for fixed formats
+        formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm"
         return formatter.date(from: string)
     }
@@ -227,7 +240,6 @@ struct WeatherHelper {
         }
     }
     
-    // Gradients have been made more vibrant to be more visible.
     static func getGradient(for code: Int) -> some View {
         let gradient: Gradient
         switch code {
@@ -254,6 +266,7 @@ extension WeatherData {
             temperature: "24°C",
             recommendation: "A light jacket and jeans would be perfect for today.",
             lastUpdated: "just now",
+            imagePath: nil,
             forecast: [
                 .init(time: "2023-10-27T09:00", temperature: 18.0, weatherCode: 1),
                 .init(time: "2023-10-27T13:00", temperature: 22.0, weatherCode: 0),
