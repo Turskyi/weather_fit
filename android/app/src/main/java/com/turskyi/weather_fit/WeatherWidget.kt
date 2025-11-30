@@ -82,7 +82,10 @@ internal fun updateAppWidget(
     // Get reference to SharedPreferences.
     val widgetData: SharedPreferences = HomeWidgetPlugin.getData(context)
     val views: RemoteViews =
-        RemoteViews(context.packageName, R.layout.weather_widget).apply {
+        RemoteViews(
+            context.packageName,
+            R.layout.weather_widget,
+        ).apply {
             // Common view setup
             // Open App on Widget Click.
             val pendingIntent: PendingIntent =
@@ -90,7 +93,10 @@ internal fun updateAppWidget(
                     context,
                     MainActivity::class.java
                 )
-            setOnClickPendingIntent(R.id.widget_container, pendingIntent)
+            setOnClickPendingIntent(
+                R.id.widget_container,
+                pendingIntent,
+            )
 
             // Bind basic weather data
             setTextViewText(
@@ -107,7 +113,10 @@ internal fun updateAppWidget(
             )
             setTextViewText(
                 R.id.text_outfit_recommendation,
-                widgetData.getString(KEY_TEXT_RECOMMENDATION, "")
+                widgetData.getString(
+                    KEY_TEXT_RECOMMENDATION,
+                    "",
+                )
             )
             setTextViewText(
                 R.id.text_last_updated,
@@ -150,6 +159,7 @@ internal fun updateAppWidget(
                         )
                         // Morning
                         bindForecastItem(
+                            context,
                             this,
                             forecastList.getOrNull(0),
                             R.id.forecast_morning_day,
@@ -159,6 +169,7 @@ internal fun updateAppWidget(
                         )
                         // Lunch
                         bindForecastItem(
+                            context,
                             this,
                             forecastList.getOrNull(1),
                             R.id.forecast_lunch_day,
@@ -168,6 +179,7 @@ internal fun updateAppWidget(
                         )
                         // Evening
                         bindForecastItem(
+                            context,
                             this,
                             forecastList.getOrNull(2),
                             R.id.forecast_evening_day,
@@ -176,11 +188,17 @@ internal fun updateAppWidget(
                             R.id.forecast_evening_temp
                         )
                     } else {
-                        setViewVisibility(R.id.forecast_container, View.GONE)
+                        setViewVisibility(
+                            R.id.forecast_container,
+                            View.GONE,
+                        )
                     }
                 }
             } else {
-                setViewVisibility(R.id.forecast_container, View.GONE)
+                setViewVisibility(
+                    R.id.forecast_container,
+                    View.GONE,
+                )
             }
         }
 
@@ -188,6 +206,7 @@ internal fun updateAppWidget(
 }
 
 private fun bindForecastItem(
+    context: Context,
     views: RemoteViews,
     item: ForecastItem?,
     dayId: Int,
@@ -198,15 +217,27 @@ private fun bindForecastItem(
     if (item != null) {
         val date: Date? = parseDate(item.time)
         if (date != null) {
-            views.setTextViewText(dayId, getDay(date))
-            views.setTextViewText(timeId, getTimeOfDay(date))
-            views.setTextViewText(emojiId, getWeatherEmoji(item.weatherCode))
-            views.setTextViewText(tempId, "${item.temperature.toInt()}°")
+            views.setTextViewText(dayId, getDay(context, date))
+            views.setTextViewText(
+                timeId,
+                getTimeOfDay(context, date),
+            )
+            views.setTextViewText(
+                emojiId,
+                getWeatherEmoji(item.weatherCode),
+            )
+            views.setTextViewText(
+                tempId,
+                "${item.temperature.toInt()}°",
+            )
         }
     }
 }
 
-private val dateParser = SimpleDateFormat("yyyy-MM-dd'T'HH:mm", Locale.US)
+private val dateParser = SimpleDateFormat(
+    "yyyy-MM-dd'T'HH:mm",
+    Locale.US,
+)
 
 private fun parseDate(dateString: String): Date? = try {
     dateParser.parse(dateString)
@@ -215,27 +246,27 @@ private fun parseDate(dateString: String): Date? = try {
     null
 }
 
-private fun getDay(date: Date): String {
+private fun getDay(context: Context, date: Date): String {
     val cal: Calendar = Calendar.getInstance()
     val today: Int = cal.get(Calendar.DAY_OF_YEAR)
     cal.time = date
     val itemDay: Int = cal.get(Calendar.DAY_OF_YEAR)
 
     return when (itemDay) {
-        today -> "Today"
-        today + 1 -> "Tomorrow"
+        today -> context.getString(R.string.today)
+        today + 1 -> context.getString(R.string.tomorrow)
         else -> SimpleDateFormat("EEE", Locale.US).format(date)
     }
 }
 
-private fun getTimeOfDay(date: Date): String {
-    val cal = Calendar.getInstance()
+private fun getTimeOfDay(context: Context, date: Date): String {
+    val cal: Calendar = Calendar.getInstance()
     cal.time = date
     return when (cal.get(Calendar.HOUR_OF_DAY)) {
-        in 5..11 -> "Morning"
-        in 12..16 -> "Lunch"
-        in 17..21 -> "Evening"
-        else -> "Night"
+        in 5..11 -> context.getString(R.string.morning)
+        in 12..16 -> context.getString(R.string.lunch)
+        in 17..21 -> context.getString(R.string.evening)
+        else -> context.getString(R.string.night)
     }
 }
 

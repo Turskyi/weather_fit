@@ -25,4 +25,10 @@
     </string>
     <string name="no_outfit_available">❌ Немає доступного вбрання</string>
     <string name="no_recommendation">🤔 немає рекомендацій</string>
+    <string name="today">Сьогодні</string>
+    <string name="tomorrow">Завтра</string>
+    <string name="morning">Ранок</string>
+    <string name="lunch">Обід</string>
+    <string name="evening">Вечір</string>
+    <string name="night">Ніч</string>
 </resources>

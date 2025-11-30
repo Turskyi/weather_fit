@@ -27,4 +27,10 @@
     </string>
     <string name="no_outfit_available">❌ No outfit available</string>
     <string name="no_recommendation">🤔 no recommendation</string>
+    <string name="today">Today</string>
+    <string name="tomorrow">Tomorrow</string>
+    <string name="morning">Morning</string>
+    <string name="lunch">Lunch</string>
+    <string name="evening">Evening</string>
+    <string name="night">Night</string>
 </resources>
