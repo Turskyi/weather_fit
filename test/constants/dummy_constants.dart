@@ -14,6 +14,7 @@ const String dummyCity = 'London';
 const String dummyWeatherDescription = 'Fog';
 const int dummyWeatherCode = 45;
 const String dummyLocale = 'en';
+const String dummyForecastTime = '2025-11-25T00:00';
 
 const Location dummyLocation = Location(
   latitude: 51.5073219,

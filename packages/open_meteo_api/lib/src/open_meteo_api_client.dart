@@ -17,7 +17,7 @@ import 'models/exceptions/weather_response_failure.dart';
 class OpenMeteoApiClient {
   /// {@macro open_meteo_api_client}
   OpenMeteoApiClient({http.Client? httpClient})
-      : _httpClient = httpClient ?? http.Client();
+    : _httpClient = httpClient ?? http.Client();
 
   static const String _baseUrlWeather = 'api.open-meteo.com';
   static const String _baseUrlGeocoding = 'geocoding-api.open-meteo.com';
@@ -28,7 +28,9 @@ class OpenMeteoApiClient {
   Future<LocationResponse> locationSearch(String query) async {
     final Uri locationRequest = Uri.https(
       _baseUrlGeocoding,
-      '/v1/search',
+      // No need to add forward slash "/" in the beginning of the path, it will
+      // be added automatically.
+      'v1/search',
       <String, String>{'name': query, 'count': '1'},
     );
 
@@ -88,6 +90,32 @@ class OpenMeteoApiClient {
       if (currentWeather is Map<String, Object?>) {
         return WeatherResponse.fromJson(currentWeather);
       }
+    }
+
+    throw WeatherResponseFailure();
+  }
+
+  Future<DailyForecastResponse> getDailyForecast({
+    required double latitude,
+    required double longitude,
+  }) async {
+    final Uri weatherRequest =
+        Uri.https(_baseUrlWeather, 'v1/forecast', <String, String>{
+          'latitude': '$latitude',
+          'longitude': '$longitude',
+          'hourly': 'temperature_2m,weathercode',
+          'timezone': 'auto',
+        });
+
+    final http.Response weatherResponse = await _httpClient.get(weatherRequest);
+
+    if (weatherResponse.statusCode != HttpStatus.ok) {
+      throw WeatherRequestFailure();
+    }
+
+    final Map<String, dynamic> weatherData = jsonDecode(weatherResponse.body);
+    if (weatherData.containsKey('hourly')) {
+      return DailyForecastResponse.fromJson(weatherData);
     }
 
     throw WeatherResponseFailure();

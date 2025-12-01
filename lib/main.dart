@@ -38,9 +38,7 @@ void main() async {
 
   final LocalDataSource localDataSource = LocalDataSource(preferences);
 
-  final String savedIsoCode = localDataSource.getLanguageIsoCode();
-
-  final Language savedLanguage = Language.fromIsoLanguageCode(savedIsoCode);
+  final Language savedLanguage = localDataSource.getSavedLanguage();
 
   final LocalizationDelegate localizationDelegate = await locale
       .getLocalizationDelegate(localDataSource);

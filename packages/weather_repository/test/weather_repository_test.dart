@@ -12,9 +12,7 @@ void main() {
 
     setUp(() {
       weatherApiClient = MockOpenMeteoApiClient();
-      weatherRepository = WeatherRepository(
-        weatherApiClient: weatherApiClient,
-      );
+      weatherRepository = WeatherRepository(weatherApiClient: weatherApiClient);
     });
 
     group('constructor', () {
@@ -52,9 +50,9 @@ void main() {
         final MockLocation location = MockLocation();
         when(() => location.latitude).thenReturn(latitude);
         when(() => location.longitude).thenReturn(longitude);
-        when(() => weatherApiClient.locationSearch(any())).thenAnswer(
-          (_) async => location,
-        );
+        when(
+          () => weatherApiClient.locationSearch(any()),
+        ).thenAnswer((_) async => location);
         try {
           await weatherRepository.getWeatherByLocation(
             Location(latitude: latitude, longitude: longitude, locale: 'en'),
@@ -73,9 +71,9 @@ void main() {
         final MockLocation location = MockLocation();
         when(() => location.latitude).thenReturn(latitude);
         when(() => location.longitude).thenReturn(longitude);
-        when(() => weatherApiClient.locationSearch(any())).thenAnswer(
-          (_) async => location,
-        );
+        when(
+          () => weatherApiClient.locationSearch(any()),
+        ).thenAnswer((_) async => location);
         when(
           () => weatherApiClient.getWeather(
             latitude: any(named: 'latitude'),

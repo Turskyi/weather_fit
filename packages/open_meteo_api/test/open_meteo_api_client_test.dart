@@ -84,8 +84,7 @@ void main() {
       test('returns Location on valid response', () async {
         final MockResponse response = MockResponse();
         when(() => response.statusCode).thenReturn(200);
-        when(() => response.body).thenReturn(
-          '''
+        when(() => response.body).thenReturn('''
 {
   "results": [
     {
@@ -98,8 +97,7 @@ void main() {
       "admin1": "Illinois"
     }
   ]
-}''',
-        );
+}''');
         when(() => httpClient.get(any())).thenAnswer((_) async => response);
         final LocationResponse actual = await apiClient.locationSearch(query);
         expect(
@@ -145,10 +143,8 @@ void main() {
         when(() => response.statusCode).thenReturn(400);
         when(() => httpClient.get(any())).thenAnswer((_) async => response);
         expect(
-          () async => apiClient.getWeather(
-            latitude: latitude,
-            longitude: longitude,
-          ),
+          () async =>
+              apiClient.getWeather(latitude: latitude, longitude: longitude),
           throwsA(isA<WeatherRequestFailure>()),
         );
       });
@@ -159,10 +155,8 @@ void main() {
         when(() => response.body).thenReturn('{}');
         when(() => httpClient.get(any())).thenAnswer((_) async => response);
         expect(
-          () async => apiClient.getWeather(
-            latitude: latitude,
-            longitude: longitude,
-          ),
+          () async =>
+              apiClient.getWeather(latitude: latitude, longitude: longitude),
           throwsA(isA<WeatherNotFoundFailure>()),
         );
       });
@@ -170,8 +164,7 @@ void main() {
       test('returns weather on valid response', () async {
         final MockResponse response = MockResponse();
         when(() => response.statusCode).thenReturn(200);
-        when(() => response.body).thenReturn(
-          '''
+        when(() => response.body).thenReturn('''
 {
 "latitude": 43,
 "longitude": -87.875,
@@ -188,8 +181,7 @@ void main() {
 "time": "2022-09-12T01:00"
 }
 }
-        ''',
-        );
+        ''');
         when(() => httpClient.get(any())).thenAnswer((_) async => response);
         final WeatherResponse actual = await apiClient.getWeather(
           latitude: latitude,

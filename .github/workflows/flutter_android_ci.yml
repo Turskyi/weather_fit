@@ -2,19 +2,21 @@ name: Upload Android build to App Tester.
 
 on:
   workflow_run:
-    workflows:
-      - Code Quality and Tests
+    workflows: [ "Code Quality and Tests" ]
     types:
       - completed
 
 jobs:
   build_apk:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch != 'master' }}
     name: Build Flutter (Android)
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout code from triggering workflow
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
 
       - name: Write the google-services.json file
         run: |
@@ -61,16 +63,6 @@ jobs:
       - uses: subosito/flutter-action@v1
         with:
           channel: 'stable'
-
-      - name: Install Dart SDK
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y apt-transport-https
-          sudo sh -c 'wget -qO- https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -'
-          sudo sh -c 'wget -qO- https://storage.googleapis.com/download.dartlang.org/linux/debian/dart_stable.list > /etc/apt/sources.list.d/dart_stable.list'
-          sudo apt-get update
-          sudo apt-get install -y dart
-        shell: bash
 
       - run: flutter pub get
 

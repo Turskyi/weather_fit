@@ -98,19 +98,17 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
           ..writeln('${translate('build_number')}: ${packageInfo.buildNumber}')
           ..writeln()
           ..writeln('${translate('platform')}: $platform')
-          ..writeln(
-            '${translate('screen_size')}: '
-            '${screenSize ?? translate('unknown')}',
-          )
-          ..writeln();
+          ..write(
+            screenSize == null
+                ? ''
+                : '${translate('screen_size')}: $screenSize\n',
+          );
 
         if (event.submissionType.isAutomatic) {
           // TODO: move this thing to "data".
           final Resend resend = Resend.instance;
           await resend.sendEmail(
-            from:
-                'Do Not Reply ${constants.appName} '
-                '<no-reply@${constants.resendEmailDomain}>',
+            from: constants.feedbackEmailSender,
             to: <String>[constants.supportEmail],
             subject:
                 '${translate('feedback.app_feedback')}: ${packageInfo.appName}',

@@ -131,63 +131,48 @@ class LocalDataSource {
   Future<String> downloadAndSaveImage(String assetPath) async {
     // Check if the platform is web OR macOS. If so, return early.
     // See issue: https://github.com/ABausG/home_widget/issues/137.
-    if (kIsWeb || (!kIsWeb && Platform.isMacOS)) {
-      return '';
-    }
-    try {
-      // Load asset data as ByteData.
-      final ByteData byteData = await rootBundle.load(assetPath);
+    if (!kIsWeb && !Platform.isMacOS) {
+      try {
+        // Load asset data as ByteData.
+        final ByteData byteData = await rootBundle.load(assetPath);
 
-      // Get the application documents directory.
-      final Directory directory = await _getAppDirectory();
-      final String filePath = '${directory.path}/outfit_image.png';
-      // Write the bytes to the file.
-      final File file = File(filePath);
+        // Get the application documents directory.
+        final Directory directory = await _getAppDirectory();
+        final String filePath = '${directory.path}/outfit_image.png';
+        // Write the bytes to the file.
+        final File file = File(filePath);
 
-      // Check if the file exists and delete it if it does.
-      if (await file.exists()) {
-        await file.delete();
+        // Check if the file exists and delete it if it does.
+        if (await file.exists()) {
+          await file.delete();
+        }
+
+        // Ensure the directory exists.
+        await directory.create(recursive: true);
+
+        // Write the new image data.
+        await file.writeAsBytes(
+          byteData.buffer.asUint8List(
+            byteData.offsetInBytes,
+            byteData.lengthInBytes,
+          ),
+        );
+
+        // Invalidate the image cache.
+        PaintingBinding.instance.imageCache.clear();
+        PaintingBinding.instance.imageCache.clearLiveImages();
+
+        return filePath;
+      } catch (e) {
+        // Handle potential errors (e.g., asset not found)
+        debugPrint('Error saving asset image to file: $e');
+        final String locale = PlatformDispatcher.instance.locale.languageCode;
+        throw Exception(
+          '${_translateError('error.save_asset_image_failed', locale)}: $e',
+        );
       }
-
-      // Ensure the directory exists.
-      await directory.create(recursive: true);
-
-      // Write the new image data.
-      await file.writeAsBytes(
-        byteData.buffer.asUint8List(
-          byteData.offsetInBytes,
-          byteData.lengthInBytes,
-        ),
-      );
-
-      // Invalidate the image cache.
-      PaintingBinding.instance.imageCache.clear();
-      PaintingBinding.instance.imageCache.clearLiveImages();
-
-      return filePath;
-    } catch (e) {
-      // Handle potential errors (e.g., asset not found)
-      debugPrint('Error saving asset image to file: $e');
-      final String locale = PlatformDispatcher.instance.locale.languageCode;
-      throw Exception(
-        '${_translateError('error.save_asset_image_failed', locale)}: $e',
-      );
-    }
-  }
-
-  Future<Directory> _getAppDirectory() async {
-    if (!kIsWeb & Platform.isIOS) {
-      const MethodChannel channel = MethodChannel(
-        'weatherfit.shared/container',
-      );
-      final String path = await channel.invokeMethod(
-        'getAppleAppGroupDirectory',
-      );
-
-      return Directory(path);
     } else {
-      // On Android or other platforms, fallback to Documents directory.
-      return getApplicationDocumentsDirectory();
+      return assetPath;
     }
   }
 
@@ -248,6 +233,14 @@ class LocalDataSource {
         : defaultLanguageCode;
   }
 
+  Language getSavedLanguage() {
+    final String savedLanguageIsoCode = getLanguageIsoCode();
+    final Language savedLanguage = Language.fromIsoLanguageCode(
+      savedLanguageIsoCode,
+    );
+    return savedLanguage;
+  }
+
   /// Saves the provided [location] to persistent storage as a JSON string.
   ///
   /// Returns a [Future] that completes with `true` if the value was
@@ -278,6 +271,11 @@ class LocalDataSource {
       }
       return const Location.empty();
     }
+  }
+
+  Future<Directory> _getAppDirectory() async {
+    // On Android or other platforms, fallback to Documents directory.
+    return getApplicationDocumentsDirectory();
   }
 
   String _translateError(String key, String locale) {

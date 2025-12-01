@@ -4,6 +4,7 @@
     android:id="@+id/widget_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/widget_background"
     android:gravity="center_horizontal"
     android:orientation="vertical"
     android:padding="16dp">
@@ -53,15 +54,145 @@
         android:gravity="center_horizontal"
         android:textSize="14sp" />
 
+    <!-- Container for the forecast items -->
+    <LinearLayout
+        android:id="@+id/forecast_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:baselineAligned="false"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <!-- Morning Forecast -->
+        <LinearLayout
+            android:id="@+id/forecast_morning"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/forecast_morning_day"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                tools:text="Today" />
+
+            <TextView
+                android:id="@+id/forecast_morning_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                tools:text="Morning" />
+
+            <TextView
+                android:id="@+id/forecast_morning_emoji"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="24sp"
+                tools:text="☁️" />
+
+            <TextView
+                android:id="@+id/forecast_morning_temp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                tools:text="10°" />
+        </LinearLayout>
+
+        <!-- Lunch Forecast -->
+        <LinearLayout
+            android:id="@+id/forecast_lunch"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/forecast_lunch_day"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                tools:text="Today" />
+
+            <TextView
+                android:id="@+id/forecast_lunch_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                tools:text="Lunch" />
+
+            <TextView
+                android:id="@+id/forecast_lunch_emoji"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="24sp"
+                tools:text="☀️" />
+
+            <TextView
+                android:id="@+id/forecast_lunch_temp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                tools:text="15°" />
+        </LinearLayout>
+
+        <!-- Evening Forecast -->
+        <LinearLayout
+            android:id="@+id/forecast_evening"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/forecast_evening_day"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                tools:text="Today" />
+
+            <TextView
+                android:id="@+id/forecast_evening_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                tools:text="Evening" />
+
+            <TextView
+                android:id="@+id/forecast_evening_emoji"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="24sp"
+                tools:text="🌙" />
+
+            <TextView
+                android:id="@+id/forecast_evening_temp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                tools:text="8°" />
+        </LinearLayout>
+
+    </LinearLayout>
+
     <!-- An ImageView for the outfit image. -->
     <!--suppress AndroidUnknownAttribute -->
     <ImageView
         android:id="@+id/image_weather"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="6dp"
         android:layout_marginBottom="0dp"
+        android:layout_weight="1"
         android:adjustViewBounds="true"
         android:background="@drawable/rounded_corner_image"
         android:clipToOutline="true"

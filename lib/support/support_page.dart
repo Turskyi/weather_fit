@@ -184,7 +184,7 @@ class _SupportPageState extends State<SupportPage> {
       query: _encodeQueryParameters(<String, String>{
         constants.subjectParameter:
             '«${translate('title')}» ${translate('support.title')}',
-        constants.bodyParameter: translate('support_email_default_body'),
+        constants.bodyParameter: translate('support.email_default_body'),
       }),
     );
 

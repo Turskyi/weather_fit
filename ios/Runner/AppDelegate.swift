@@ -7,6 +7,7 @@ import BackgroundTasks
 import os
 
 private let appGroupId = "group.dmytrowidget"
+
 @main
 @objc class AppDelegate: FlutterAppDelegate {
     
@@ -15,26 +16,13 @@ private let appGroupId = "group.dmytrowidget"
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
         
-        let controller: FlutterViewController = window?.rootViewController as! FlutterViewController
-        let channel = FlutterMethodChannel(name: "weatherfit.shared/container", binaryMessenger: controller.binaryMessenger)
-        channel.setMethodCallHandler { call, result in
-            if call.method == "getAppleAppGroupDirectory" {
-                
-                if let containerURL = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupId) {
-                    
-                    result(containerURL.path)
-                } else {
-                    
-                    result(FlutterError(code: "UNAVAILABLE", message: "App Group container not available", details: nil))
-                }
-            } else {
-                
-                result(FlutterMethodNotImplemented)
-            }
-        }
-        
-        
+        // Register plugins first to ensure they are available for all other operations.
         GeneratedPluginRegistrant.register(with: self)
+
+        // The custom method channel for file sharing has been temporarily removed
+        // to isolate the source of the 'CFPrefsPlistSource' error.
+        // If the widget data now appears correctly, we can confirm the issue
+        // is related to file container access and not the general plugin setup.
         
         // This prevents the iOS crash on launch when identifier is declared in Info.plist.
         if #available(iOS 13.0, *) {
@@ -62,5 +50,4 @@ private let appGroupId = "group.dmytrowidget"
         
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
     }
-    
 }

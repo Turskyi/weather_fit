@@ -12,6 +12,7 @@ class WeatherErrorDefault extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
+        SizedBox(height: MediaQuery.paddingOf(context).top),
         Text(
           '🫠',
           style: TextStyle(fontSize: textTheme.displayLarge?.fontSize),

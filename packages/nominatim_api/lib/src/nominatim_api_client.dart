@@ -13,7 +13,7 @@ import 'models/responses/nominatim_location_response.dart';
 class NominatimApiClient {
   /// {@macro nominatim_api_client}
   NominatimApiClient({http.Client? httpClient})
-      : _httpClient = httpClient ?? http.Client();
+    : _httpClient = httpClient ?? http.Client();
 
   static const String _baseUrl = 'nominatim.openstreetmap.org';
 
@@ -21,16 +21,12 @@ class NominatimApiClient {
 
   /// Finds a [NominatimLocationResponse] using `/search?q=(query)`.
   Future<NominatimLocationResponse> locationSearch(String query) async {
-    final Uri requestUri = Uri.https(
-      _baseUrl,
-      '/search',
-      <String, String>{
-        'q': query,
-        'format': 'json',
-        'limit': '1',
-        'accept-language': 'uk,en',
-      },
-    );
+    final Uri requestUri = Uri.https(_baseUrl, '/search', <String, String>{
+      'q': query,
+      'format': 'json',
+      'limit': '1',
+      'accept-language': 'uk,en',
+    });
 
     final http.Response response = await _httpClient.get(
       requestUri,

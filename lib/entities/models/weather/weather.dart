@@ -126,7 +126,9 @@ class Weather extends Equatable {
   }
 
   String get formattedTemperature {
-    return '''${temperature.value.toStringAsPrecision(2)}°${temperatureUnits.isCelsius ? 'C' : 'F'}''';
+    final String value = temperature.value.round().toString();
+
+    return '$value°${temperatureUnits.isCelsius ? 'C' : 'F'}';
   }
 
   String get emoji => condition.toEmoji;
