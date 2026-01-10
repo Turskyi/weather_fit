@@ -213,19 +213,24 @@ class LocalDataSource {
         : Language.en.isoLanguageCode;
 
     final String host = Uri.base.host;
-    if (host.startsWith('${Language.uk.isoLanguageCode}.')) {
-      try {
-        Intl.defaultLocale = Language.uk.isoLanguageCode;
-      } catch (e, stackTrace) {
-        debugPrint(
-          'Failed to set Intl.defaultLocale to '
-          '"${Language.uk.isoLanguageCode}".\n'
-          'Error: $e\n'
-          'StackTrace: $stackTrace\n'
-          'Proceeding with previously set default locale or system default.',
-        );
+
+    for (final Language language in Language.values) {
+      final String currentLanguageCode = language.isoLanguageCode;
+      if (host.startsWith('$currentLanguageCode.')) {
+        try {
+          Intl.defaultLocale = currentLanguageCode;
+        } catch (e, stackTrace) {
+          debugPrint(
+            'Failed to set Intl.defaultLocale to "$currentLanguageCode".\n'
+            'Error: $e\n'
+            'StackTrace: $stackTrace\n'
+            'Proceeding with previously set default locale or system default.',
+          );
+        }
+        defaultLanguageCode = currentLanguageCode;
+        // Exit the loop once a match is found and processed.
+        break;
       }
-      defaultLanguageCode = Language.uk.isoLanguageCode;
     }
 
     return isSavedLanguageSupported

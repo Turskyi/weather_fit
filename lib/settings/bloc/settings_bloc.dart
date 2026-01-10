@@ -48,9 +48,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     SubmitFeedbackEvent event,
     Emitter<SettingsState> emit,
   ) async {
-    if (state is LoadingSettingsState || state is FeedbackSent) {
-      return;
-    } else {
+    if (state is! LoadingSettingsState && state is! FeedbackSent) {
       emit(LoadingSettingsState(language: state.language));
       final UserFeedback feedback = event.feedback;
       try {
@@ -80,6 +78,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
 
         final bool isFeedbackType = type is FeedbackType;
         final bool isFeedbackRating = rating is FeedbackRating;
+
         // Construct the feedback text with details from `extra'.
         final StringBuffer feedbackBody = StringBuffer()
           ..writeln(
