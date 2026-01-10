@@ -56,8 +56,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_bloc: ^9.1.1
-  # Do not upgrade to 8.0.0.
-  flutter_email_sender: ^7.0.0
+  flutter_email_sender: ^8.0.0
   flutter_localizations:
     sdk: flutter
   flutter_svg: ^2.2.3
@@ -76,14 +75,13 @@ dependencies:
   hydrated_bloc: ^10.1.1
   intl: ^0.20.2
   json_annotation: ^4.9.0
-  # Tried ^1.17.0, but it did not compile.
-  meta: any
+  meta: ^1.17.0
   nested: ^1.0.0
   nominatim_api:
     path: packages/nominatim_api
   open_meteo_api:
     path: packages/open_meteo_api
-  package_info_plus: any
+  package_info_plus: ^9.0.0
   path_provider: ^2.1.5
   permission_handler: ^12.0.1
   resend: ^1.0.0
@@ -108,6 +106,7 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   flutter_test:
     sdk: flutter
+  # Tried "^6.11.3", but got error during "flutter pub get".
   json_serializable: any
   mocktail: ^1.0.4
 
