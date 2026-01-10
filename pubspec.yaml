@@ -70,7 +70,7 @@ dependencies:
   geolocator: ^14.0.2
   google_fonts: ^7.0.0
   # Tested home_widget: ^0.9.0 and it does not compile on iOS and Android.
-  home_widget: ^0.7.0+1
+  home_widget: any
   http: ^1.6.0
   hydrated_bloc: ^10.1.1
   intl: ^0.20.2
