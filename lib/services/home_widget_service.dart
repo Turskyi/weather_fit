@@ -32,6 +32,12 @@ abstract class HomeWidgetService {
     required DailyForecastDomain forecast,
     required OutfitRepository outfitRepository,
   });
+
+  Future<void> requestPinWidget({
+    String? name,
+    String? androidName,
+    String? qualifiedAndroidName,
+  });
 }
 
 class HomeWidgetServiceImpl implements HomeWidgetService {
@@ -142,6 +148,19 @@ class HomeWidgetServiceImpl implements HomeWidgetService {
     await updateWidget(
       iOSName: constants.iOSWidgetName,
       androidName: constants.androidWidgetName,
+    );
+  }
+
+  @override
+  Future<void> requestPinWidget({
+    String? name,
+    String? androidName,
+    String? qualifiedAndroidName,
+  }) {
+    return HomeWidget.requestPinWidget(
+      name: name,
+      androidName: androidName,
+      qualifiedAndroidName: qualifiedAndroidName,
     );
   }
 

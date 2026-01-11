@@ -5,7 +5,9 @@ import 'package:flutter_translate/flutter_translate.dart';
 import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/extensions/build_context_extensions.dart';
+import 'package:weather_fit/res/constants.dart' as constants;
 import 'package:weather_fit/router/app_route.dart';
+import 'package:weather_fit/services/home_widget_service.dart';
 import 'package:weather_fit/settings/bloc/settings_bloc.dart';
 import 'package:weather_fit/settings/ui/settings_page_default_layout.dart';
 import 'package:weather_fit/settings/ui/settings_page_extra_small_layout.dart';
@@ -33,6 +35,7 @@ class _SettingsPageState extends State<SettingsPage> {
             onPrivacyTap: _navigateToPrivacy,
             onFeedbackTap: _handleFeedbackRequest,
             onSupportTap: _navigateToSupport,
+            onPinWidgetTap: _requestPinWidget,
             languageIsoCode: widget.languageIsoCode,
             onSearchPressed: _handleLocationSearchAndFetchWeather,
           )
@@ -45,6 +48,7 @@ class _SettingsPageState extends State<SettingsPage> {
             onPrivacyTap: _navigateToPrivacy,
             onFeedbackTap: _handleFeedbackRequest,
             onSupportTap: _navigateToSupport,
+            onPinWidgetTap: _requestPinWidget,
             languageIsoCode: widget.languageIsoCode,
           );
   }
@@ -74,6 +78,12 @@ class _SettingsPageState extends State<SettingsPage> {
       defaultTargetPlatform == TargetPlatform.android
           ? AppRoute.privacyPolicyAndroid.path
           : AppRoute.privacyPolicy.path,
+    );
+  }
+
+  void _requestPinWidget() {
+    context.read<HomeWidgetService>().requestPinWidget(
+      androidName: constants.androidWidgetName,
     );
   }
 

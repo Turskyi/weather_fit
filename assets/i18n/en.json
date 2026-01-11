@@ -121,7 +121,9 @@
     "temperature_units_subtitle_imperial": "Use imperial measurements for temperature units.",
     "about_app_subtitle": "Learn more about «WeatherFit».",
     "feedback_subtitle": "Let us know your thoughts and suggestions. You can also report any issues with the app’s content.",
-    "support_subtitle": "Visit our support page for help and frequently asked questions."
+    "support_subtitle": "Visit our support page for help and frequently asked questions.",
+    "pin_widget": "Pin Widget",
+    "pin_widget_subtitle": "Add a widget to your home screen to see the weather at a glance."
   },
   "search": {
     "label": "Search",

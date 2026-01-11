@@ -21,6 +21,7 @@ class SettingsPageDefaultLayout extends StatelessWidget {
     required this.onPrivacyTap,
     required this.onFeedbackTap,
     required this.onSupportTap,
+    required this.onPinWidgetTap,
     required this.languageIsoCode,
     super.key,
   });
@@ -62,6 +63,9 @@ class SettingsPageDefaultLayout extends StatelessWidget {
 
   /// Called when the user taps "Support" list tile.
   final GestureTapCallback onSupportTap;
+
+  /// Called when the user taps "Pin Widget" list tile.
+  final GestureTapCallback onPinWidgetTap;
 
   final String languageIsoCode;
 
@@ -218,6 +222,29 @@ class SettingsPageDefaultLayout extends StatelessWidget {
                     );
                   },
                 ),
+                if (!kIsWeb &&
+                    (defaultTargetPlatform ==
+                        TargetPlatform.android)) ...<Widget>[
+                  const SizedBox(height: 20),
+                  Card(
+                    elevation: 2.0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    child: ListTile(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      title: Text(
+                        translate('settings.pin_widget'),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Text(translate('settings.pin_widget_subtitle')),
+                      trailing: const Icon(Icons.push_pin_outlined),
+                      onTap: onPinWidgetTap,
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 20),
                 Card(
                   elevation: 2.0,

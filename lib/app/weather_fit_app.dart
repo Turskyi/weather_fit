@@ -46,18 +46,21 @@ class WeatherFitApp extends StatelessWidget {
       providers: <SingleChildWidget>[
         RepositoryProvider<WeatherRepository>.value(value: weatherRepository),
         RepositoryProvider<OutfitRepository>.value(value: outfitRepository),
+        RepositoryProvider<HomeWidgetService>(
+          create: (_) => const HomeWidgetServiceImpl(),
+        ),
       ],
       child: MultiBlocProvider(
         providers: <SingleChildWidget>[
           // Provide the theme cubit.
           BlocProvider<ThemeCubit>(create: (_) => ThemeCubit()),
           BlocProvider<WeatherBloc>(
-            create: (BuildContext _) {
+            create: (BuildContext context) {
               return WeatherBloc(
                 weatherRepository,
                 outfitRepository,
                 localDataSource,
-                const HomeWidgetServiceImpl(),
+                context.read<HomeWidgetService>(),
                 initialLanguage.isoLanguageCode,
               );
             },
