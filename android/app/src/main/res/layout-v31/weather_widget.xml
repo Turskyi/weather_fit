@@ -8,10 +8,13 @@
     android:padding="8dp">
 
     <!-- Top Part with Image and Stacked Info -->
+    <!--suppress AndroidUnknownAttribute -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:background="@drawable/rounded_corner_image"
+        android:clipToOutline="true">
 
         <!-- Background Image -->
         <ImageView
@@ -22,14 +25,17 @@
             android:contentDescription="@string/outfit_image"
             android:scaleType="centerCrop"
             android:visibility="gone"
-            tools:src="@mipmap/ic_launcher_round"
+            tools:src="@drawable/clear_0"
             tools:visibility="visible" />
 
-        <!-- Info Card Overlay (at the bottom of the image stack) -->
+        <!-- Info Card Overlay -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="12dp"
             android:background="@drawable/widget_text_background"
             android:orientation="vertical"
             android:padding="8dp">
@@ -100,18 +106,19 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
                 android:textColor="#E0E0E0"
-                android:textSize="9sp"
+                android:textSize="11sp"
                 tools:text="Updated 12:00 PM" />
         </LinearLayout>
     </FrameLayout>
 
-    <!-- Bottom Forecast Card (Vertically below the image) -->
+    <!-- Bottom Forecast Card -->
     <LinearLayout
         android:id="@+id/forecast_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:background="@drawable/widget_text_background"
+        android:baselineAligned="false"
         android:orientation="horizontal"
         android:padding="8dp"
         android:visibility="gone"
@@ -131,7 +138,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#E0E0E0"
-                android:textSize="10sp"
+                android:textSize="11sp"
                 tools:text="Morn" />
 
             <TextView
@@ -146,7 +153,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@android:color/white"
-                android:textSize="10sp"
+                android:textSize="11sp"
                 tools:text="10°" />
         </LinearLayout>
 
@@ -164,7 +171,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#E0E0E0"
-                android:textSize="10sp"
+                android:textSize="11sp"
                 tools:text="Noon" />
 
             <TextView
@@ -179,7 +186,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@android:color/white"
-                android:textSize="10sp"
+                android:textSize="11sp"
                 tools:text="15°" />
         </LinearLayout>
 
@@ -197,7 +204,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#E0E0E0"
-                android:textSize="10sp"
+                android:textSize="11sp"
                 tools:text="Eve" />
 
             <TextView
@@ -212,7 +219,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@android:color/white"
-                android:textSize="10sp"
+                android:textSize="11sp"
                 tools:text="8°" />
         </LinearLayout>
 
