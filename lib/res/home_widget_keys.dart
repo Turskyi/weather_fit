@@ -5,7 +5,8 @@ enum HomeWidgetKey {
   textLastUpdated,
   textRecommendation,
   forecastData,
-  imageWeather;
+  imageWeather,
+  weatherCode;
 
   String get stringValue {
     switch (this) {
@@ -23,6 +24,8 @@ enum HomeWidgetKey {
         return 'image_weather';
       case HomeWidgetKey.forecastData:
         return 'forecast_data';
+      case HomeWidgetKey.weatherCode:
+        return 'weather_code';
     }
   }
 }

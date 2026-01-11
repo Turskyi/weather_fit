@@ -127,6 +127,12 @@ class HomeWidgetServiceImpl implements HomeWidgetService {
       outfitRecommendation,
     );
 
+    // Save weather code for background color mapping.
+    await saveWidgetData<int>(
+      HomeWidgetKey.weatherCode.stringValue,
+      weather.code,
+    );
+
     // The image feature is temporarily disabled.
     await saveWidgetData<String>(
       HomeWidgetKey.imageWeather.stringValue,
