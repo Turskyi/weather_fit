@@ -31,9 +31,7 @@ class SearchLayoutDefault extends StatelessWidget {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        leading: kIsWeb
-            ? LeadingWidget(languageIsoCode: languageIsoCode)
-            : null,
+        leading: kIsWeb ? const LeadingWidget() : null,
         title: KeyboardVisibilityBuilder(
           builder: (bool isKeyboardVisible) {
             final Orientation orientation = MediaQuery.of(context).orientation;

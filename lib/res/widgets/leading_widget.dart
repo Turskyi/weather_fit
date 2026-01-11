@@ -5,9 +5,7 @@ import 'package:weather_fit/weather/ui/weather_page.dart';
 import '../constants.dart' as constants;
 
 class LeadingWidget extends StatelessWidget {
-  const LeadingWidget({required this.languageIsoCode, super.key});
-
-  final String languageIsoCode;
+  const LeadingWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +22,7 @@ class LeadingWidget extends StatelessWidget {
               Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute<void>(
                   builder: (BuildContext _) {
-                    return WeatherPage(languageIsoCode: languageIsoCode);
+                    return const WeatherPage();
                   },
                   settings: RouteSettings(name: AppRoute.weather.path),
                 ),

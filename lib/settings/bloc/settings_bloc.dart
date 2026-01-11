@@ -22,8 +22,8 @@ part 'settings_event.dart';
 part 'settings_state.dart';
 
 class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
-  SettingsBloc(this._localDataSource, Language initialLanguage)
-    : super(SettingsInitial(language: initialLanguage)) {
+  SettingsBloc(this._localDataSource)
+    : super(SettingsInitial(language: _localDataSource.getSavedLanguage())) {
     on<ClosingFeedbackEvent>(_onFeedbackDialogDismissed);
 
     on<BugReportPressedEvent>(_onFeedbackRequested);

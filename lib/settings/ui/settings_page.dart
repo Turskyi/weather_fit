@@ -14,9 +14,7 @@ import 'package:weather_fit/settings/ui/settings_page_extra_small_layout.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 
 class SettingsPage extends StatefulWidget {
-  const SettingsPage({required this.languageIsoCode, super.key});
-
-  final String languageIsoCode;
+  const SettingsPage({super.key});
 
   @override
   State<SettingsPage> createState() => _SettingsPageState();
@@ -36,7 +34,6 @@ class _SettingsPageState extends State<SettingsPage> {
             onFeedbackTap: _handleFeedbackRequest,
             onSupportTap: _navigateToSupport,
             onPinWidgetTap: _requestPinWidget,
-            languageIsoCode: widget.languageIsoCode,
             onSearchPressed: _handleLocationSearchAndFetchWeather,
           )
         : SettingsPageDefaultLayout(
@@ -49,7 +46,6 @@ class _SettingsPageState extends State<SettingsPage> {
             onFeedbackTap: _handleFeedbackRequest,
             onSupportTap: _navigateToSupport,
             onPinWidgetTap: _requestPinWidget,
-            languageIsoCode: widget.languageIsoCode,
           );
   }
 

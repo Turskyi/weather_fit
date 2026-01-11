@@ -28,9 +28,9 @@ class SearchPageExtraSmallLayout extends StatelessWidget {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: Padding(
-          padding: const EdgeInsets.only(top: 8.0),
-          child: LeadingWidget(languageIsoCode: languageIsoCode),
+        title: const Padding(
+          padding: EdgeInsets.only(top: 8.0),
+          child: LeadingWidget(),
         ),
         centerTitle: true,
         automaticallyImplyLeading: false,

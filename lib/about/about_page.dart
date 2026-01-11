@@ -47,9 +47,7 @@ class AboutPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        leading: kIsWeb
-            ? LeadingWidget(languageIsoCode: languageIsoCode)
-            : null,
+        leading: kIsWeb ? const LeadingWidget() : null,
         title: Text(
           '${translate('about.title')} «${translate('title')}»',
           maxLines: 2,

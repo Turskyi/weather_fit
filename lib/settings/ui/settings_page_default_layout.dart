@@ -22,7 +22,6 @@ class SettingsPageDefaultLayout extends StatelessWidget {
     required this.onFeedbackTap,
     required this.onSupportTap,
     required this.onPinWidgetTap,
-    required this.languageIsoCode,
     super.key,
   });
 
@@ -67,8 +66,6 @@ class SettingsPageDefaultLayout extends StatelessWidget {
   /// Called when the user taps "Pin Widget" list tile.
   final GestureTapCallback onPinWidgetTap;
 
-  final String languageIsoCode;
-
   @override
   Widget build(BuildContext context) {
     final ThemeData themeData = Theme.of(context);
@@ -76,9 +73,7 @@ class SettingsPageDefaultLayout extends StatelessWidget {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        leading: kIsWeb
-            ? LeadingWidget(languageIsoCode: languageIsoCode)
-            : null,
+        leading: kIsWeb ? const LeadingWidget() : null,
         title: Text(translate('settings.title')),
       ),
       body: Stack(

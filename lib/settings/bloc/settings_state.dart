@@ -11,6 +11,8 @@ sealed class SettingsState {
   bool get isUkrainian => language == Language.uk;
 
   String get locale => language.isoLanguageCode;
+
+  String get languageIsoCode => language.isoLanguageCode;
 }
 
 final class SettingsInitial extends SettingsState {

@@ -20,9 +20,7 @@ class PrivacyPolicyPage extends StatelessWidget {
     final String updatedDate = getPrivacyLastUpdatedDate(languageIsoCode);
     return Scaffold(
       appBar: AppBar(
-        leading: kIsWeb
-            ? LeadingWidget(languageIsoCode: languageIsoCode)
-            : null,
+        leading: kIsWeb ? const LeadingWidget() : null,
         title: Text(translate('privacy_policy')),
       ),
       body: SingleChildScrollView(

@@ -22,9 +22,7 @@ class _SupportPageState extends State<SupportPage> {
 
     return Scaffold(
       appBar: AppBar(
-        leading: kIsWeb
-            ? LeadingWidget(languageIsoCode: widget.languageIsoCode)
-            : null,
+        leading: kIsWeb ? const LeadingWidget() : null,
         title: Text(translate('support.title')),
         actions: <Widget>[
           LanguageSelector(

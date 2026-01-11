@@ -58,7 +58,6 @@ void main() {
       mockOutfitRepository,
       localDataSource,
       mockHomeWidgetService,
-      localDataSource.getLanguageIsoCode(),
     );
   });
 
@@ -109,7 +108,6 @@ void main() {
         mockOutfitRepository,
         localDataSource,
         mockHomeWidgetService,
-        localDataSource.getLanguageIsoCode(),
       );
     });
 
@@ -123,7 +121,6 @@ void main() {
         mockOutfitRepository,
         localDataSource,
         mockHomeWidgetService,
-        locale,
       );
       expect(weatherBloc.state, WeatherInitial(locale: locale));
     });
@@ -139,7 +136,6 @@ void main() {
           mockOutfitRepository,
           localDataSource,
           mockHomeWidgetService,
-          locale,
         );
         expect(WeatherInitial(locale: locale), weatherBloc.state);
       });

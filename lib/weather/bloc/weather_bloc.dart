@@ -28,8 +28,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     this._outfitRepository,
     this._localDataSource,
     this._homeWidgetService,
-    String _locale,
-  ) : super(WeatherInitial(locale: _locale)) {
+  ) : super(WeatherInitial(locale: _localDataSource.getLanguageIsoCode())) {
     on<FetchWeather>(_onFetchWeather);
     on<RefreshWeather>(_onRefreshWeather);
     on<ToggleUnits>(_onToggleUnits);

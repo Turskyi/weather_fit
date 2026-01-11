@@ -61,13 +61,12 @@ class WeatherFitApp extends StatelessWidget {
                 outfitRepository,
                 localDataSource,
                 context.read<HomeWidgetService>(),
-                initialLanguage.isoLanguageCode,
               );
             },
           ),
           BlocProvider<SettingsBloc>(
             create: (BuildContext _) {
-              return SettingsBloc(localDataSource, initialLanguage);
+              return SettingsBloc(localDataSource);
             },
           ),
           BlocProvider<SearchBloc>(

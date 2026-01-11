@@ -21,7 +21,6 @@ class SettingsPageExtraSmallLayout extends StatelessWidget {
     required this.onFeedbackTap,
     required this.onSupportTap,
     required this.onPinWidgetTap,
-    required this.languageIsoCode,
     required this.onSearchPressed,
     super.key,
   });
@@ -35,7 +34,6 @@ class SettingsPageExtraSmallLayout extends StatelessWidget {
   final GestureTapCallback onFeedbackTap;
   final GestureTapCallback onSupportTap;
   final GestureTapCallback onPinWidgetTap;
-  final String languageIsoCode;
 
   /// The callback that is called when the "Search" button is tapped or
   /// otherwise activated.
@@ -47,9 +45,9 @@ class SettingsPageExtraSmallLayout extends StatelessWidget {
       extendBodyBehindAppBar: true,
       backgroundColor: Colors.transparent,
       appBar: AppBar(
-        title: Padding(
-          padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-          child: LeadingWidget(languageIsoCode: languageIsoCode),
+        title: const Padding(
+          padding: EdgeInsets.only(top: 8.0, bottom: 8.0),
+          child: LeadingWidget(),
         ),
         centerTitle: true,
         automaticallyImplyLeading: false,
