@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:nested/nested.dart';
 import 'package:resend/resend.dart';
 import 'package:weather_fit/app/settings_state_listener_content.dart';
@@ -88,6 +87,9 @@ class WeatherFitApp extends StatelessWidget {
             final LocalizationDelegate localizationDelegate = LocalizedApp.of(
               context,
             ).delegate;
+
+            const String fontFamily = 'Montserrat';
+
             return Resources(
               child: MaterialApp(
                 navigatorKey: navigatorKey,
@@ -107,19 +109,17 @@ class WeatherFitApp extends StatelessWidget {
                   return SettingsStateListenerContent(child: child);
                 },
                 theme: ThemeData(
+                  useMaterial3: true,
+                  fontFamily: fontFamily,
                   appBarTheme: const AppBarTheme(
                     backgroundColor: Colors.transparent,
                     elevation: 0,
                   ),
                   colorScheme: ColorScheme.fromSeed(seedColor: color),
-                  textTheme: GoogleFonts.montserratTextTheme(),
-                  // FIXME: This font is probably not needed, I added it to
-                  //  avoid a "Could not find a set of Noto fonts to
-                  //  display all missing characters" error, but it still
-                  //  did not help.
-                  fontFamily: 'NotoSans',
                 ),
                 darkTheme: ThemeData(
+                  useMaterial3: true,
+                  fontFamily: fontFamily,
                   appBarTheme: const AppBarTheme(
                     backgroundColor: Colors.transparent,
                     elevation: 0,
@@ -128,10 +128,6 @@ class WeatherFitApp extends StatelessWidget {
                     seedColor: color,
                     brightness: Brightness.dark,
                   ),
-                  textTheme: GoogleFonts.montserratTextTheme(
-                    ThemeData.dark().textTheme,
-                  ),
-                  fontFamily: 'NotoSans',
                 ),
                 themeMode: completeDarkness ? ThemeMode.dark : ThemeMode.light,
               ),
