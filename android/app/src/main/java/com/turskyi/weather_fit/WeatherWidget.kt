@@ -157,31 +157,36 @@ internal fun updateAppWidget(
                             R.id.forecast_container,
                             View.VISIBLE,
                         )
-                        // Morning
+
+                        // Sort the forecast list chronologically by time.
+                        val sortedForecast: List<ForecastItem> =
+                            forecastList.sortedBy { it.time }
+
+                        // Morning slot
                         bindForecastItem(
                             context,
                             this,
-                            forecastList.getOrNull(0),
+                            sortedForecast.getOrNull(0),
                             R.id.forecast_morning_day,
                             R.id.forecast_morning_time,
                             R.id.forecast_morning_emoji,
                             R.id.forecast_morning_temp
                         )
-                        // Lunch
+                        // Lunch slot
                         bindForecastItem(
                             context,
                             this,
-                            forecastList.getOrNull(1),
+                            sortedForecast.getOrNull(1),
                             R.id.forecast_lunch_day,
                             R.id.forecast_lunch_time,
                             R.id.forecast_lunch_emoji,
                             R.id.forecast_lunch_temp
                         )
-                        // Evening
+                        // Evening slot
                         bindForecastItem(
                             context,
                             this,
-                            forecastList.getOrNull(2),
+                            sortedForecast.getOrNull(2),
                             R.id.forecast_evening_day,
                             R.id.forecast_evening_time,
                             R.id.forecast_evening_emoji,
