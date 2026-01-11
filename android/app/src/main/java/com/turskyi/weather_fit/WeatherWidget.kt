@@ -170,14 +170,21 @@ internal fun updateAppWidget(
                 WeatherWidget.KEY_IMAGE_WEATHER,
                 null,
             )
-            // Get image and put it in the widget if it exists.
-            if (!imagePath.isNullOrEmpty() && File(imagePath).exists()) {
-                val bitmap: android.graphics.Bitmap? =
-                    BitmapFactory.decodeFile(
-                        File(imagePath).absolutePath,
-                    )
-                if (bitmap != null) {
-                    setImageViewBitmap(R.id.image_weather, bitmap)
+
+            val imageFile: File? = imagePath?.takeIf {
+                it.isNotEmpty()
+            }?.let { path: String ->
+                File(path)
+            }
+            val isImageAvailable: Boolean = imageFile?.exists() == true
+
+            if (isImageAvailable) {
+                imageFile?.let { file: File ->
+                    val bitmap: android.graphics.Bitmap? =
+                        BitmapFactory.decodeFile(file.absolutePath)
+                    bitmap?.let { bmp: android.graphics.Bitmap ->
+                        setImageViewBitmap(R.id.image_weather, bmp)
+                    }
                 }
             }
 
