@@ -1,67 +1,121 @@
-<?xml version="1.0" encoding="utf-8"?><!--suppress AndroidDomInspection -->
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/widget_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center_horizontal"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="8dp">
 
-    <!-- A TextView for the emoji with top padding. -->
-    <TextView
-        android:id="@+id/text_emoji"
+    <!-- Top Part with Image and Stacked Info -->
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:gravity="center_horizontal"
-        android:textSize="64sp" />
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
-    <!-- A TextView for the location. -->
-    <TextView
-        android:id="@+id/text_location"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:textSize="24sp" />
+        <!-- Background Image -->
+        <ImageView
+            android:id="@+id/image_weather"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:adjustViewBounds="true"
+            android:contentDescription="@string/outfit_image"
+            android:scaleType="centerCrop"
+            android:visibility="gone"
+            tools:src="@mipmap/ic_launcher_round"
+            tools:visibility="visible" />
 
-    <!-- A TextView for the temperature. -->
-    <TextView
-        android:id="@+id/text_temperature"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:textSize="18sp" />
+        <!-- Info Card Overlay (at the bottom of the image stack) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:background="@drawable/widget_text_background"
+            android:orientation="vertical"
+            android:padding="8dp">
 
-    <!-- A TextView for the outfit recommendation. -->
-    <TextView
-        android:id="@+id/text_outfit_recommendation"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:gravity="center_horizontal"
-        android:textColor="@android:color/darker_gray"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        tools:text="Recommended Outfit: Casual Jacket and Jeans" />
+            <!-- Location and Temp -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-    <!-- A TextView for the last updated time. -->
-    <TextView
-        android:id="@+id/text_last_updated"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:textSize="14sp" />
+                <TextView
+                    android:id="@+id/text_location"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    tools:text="San Francisco" />
 
-    <!-- Container for the forecast items -->
+                <TextView
+                    android:id="@+id/text_temperature"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="0dp"
+                    android:textColor="@android:color/white"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    tools:text="22°" />
+            </LinearLayout>
+
+            <!-- Recommendation and Emoji -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/text_outfit_recommendation"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textColor="@android:color/white"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    tools:text="Recommended Outfit: Casual Jacket and Jeans" />
+
+                <TextView
+                    android:id="@+id/text_emoji"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="0dp"
+                    android:textSize="32sp"
+                    tools:text="☀️" />
+            </LinearLayout>
+
+            <!-- Last Updated -->
+            <TextView
+                android:id="@+id/text_last_updated"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:textColor="#E0E0E0"
+                android:textSize="9sp"
+                tools:text="Updated 12:00 PM" />
+        </LinearLayout>
+    </FrameLayout>
+
+    <!-- Bottom Forecast Card (Vertically below the image) -->
     <LinearLayout
         android:id="@+id/forecast_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:baselineAligned="false"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:layout_marginTop="8dp"
+        android:background="@drawable/widget_text_background"
+        android:orientation="horizontal"
+        android:padding="8dp"
+        android:visibility="gone"
+        tools:visibility="visible">
 
         <!-- Morning Forecast -->
         <LinearLayout
@@ -73,32 +127,26 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/forecast_morning_day"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                tools:text="Today" />
-
-            <TextView
                 android:id="@+id/forecast_morning_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="12sp"
-                tools:text="Morning" />
+                android:textColor="#E0E0E0"
+                android:textSize="10sp"
+                tools:text="Morn" />
 
             <TextView
                 android:id="@+id/forecast_morning_emoji"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="24sp"
+                android:textSize="14sp"
                 tools:text="☁️" />
 
             <TextView
                 android:id="@+id/forecast_morning_temp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="12sp"
+                android:textColor="@android:color/white"
+                android:textSize="10sp"
                 tools:text="10°" />
         </LinearLayout>
 
@@ -112,32 +160,26 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/forecast_lunch_day"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                tools:text="Today" />
-
-            <TextView
                 android:id="@+id/forecast_lunch_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="12sp"
-                tools:text="Lunch" />
+                android:textColor="#E0E0E0"
+                android:textSize="10sp"
+                tools:text="Noon" />
 
             <TextView
                 android:id="@+id/forecast_lunch_emoji"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="24sp"
+                android:textSize="14sp"
                 tools:text="☀️" />
 
             <TextView
                 android:id="@+id/forecast_lunch_temp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="12sp"
+                android:textColor="@android:color/white"
+                android:textSize="10sp"
                 tools:text="15°" />
         </LinearLayout>
 
@@ -151,54 +193,28 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/forecast_evening_day"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                tools:text="Today" />
-
-            <TextView
                 android:id="@+id/forecast_evening_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="12sp"
-                tools:text="Evening" />
+                android:textColor="#E0E0E0"
+                android:textSize="10sp"
+                tools:text="Eve" />
 
             <TextView
                 android:id="@+id/forecast_evening_emoji"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="24sp"
+                android:textSize="14sp"
                 tools:text="🌙" />
 
             <TextView
                 android:id="@+id/forecast_evening_temp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="12sp"
+                android:textColor="@android:color/white"
+                android:textSize="10sp"
                 tools:text="8°" />
         </LinearLayout>
 
     </LinearLayout>
-
-    <!-- An ImageView for the outfit image. -->
-    <!--suppress AndroidUnknownAttribute -->
-    <ImageView
-        android:id="@+id/image_weather"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="6dp"
-        android:layout_marginBottom="0dp"
-        android:adjustViewBounds="true"
-        android:background="@drawable/rounded_corner_image"
-        android:clipToOutline="true"
-        android:contentDescription="@string/outfit_image"
-        android:gravity="center_horizontal"
-        android:scaleType="fitCenter"
-        android:src="@mipmap/ic_launcher_round"
-        android:visibility="visible"
-        tools:visibility="visible" />
-
 </LinearLayout>

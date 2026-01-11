@@ -76,8 +76,7 @@ internal fun updateAppWidget(
 ) {
     // Get reference to SharedPreferences.
     val widgetData: SharedPreferences = HomeWidgetPlugin.getData(context)
-    val views: RemoteViews =
-        RemoteViews(
+    val views: RemoteViews = RemoteViews(
             context.packageName,
             R.layout.weather_widget,
         ).apply {
@@ -154,13 +153,10 @@ internal fun updateAppWidget(
                 setTextColor(R.id.text_last_updated, textColor)
 
                 // Forecast items text colors
-                setTextColor(R.id.forecast_morning_day, textColor)
                 setTextColor(R.id.forecast_morning_time, textColor)
                 setTextColor(R.id.forecast_morning_temp, textColor)
-                setTextColor(R.id.forecast_lunch_day, textColor)
                 setTextColor(R.id.forecast_lunch_time, textColor)
                 setTextColor(R.id.forecast_lunch_temp, textColor)
-                setTextColor(R.id.forecast_evening_day, textColor)
                 setTextColor(R.id.forecast_evening_time, textColor)
                 setTextColor(R.id.forecast_evening_temp, textColor)
             }
@@ -179,13 +175,17 @@ internal fun updateAppWidget(
             val isImageAvailable: Boolean = imageFile?.exists() == true
 
             if (isImageAvailable) {
+                @Suppress("UNNECESSARY_SAFE_CALL")
                 imageFile?.let { file: File ->
                     val bitmap: android.graphics.Bitmap? =
                         BitmapFactory.decodeFile(file.absolutePath)
                     bitmap?.let { bmp: android.graphics.Bitmap ->
                         setImageViewBitmap(R.id.image_weather, bmp)
+                        setViewVisibility(R.id.image_weather, View.VISIBLE)
                     }
                 }
+            } else {
+                setViewVisibility(R.id.image_weather, View.GONE)
             }
 
             // Parse and display forecast data
@@ -222,7 +222,7 @@ internal fun updateAppWidget(
                             context,
                             this,
                             sortedForecast.getOrNull(0),
-                            R.id.forecast_morning_day,
+                            null, // Removed day view
                             R.id.forecast_morning_time,
                             R.id.forecast_morning_emoji,
                             R.id.forecast_morning_temp
@@ -232,7 +232,7 @@ internal fun updateAppWidget(
                             context,
                             this,
                             sortedForecast.getOrNull(1),
-                            R.id.forecast_lunch_day,
+                            null, // Removed day view
                             R.id.forecast_lunch_time,
                             R.id.forecast_lunch_emoji,
                             R.id.forecast_lunch_temp
@@ -242,7 +242,7 @@ internal fun updateAppWidget(
                             context,
                             this,
                             sortedForecast.getOrNull(2),
-                            R.id.forecast_evening_day,
+                            null, // Removed day view
                             R.id.forecast_evening_time,
                             R.id.forecast_evening_emoji,
                             R.id.forecast_evening_temp
@@ -279,7 +279,7 @@ private fun bindForecastItem(
     context: Context,
     views: RemoteViews,
     item: ForecastItem?,
-    dayId: Int,
+    dayId: Int?,
     timeId: Int,
     emojiId: Int,
     tempId: Int
@@ -287,7 +287,9 @@ private fun bindForecastItem(
     if (item != null) {
         val date: Date? = parseDate(item.time)
         if (date != null) {
-            views.setTextViewText(dayId, getDay(context, date))
+            if (dayId != null) {
+                views.setTextViewText(dayId, getDay(context, date))
+            }
             views.setTextViewText(
                 timeId,
                 getTimeOfDay(context, date),
