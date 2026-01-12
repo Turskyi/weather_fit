@@ -41,7 +41,7 @@ class LocalDataSource {
     if (roundedTemp > 30) roundedTemp = 30;
     if (roundedTemp < -30) roundedTemp = -30;
 
-    final String precipitation = 'precipitation';
+    const String precipitation = 'precipitation';
 
     // Random condition for unknown states.
     final List<String> possibleConditions = <String>[
@@ -137,7 +137,7 @@ class LocalDataSource {
         final ByteData byteData = await rootBundle.load(assetPath);
 
         // Get the application documents directory.
-        final Directory directory = await _getAppDirectory();
+        final Directory directory = await getAppDirectory();
         final String filePath = '${directory.path}/outfit_image.png';
         // Write the bytes to the file.
         final File file = File(filePath);
@@ -246,15 +246,6 @@ class LocalDataSource {
     return savedLanguage;
   }
 
-  /// Saves the provided [location] to persistent storage as a JSON string.
-  ///
-  /// Returns a [Future] that completes with `true` if the value was
-  /// successfully written to [SharedPreferences], or `false` if the operation
-  /// failed.
-  ///
-  /// This is useful for caching the last selected or confirmed location
-  /// locally, so the app can restore it on next launch without requiring user
-  /// input.
   Future<bool> saveLocation(Location location) {
     final String json = jsonEncode(location.toJson());
     return _preferences.setString(Settings.location.key, json);
@@ -278,36 +269,12 @@ class LocalDataSource {
     }
   }
 
-  String getOutfitImagePath(Weather weather) {
-    final WeatherCondition condition = weather.condition;
-    double temperatureValue = weather.temperature.value;
-    final TemperatureUnits units = weather.temperatureUnits;
-
-    if (units.isFahrenheit) {
-      temperatureValue = temperatureValue.toCelsius();
-    }
-    final String precipitation = 'precipitation';
-
-    // Random condition for unknown states.
-    final List<String> possibleConditions = <String>[
-      WeatherCondition.clear.name,
-      WeatherCondition.cloudy.name,
-      precipitation,
-    ];
-
-    // Normalize snowy → precipitation for shared assets
-    final String conditionName = switch (condition) {
-      WeatherCondition.clear => condition.name,
-      WeatherCondition.cloudy => condition.name,
-      WeatherCondition.rainy || WeatherCondition.snowy => precipitation,
-      _ => WeatherCondition.unknown.name,
-    };
-    throw UnimplementedError('TODO: we will figure out what should be here.');
+  Future<Directory> getAppDirectory() async {
+    return getApplicationDocumentsDirectory();
   }
 
-  Future<Directory> _getAppDirectory() async {
-    // On Android or other platforms, fallback to Documents directory.
-    return getApplicationDocumentsDirectory();
+  Future<bool> fileExists(String filePath) async {
+    return File(filePath).exists();
   }
 
   String _translateError(String key, String locale) {

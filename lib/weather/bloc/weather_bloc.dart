@@ -12,6 +12,7 @@ import 'package:weather_fit/data/repositories/outfit_repository.dart';
 import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/entities/enums/temperature_units.dart';
 import 'package:weather_fit/entities/enums/weather_fetch_origin.dart';
+import 'package:weather_fit/entities/models/outfit/outfit_image.dart';
 import 'package:weather_fit/entities/models/temperature/temperature.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/res/extensions/double_extension.dart';
@@ -112,11 +113,11 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
 
       final WeatherState currentState = state;
       if (currentState is WeatherSuccess) {
-        final String assetPath = _outfitRepository.getOutfitImageAssetPath(
+        final OutfitImage outfitImage = await _outfitRepository.getOutfitImage(
           weather,
         );
 
-        emit(currentState.copyWith(outfitAssetPath: assetPath));
+        emit(currentState.copyWith(outfitImage: outfitImage));
 
         final WeatherFetchOrigin eventOrigin = event.origin;
         // Only add the event if it's NOT web AND NOT macOS.
@@ -126,11 +127,15 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           add(UpdateWeatherOnMobileHomeScreenEvent(eventOrigin));
         }
       } else {
+        final OutfitImage outfitImage = await _outfitRepository.getOutfitImage(
+          weather,
+        );
         emit(
           WeatherSuccess(
             locale: savedLocale,
             weather: updatedWeather,
             outfitRecommendation: outfitRecommendation,
+            outfitImage: outfitImage,
             dailyForecast: dailyForecast,
           ),
         );
@@ -166,7 +171,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
   ) async {
     final Weather stateWeather = state.weather;
     final String stateOutfitRecommendation = state.outfitRecommendation;
-    final String stateOutfitAssetPath = state.outfitAssetPath;
+    final OutfitImage stateOutfitImage = state.outfitImage;
     final String savedLocale = _localDataSource.getLanguageIsoCode();
     if (state is! WeatherSuccess) {
       emit(
@@ -174,7 +179,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           locale: savedLocale,
           weather: stateWeather,
           outfitRecommendation: stateOutfitRecommendation,
-          outfitAssetPath: stateOutfitAssetPath,
+          outfitImage: stateOutfitImage,
           dailyForecast: state.dailyForecast,
         ),
       );
@@ -193,7 +198,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
         locale: savedLocale,
         weather: stateWeather,
         outfitRecommendation: stateOutfitRecommendation,
-        outfitAssetPath: stateOutfitAssetPath,
+        outfitImage: stateOutfitImage,
         dailyForecast: state.dailyForecast,
       ),
     );
@@ -219,6 +224,9 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
         weather,
       );
 
+      final OutfitImage updatedOutfitImage = await _outfitRepository
+          .getOutfitImage(weather);
+
       emit(
         LoadingOutfitState(
           locale: savedLocale,
@@ -227,17 +235,15 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
             temperatureUnits: units,
           ),
           outfitRecommendation: updatedOutfitRecommendation,
-          outfitAssetPath: _outfitRepository.getOutfitImageAssetPath(weather),
+          outfitImage: updatedOutfitImage,
           dailyForecast: dailyForecast,
         ),
       );
 
       if (state is WeatherSuccess) {
-        final String filePath = _outfitRepository.getOutfitImageAssetPath(
-          weather,
+        emit(
+          (state as WeatherSuccess).copyWith(outfitImage: updatedOutfitImage),
         );
-
-        emit((state as WeatherSuccess).copyWith(outfitAssetPath: filePath));
 
         final WeatherFetchOrigin eventOrigin = event.origin;
         // Only add the event if it's NOT web AND NOT macOS.
@@ -254,7 +260,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           locale: savedLocale,
           message: '$e',
           outfitRecommendation: stateOutfitRecommendation,
-          outfitAssetPath: stateOutfitAssetPath,
+          outfitImage: stateOutfitImage,
           dailyForecast: state.dailyForecast,
         ),
       );
@@ -346,10 +352,10 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
       );
 
       if (state is WeatherSuccess) {
-        final String assetPath = _outfitRepository.getOutfitImageAssetPath(
+        final OutfitImage outfitImage = await _outfitRepository.getOutfitImage(
           eventWeather,
         );
-        emit((state as WeatherSuccess).copyWith(outfitAssetPath: assetPath));
+        emit((state as WeatherSuccess).copyWith(outfitImage: outfitImage));
         final WeatherFetchOrigin eventOrigin = event.origin;
         // Only add the event if it's NOT web AND NOT macOS.
         // For context, see issue:
@@ -365,11 +371,15 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           //   TODO: add notification to user that location has been saved.
         }
       } else {
+        final OutfitImage outfitImage = await _outfitRepository.getOutfitImage(
+          eventWeather,
+        );
         emit(
           WeatherSuccess(
             locale: savedLocale,
             weather: updatedWeather,
             outfitRecommendation: outfitRecommendation,
+            outfitImage: outfitImage,
             dailyForecast: state.dailyForecast,
           ),
         );
@@ -410,7 +420,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
         weather: state.weather,
         dailyForecast: state.dailyForecast,
         outfitRecommendation: state.outfitRecommendation,
-        outfitAssetPath: state.outfitAssetPath,
+        outfitImage: state.outfitImage,
       ),
     );
     try {
@@ -435,7 +445,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           locale: savedLocale,
           message: '$e',
           outfitRecommendation: state.outfitRecommendation,
-          outfitAssetPath: state.outfitAssetPath,
+          outfitImage: state.outfitImage,
           dailyForecast: state.dailyForecast,
         ),
       );

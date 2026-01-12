@@ -1,20 +1,22 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
+import 'package:weather_fit/entities/models/outfit/outfit_image.dart';
 import 'package:weather_fit/extensions/build_context_extensions.dart';
 import 'package:weather_fit/weather/ui/error/outfit_image_error_widget.dart';
 import 'package:weather_fit/weather/ui/text_recommendation_widget.dart';
 
 class OutfitWidget extends StatelessWidget {
   const OutfitWidget({
-    required this.assetPath,
+    required this.outfitImage,
     required this.onRefresh,
     this.outfitRecommendation = '',
     super.key,
   });
 
-  final String assetPath;
+  final OutfitImage outfitImage;
   final String outfitRecommendation;
   final RefreshCallback onRefresh;
 
@@ -68,7 +70,7 @@ class OutfitWidget extends StatelessWidget {
         height: outfitSize.height,
         child: ClipRRect(
           borderRadius: borderRadius,
-          child: assetPath.isEmpty
+          child: outfitImage.isEmpty
               ? TextRecommendationWidget(displayText: displayText)
               : isNarrowScreen
               ? ColoredBox(
@@ -80,16 +82,7 @@ class OutfitWidget extends StatelessWidget {
                         flex: 5,
                         child: ClipRRect(
                           borderRadius: borderRadius,
-                          child: Image.asset(
-                            assetPath,
-                            fit: BoxFit.fitHeight,
-                            errorBuilder:
-                                (BuildContext _, Object _, StackTrace? _) {
-                                  return OutfitImageErrorWidget(
-                                    onRefresh: onRefresh,
-                                  );
-                                },
-                          ),
+                          child: _buildImage(outfitImage),
                         ),
                       ),
                       Expanded(
@@ -115,39 +108,7 @@ class OutfitWidget extends StatelessWidget {
                   children: <Widget>[
                     Expanded(
                       flex: 3,
-                      child: Image.asset(
-                        assetPath,
-                        fit: BoxFit.cover,
-                        errorBuilder:
-                            (BuildContext _, Object error, StackTrace? _) {
-                              debugPrint(
-                                '⚠️ Failed to load outfit image on wide '
-                                'screen: "$assetPath". '
-                                'Error: $error\n'
-                                'Fallback UI displayed.',
-                              );
-                              return Container(
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                    colors: <Color>[
-                                      colorScheme.primaryContainer,
-                                      colorScheme.secondaryContainer,
-                                    ],
-                                  ),
-                                ),
-                                padding: const EdgeInsets.all(20),
-                                alignment: Alignment.center,
-                                child: ElevatedButton(
-                                  onPressed: onRefresh,
-                                  child: Text(
-                                    translate('get_new_outfit_suggestion'),
-                                  ),
-                                ),
-                              );
-                            },
-                      ),
+                      child: _buildImage(outfitImage, fit: BoxFit.cover),
                     ),
                     Expanded(
                       flex: 2,
@@ -171,6 +132,31 @@ class OutfitWidget extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _buildImage(OutfitImage outfitImage, {BoxFit fit = BoxFit.fitHeight}) {
+    final Image image = switch (outfitImage.source) {
+      OutfitImageSource.asset => Image.asset(
+        outfitImage.path,
+        fit: fit,
+        errorBuilder: _errorBuilder,
+      ),
+      OutfitImageSource.file => Image.file(
+        File(outfitImage.path),
+        fit: fit,
+        errorBuilder: _errorBuilder,
+      ),
+    };
+    return image;
+  }
+
+  Widget _errorBuilder(BuildContext _, Object error, StackTrace? _) {
+    debugPrint(
+      '⚠️ Failed to load outfit image: "${outfitImage.path}". '
+      'Error: $error\n'
+      'Fallback UI displayed.',
+    );
+    return OutfitImageErrorWidget(onRefresh: onRefresh);
   }
 
   Size _getOutfitImageSize(BuildContext context) {

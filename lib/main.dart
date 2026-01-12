@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:feedback/feedback.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
@@ -7,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart'
     show SharedPreferences;
 import 'package:weather_fit/app/weather_fit_app.dart';
 import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
+import 'package:weather_fit/data/data_sources/remote/remote_data_source.dart';
 import 'package:weather_fit/data/repositories/location_repository.dart';
 import 'package:weather_fit/data/repositories/outfit_repository.dart';
 import 'package:weather_fit/di/injector.dart' as di;
@@ -37,6 +39,7 @@ void main() async {
   final SharedPreferences preferences = await SharedPreferences.getInstance();
 
   final LocalDataSource localDataSource = LocalDataSource(preferences);
+  final RemoteDataSource remoteDataSource = RemoteDataSource(Dio());
 
   final Language savedLanguage = localDataSource.getSavedLanguage();
 
@@ -79,7 +82,7 @@ void main() async {
             OpenMeteoApiClient(),
             localDataSource,
           ),
-          outfitRepository: OutfitRepository(localDataSource),
+          outfitRepository: OutfitRepository(localDataSource, remoteDataSource),
           localDataSource: localDataSource,
           initialLanguage: savedLanguage,
         ),

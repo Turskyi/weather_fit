@@ -22,9 +22,11 @@ WeatherInitial _$WeatherInitialFromJson(Map<String, dynamic> json) =>
             (v) =>
                 v == null ? null : Weather.fromJson(v as Map<String, dynamic>),
           ),
-          outfitAssetPath: $checkedConvert(
-            'outfit_asset_path',
-            (v) => v as String? ?? '',
+          outfitImage: $checkedConvert(
+            'outfit_image',
+            (v) => v == null
+                ? const OutfitImage.empty()
+                : OutfitImage.fromJson(v as Map<String, dynamic>),
           ),
           dailyForecast: $checkedConvert(
             'daily_forecast',
@@ -37,7 +39,7 @@ WeatherInitial _$WeatherInitialFromJson(Map<String, dynamic> json) =>
       },
       fieldKeyMap: const {
         'outfitRecommendation': 'outfit_recommendation',
-        'outfitAssetPath': 'outfit_asset_path',
+        'outfitImage': 'outfit_image',
         'dailyForecast': 'daily_forecast',
       },
     );
@@ -46,7 +48,7 @@ Map<String, dynamic> _$WeatherInitialToJson(WeatherInitial instance) =>
     <String, dynamic>{
       'weather': instance.weather.toJson(),
       'outfit_recommendation': instance.outfitRecommendation,
-      'outfit_asset_path': instance.outfitAssetPath,
+      'outfit_image': instance.outfitImage.toJson(),
       'locale': instance.locale,
       'daily_forecast': instance.dailyForecast?.toJson(),
     };
@@ -67,9 +69,11 @@ WeatherLoadingState _$WeatherLoadingStateFromJson(Map<String, dynamic> json) =>
             'outfit_recommendation',
             (v) => v as String? ?? '',
           ),
-          outfitAssetPath: $checkedConvert(
-            'outfit_asset_path',
-            (v) => v as String? ?? '',
+          outfitImage: $checkedConvert(
+            'outfit_image',
+            (v) => v == null
+                ? const OutfitImage.empty()
+                : OutfitImage.fromJson(v as Map<String, dynamic>),
           ),
           dailyForecast: $checkedConvert(
             'daily_forecast',
@@ -82,7 +86,7 @@ WeatherLoadingState _$WeatherLoadingStateFromJson(Map<String, dynamic> json) =>
       },
       fieldKeyMap: const {
         'outfitRecommendation': 'outfit_recommendation',
-        'outfitAssetPath': 'outfit_asset_path',
+        'outfitImage': 'outfit_image',
         'dailyForecast': 'daily_forecast',
       },
     );
@@ -92,7 +96,7 @@ Map<String, dynamic> _$WeatherLoadingStateToJson(
 ) => <String, dynamic>{
   'weather': instance.weather.toJson(),
   'outfit_recommendation': instance.outfitRecommendation,
-  'outfit_asset_path': instance.outfitAssetPath,
+  'outfit_image': instance.outfitImage.toJson(),
   'locale': instance.locale,
   'daily_forecast': instance.dailyForecast?.toJson(),
 };
@@ -110,9 +114,11 @@ WeatherSuccess _$WeatherSuccessFromJson(Map<String, dynamic> json) =>
                 ? null
                 : DailyForecastDomain.fromJson(v as Map<String, dynamic>),
           ),
-          outfitAssetPath: $checkedConvert(
-            'outfit_asset_path',
-            (v) => v as String? ?? '',
+          outfitImage: $checkedConvert(
+            'outfit_image',
+            (v) => v == null
+                ? const OutfitImage.empty()
+                : OutfitImage.fromJson(v as Map<String, dynamic>),
           ),
           outfitRecommendation: $checkedConvert(
             'outfit_recommendation',
@@ -129,7 +135,7 @@ WeatherSuccess _$WeatherSuccessFromJson(Map<String, dynamic> json) =>
       },
       fieldKeyMap: const {
         'dailyForecast': 'daily_forecast',
-        'outfitAssetPath': 'outfit_asset_path',
+        'outfitImage': 'outfit_image',
         'outfitRecommendation': 'outfit_recommendation',
       },
     );
@@ -139,7 +145,7 @@ Map<String, dynamic> _$WeatherSuccessToJson(WeatherSuccess instance) =>
       'weather': instance.weather.toJson(),
       'outfit_recommendation': instance.outfitRecommendation,
       'message': instance.message,
-      'outfit_asset_path': instance.outfitAssetPath,
+      'outfit_image': instance.outfitImage.toJson(),
       'locale': instance.locale,
       'daily_forecast': instance.dailyForecast?.toJson(),
     };
@@ -161,9 +167,11 @@ LoadingOutfitState _$LoadingOutfitStateFromJson(Map<String, dynamic> json) =>
             'outfit_recommendation',
             (v) => v as String? ?? '',
           ),
-          outfitAssetPath: $checkedConvert(
-            'outfit_asset_path',
-            (v) => v as String? ?? '',
+          outfitImage: $checkedConvert(
+            'outfit_image',
+            (v) => v == null
+                ? const OutfitImage.empty()
+                : OutfitImage.fromJson(v as Map<String, dynamic>),
           ),
           weather: $checkedConvert(
             'weather',
@@ -176,7 +184,7 @@ LoadingOutfitState _$LoadingOutfitStateFromJson(Map<String, dynamic> json) =>
       fieldKeyMap: const {
         'dailyForecast': 'daily_forecast',
         'outfitRecommendation': 'outfit_recommendation',
-        'outfitAssetPath': 'outfit_asset_path',
+        'outfitImage': 'outfit_image',
       },
     );
 
@@ -184,7 +192,7 @@ Map<String, dynamic> _$LoadingOutfitStateToJson(LoadingOutfitState instance) =>
     <String, dynamic>{
       'weather': instance.weather.toJson(),
       'outfit_recommendation': instance.outfitRecommendation,
-      'outfit_asset_path': instance.outfitAssetPath,
+      'outfit_image': instance.outfitImage.toJson(),
       'locale': instance.locale,
       'daily_forecast': instance.dailyForecast?.toJson(),
     };
@@ -196,9 +204,11 @@ WeatherFailure _$WeatherFailureFromJson(Map<String, dynamic> json) =>
       ($checkedConvert) {
         final val = WeatherFailure(
           locale: $checkedConvert('locale', (v) => v as String),
-          outfitAssetPath: $checkedConvert(
-            'outfit_asset_path',
-            (v) => v as String? ?? '',
+          outfitImage: $checkedConvert(
+            'outfit_image',
+            (v) => v == null
+                ? const OutfitImage.empty()
+                : OutfitImage.fromJson(v as Map<String, dynamic>),
           ),
           outfitRecommendation: $checkedConvert(
             'outfit_recommendation',
@@ -215,7 +225,7 @@ WeatherFailure _$WeatherFailureFromJson(Map<String, dynamic> json) =>
         return val;
       },
       fieldKeyMap: const {
-        'outfitAssetPath': 'outfit_asset_path',
+        'outfitImage': 'outfit_image',
         'outfitRecommendation': 'outfit_recommendation',
         'dailyForecast': 'daily_forecast',
       },
@@ -225,7 +235,7 @@ Map<String, dynamic> _$WeatherFailureToJson(WeatherFailure instance) =>
     <String, dynamic>{
       'outfit_recommendation': instance.outfitRecommendation,
       'message': instance.message,
-      'outfit_asset_path': instance.outfitAssetPath,
+      'outfit_image': instance.outfitImage.toJson(),
       'locale': instance.locale,
       'daily_forecast': instance.dailyForecast?.toJson(),
     };

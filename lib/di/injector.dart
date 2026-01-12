@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
@@ -7,6 +8,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
+import 'package:weather_fit/data/data_sources/remote/remote_data_source.dart';
 import 'package:weather_fit/data/repositories/outfit_repository.dart';
 import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
@@ -84,6 +86,7 @@ void _callbackDispatcher() {
             await SharedPreferences.getInstance();
 
         final LocalDataSource localDataSource = LocalDataSource(preferences);
+        final RemoteDataSource remoteDataSource = RemoteDataSource(Dio());
 
         final Location lastSavedLocation = localDataSource
             .getLastSavedLocation();
@@ -100,6 +103,7 @@ void _callbackDispatcher() {
 
           final OutfitRepository outfitRepository = OutfitRepository(
             localDataSource,
+            remoteDataSource,
           );
 
           final HomeWidgetService homeWidgetService =

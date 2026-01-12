@@ -99,7 +99,7 @@ class WeatherPageExtraSmallLayout extends StatelessWidget {
                     ).colorScheme;
                     if (stateOutfitRecommendation.isNotEmpty) {
                       outfitImageWidget = OutfitWidget(
-                        assetPath: state.outfitAssetPath,
+                        outfitImage: state.outfitImage,
                         outfitRecommendation: stateOutfitRecommendation,
                         onRefresh: onRefresh,
                       );
