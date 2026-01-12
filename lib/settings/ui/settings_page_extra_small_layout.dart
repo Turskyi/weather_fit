@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
+import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/res/constants.dart' as constant;
 import 'package:weather_fit/res/widgets/leading_widget.dart';
 import 'package:weather_fit/settings/bloc/settings_bloc.dart';
@@ -26,7 +27,7 @@ class SettingsPageExtraSmallLayout extends StatelessWidget {
   });
 
   final BlocBuilderCondition<SettingsState> rebuildSettingsWhen;
-  final ValueChanged<bool> onLanguageChanged;
+  final ValueChanged<Language> onLanguageChanged;
   final BlocBuilderCondition<WeatherState> rebuildUnitsWhen;
   final ValueChanged<bool> onUnitsChanged;
   final GestureTapCallback onAboutTap;
@@ -70,15 +71,18 @@ class SettingsPageExtraSmallLayout extends StatelessWidget {
             BlocBuilder<SettingsBloc, SettingsState>(
               buildWhen: rebuildSettingsWhen,
               builder: (BuildContext _, SettingsState settingsState) {
-                final int selectedIndex = settingsState.isEnglish ? 0 : 1;
+                final int selectedIndex = Language.values.indexOf(
+                  settingsState.language,
+                );
                 return _SettingSegmentedToggle(
                   label: translate('settings.language'),
                   selectedIndex: selectedIndex,
-                  options: <String>[translate('en'), translate('uk')],
+                  options: Language.values
+                      .map((Language l) => translate(l.isoLanguageCode))
+                      .toList(),
                   onSelected: (int index) {
-                    final bool isEnglish = index == 0;
-                    onLanguageChanged(isEnglish);
-                  }, // true if English
+                    onLanguageChanged(Language.values[index]);
+                  },
                 );
               },
             ),

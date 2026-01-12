@@ -92,13 +92,12 @@ class _SettingsPageState extends State<SettingsPage> {
     return previous.language != current.language;
   }
 
-  void _changeLanguage(bool isEnglish) {
-    final Language newLanguage = isEnglish ? Language.en : Language.uk;
-    changeLocale(context, newLanguage.isoLanguageCode)
+  void _changeLanguage(Language language) {
+    changeLocale(context, language.isoLanguageCode)
     // The returned value is always `null`.
     .then((Object? _) {
       if (mounted) {
-        context.read<SettingsBloc>().add(ChangeLanguageEvent(newLanguage));
+        context.read<SettingsBloc>().add(ChangeLanguageEvent(language));
       }
     });
   }
