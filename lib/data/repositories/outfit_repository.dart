@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
 import 'package:weather_fit/data/data_sources/remote/remote_data_source.dart';
+import 'package:weather_fit/entities/enums/outfit_image_source.dart';
 import 'package:weather_fit/entities/enums/temperature_units.dart';
 import 'package:weather_fit/entities/models/outfit/outfit_image.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
@@ -40,7 +41,7 @@ class OutfitRepository {
         return OutfitImage(path: filePath, source: OutfitImageSource.file);
       }
 
-      // Attempt to download from GitHub.
+      // Attempt to download from remote source.
       final List<int> bytes = await _remoteDataSource
           .downloadOutfitImage(fileName)
           .timeout(const Duration(seconds: 5));
@@ -70,8 +71,19 @@ class OutfitRepository {
     return _localDataSource.getOutfitRecommendation(weather);
   }
 
-  Future<String> downloadAndSaveImage(String assetPath) async {
-    return _localDataSource.downloadAndSaveImage(assetPath);
+  /// Orchestrates getting the outfit image and ensuring it's saved as a file
+  /// for external consumers like Home Widgets.
+  Future<String> downloadAndSaveImage(Weather weather) async {
+    final OutfitImage outfitImage = await getOutfitImage(weather);
+
+    if (outfitImage.source == OutfitImageSource.file) {
+      // It's already a file on disk (either cached or freshly downloaded).
+      return outfitImage.path;
+    } else {
+      // It's a bundled asset, we need to "download" (copy) it to a file
+      // so the Home Widget can access it.
+      return _localDataSource.downloadAndSaveImage(outfitImage.path);
+    }
   }
 
   double _getTemperatureInCelsius(Weather weather) {

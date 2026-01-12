@@ -91,11 +91,8 @@ class HomeWidgetServiceImpl implements HomeWidgetService {
     final String outfitRecommendation = outfitRepository
         .getOutfitRecommendation(updatedWeather);
 
-    final String outfitAssetPath = outfitRepository.getOutfitImageAssetPath(
-      weather,
-    );
     final String outfitFilePath = await outfitRepository.downloadAndSaveImage(
-      outfitAssetPath,
+      weather,
     );
 
     // Set app group ID.

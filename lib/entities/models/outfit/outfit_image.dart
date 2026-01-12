@@ -1,20 +1,14 @@
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:weather_fit/entities/enums/outfit_image_source.dart';
 
 part 'outfit_image.g.dart';
 
-enum OutfitImageSource { asset, file }
-
 @JsonSerializable()
 class OutfitImage extends Equatable {
-  const OutfitImage({
-    required this.path,
-    required this.source,
-  });
+  const OutfitImage({required this.path, required this.source});
 
-  const OutfitImage.empty()
-      : path = '',
-        source = OutfitImageSource.asset;
+  const OutfitImage.empty() : path = '', source = OutfitImageSource.asset;
 
   factory OutfitImage.fromJson(Map<String, dynamic> json) =>
       _$OutfitImageFromJson(json);
@@ -25,6 +19,7 @@ class OutfitImage extends Equatable {
   final OutfitImageSource source;
 
   bool get isEmpty => path.isEmpty;
+
   bool get isNotEmpty => path.isNotEmpty;
 
   @override
