@@ -43,7 +43,7 @@ class LocalDataSource {
 
     final String precipitation = 'precipitation';
 
-    // Random condition for unknown states
+    // Random condition for unknown states.
     final List<String> possibleConditions = <String>[
       WeatherCondition.clear.name,
       WeatherCondition.cloudy.name,
@@ -129,7 +129,7 @@ class LocalDataSource {
   }
 
   Future<String> downloadAndSaveImage(String assetPath) async {
-    // Check if the platform is web OR macOS. If so, return early.
+    // Check if the platform is web OR macOS.
     // See issue: https://github.com/ABausG/home_widget/issues/137.
     if (!kIsWeb && !Platform.isMacOS) {
       try {
@@ -276,6 +276,33 @@ class LocalDataSource {
       }
       return const Location.empty();
     }
+  }
+
+  String getOutfitImagePath(Weather weather) {
+    final WeatherCondition condition = weather.condition;
+    double temperatureValue = weather.temperature.value;
+    final TemperatureUnits units = weather.temperatureUnits;
+
+    if (units.isFahrenheit) {
+      temperatureValue = temperatureValue.toCelsius();
+    }
+    final String precipitation = 'precipitation';
+
+    // Random condition for unknown states.
+    final List<String> possibleConditions = <String>[
+      WeatherCondition.clear.name,
+      WeatherCondition.cloudy.name,
+      precipitation,
+    ];
+
+    // Normalize snowy → precipitation for shared assets
+    final String conditionName = switch (condition) {
+      WeatherCondition.clear => condition.name,
+      WeatherCondition.cloudy => condition.name,
+      WeatherCondition.rainy || WeatherCondition.snowy => precipitation,
+      _ => WeatherCondition.unknown.name,
+    };
+    throw UnimplementedError('TODO: we will figure out what should be here.');
   }
 
   Future<Directory> _getAppDirectory() async {
