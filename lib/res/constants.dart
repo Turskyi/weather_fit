@@ -35,7 +35,7 @@ const String searchError = 'searchError';
 const String resendEmailDomain = 'kima.website';
 
 /// Blur intensity constant.
-const double blurSigma = 1.5;
+const double blurSigma = 8;
 
 const String doNotReplySenderName = 'Do Not Reply';
 const String feedbackEmailSender =

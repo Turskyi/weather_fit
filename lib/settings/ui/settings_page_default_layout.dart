@@ -1,9 +1,12 @@
+import 'dart:ui';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/extensions/build_context_extensions.dart';
+import 'package:weather_fit/res/constants.dart' as constant;
 import 'package:weather_fit/res/widgets/background.dart';
 import 'package:weather_fit/res/widgets/leading_widget.dart';
 import 'package:weather_fit/settings/bloc/settings_bloc.dart';
@@ -55,6 +58,15 @@ class SettingsPageDefaultLayout extends StatelessWidget {
       appBar: AppBar(
         leading: kIsWeb ? const LeadingWidget() : null,
         title: Text(translate('settings.title')),
+        flexibleSpace: ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(
+              sigmaX: constant.blurSigma,
+              sigmaY: constant.blurSigma,
+            ),
+            child: Container(color: Colors.transparent),
+          ),
+        ),
       ),
       body: Stack(
         alignment: Alignment.topCenter,
