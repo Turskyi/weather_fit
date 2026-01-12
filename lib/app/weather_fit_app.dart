@@ -121,6 +121,12 @@ class WeatherFitApp extends StatelessWidget {
                   appBarTheme: const AppBarTheme(
                     backgroundColor: Colors.transparent,
                     elevation: 0,
+                    titleTextStyle: TextStyle(
+                      fontFamily: fontFamily,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black,
+                    ),
                   ),
                   colorScheme: ColorScheme.fromSeed(seedColor: color),
                 ),
@@ -130,6 +136,12 @@ class WeatherFitApp extends StatelessWidget {
                   appBarTheme: const AppBarTheme(
                     backgroundColor: Colors.transparent,
                     elevation: 0,
+                    titleTextStyle: TextStyle(
+                      fontFamily: fontFamily,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
                   ),
                   colorScheme: ColorScheme.fromSeed(
                     seedColor: color,

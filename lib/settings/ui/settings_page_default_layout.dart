@@ -73,10 +73,7 @@ class SettingsPageDefaultLayout extends StatelessWidget {
         children: <Widget>[
           const Background(),
           Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16.0,
-              vertical: 16.0,
-            ),
+            padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0.0),
             constraints: BoxConstraints(maxWidth: context.maxWidth),
             child: ListView(
               children: <Widget>[
@@ -262,6 +259,7 @@ class SettingsPageDefaultLayout extends StatelessWidget {
                     },
                   ),
                 ),
+                const SizedBox(height: 24),
               ],
             ),
           ),
