@@ -316,6 +316,25 @@ class SettingsPageDefaultLayout extends StatelessWidget {
                     onTap: onSupportTap,
                   ),
                 ),
+                const SizedBox(height: 20),
+                BlocBuilder<SettingsBloc, SettingsState>(
+                  buildWhen: rebuildSettingsWhen,
+                  builder: (BuildContext _, SettingsState settingsState) {
+                    final String? version = settingsState.appVersion;
+                    if (version == null) return const SizedBox.shrink();
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: Center(
+                        child: Text(
+                          '${translate('app_version')}: $version',
+                          style: themeData.textTheme.labelMedium?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
               ],
             ),
           ),
