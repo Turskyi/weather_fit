@@ -17,14 +17,17 @@ import 'package:weather_fit/entities/enums/feedback_type.dart';
 import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/entities/models/exceptions/email_launch_exception.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
+import 'package:weather_fit/services/update_service.dart';
 
 part 'settings_event.dart';
 part 'settings_state.dart';
 
 class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
-  SettingsBloc(this._localDataSource)
+  SettingsBloc(this._localDataSource, this._updateService)
     : super(SettingsInitial(language: _localDataSource.getSavedLanguage())) {
     on<LoadSettingsEvent>(_onLoadSettings);
+
+    on<CheckForUpdateEvent>(_onCheckForUpdate);
 
     on<ClosingFeedbackEvent>(_onFeedbackDialogDismissed);
 
@@ -37,9 +40,11 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     on<ChangeLanguageEvent>(_changeLanguage);
 
     add(const LoadSettingsEvent());
+    add(const CheckForUpdateEvent());
   }
 
   final LocalDataSource _localDataSource;
+  final UpdateService _updateService;
 
   FutureOr<void> _onLoadSettings(
     LoadSettingsEvent event,
@@ -52,6 +57,13 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         appVersion: '${packageInfo.version} (${packageInfo.buildNumber})',
       ),
     );
+  }
+
+  FutureOr<void> _onCheckForUpdate(
+    CheckForUpdateEvent event,
+    Emitter<SettingsState> emit,
+  ) async {
+    await _updateService.checkForUpdate();
   }
 
   FutureOr<void> _handleError(

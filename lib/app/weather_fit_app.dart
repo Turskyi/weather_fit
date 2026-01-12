@@ -18,6 +18,7 @@ import 'package:weather_fit/router/navigator.dart';
 import 'package:weather_fit/router/routes.dart' as routes;
 import 'package:weather_fit/search/bloc/search_bloc.dart';
 import 'package:weather_fit/services/home_widget_service.dart';
+import 'package:weather_fit/services/update_service.dart';
 import 'package:weather_fit/settings/bloc/settings_bloc.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 import 'package:weather_repository/weather_repository.dart';
@@ -48,6 +49,9 @@ class WeatherFitApp extends StatelessWidget {
         RepositoryProvider<HomeWidgetService>(
           create: (_) => const HomeWidgetServiceImpl(),
         ),
+        RepositoryProvider<UpdateService>(
+          create: (_) => const UpdateServiceImpl(),
+        ),
       ],
       child: MultiBlocProvider(
         providers: <SingleChildWidget>[
@@ -64,8 +68,11 @@ class WeatherFitApp extends StatelessWidget {
             },
           ),
           BlocProvider<SettingsBloc>(
-            create: (BuildContext _) {
-              return SettingsBloc(localDataSource);
+            create: (BuildContext context) {
+              return SettingsBloc(
+                localDataSource,
+                context.read<UpdateService>(),
+              );
             },
           ),
           BlocProvider<SearchBloc>(

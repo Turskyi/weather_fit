@@ -45,6 +45,7 @@ dependencies:
   home_widget: any
   http: ^1.6.0
   hydrated_bloc: ^10.1.1
+  in_app_update: ^4.2.5
   intl: ^0.20.2
   json_annotation: ^4.9.0
   meta: ^1.17.0

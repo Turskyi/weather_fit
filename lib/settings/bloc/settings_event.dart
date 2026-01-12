@@ -9,6 +9,10 @@ final class LoadSettingsEvent extends SettingsEvent {
   const LoadSettingsEvent();
 }
 
+final class CheckForUpdateEvent extends SettingsEvent {
+  const CheckForUpdateEvent();
+}
+
 final class BugReportPressedEvent extends SettingsEvent {
   const BugReportPressedEvent(this.errorText);
 
