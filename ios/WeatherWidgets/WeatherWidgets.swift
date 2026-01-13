@@ -111,59 +111,60 @@ struct WeatherWidgetsEntryView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            // Top section: Location and Emoji
-            HStack {
-                Text(entry.weatherData.location ?? "Unknown Location")
-                    .font(.headline).fontWeight(.semibold)
-                Spacer()
-                VStack(alignment: .trailing, spacing: 2) {
+            // Top section: Aligned to corners to keep the center (faces) clear
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 0) {
+                    Text(entry.weatherData.location ?? "Unknown Location")
+                        .font(.subheadline).fontWeight(.semibold)
                     Text(entry.weatherData.temperature ?? "--")
-                        .font(.title3).fontWeight(.bold)
-                    Text(entry.weatherData.lastUpdated ?? "never")
-                        .font(.caption2)
+                        .font(.title2).fontWeight(.bold)
                 }
-                .frame(width: 80, alignment: .trailing)
-                .multilineTextAlignment(.trailing)
                 Spacer()
-                Text(entry.weatherData.emoji ?? "")
-                    .font(.largeTitle)
+                VStack(alignment: .trailing, spacing: 0) {
+                    Text(entry.weatherData.emoji ?? "")
+                        .font(.largeTitle)
+                    Text(entry.weatherData.lastUpdated ?? "")
+                        .font(.system(size: 8))
+                }
             }
-            .padding(.horizontal)
+            .padding(.horizontal, 12)
+            .padding(.top, 8)
             .foregroundColor(.white)
             .shadow(color: .black.opacity(0.8), radius: 2, x: 0, y: 1)
             
             Spacer()
             
-            // Middle section: Recommendation
-            Text(entry.weatherData.recommendation ?? "No recommendation available.")
-                .font(.subheadline).fontWeight(.medium)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal)
-                .foregroundColor(.white)
-                .shadow(color: .black.opacity(0.8), radius: 2, x: 0, y: 1)
-            
-            Spacer()
-            
-            // Bottom section: Forecast
-            HStack(alignment: .bottom) {
-                if let forecast = entry.weatherData.forecast, !forecast.isEmpty {
-                    HStack(alignment: .bottom) {
+            // Lower section: Recommendation and Forecast
+            // Moved to the bottom to avoid covering the person's upper body/face
+            VStack(spacing: 8) {
+                if let recommendation = entry.weatherData.recommendation {
+                    Text(recommendation)
+                        .font(.caption).fontWeight(.medium)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(Color.black.opacity(0.25).cornerRadius(6))
+                }
+                
+                // Forecast
+                HStack(alignment: .bottom) {
+                    if let forecast = entry.weatherData.forecast, !forecast.isEmpty {
                         ForEach(Array(forecast.enumerated()), id: \.element.time) { index, item in
                             ForecastItemView(item: item)
                             if index < forecast.count - 1 {
                                 Spacer()
                             }
                         }
+                    } else {
+                        Text("No forecast data.").font(.caption)
                     }
-                } else {
-                    Text("No forecast data.").font(.caption)
-                        .foregroundColor(.white)
-                        .shadow(color: .black.opacity(0.8), radius: 2, x: 0, y: 1)
                 }
             }
-            .padding(12)
+            .padding(.horizontal, 12)
+            .padding(.bottom, 8)
+            .foregroundColor(.white)
+            .shadow(color: .black.opacity(0.8), radius: 2, x: 0, y: 1)
         }
-        .padding(8)
         .widgetURL(URL(string: "weatherfit://open")!)
     }
 }
