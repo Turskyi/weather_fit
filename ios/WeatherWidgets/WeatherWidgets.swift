@@ -101,10 +101,11 @@ struct ForecastItemView: View {
             Text("\(Int(item.temperature.rounded()))°")
                 .font(.caption)
         }
+        .foregroundColor(.white)
+        .shadow(color: .black.opacity(0.8), radius: 2, x: 0, y: 1)
     }
 }
 
-// This view now ONLY contains the foreground content.
 struct WeatherWidgetsEntryView: View {
     var entry: Provider.Entry
     
@@ -128,6 +129,8 @@ struct WeatherWidgetsEntryView: View {
                     .font(.largeTitle)
             }
             .padding(.horizontal)
+            .foregroundColor(.white)
+            .shadow(color: .black.opacity(0.8), radius: 2, x: 0, y: 1)
             
             Spacer()
             
@@ -136,6 +139,8 @@ struct WeatherWidgetsEntryView: View {
                 .font(.subheadline).fontWeight(.medium)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
+                .foregroundColor(.white)
+                .shadow(color: .black.opacity(0.8), radius: 2, x: 0, y: 1)
             
             Spacer()
             
@@ -152,6 +157,8 @@ struct WeatherWidgetsEntryView: View {
                     }
                 } else {
                     Text("No forecast data.").font(.caption)
+                        .foregroundColor(.white)
+                        .shadow(color: .black.opacity(0.8), radius: 2, x: 0, y: 1)
                 }
             }
             .padding(12)
@@ -167,22 +174,19 @@ struct WeatherWidgets: Widget {
     
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: Provider()) { entry in
-            // The content view is passed here.
             WeatherWidgetsEntryView(entry: entry)
-            // The .containerBackground modifier handles the background for iOS 17+
                 .containerBackground(for: .widget) {
-                    // This ZStack provides either an image or a gradient fallback.
                     ZStack {
-                        // We always show the gradient as a base background
                         WeatherHelper.getGradient(for: entry.weatherData.forecast?.first?.weatherCode ?? 0)
                         
-                        // NOTE: There is a persistent 'CFPrefsPlistSource' error that can prevent
-                        // the app from correctly reading the imagePath from the shared container.
                         if let imagePath = entry.weatherData.imagePath, let uiImage = UIImage(contentsOfFile: imagePath) {
                             Image(uiImage: uiImage)
                                 .resizable()
                                 .scaledToFit()
                         }
+                        
+                        // Added a subtle dark overlay to ensure text readability on light images
+                        Color.black.opacity(0.2)
                     }
                 }
         }
