@@ -21,6 +21,10 @@ class LocalDataSource {
 
   final SharedPreferences _preferences;
 
+  static const MethodChannel _channel = MethodChannel(
+    'com.turskyi.weather_fit/shared_container',
+  );
+
   String getOutfitImageAssetPath(Weather weather) {
     final WeatherCondition condition = weather.condition;
     double temperatureValue = weather.temperature.value;
@@ -103,17 +107,17 @@ class LocalDataSource {
       'outfit.snowy': 'Ubierz się ciepło, pada śnieg!',
       'outfit.cold': 'Ubierz się ciepło',
       'outfit.cool': 'Może przydać się lekka kurtka',
-      'outfit.warm': 'Lekkie ubrania będą w sam raz',
+      'outfit.warm': 'Lekkie ubrania będą в sam raz',
       'outfit.hot': 'Jest gorąco! Ubierz się lekko',
       'outfit.moderate': 'Dzisiaj jest przyjemna pogoda',
     };
 
     final Map<String, String> outfit =
         locale.startsWith(Language.uk.isoLanguageCode)
-            ? outfitUk
-            : locale.startsWith(Language.pl.isoLanguageCode)
-                ? outfitPl
-                : outfitEn;
+        ? outfitUk
+        : locale.startsWith(Language.pl.isoLanguageCode)
+        ? outfitPl
+        : outfitEn;
 
     String localeTranslate(String key) => outfit[key] ?? key;
 
@@ -285,6 +289,18 @@ class LocalDataSource {
   }
 
   Future<Directory> getAppDirectory() async {
+    if (!kIsWeb && Platform.isIOS) {
+      try {
+        final String? sharedPath = await _channel.invokeMethod<String>(
+          'getSharedContainerPath',
+        );
+        if (sharedPath != null) {
+          return Directory(sharedPath);
+        }
+      } catch (e) {
+        debugPrint('Error getting shared container path: $e');
+      }
+    }
     return getApplicationDocumentsDirectory();
   }
 

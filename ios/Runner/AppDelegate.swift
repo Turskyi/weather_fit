@@ -19,10 +19,24 @@ private let appGroupId = "group.dmytrowidget"
         // Register plugins first to ensure they are available for all other operations.
         GeneratedPluginRegistrant.register(with: self)
 
-        // The custom method channel for file sharing has been temporarily removed
-        // to isolate the source of the 'CFPrefsPlistSource' error.
-        // If the widget data now appears correctly, we can confirm the issue
-        // is related to file container access and not the general plugin setup.
+        let controller : FlutterViewController = window?.rootViewController as! FlutterViewController
+        let channel = FlutterMethodChannel(name: "com.turskyi.weather_fit/shared_container",
+                                          binaryMessenger: controller.binaryMessenger)
+        
+        channel.setMethodCallHandler({
+            (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
+            if call.method == "getSharedContainerPath" {
+                if let url = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupId) {
+                    result(url.path)
+                } else {
+                    result(FlutterError(code: "UNAVAILABLE",
+                                        message: "Shared container for \(appGroupId) not found",
+                                        details: nil))
+                }
+            } else {
+                result(FlutterMethodNotImplemented)
+            }
+        })
         
         // This prevents the iOS crash on launch when identifier is declared in Info.plist.
         if #available(iOS 13.0, *) {

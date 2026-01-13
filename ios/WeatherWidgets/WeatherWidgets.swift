@@ -173,17 +173,15 @@ struct WeatherWidgets: Widget {
                 .containerBackground(for: .widget) {
                     // This ZStack provides either an image or a gradient fallback.
                     ZStack {
+                        // We always show the gradient as a base background
+                        WeatherHelper.getGradient(for: entry.weatherData.forecast?.first?.weatherCode ?? 0)
+                        
                         // NOTE: There is a persistent 'CFPrefsPlistSource' error that can prevent
                         // the app from correctly reading the imagePath from the shared container.
-                        // When this happens, this 'if' condition will fail and the widget will
-                        // gracefully fall back to displaying the gradient background in the 'else' block.
                         if let imagePath = entry.weatherData.imagePath, let uiImage = UIImage(contentsOfFile: imagePath) {
                             Image(uiImage: uiImage)
                                 .resizable()
-                                .scaledToFill()
-                                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        } else {
-                            WeatherHelper.getGradient(for: entry.weatherData.forecast?.first?.weatherCode ?? 0)
+                                .scaledToFit()
                         }
                     }
                 }
