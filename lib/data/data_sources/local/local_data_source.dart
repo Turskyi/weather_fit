@@ -97,8 +97,23 @@ class LocalDataSource {
       'outfit.moderate': 'Сьогодні комфортна погода',
     };
 
+    final Map<String, String> outfitPl = <String, String>{
+      'outfit.rainy': 'Weź parasol',
+      'outfit.rainy_hot': 'Gorąco i pada — lekkie ubrania + parasol',
+      'outfit.snowy': 'Ubierz się ciepło, pada śnieg!',
+      'outfit.cold': 'Ubierz się ciepło',
+      'outfit.cool': 'Może przydać się lekka kurtka',
+      'outfit.warm': 'Lekkie ubrania będą w sam raz',
+      'outfit.hot': 'Jest gorąco! Ubierz się lekko',
+      'outfit.moderate': 'Dzisiaj jest przyjemna pogoda',
+    };
+
     final Map<String, String> outfit =
-        locale.startsWith(Language.uk.isoLanguageCode) ? outfitUk : outfitEn;
+        locale.startsWith(Language.uk.isoLanguageCode)
+            ? outfitUk
+            : locale.startsWith(Language.pl.isoLanguageCode)
+                ? outfitPl
+                : outfitEn;
 
     String localeTranslate(String key) => outfit[key] ?? key;
 
@@ -283,6 +298,7 @@ class LocalDataSource {
           'error.save_asset_image_failed': <String, String>{
             'en': 'Failed to save asset image',
             'uk': 'Не вдалося зберегти зображення',
+            'pl': 'Nie udało się zapisać obrazu zasobu',
           },
         };
     return localizedErrors[key]?[locale] ?? key;

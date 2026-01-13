@@ -2,7 +2,7 @@ import UIKit
 import Flutter
 import Foundation
 import home_widget
-import workmanager
+import workmanager_apple
 import BackgroundTasks
 import os
 
