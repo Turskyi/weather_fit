@@ -4,7 +4,6 @@ import Foundation
 import home_widget
 import workmanager_apple
 import BackgroundTasks
-import os
 
 private let appGroupId = "group.dmytrowidget"
 
@@ -16,7 +15,6 @@ private let appGroupId = "group.dmytrowidget"
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
         
-        // Register plugins first to ensure they are available for all other operations.
         GeneratedPluginRegistrant.register(with: self)
 
         let controller : FlutterViewController = window?.rootViewController as! FlutterViewController
@@ -38,23 +36,19 @@ private let appGroupId = "group.dmytrowidget"
             }
         })
         
-        // This prevents the iOS crash on launch when identifier is declared in Info.plist.
-        if #available(iOS 13.0, *) {
-            BGTaskScheduler.shared.register(forTaskWithIdentifier: "weatherfit_background_update", using: nil) { task in
-                task.setTaskCompleted(success: true)
-            }
-        }
-        
-        // Hey iOS, I’d like you to run my background fetch task at least every
-        // 4 hours.
-        UIApplication.shared.setMinimumBackgroundFetchInterval(60 * 60 * 4)
-        
-        //This ensures that plugins used in your background task (e.g.,
-        // shared_preferences, path_provider, etc.) are properly registered when the
-        // background isolate starts.
+        // This ensures that plugins used in background task are properly registered.
         WorkmanagerPlugin.setPluginRegistrantCallback { registry in
             GeneratedPluginRegistrant.register(with: registry)
         }
+        
+        // Register the periodic task identifier as per workmanager documentation.
+        // This prevents the 'No launch handler registered' crash.
+        WorkmanagerPlugin.registerPeriodicTask(
+            withIdentifier: "weatherfit_background_update",
+            frequency: NSNumber(value: 2 * 60 * 60) // 2 hours in seconds
+        )
+        
+        UIApplication.shared.setMinimumBackgroundFetchInterval(60 * 60 * 4)
         
         if #available(iOS 17, *) {
             HomeWidgetBackgroundWorker.setPluginRegistrantCallback { registry in
