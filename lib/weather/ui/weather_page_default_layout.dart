@@ -152,6 +152,7 @@ class WeatherPageDefaultLayout extends StatelessWidget {
               return WeatherError(
                 message: state.message,
                 onReportPressed: onReportPressed,
+                onRetryPressed: onRefresh,
               );
           }
         },

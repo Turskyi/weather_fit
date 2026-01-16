@@ -6,12 +6,14 @@ import 'package:weather_fit/weather/ui/error/weather_error_extra_small.dart';
 class WeatherError extends StatelessWidget {
   const WeatherError({
     required this.onReportPressed,
+    required this.onRetryPressed,
     required this.message,
     super.key,
   });
 
   final String message;
   final VoidCallback onReportPressed;
+  final VoidCallback onRetryPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +21,8 @@ class WeatherError extends StatelessWidget {
         ? WeatherErrorExtraSmall(
             message: message,
             onReportPressed: onReportPressed,
+            onRetryPressed: onRetryPressed,
           )
-        : WeatherErrorDefault(message: message);
+        : WeatherErrorDefault(message: message, onRetryPressed: onRetryPressed);
   }
 }

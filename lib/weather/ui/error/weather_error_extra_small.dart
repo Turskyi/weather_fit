@@ -5,11 +5,13 @@ class WeatherErrorExtraSmall extends StatelessWidget {
   const WeatherErrorExtraSmall({
     required this.message,
     required this.onReportPressed,
+    required this.onRetryPressed,
     super.key,
   });
 
   final String message;
   final VoidCallback onReportPressed;
+  final VoidCallback onRetryPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +36,10 @@ class WeatherErrorExtraSmall extends StatelessWidget {
             maxLines: 3,
           ),
           const SizedBox(height: 12),
+          ElevatedButton(
+            onPressed: onRetryPressed,
+            child: Text(translate('try_again')),
+          ),
           TextButton(
             onPressed: onReportPressed,
             child: Text(
