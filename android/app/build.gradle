@@ -1,7 +1,7 @@
 //noinspection GrUnresolvedAccess
 plugins {
     id "com.android.application"
-    id "kotlin-android"
+    id "org.jetbrains.kotlin.android"
     id "dev.flutter.flutter-gradle-plugin"
     id 'com.google.gms.google-services'
     id 'com.google.firebase.crashlytics'
@@ -119,7 +119,7 @@ flutter {
     source = "../.."
 }
 dependencies {
-    implementation 'com.google.firebase:firebase-crashlytics:20.0.3'
+    implementation 'com.google.firebase:firebase-crashlytics:20.0.4'
     implementation 'com.google.firebase:firebase-analytics:23.0.0'
     implementation 'com.google.code.gson:gson:2.13.2'
 }
