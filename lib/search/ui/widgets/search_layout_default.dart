@@ -73,6 +73,11 @@ class SearchLayoutDefault extends StatelessWidget {
                 constraints: BoxConstraints(maxWidth: context.maxWidth),
                 child: TextField(
                   controller: textEditingController,
+                  autofocus: true,
+                  textInputAction: TextInputAction.search,
+                  onSubmitted: (String value) {
+                    _onSearchSubmitted(context: context, value: value);
+                  },
                   decoration: InputDecoration(
                     labelText: translate('search.city_or_country'),
                     hintText: translate('search.enter_city_or_country'),
@@ -111,8 +116,9 @@ class SearchLayoutDefault extends StatelessWidget {
                                 state is! SearchLoading &&
                                     value.text.trim().isNotEmpty
                                 ? () {
-                                    context.read<SearchBloc>().add(
-                                      SearchLocation(value.text),
+                                    _onSearchSubmitted(
+                                      context: context,
+                                      value: value.text,
                                     );
                                   }
                                 : null,
@@ -128,5 +134,15 @@ class SearchLayoutDefault extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  void _onSearchSubmitted({
+    required BuildContext context,
+    required String value,
+  }) {
+    final SearchState state = context.read<SearchBloc>().state;
+    if (state is! SearchLoading && value.trim().isNotEmpty) {
+      context.read<SearchBloc>().add(SearchLocation(value));
+    }
   }
 }

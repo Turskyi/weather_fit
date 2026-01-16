@@ -77,6 +77,7 @@ class OutfitWidget extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: <Widget>[
+                      const SizedBox(height: 8),
                       Expanded(
                         flex: 5,
                         child: ClipRRect(
