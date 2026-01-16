@@ -1,7 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:feedback/feedback.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
+import 'package:intl/intl.dart';
 import 'package:nominatim_api/nominatim_api.dart';
 import 'package:open_meteo_api/open_meteo_api.dart';
 import 'package:shared_preferences/shared_preferences.dart'
@@ -41,7 +43,32 @@ void main() async {
   final LocalDataSource localDataSource = LocalDataSource(preferences);
   final RemoteDataSource remoteDataSource = RemoteDataSource(Dio());
 
-  final Language savedLanguage = localDataSource.getSavedLanguage();
+  Language initialLanguage = localDataSource.getSavedLanguage();
+
+  if (kIsWeb) {
+    final String host = Uri.base.host;
+
+    for (final Language language in Language.values) {
+      final String currentLanguageCode = language.isoLanguageCode;
+      if (host.startsWith('$currentLanguageCode.')) {
+        try {
+          Intl.defaultLocale = currentLanguageCode;
+        } catch (e, stackTrace) {
+          debugPrint(
+            'Failed to set Intl.defaultLocale to "$currentLanguageCode".\n'
+            'Error: $e\n'
+            'StackTrace: $stackTrace\n'
+            'Proceeding with previously set default locale or system default.',
+          );
+        }
+        initialLanguage = language;
+        // We save it so the rest of the app (like recommendations) uses this
+        // language.
+        await localDataSource.saveLanguageIsoCode(currentLanguageCode);
+        break;
+      }
+    }
+  }
 
   final LocalizationDelegate localizationDelegate = await locale
       .getLocalizationDelegate(localDataSource);
@@ -50,8 +77,8 @@ void main() async {
     localizationDelegate.currentLocale.languageCode,
   );
 
-  if (savedLanguage != currentLanguage) {
-    final Locale locale = localeFromString(savedLanguage.isoLanguageCode);
+  if (initialLanguage != currentLanguage) {
+    final Locale locale = localeFromString(initialLanguage.isoLanguageCode);
 
     localizationDelegate.changeLocale(locale);
 
@@ -84,7 +111,7 @@ void main() async {
           ),
           outfitRepository: OutfitRepository(localDataSource, remoteDataSource),
           localDataSource: localDataSource,
-          initialLanguage: savedLanguage,
+          initialLanguage: initialLanguage,
         ),
       ),
     ),
