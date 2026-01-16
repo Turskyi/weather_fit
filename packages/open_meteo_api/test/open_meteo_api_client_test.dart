@@ -3,7 +3,6 @@ import 'package:mocktail/mocktail.dart';
 import 'package:open_meteo_api/open_meteo_api.dart';
 import 'package:open_meteo_api/src/models/exceptions/location_request_failure.dart';
 import 'package:open_meteo_api/src/models/exceptions/weather_not_found_failure.dart';
-import 'package:open_meteo_api/src/models/exceptions/weather_request_failure.dart';
 import 'package:test/test.dart';
 
 import 'helpers/mocks.dart';

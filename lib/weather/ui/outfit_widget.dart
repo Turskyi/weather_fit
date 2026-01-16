@@ -1,12 +1,10 @@
-import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:weather_fit/entities/enums/outfit_image_source.dart';
 import 'package:weather_fit/entities/models/outfit/outfit_image.dart';
 import 'package:weather_fit/extensions/build_context_extensions.dart';
-import 'package:weather_fit/weather/ui/error/outfit_image_error_widget.dart';
+import 'package:weather_fit/weather/ui/outfit_image_widget.dart';
 import 'package:weather_fit/weather/ui/text_recommendation_widget.dart';
 
 class OutfitWidget extends StatelessWidget {
@@ -83,7 +81,10 @@ class OutfitWidget extends StatelessWidget {
                         flex: 5,
                         child: ClipRRect(
                           borderRadius: borderRadius,
-                          child: _buildImage(outfitImage),
+                          child: OutfitImageWidget(
+                            outfitImage: outfitImage,
+                            onRefresh: onRefresh,
+                          ),
                         ),
                       ),
                       Expanded(
@@ -109,7 +110,11 @@ class OutfitWidget extends StatelessWidget {
                   children: <Widget>[
                     Expanded(
                       flex: 3,
-                      child: _buildImage(outfitImage, fit: BoxFit.cover),
+                      child: OutfitImageWidget(
+                        outfitImage: outfitImage,
+                        onRefresh: onRefresh,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                     Expanded(
                       flex: 2,
@@ -133,31 +138,6 @@ class OutfitWidget extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Widget _buildImage(OutfitImage outfitImage, {BoxFit fit = BoxFit.fitHeight}) {
-    final Image image = switch (outfitImage.source) {
-      OutfitImageSource.asset => Image.asset(
-        outfitImage.path,
-        fit: fit,
-        errorBuilder: _errorBuilder,
-      ),
-      OutfitImageSource.file => Image.file(
-        File(outfitImage.path),
-        fit: fit,
-        errorBuilder: _errorBuilder,
-      ),
-    };
-    return image;
-  }
-
-  Widget _errorBuilder(BuildContext _, Object error, StackTrace? _) {
-    debugPrint(
-      '⚠️ Failed to load outfit image: "${outfitImage.path}". '
-      'Error: $error\n'
-      'Fallback UI displayed.',
-    );
-    return OutfitImageErrorWidget(onRefresh: onRefresh);
   }
 
   Size _getOutfitImageSize(BuildContext context) {
