@@ -32,9 +32,7 @@ class _PrivacyPolicyAndroidPageState extends State<PrivacyPolicyAndroidPage> {
     );
     return Scaffold(
       appBar: AppBar(
-        leading: kIsWeb
-            ? LeadingWidget(languageIsoCode: widget.languageIsoCode)
-            : null,
+        leading: kIsWeb ? const LeadingWidget() : null,
         title: LayoutBuilder(
           builder: (BuildContext _, BoxConstraints constraints) {
             return ConstrainedBox(

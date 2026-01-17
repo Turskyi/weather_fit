@@ -5,7 +5,7 @@ sealed class WeatherState extends Equatable {
   const WeatherState({
     required this.locale,
     this.outfitRecommendation = '',
-    this.outfitAssetPath = '',
+    this.outfitImage = const OutfitImage.empty(),
     this.message = '',
     this.dailyForecast,
     Weather? weather,
@@ -18,7 +18,7 @@ sealed class WeatherState extends Equatable {
   final Weather weather;
   final String outfitRecommendation;
   final String message;
-  final String outfitAssetPath;
+  final OutfitImage outfitImage;
   final String locale;
   final DailyForecastDomain? dailyForecast;
 
@@ -26,7 +26,7 @@ sealed class WeatherState extends Equatable {
   List<Object?> get props => <Object?>[
     weather,
     outfitRecommendation,
-    outfitAssetPath,
+    outfitImage,
     message,
     locale,
     isCelsius,
@@ -37,7 +37,7 @@ sealed class WeatherState extends Equatable {
     return <String, Object?>{
       'weather': weather.toJson(),
       'outfit_recommendation': outfitRecommendation,
-      'outfit_asset_path': outfitAssetPath,
+      'outfit_image': outfitImage.toJson(),
       'message': message,
     };
   }
@@ -72,7 +72,7 @@ final class WeatherInitial extends WeatherState {
     required super.locale,
     super.outfitRecommendation,
     super.weather,
-    super.outfitAssetPath,
+    super.outfitImage,
     super.dailyForecast,
   });
 
@@ -87,7 +87,7 @@ final class WeatherInitial extends WeatherState {
     String? locale,
     Weather? weather,
     String? outfitRecommendation,
-    String? outfitAssetPath,
+    OutfitImage? outfitImage,
     DailyForecastDomain? dailyForecast,
     Language? language,
   }) {
@@ -95,7 +95,7 @@ final class WeatherInitial extends WeatherState {
       locale: locale ?? this.locale,
       weather: weather ?? this.weather,
       outfitRecommendation: outfitRecommendation ?? this.outfitRecommendation,
-      outfitAssetPath: outfitAssetPath ?? this.outfitAssetPath,
+      outfitImage: outfitImage ?? this.outfitImage,
       dailyForecast: dailyForecast ?? this.dailyForecast,
     );
   }
@@ -107,7 +107,7 @@ class WeatherLoadingState extends WeatherState {
     required super.locale,
     required super.weather,
     super.outfitRecommendation,
-    super.outfitAssetPath,
+    super.outfitImage,
     super.dailyForecast,
   });
 
@@ -134,7 +134,7 @@ class WeatherLoadingState extends WeatherState {
     locale,
     weather,
     outfitRecommendation,
-    outfitAssetPath,
+    outfitImage,
     dailyForecast,
   ];
 }
@@ -144,7 +144,7 @@ class WeatherSuccess extends WeatherState {
   const WeatherSuccess({
     required super.locale,
     required super.dailyForecast,
-    super.outfitAssetPath,
+    super.outfitImage,
     super.outfitRecommendation,
     super.weather,
     super.message,
@@ -161,14 +161,14 @@ class WeatherSuccess extends WeatherState {
     String? locale,
     Weather? weather,
     String? outfitRecommendation,
-    String? outfitAssetPath,
+    OutfitImage? outfitImage,
     String? message,
     DailyForecastDomain? dailyForecast,
   }) => WeatherSuccess(
     locale: locale ?? this.locale,
     weather: weather ?? this.weather,
     outfitRecommendation: outfitRecommendation ?? this.outfitRecommendation,
-    outfitAssetPath: outfitAssetPath ?? this.outfitAssetPath,
+    outfitImage: outfitImage ?? this.outfitImage,
     message: message ?? this.message,
     dailyForecast: dailyForecast ?? this.dailyForecast,
   );
@@ -178,7 +178,7 @@ class WeatherSuccess extends WeatherState {
     locale,
     weather,
     outfitRecommendation,
-    outfitAssetPath,
+    outfitImage,
     message,
     dailyForecast,
   ];
@@ -190,7 +190,7 @@ final class LoadingOutfitState extends WeatherSuccess {
     required super.locale,
     required super.dailyForecast,
     super.outfitRecommendation = '',
-    super.outfitAssetPath = '',
+    super.outfitImage = const OutfitImage.empty(),
     super.weather,
   });
 
@@ -202,7 +202,7 @@ final class LoadingOutfitState extends WeatherSuccess {
 class WeatherFailure extends WeatherState {
   const WeatherFailure({
     required super.locale,
-    super.outfitAssetPath,
+    super.outfitImage,
     super.outfitRecommendation,
     super.message,
     super.dailyForecast,
@@ -219,7 +219,7 @@ class WeatherFailure extends WeatherState {
   List<Object?> get props => <Object?>[
     locale,
     outfitRecommendation,
-    outfitAssetPath,
+    outfitImage,
     message,
     dailyForecast,
   ];

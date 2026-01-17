@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="appwidget_text">PRZYKŁAD</string>
+    <string name="add_widget">Dodaj widżet</string>
+    <string name="app_widget_description">To jest opis widżetu aplikacji</string>
+    <string name="outfit_image">Zdjęcie stroju</string>
+    <string name="weatherfit">WeatherFit</string>
+    <string name="oops_no_outfit_suggestion_available">
+        👕 Ups! Brak dostępnych propozycji strojów.
+    </string>
+    <string name="looks_like_we_couldn_t_pick_an_outfit_this_time">
+        🤷 Wygląda na to, że tym razem nie udało nam się dobrać stroju.
+    </string>
+    <string name="no_recommendation_time_to_mix_match_your_own_style">
+        <![CDATA[🎭 Brak rekomendacji? Czas na miksowanie i dopasowywanie własnego stylu!]]>
+    </string>
+    <string name="your_fashion_instincts_take_the_lead_today">
+        💡 Dziś Twoje instynkty modowe biorą górę!
+    </string>
+    <string name="ai_is_taking_a_fashion_break_try_again">
+        🚀 AI robi sobie przerwę od mody. Spróbuj ponownie!
+    </string>
+    <string name="no_outfit_picked_maybe_today_is_a_pajama_day">
+        🛌 Nie wybrano żadnego stroju — może dziś jest dzień piżamy?
+    </string>
+    <string name="no_outfit_available">❌ Brak dostępnego stroju</string>
+    <string name="no_recommendation">🤔 brak rekomendacji</string>
+    <string name="today">Dzisiaj</string>
+    <string name="tomorrow">Jutro</string>
+    <string name="morning">Rano</string>
+    <string name="lunch">Obiad</string>
+    <string name="evening">Wieczór</string>
+    <string name="night">Noc</string>
+</resources>

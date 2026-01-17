@@ -11,16 +11,10 @@ import android.os.Build
 import android.view.View
 import android.widget.RemoteViews
 import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
-import com.turskyi.weather_fit.WeatherWidget.Companion.KEY_EMOJI
-import com.turskyi.weather_fit.WeatherWidget.Companion.KEY_FORECAST_DATA
-import com.turskyi.weather_fit.WeatherWidget.Companion.KEY_IMAGE_WEATHER
-import com.turskyi.weather_fit.WeatherWidget.Companion.KEY_TEXT_LAST_UPDATED
-import com.turskyi.weather_fit.WeatherWidget.Companion.KEY_TEXT_LOCATION
-import com.turskyi.weather_fit.WeatherWidget.Companion.KEY_TEXT_RECOMMENDATION
-import com.turskyi.weather_fit.WeatherWidget.Companion.KEY_TEXT_TEMPERATURE
 import es.antonborri.home_widget.HomeWidgetLaunchIntent
 import es.antonborri.home_widget.HomeWidgetPlugin
 import java.io.File
@@ -49,6 +43,7 @@ class WeatherWidget : AppWidgetProvider() {
         const val KEY_IMAGE_WEATHER = "image_weather"
         const val KEY_TEXT_RECOMMENDATION = "text_recommendation"
         const val KEY_FORECAST_DATA = "forecast_data"
+        const val KEY_WEATHER_CODE = "weather_code"
     }
 
     override fun onUpdate(
@@ -75,141 +70,200 @@ class WeatherWidget : AppWidgetProvider() {
 @RequiresApi(Build.VERSION_CODES.CUPCAKE)
 @SuppressLint("ObsoleteSdkInt")
 internal fun updateAppWidget(
-    context: Context,
-    appWidgetManager: AppWidgetManager,
-    appWidgetId: Int
+    context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int
 ) {
     // Get reference to SharedPreferences.
     val widgetData: SharedPreferences = HomeWidgetPlugin.getData(context)
-    val views: RemoteViews =
-        RemoteViews(
-            context.packageName,
-            R.layout.weather_widget,
-        ).apply {
-            // Common view setup
-            // Open App on Widget Click.
-            val pendingIntent: PendingIntent =
-                HomeWidgetLaunchIntent.getActivity(
-                    context,
-                    MainActivity::class.java
-                )
-            setOnClickPendingIntent(
-                R.id.widget_container,
-                pendingIntent,
+    val views: RemoteViews = RemoteViews(
+        context.packageName,
+        R.layout.weather_widget,
+    ).apply {
+        // Common view setup
+        // Open App on Widget Click.
+        val pendingIntent: PendingIntent = HomeWidgetLaunchIntent.getActivity(
+            context, MainActivity::class.java
+        )
+        setOnClickPendingIntent(
+            R.id.widget_container,
+            pendingIntent,
+        )
+
+        // Bind basic weather data
+        setTextViewText(
+            R.id.text_emoji, widgetData.getString(
+                WeatherWidget.KEY_EMOJI,
+                "",
+            )
+        )
+        setTextViewText(
+            R.id.text_location, widgetData.getString(
+                WeatherWidget.KEY_TEXT_LOCATION,
+                "",
+            )
+        )
+        setTextViewText(
+            R.id.text_temperature, widgetData.getString(
+                WeatherWidget.KEY_TEXT_TEMPERATURE,
+                "",
+            )
+        )
+        setTextViewText(
+            R.id.text_outfit_recommendation, widgetData.getString(
+                WeatherWidget.KEY_TEXT_RECOMMENDATION,
+                "",
+            )
+        )
+        setTextViewText(
+            R.id.text_last_updated, widgetData.getString(
+                WeatherWidget.KEY_TEXT_LAST_UPDATED,
+                "",
+            )
+        )
+
+        // Apply background based on weather code.
+        val weatherCode: Int = widgetData.getInt(
+            WeatherWidget.KEY_WEATHER_CODE,
+            -1,
+        )
+        if (weatherCode != -1) {
+            val backgroundResId: Int = getBackgroundResource(weatherCode)
+            setInt(
+                R.id.widget_container, "setBackgroundResource", backgroundResId
             )
 
-            // Bind basic weather data
-            setTextViewText(
-                R.id.text_emoji,
-                widgetData.getString(KEY_EMOJI, "")
+            // Ensure text is readable on colored backgrounds.
+            val textColor: Int = ContextCompat.getColor(
+                context,
+                android.R.color.white,
             )
-            setTextViewText(
-                R.id.text_location,
-                widgetData.getString(KEY_TEXT_LOCATION, "")
-            )
-            setTextViewText(
-                R.id.text_temperature,
-                widgetData.getString(KEY_TEXT_TEMPERATURE, "")
-            )
-            setTextViewText(
-                R.id.text_outfit_recommendation,
-                widgetData.getString(
-                    KEY_TEXT_RECOMMENDATION,
-                    "",
-                )
-            )
-            setTextViewText(
-                R.id.text_last_updated,
-                widgetData.getString(KEY_TEXT_LAST_UPDATED, "")
-            )
+            setTextColor(R.id.text_location, textColor)
+            setTextColor(R.id.text_temperature, textColor)
+            setTextColor(R.id.text_outfit_recommendation, textColor)
+            setTextColor(R.id.text_last_updated, textColor)
 
-            // Bind image
-            val imagePath: String? =
-                widgetData.getString(KEY_IMAGE_WEATHER, null)
-            // Get image and put it in the widget if it exists.
-            if (!imagePath.isNullOrEmpty() && File(imagePath).exists()) {
-                val bitmap: android.graphics.Bitmap? =
-                    BitmapFactory.decodeFile(
-                        File(imagePath).absolutePath,
-                    )
-                if (bitmap != null) {
-                    setImageViewBitmap(R.id.image_weather, bitmap)
-                }
-            }
-
-            // Parse and display forecast data
-            val forecastJson: String? =
-                widgetData.getString(KEY_FORECAST_DATA, null)
-
-            if (forecastJson != null) {
-                val gson = Gson()
-                val forecastDataType: java.lang.reflect.Type =
-                    object : TypeToken<ForecastData>() {}.type
-
-                val forecastData: ForecastData? =
-                    gson.fromJson(forecastJson, forecastDataType)
-
-                forecastData?.forecast?.let { forecastList: List<ForecastItem> ->
-
-                    if (forecastList.isNotEmpty()) {
-                        // Make forecast container visible.
-                        setViewVisibility(
-                            R.id.forecast_container,
-                            View.VISIBLE,
-                        )
-                        // Morning
-                        bindForecastItem(
-                            context,
-                            this,
-                            forecastList.getOrNull(0),
-                            R.id.forecast_morning_day,
-                            R.id.forecast_morning_time,
-                            R.id.forecast_morning_emoji,
-                            R.id.forecast_morning_temp
-                        )
-                        // Lunch
-                        bindForecastItem(
-                            context,
-                            this,
-                            forecastList.getOrNull(1),
-                            R.id.forecast_lunch_day,
-                            R.id.forecast_lunch_time,
-                            R.id.forecast_lunch_emoji,
-                            R.id.forecast_lunch_temp
-                        )
-                        // Evening
-                        bindForecastItem(
-                            context,
-                            this,
-                            forecastList.getOrNull(2),
-                            R.id.forecast_evening_day,
-                            R.id.forecast_evening_time,
-                            R.id.forecast_evening_emoji,
-                            R.id.forecast_evening_temp
-                        )
-                    } else {
-                        setViewVisibility(
-                            R.id.forecast_container,
-                            View.GONE,
-                        )
-                    }
-                }
-            } else {
-                setViewVisibility(
-                    R.id.forecast_container,
-                    View.GONE,
-                )
-            }
+            // Forecast items text colors
+            setTextColor(R.id.forecast_morning_time, textColor)
+            setTextColor(R.id.forecast_morning_temp, textColor)
+            setTextColor(R.id.forecast_lunch_time, textColor)
+            setTextColor(R.id.forecast_lunch_temp, textColor)
+            setTextColor(R.id.forecast_evening_time, textColor)
+            setTextColor(R.id.forecast_evening_temp, textColor)
         }
 
+        // Bind image.
+        val imagePath: String? = widgetData.getString(
+            WeatherWidget.KEY_IMAGE_WEATHER,
+            null,
+        )
+
+        val imageFile: File? = imagePath?.takeIf {
+            it.isNotEmpty()
+        }?.let { path: String ->
+            File(path)
+        }
+        val isImageAvailable: Boolean = imageFile?.exists() == true
+
+        if (isImageAvailable) {
+            @Suppress("UNNECESSARY_SAFE_CALL") imageFile?.let { file: File ->
+                val bitmap: android.graphics.Bitmap? =
+                    BitmapFactory.decodeFile(file.absolutePath)
+                bitmap?.let { bmp: android.graphics.Bitmap ->
+                    setImageViewBitmap(R.id.image_weather, bmp)
+                    setViewVisibility(R.id.image_weather, View.VISIBLE)
+                }
+            }
+        } else {
+            setViewVisibility(R.id.image_weather, View.GONE)
+        }
+
+        // Parse and display forecast data
+        val forecastJson: String? = widgetData.getString(
+            WeatherWidget.KEY_FORECAST_DATA,
+            null,
+        )
+
+        if (forecastJson != null) {
+            val gson = Gson()
+            val forecastDataType: java.lang.reflect.Type =
+                object : TypeToken<ForecastData>() {}.type
+
+            val forecastData: ForecastData? = gson.fromJson(
+                forecastJson,
+                forecastDataType,
+            )
+
+            forecastData?.forecast?.let { forecastList: List<ForecastItem> ->
+
+                if (forecastList.isNotEmpty()) {
+                    // Make forecast container visible.
+                    setViewVisibility(
+                        R.id.forecast_container,
+                        View.VISIBLE,
+                    )
+
+                    // Sort the forecast list chronologically by time.
+                    val sortedForecast: List<ForecastItem> =
+                        forecastList.sortedBy { it.time }
+
+                    // Morning slot
+                    bindForecastItem(
+                        context,
+                        this,
+                        sortedForecast.getOrNull(0),
+                        R.id.forecast_morning_time,
+                        R.id.forecast_morning_emoji,
+                        R.id.forecast_morning_temp
+                    )
+                    // Lunch slot
+                    bindForecastItem(
+                        context,
+                        this,
+                        sortedForecast.getOrNull(1),
+                        R.id.forecast_lunch_time,
+                        R.id.forecast_lunch_emoji,
+                        R.id.forecast_lunch_temp
+                    )
+                    // Evening slot
+                    bindForecastItem(
+                        context,
+                        this,
+                        sortedForecast.getOrNull(2),
+                        R.id.forecast_evening_time,
+                        R.id.forecast_evening_emoji,
+                        R.id.forecast_evening_temp
+                    )
+                } else {
+                    setViewVisibility(
+                        R.id.forecast_container,
+                        View.GONE,
+                    )
+                }
+            }
+        } else {
+            setViewVisibility(
+                R.id.forecast_container,
+                View.GONE,
+            )
+        }
+    }
+
     appWidgetManager.updateAppWidget(appWidgetId, views)
+}
+
+private fun getBackgroundResource(code: Int): Int {
+    return when (code) {
+        0 -> R.drawable.widget_background_sunny
+        1, 2, 3, 45, 48 -> R.drawable.widget_background_cloudy
+        51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82, 95, 96, 99 -> R.drawable.widget_background_rainy
+        71, 73, 75, 77, 85, 86 -> R.drawable.widget_background_snowy
+        else -> R.drawable.widget_background
+    }
 }
 
 private fun bindForecastItem(
     context: Context,
     views: RemoteViews,
     item: ForecastItem?,
-    dayId: Int,
     timeId: Int,
     emojiId: Int,
     tempId: Int
@@ -217,7 +271,6 @@ private fun bindForecastItem(
     if (item != null) {
         val date: Date? = parseDate(item.time)
         if (date != null) {
-            views.setTextViewText(dayId, getDay(context, date))
             views.setTextViewText(
                 timeId,
                 getTimeOfDay(context, date),
@@ -244,19 +297,6 @@ private fun parseDate(dateString: String): Date? = try {
 } catch (e: Exception) {
     e.printStackTrace()
     null
-}
-
-private fun getDay(context: Context, date: Date): String {
-    val cal: Calendar = Calendar.getInstance()
-    val today: Int = cal.get(Calendar.DAY_OF_YEAR)
-    cal.time = date
-    val itemDay: Int = cal.get(Calendar.DAY_OF_YEAR)
-
-    return when (itemDay) {
-        today -> context.getString(R.string.today)
-        today + 1 -> context.getString(R.string.tomorrow)
-        else -> SimpleDateFormat("EEE", Locale.US).format(date)
-    }
 }
 
 private fun getTimeOfDay(context: Context, date: Date): String {

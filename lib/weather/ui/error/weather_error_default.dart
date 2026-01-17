@@ -2,9 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 
 class WeatherErrorDefault extends StatelessWidget {
-  const WeatherErrorDefault({required this.message, super.key});
+  const WeatherErrorDefault({
+    required this.message,
+    required this.onRetryPressed,
+    super.key,
+  });
 
   final String message;
+  final VoidCallback onRetryPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -26,6 +31,11 @@ class WeatherErrorDefault extends StatelessWidget {
           alignment: Alignment.center,
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: SelectableText(message, style: textTheme.headlineSmall),
+        ),
+        const SizedBox(height: 32),
+        ElevatedButton(
+          onPressed: onRetryPressed,
+          child: Text(translate('try_again')),
         ),
       ],
     );

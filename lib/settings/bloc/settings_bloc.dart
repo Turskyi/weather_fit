@@ -17,13 +17,18 @@ import 'package:weather_fit/entities/enums/feedback_type.dart';
 import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/entities/models/exceptions/email_launch_exception.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
+import 'package:weather_fit/services/update_service.dart';
 
 part 'settings_event.dart';
 part 'settings_state.dart';
 
 class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
-  SettingsBloc(this._localDataSource, Language initialLanguage)
-    : super(SettingsInitial(language: initialLanguage)) {
+  SettingsBloc(this._localDataSource, this._updateService)
+    : super(SettingsInitial(language: _localDataSource.getSavedLanguage())) {
+    on<LoadSettingsEvent>(_onLoadSettings);
+
+    on<CheckForUpdateEvent>(_onCheckForUpdate);
+
     on<ClosingFeedbackEvent>(_onFeedbackDialogDismissed);
 
     on<BugReportPressedEvent>(_onFeedbackRequested);
@@ -33,25 +38,58 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     on<SettingsErrorEvent>(_handleError);
 
     on<ChangeLanguageEvent>(_changeLanguage);
+
+    add(const LoadSettingsEvent());
+    add(const CheckForUpdateEvent());
   }
 
   final LocalDataSource _localDataSource;
+  final UpdateService _updateService;
+
+  FutureOr<void> _onLoadSettings(
+    LoadSettingsEvent event,
+    Emitter<SettingsState> emit,
+  ) async {
+    final PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    emit(
+      SettingsInitial(
+        language: state.language,
+        appVersion: '${packageInfo.version} (${packageInfo.buildNumber})',
+      ),
+    );
+  }
+
+  FutureOr<void> _onCheckForUpdate(
+    CheckForUpdateEvent event,
+    Emitter<SettingsState> emit,
+  ) async {
+    await _updateService.checkForUpdate();
+  }
 
   FutureOr<void> _handleError(
     SettingsErrorEvent event,
     Emitter<SettingsState> emit,
   ) {
-    emit(SettingsError(errorMessage: event.error, language: state.language));
+    emit(
+      SettingsError(
+        errorMessage: event.error,
+        language: state.language,
+        appVersion: state.appVersion,
+      ),
+    );
   }
 
   FutureOr<void> _sendUserFeedback(
     SubmitFeedbackEvent event,
     Emitter<SettingsState> emit,
   ) async {
-    if (state is LoadingSettingsState || state is FeedbackSent) {
-      return;
-    } else {
-      emit(LoadingSettingsState(language: state.language));
+    if (state is! LoadingSettingsState && state is! FeedbackSent) {
+      emit(
+        LoadingSettingsState(
+          language: state.language,
+          appVersion: state.appVersion,
+        ),
+      );
       final UserFeedback feedback = event.feedback;
       try {
         final PackageInfo packageInfo = await PackageInfo.fromPlatform();
@@ -80,6 +118,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
 
         final bool isFeedbackType = type is FeedbackType;
         final bool isFeedbackRating = rating is FeedbackRating;
+
         // Construct the feedback text with details from `extra'.
         final StringBuffer feedbackBody = StringBuffer()
           ..writeln(
@@ -146,6 +185,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
               SettingsError(
                 errorMessage: errorMessage,
                 language: state.language,
+                appVersion: state.appVersion,
               ),
             );
           }
@@ -170,13 +210,16 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
           }
         }
 
-        emit(FeedbackSent(language: state.language));
+        emit(
+          FeedbackSent(language: state.language, appVersion: state.appVersion),
+        );
       } catch (e, stackTrace) {
         debugPrint('SettingsErrorEvent:$e\nStackTrace: $stackTrace');
         emit(
           SettingsError(
             errorMessage: translate('error.unexpected_error'),
             language: state.language,
+            appVersion: state.appVersion,
           ),
         );
       }
@@ -195,7 +238,13 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     } else if (state is FeedbackState) {
       errorMessage = state.errorMessage;
     }
-    emit(FeedbackState(language: state.language, errorMessage: errorMessage));
+    emit(
+      FeedbackState(
+        language: state.language,
+        errorMessage: errorMessage,
+        appVersion: state.appVersion,
+      ),
+    );
   }
 
   Future<String> _writeImageToStorage(Uint8List feedbackScreenshot) async {
@@ -210,7 +259,9 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     ClosingFeedbackEvent _,
     Emitter<SettingsState> emit,
   ) {
-    emit(SettingsInitial(language: state.language));
+    emit(
+      SettingsInitial(language: state.language, appVersion: state.appVersion),
+    );
   }
 
   FutureOr<void> _changeLanguage(
@@ -229,7 +280,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         if (state is SettingsInitial) {
           emit(state.copyWith(language: language));
         } else {
-          SettingsInitial(language: language);
+          SettingsInitial(language: language, appVersion: state.appVersion);
         }
       } else {
         //TODO: no sure what to do.

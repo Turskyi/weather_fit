@@ -87,7 +87,7 @@ class WeatherPageDefaultLayout extends StatelessWidget {
               final ColorScheme colorScheme = Theme.of(context).colorScheme;
               if (stateOutfitRecommendation.isNotEmpty) {
                 outfitImageWidget = OutfitWidget(
-                  assetPath: state.outfitAssetPath,
+                  outfitImage: state.outfitImage,
                   outfitRecommendation: stateOutfitRecommendation,
                   onRefresh: onRefresh,
                 );
@@ -152,6 +152,7 @@ class WeatherPageDefaultLayout extends StatelessWidget {
               return WeatherError(
                 message: state.message,
                 onReportPressed: onReportPressed,
+                onRetryPressed: onRefresh,
               );
           }
         },

@@ -5,16 +5,16 @@ import 'package:flutter_translate/flutter_translate.dart';
 import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/extensions/build_context_extensions.dart';
+import 'package:weather_fit/res/constants.dart' as constants;
 import 'package:weather_fit/router/app_route.dart';
+import 'package:weather_fit/services/home_widget_service.dart';
 import 'package:weather_fit/settings/bloc/settings_bloc.dart';
 import 'package:weather_fit/settings/ui/settings_page_default_layout.dart';
 import 'package:weather_fit/settings/ui/settings_page_extra_small_layout.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 
 class SettingsPage extends StatefulWidget {
-  const SettingsPage({required this.languageIsoCode, super.key});
-
-  final String languageIsoCode;
+  const SettingsPage({super.key});
 
   @override
   State<SettingsPage> createState() => _SettingsPageState();
@@ -33,7 +33,7 @@ class _SettingsPageState extends State<SettingsPage> {
             onPrivacyTap: _navigateToPrivacy,
             onFeedbackTap: _handleFeedbackRequest,
             onSupportTap: _navigateToSupport,
-            languageIsoCode: widget.languageIsoCode,
+            onPinWidgetTap: _requestPinWidget,
             onSearchPressed: _handleLocationSearchAndFetchWeather,
           )
         : SettingsPageDefaultLayout(
@@ -45,7 +45,7 @@ class _SettingsPageState extends State<SettingsPage> {
             onPrivacyTap: _navigateToPrivacy,
             onFeedbackTap: _handleFeedbackRequest,
             onSupportTap: _navigateToSupport,
-            languageIsoCode: widget.languageIsoCode,
+            onPinWidgetTap: _requestPinWidget,
           );
   }
 
@@ -77,6 +77,12 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
+  void _requestPinWidget() {
+    context.read<HomeWidgetService>().requestPinWidget(
+      androidName: constants.androidWidgetName,
+    );
+  }
+
   bool _isUnitsChanged(WeatherState previous, WeatherState current) {
     return previous.weather.temperatureUnits !=
         current.weather.temperatureUnits;
@@ -86,13 +92,12 @@ class _SettingsPageState extends State<SettingsPage> {
     return previous.language != current.language;
   }
 
-  void _changeLanguage(bool isEnglish) {
-    final Language newLanguage = isEnglish ? Language.en : Language.uk;
-    changeLocale(context, newLanguage.isoLanguageCode)
+  void _changeLanguage(Language language) {
+    changeLocale(context, language.isoLanguageCode)
     // The returned value is always `null`.
     .then((Object? _) {
       if (mounted) {
-        context.read<SettingsBloc>().add(ChangeLanguageEvent(newLanguage));
+        context.read<SettingsBloc>().add(ChangeLanguageEvent(language));
       }
     });
   }

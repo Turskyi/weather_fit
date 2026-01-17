@@ -101,62 +101,70 @@ struct ForecastItemView: View {
             Text("\(Int(item.temperature.rounded()))°")
                 .font(.caption)
         }
+        .foregroundColor(.white)
+        .shadow(color: .black.opacity(0.8), radius: 2, x: 0, y: 1)
     }
 }
 
-// This view now ONLY contains the foreground content.
 struct WeatherWidgetsEntryView: View {
     var entry: Provider.Entry
     
     var body: some View {
         VStack(spacing: 0) {
-            // Top section: Location and Emoji
-            HStack {
-                Text(entry.weatherData.location ?? "Unknown Location")
-                    .font(.headline).fontWeight(.semibold)
-                Spacer()
-                VStack(alignment: .trailing, spacing: 2) {
+            // Top section: Aligned to corners to keep the center (faces) clear
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 0) {
+                    Text(entry.weatherData.location ?? "Unknown Location")
+                        .font(.subheadline).fontWeight(.semibold)
                     Text(entry.weatherData.temperature ?? "--")
-                        .font(.title3).fontWeight(.bold)
-                    Text(entry.weatherData.lastUpdated ?? "never")
-                        .font(.caption2)
+                        .font(.title2).fontWeight(.bold)
                 }
-                .frame(width: 80, alignment: .trailing)
-                .multilineTextAlignment(.trailing)
                 Spacer()
-                Text(entry.weatherData.emoji ?? "")
-                    .font(.largeTitle)
+                VStack(alignment: .trailing, spacing: 0) {
+                    Text(entry.weatherData.emoji ?? "")
+                        .font(.largeTitle)
+                    Text(entry.weatherData.lastUpdated ?? "")
+                        .font(.system(size: 8))
+                }
             }
-            .padding(.horizontal)
+            .padding(.horizontal, 12)
+            .padding(.top, 8)
+            .foregroundColor(.white)
+            .shadow(color: .black.opacity(0.8), radius: 2, x: 0, y: 1)
             
             Spacer()
             
-            // Middle section: Recommendation
-            Text(entry.weatherData.recommendation ?? "No recommendation available.")
-                .font(.subheadline).fontWeight(.medium)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal)
-            
-            Spacer()
-            
-            // Bottom section: Forecast
-            HStack(alignment: .bottom) {
-                if let forecast = entry.weatherData.forecast, !forecast.isEmpty {
-                    HStack(alignment: .bottom) {
+            // Lower section: Recommendation and Forecast
+            // Moved to the bottom to avoid covering the person's upper body/face
+            VStack(spacing: 8) {
+                if let recommendation = entry.weatherData.recommendation {
+                    Text(recommendation)
+                        .font(.caption).fontWeight(.medium)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(Color.black.opacity(0.25).cornerRadius(6))
+                }
+                
+                // Forecast
+                HStack(alignment: .bottom) {
+                    if let forecast = entry.weatherData.forecast, !forecast.isEmpty {
                         ForEach(Array(forecast.enumerated()), id: \.element.time) { index, item in
                             ForecastItemView(item: item)
                             if index < forecast.count - 1 {
                                 Spacer()
                             }
                         }
+                    } else {
+                        Text("No forecast data.").font(.caption)
                     }
-                } else {
-                    Text("No forecast data.").font(.caption)
                 }
             }
-            .padding(12)
+            .padding(.horizontal, 12)
+            .padding(.bottom, 8)
+            .foregroundColor(.white)
+            .shadow(color: .black.opacity(0.8), radius: 2, x: 0, y: 1)
         }
-        .padding(8)
         .widgetURL(URL(string: "weatherfit://open")!)
     }
 }
@@ -167,24 +175,19 @@ struct WeatherWidgets: Widget {
     
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: Provider()) { entry in
-            // The content view is passed here.
             WeatherWidgetsEntryView(entry: entry)
-            // The .containerBackground modifier handles the background for iOS 17+
                 .containerBackground(for: .widget) {
-                    // This ZStack provides either an image or a gradient fallback.
                     ZStack {
-                        // NOTE: There is a persistent 'CFPrefsPlistSource' error that can prevent
-                        // the app from correctly reading the imagePath from the shared container.
-                        // When this happens, this 'if' condition will fail and the widget will
-                        // gracefully fall back to displaying the gradient background in the 'else' block.
+                        WeatherHelper.getGradient(for: entry.weatherData.forecast?.first?.weatherCode ?? 0)
+                        
                         if let imagePath = entry.weatherData.imagePath, let uiImage = UIImage(contentsOfFile: imagePath) {
                             Image(uiImage: uiImage)
                                 .resizable()
-                                .scaledToFill()
-                                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        } else {
-                            WeatherHelper.getGradient(for: entry.weatherData.forecast?.first?.weatherCode ?? 0)
+                                .scaledToFit()
                         }
+                        
+                        // Added a subtle dark overlay to ensure text readability on light images
+                        Color.black.opacity(0.2)
                     }
                 }
         }

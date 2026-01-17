@@ -2,9 +2,8 @@ import UIKit
 import Flutter
 import Foundation
 import home_widget
-import workmanager
+import workmanager_apple
 import BackgroundTasks
-import os
 
 private let appGroupId = "group.dmytrowidget"
 
@@ -16,31 +15,40 @@ private let appGroupId = "group.dmytrowidget"
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
         
-        // Register plugins first to ensure they are available for all other operations.
         GeneratedPluginRegistrant.register(with: self)
 
-        // The custom method channel for file sharing has been temporarily removed
-        // to isolate the source of the 'CFPrefsPlistSource' error.
-        // If the widget data now appears correctly, we can confirm the issue
-        // is related to file container access and not the general plugin setup.
+        let controller : FlutterViewController = window?.rootViewController as! FlutterViewController
+        let channel = FlutterMethodChannel(name: "com.turskyi.weather_fit/shared_container",
+                                          binaryMessenger: controller.binaryMessenger)
         
-        // This prevents the iOS crash on launch when identifier is declared in Info.plist.
-        if #available(iOS 13.0, *) {
-            BGTaskScheduler.shared.register(forTaskWithIdentifier: "weatherfit_background_update", using: nil) { task in
-                task.setTaskCompleted(success: true)
+        channel.setMethodCallHandler({
+            (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
+            if call.method == "getSharedContainerPath" {
+                if let url = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupId) {
+                    result(url.path)
+                } else {
+                    result(FlutterError(code: "UNAVAILABLE",
+                                        message: "Shared container for \(appGroupId) not found",
+                                        details: nil))
+                }
+            } else {
+                result(FlutterMethodNotImplemented)
             }
-        }
+        })
         
-        // Hey iOS, I’d like you to run my background fetch task at least every
-        // 4 hours.
-        UIApplication.shared.setMinimumBackgroundFetchInterval(60 * 60 * 4)
-        
-        //This ensures that plugins used in your background task (e.g.,
-        // shared_preferences, path_provider, etc.) are properly registered when the
-        // background isolate starts.
+        // This ensures that plugins used in background task are properly registered.
         WorkmanagerPlugin.setPluginRegistrantCallback { registry in
             GeneratedPluginRegistrant.register(with: registry)
         }
+        
+        // Register the periodic task identifier as per workmanager documentation.
+        // This prevents the 'No launch handler registered' crash.
+        WorkmanagerPlugin.registerPeriodicTask(
+            withIdentifier: "weatherfit_background_update",
+            frequency: NSNumber(value: 2 * 60 * 60) // 2 hours in seconds
+        )
+        
+        UIApplication.shared.setMinimumBackgroundFetchInterval(60 * 60 * 4)
         
         if #available(iOS 17, *) {
             HomeWidgetBackgroundWorker.setPluginRegistrantCallback { registry in

@@ -10,9 +10,7 @@ import 'package:weather_fit/weather/ui/weather_page_default_layout.dart';
 import 'package:weather_fit/weather/ui/weather_page_extra_small_layout.dart';
 
 class WeatherPage extends StatefulWidget {
-  const WeatherPage({required this.languageIsoCode, super.key});
-
-  final String languageIsoCode;
+  const WeatherPage({super.key});
 
   @override
   State<WeatherPage> createState() => _WeatherPageState();

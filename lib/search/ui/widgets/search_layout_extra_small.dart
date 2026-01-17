@@ -21,6 +21,13 @@ class SearchPageExtraSmallLayout extends StatelessWidget {
 
   final String languageIsoCode;
 
+  void _onSearchSubmitted(BuildContext context, String value) {
+    final SearchState state = context.read<SearchBloc>().state;
+    if (state is! SearchLoading && value.trim().isNotEmpty) {
+      context.read<SearchBloc>().add(SearchLocation(value.trim()));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
@@ -28,9 +35,9 @@ class SearchPageExtraSmallLayout extends StatelessWidget {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: Padding(
-          padding: const EdgeInsets.only(top: 8.0),
-          child: LeadingWidget(languageIsoCode: languageIsoCode),
+        title: const Padding(
+          padding: EdgeInsets.only(top: 8.0),
+          child: LeadingWidget(),
         ),
         centerTitle: true,
         automaticallyImplyLeading: false,
@@ -46,7 +53,11 @@ class SearchPageExtraSmallLayout extends StatelessWidget {
               children: <Widget>[
                 TextField(
                   controller: textEditingController,
+                  autofocus: true,
                   style: textTheme.labelSmall,
+                  textInputAction: TextInputAction.search,
+                  onSubmitted: (String value) =>
+                      _onSearchSubmitted(context, value),
                   decoration: InputDecoration(
                     isDense: true,
                     hintText: translate('search.enter_city_or_country'),
@@ -81,11 +92,7 @@ class SearchPageExtraSmallLayout extends StatelessWidget {
                               onPressed:
                                   state is! SearchLoading &&
                                       valueText.isNotEmpty
-                                  ? () {
-                                      context.read<SearchBloc>().add(
-                                        SearchLocation(valueText),
-                                      );
-                                    }
+                                  ? () => _onSearchSubmitted(context, valueText)
                                   : null,
                               child: textSubmit,
                             );

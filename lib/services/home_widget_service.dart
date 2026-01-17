@@ -32,6 +32,12 @@ abstract class HomeWidgetService {
     required DailyForecastDomain forecast,
     required OutfitRepository outfitRepository,
   });
+
+  Future<void> requestPinWidget({
+    String? name,
+    String? androidName,
+    String? qualifiedAndroidName,
+  });
 }
 
 class HomeWidgetServiceImpl implements HomeWidgetService {
@@ -85,11 +91,8 @@ class HomeWidgetServiceImpl implements HomeWidgetService {
     final String outfitRecommendation = outfitRepository
         .getOutfitRecommendation(updatedWeather);
 
-    final String outfitAssetPath = outfitRepository.getOutfitImageAssetPath(
-      weather,
-    );
     final String outfitFilePath = await outfitRepository.downloadAndSaveImage(
-      outfitAssetPath,
+      weather,
     );
 
     // Set app group ID.
@@ -121,6 +124,12 @@ class HomeWidgetServiceImpl implements HomeWidgetService {
       outfitRecommendation,
     );
 
+    // Save weather code for background color mapping.
+    await saveWidgetData<int>(
+      HomeWidgetKey.weatherCode.stringValue,
+      weather.code,
+    );
+
     // The image feature is temporarily disabled.
     await saveWidgetData<String>(
       HomeWidgetKey.imageWeather.stringValue,
@@ -142,6 +151,19 @@ class HomeWidgetServiceImpl implements HomeWidgetService {
     await updateWidget(
       iOSName: constants.iOSWidgetName,
       androidName: constants.androidWidgetName,
+    );
+  }
+
+  @override
+  Future<void> requestPinWidget({
+    String? name,
+    String? androidName,
+    String? qualifiedAndroidName,
+  }) {
+    return HomeWidget.requestPinWidget(
+      name: name,
+      androidName: androidName,
+      qualifiedAndroidName: qualifiedAndroidName,
     );
   }
 

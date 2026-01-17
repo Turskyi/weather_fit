@@ -1,0 +1,1 @@
+enum OutfitImageSource { asset, file }

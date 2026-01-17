@@ -1,8 +1,10 @@
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
+import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/res/constants.dart' as constant;
 import 'package:weather_fit/res/widgets/leading_widget.dart';
 import 'package:weather_fit/settings/bloc/settings_bloc.dart';
@@ -19,20 +21,20 @@ class SettingsPageExtraSmallLayout extends StatelessWidget {
     required this.onPrivacyTap,
     required this.onFeedbackTap,
     required this.onSupportTap,
-    required this.languageIsoCode,
+    required this.onPinWidgetTap,
     required this.onSearchPressed,
     super.key,
   });
 
   final BlocBuilderCondition<SettingsState> rebuildSettingsWhen;
-  final ValueChanged<bool> onLanguageChanged;
+  final ValueChanged<Language> onLanguageChanged;
   final BlocBuilderCondition<WeatherState> rebuildUnitsWhen;
   final ValueChanged<bool> onUnitsChanged;
   final GestureTapCallback onAboutTap;
   final GestureTapCallback onPrivacyTap;
   final GestureTapCallback onFeedbackTap;
   final GestureTapCallback onSupportTap;
-  final String languageIsoCode;
+  final GestureTapCallback onPinWidgetTap;
 
   /// The callback that is called when the "Search" button is tapped or
   /// otherwise activated.
@@ -44,9 +46,9 @@ class SettingsPageExtraSmallLayout extends StatelessWidget {
       extendBodyBehindAppBar: true,
       backgroundColor: Colors.transparent,
       appBar: AppBar(
-        title: Padding(
-          padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-          child: LeadingWidget(languageIsoCode: languageIsoCode),
+        title: const Padding(
+          padding: EdgeInsets.only(top: 8.0, bottom: 8.0),
+          child: LeadingWidget(),
         ),
         centerTitle: true,
         automaticallyImplyLeading: false,
@@ -69,15 +71,18 @@ class SettingsPageExtraSmallLayout extends StatelessWidget {
             BlocBuilder<SettingsBloc, SettingsState>(
               buildWhen: rebuildSettingsWhen,
               builder: (BuildContext _, SettingsState settingsState) {
-                final int selectedIndex = settingsState.isEnglish ? 0 : 1;
+                final int selectedIndex = Language.values.indexOf(
+                  settingsState.language,
+                );
                 return _SettingSegmentedToggle(
                   label: translate('settings.language'),
                   selectedIndex: selectedIndex,
-                  options: <String>[translate('en'), translate('uk')],
+                  options: Language.values
+                      .map((Language l) => translate(l.isoLanguageCode))
+                      .toList(),
                   onSelected: (int index) {
-                    final bool isEnglish = index == 0;
-                    onLanguageChanged(isEnglish);
-                  }, // true if English
+                    onLanguageChanged(Language.values[index]);
+                  },
                 );
               },
             ),
@@ -100,6 +105,28 @@ class SettingsPageExtraSmallLayout extends StatelessWidget {
                 );
               },
             ),
+            if (!kIsWeb &&
+                (defaultTargetPlatform == TargetPlatform.android)) ...<Widget>[
+              const SizedBox(height: 16),
+              Card(
+                elevation: 2.0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                child: ListTile(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  title: Text(
+                    translate('settings.pin_widget'),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: Text(translate('settings.pin_widget_subtitle')),
+                  trailing: const Icon(Icons.push_pin_outlined),
+                  onTap: onPinWidgetTap,
+                ),
+              ),
+            ],
           ],
         ),
       ),

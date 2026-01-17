@@ -82,7 +82,6 @@ void main() {
                     outfitRepository,
                     localDataSource,
                     mockHomeWidgetService,
-                    localDataSource.getLanguageIsoCode(),
                   );
                 },
               ),
@@ -149,9 +148,7 @@ void main() {
             value: weatherBloc,
             child: LocalizedApp(
               localizationDelegate,
-              const MaterialApp(
-                home: WeatherPage(languageIsoCode: dummy_constants.dummyLocale),
-              ),
+              const MaterialApp(home: WeatherPage()),
             ),
           ),
         ),

@@ -21,6 +21,10 @@ class LocalDataSource {
 
   final SharedPreferences _preferences;
 
+  static const MethodChannel _channel = MethodChannel(
+    'com.turskyi.weather_fit/shared_container',
+  );
+
   String getOutfitImageAssetPath(Weather weather) {
     final WeatherCondition condition = weather.condition;
     double temperatureValue = weather.temperature.value;
@@ -41,9 +45,9 @@ class LocalDataSource {
     if (roundedTemp > 30) roundedTemp = 30;
     if (roundedTemp < -30) roundedTemp = -30;
 
-    final String precipitation = 'precipitation';
+    const String precipitation = 'precipitation';
 
-    // Random condition for unknown states
+    // Random condition for unknown states.
     final List<String> possibleConditions = <String>[
       WeatherCondition.clear.name,
       WeatherCondition.cloudy.name,
@@ -97,8 +101,23 @@ class LocalDataSource {
       'outfit.moderate': 'Сьогодні комфортна погода',
     };
 
+    final Map<String, String> outfitPl = <String, String>{
+      'outfit.rainy': 'Weź parasol',
+      'outfit.rainy_hot': 'Gorąco i pada — lekkie ubrania + parasol',
+      'outfit.snowy': 'Ubierz się ciepło, pada śnieg!',
+      'outfit.cold': 'Ubierz się ciepło',
+      'outfit.cool': 'Może przydać się lekka kurtka',
+      'outfit.warm': 'Lekkie ubrania będą в sam raz',
+      'outfit.hot': 'Jest gorąco! Ubierz się lekko',
+      'outfit.moderate': 'Dzisiaj jest przyjemna pogoda',
+    };
+
     final Map<String, String> outfit =
-        locale.startsWith(Language.uk.isoLanguageCode) ? outfitUk : outfitEn;
+        locale.startsWith(Language.uk.isoLanguageCode)
+        ? outfitUk
+        : locale.startsWith(Language.pl.isoLanguageCode)
+        ? outfitPl
+        : outfitEn;
 
     String localeTranslate(String key) => outfit[key] ?? key;
 
@@ -129,7 +148,7 @@ class LocalDataSource {
   }
 
   Future<String> downloadAndSaveImage(String assetPath) async {
-    // Check if the platform is web OR macOS. If so, return early.
+    // Check if the platform is web OR macOS.
     // See issue: https://github.com/ABausG/home_widget/issues/137.
     if (!kIsWeb && !Platform.isMacOS) {
       try {
@@ -137,7 +156,7 @@ class LocalDataSource {
         final ByteData byteData = await rootBundle.load(assetPath);
 
         // Get the application documents directory.
-        final Directory directory = await _getAppDirectory();
+        final Directory directory = await getAppDirectory();
         final String filePath = '${directory.path}/outfit_image.png';
         // Write the bytes to the file.
         final File file = File(filePath);
@@ -213,19 +232,24 @@ class LocalDataSource {
         : Language.en.isoLanguageCode;
 
     final String host = Uri.base.host;
-    if (host.startsWith('${Language.uk.isoLanguageCode}.')) {
-      try {
-        Intl.defaultLocale = Language.uk.isoLanguageCode;
-      } catch (e, stackTrace) {
-        debugPrint(
-          'Failed to set Intl.defaultLocale to '
-          '"${Language.uk.isoLanguageCode}".\n'
-          'Error: $e\n'
-          'StackTrace: $stackTrace\n'
-          'Proceeding with previously set default locale or system default.',
-        );
+
+    for (final Language language in Language.values) {
+      final String currentLanguageCode = language.isoLanguageCode;
+      if (host.startsWith('$currentLanguageCode.')) {
+        try {
+          Intl.defaultLocale = currentLanguageCode;
+        } catch (e, stackTrace) {
+          debugPrint(
+            'Failed to set Intl.defaultLocale to "$currentLanguageCode".\n'
+            'Error: $e\n'
+            'StackTrace: $stackTrace\n'
+            'Proceeding with previously set default locale or system default.',
+          );
+        }
+        defaultLanguageCode = currentLanguageCode;
+        // Exit the loop once a match is found and processed.
+        break;
       }
-      defaultLanguageCode = Language.uk.isoLanguageCode;
     }
 
     return isSavedLanguageSupported
@@ -241,15 +265,6 @@ class LocalDataSource {
     return savedLanguage;
   }
 
-  /// Saves the provided [location] to persistent storage as a JSON string.
-  ///
-  /// Returns a [Future] that completes with `true` if the value was
-  /// successfully written to [SharedPreferences], or `false` if the operation
-  /// failed.
-  ///
-  /// This is useful for caching the last selected or confirmed location
-  /// locally, so the app can restore it on next launch without requiring user
-  /// input.
   Future<bool> saveLocation(Location location) {
     final String json = jsonEncode(location.toJson());
     return _preferences.setString(Settings.location.key, json);
@@ -273,9 +288,24 @@ class LocalDataSource {
     }
   }
 
-  Future<Directory> _getAppDirectory() async {
-    // On Android or other platforms, fallback to Documents directory.
+  Future<Directory> getAppDirectory() async {
+    if (!kIsWeb && Platform.isIOS) {
+      try {
+        final String? sharedPath = await _channel.invokeMethod<String>(
+          'getSharedContainerPath',
+        );
+        if (sharedPath != null) {
+          return Directory(sharedPath);
+        }
+      } catch (e) {
+        debugPrint('Error getting shared container path: $e');
+      }
+    }
     return getApplicationDocumentsDirectory();
+  }
+
+  Future<bool> fileExists(String filePath) async {
+    return File(filePath).exists();
   }
 
   String _translateError(String key, String locale) {
@@ -284,6 +314,7 @@ class LocalDataSource {
           'error.save_asset_image_failed': <String, String>{
             'en': 'Failed to save asset image',
             'uk': 'Не вдалося зберегти зображення',
+            'pl': 'Nie udało się zapisać obrazu zasobu',
           },
         };
     return localizedErrors[key]?[locale] ?? key;

@@ -7,9 +7,7 @@ import 'package:open_meteo_api/open_meteo_api.dart';
 import 'package:open_meteo_api/src/models/exceptions/location_request_failure.dart';
 import 'package:open_meteo_api/src/models/exceptions/location_response_failure.dart';
 import 'package:open_meteo_api/src/models/exceptions/weather_not_found_failure.dart';
-import 'package:open_meteo_api/src/models/exceptions/weather_request_failure.dart';
-
-import 'models/exceptions/weather_response_failure.dart';
+import 'package:open_meteo_api/src/models/exceptions/weather_response_failure.dart';
 
 /// {@template open_meteo_api_client}
 /// Dart API Client which wraps the [Open Meteo API](https://open-meteo.com).
@@ -77,7 +75,10 @@ class OpenMeteoApiClient {
     final http.Response weatherResponse = await _httpClient.get(weatherRequest);
 
     if (weatherResponse.statusCode != HttpStatus.ok) {
-      throw WeatherRequestFailure();
+      throw WeatherRequestFailure(
+        message: 'Weather request failed for getWeather',
+        statusCode: weatherResponse.statusCode,
+      );
     }
 
     final Object weatherData = jsonDecode(weatherResponse.body);
@@ -110,7 +111,10 @@ class OpenMeteoApiClient {
     final http.Response weatherResponse = await _httpClient.get(weatherRequest);
 
     if (weatherResponse.statusCode != HttpStatus.ok) {
-      throw WeatherRequestFailure();
+      throw WeatherRequestFailure(
+        message: 'Weather request failed for getDailyForecast',
+        statusCode: weatherResponse.statusCode,
+      );
     }
 
     final Map<String, dynamic> weatherData = jsonDecode(weatherResponse.body);
