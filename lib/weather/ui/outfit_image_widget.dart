@@ -23,7 +23,7 @@ class OutfitImageWidget extends StatelessWidget {
     return Container(
       color: colorScheme.surface,
       alignment: Alignment.center,
-      padding: const EdgeInsets.only(left: 8.0),
+      padding: const EdgeInsets.only(left: 8.0, top: 8.0, bottom: 8.0),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20.0),
         clipBehavior: Clip.antiAlias,
