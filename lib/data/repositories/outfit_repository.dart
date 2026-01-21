@@ -20,6 +20,19 @@ class OutfitRepository {
     final double temperatureValue = _getTemperatureInCelsius(weather);
     final int roundedTemp = temperatureValue.round();
 
+    // On web, we cannot use dart:io Directory or File,
+    // so we use network source directly.
+    if (kIsWeb) {
+      final String conditionName = _getConditionName(weather.condition);
+      final String fileName = '${conditionName}_$roundedTemp.png';
+      const String baseUrl =
+          'https://raw.githubusercontent.com/Turskyi/weather_fit/refs/heads/master/outfits/';
+      return OutfitImage(
+        path: '$baseUrl$fileName',
+        source: OutfitImageSource.network,
+      );
+    }
+
     // 1. If the temperature ends with 0, return the asset image path
     // immediately.
     if (roundedTemp % 10 == 0) {
@@ -78,6 +91,9 @@ class OutfitRepository {
 
     if (outfitImage.source == OutfitImageSource.file) {
       // It's already a file on disk (either cached or freshly downloaded).
+      return outfitImage.path;
+    } else if (outfitImage.source == OutfitImageSource.network) {
+      // For network images on web, we don't have a local file path to return.
       return outfitImage.path;
     } else {
       // It's a bundled asset, we need to "download" (copy) it to a file

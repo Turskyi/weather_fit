@@ -13,7 +13,7 @@ part of 'remote_data_source.dart';
 class _RemoteDataSource implements RemoteDataSource {
   _RemoteDataSource(this._dio, {this.baseUrl, this.errorLogger}) {
     baseUrl ??=
-        'https://raw.githubusercontent.com/Turskyi/weather_fit/refs/heads/dev31/outfits/';
+        'https://raw.githubusercontent.com/Turskyi/weather_fit/refs/heads/master/outfits/';
   }
 
   final Dio _dio;

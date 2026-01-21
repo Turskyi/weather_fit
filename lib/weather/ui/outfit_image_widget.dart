@@ -38,6 +38,11 @@ class OutfitImageWidget extends StatelessWidget {
             fit: fit,
             errorBuilder: _errorBuilder,
           ),
+          OutfitImageSource.network => Image.network(
+            outfitImage.path,
+            fit: fit,
+            errorBuilder: _errorBuilder,
+          ),
         },
       ),
     );

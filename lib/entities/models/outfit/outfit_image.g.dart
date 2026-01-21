@@ -27,4 +27,5 @@ Map<String, dynamic> _$OutfitImageToJson(OutfitImage instance) =>
 const _$OutfitImageSourceEnumMap = {
   OutfitImageSource.asset: 'asset',
   OutfitImageSource.file: 'file',
+  OutfitImageSource.network: 'network',
 };
