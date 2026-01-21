@@ -7,6 +7,7 @@ import 'package:weather_fit/entities/enums/outfit_image_source.dart';
 import 'package:weather_fit/entities/enums/temperature_units.dart';
 import 'package:weather_fit/entities/models/outfit/outfit_image.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
+import 'package:weather_fit/res/constants.dart' as constants;
 import 'package:weather_fit/res/extensions/double_extension.dart';
 import 'package:weather_repository/weather_repository.dart';
 
@@ -19,16 +20,13 @@ class OutfitRepository {
   Future<OutfitImage> getOutfitImage(Weather weather) async {
     final double temperatureValue = _getTemperatureInCelsius(weather);
     final int roundedTemp = temperatureValue.round();
+    final String fileName = _getFileName(weather.condition, roundedTemp);
 
     // On web, we cannot use dart:io Directory or File,
     // so we use network source directly.
     if (kIsWeb) {
-      final String conditionName = _getConditionName(weather.condition);
-      final String fileName = '${conditionName}_$roundedTemp.png';
-      const String baseUrl =
-          'https://raw.githubusercontent.com/Turskyi/weather_fit/refs/heads/master/outfits/';
       return OutfitImage(
-        path: '$baseUrl$fileName',
+        path: '${constants.remoteOutfitBaseUrl}$fileName',
         source: OutfitImageSource.network,
       );
     }
@@ -44,8 +42,6 @@ class OutfitRepository {
 
     // 2. If the temperature does not end with 0, handle remote/cached image.
     try {
-      final String conditionName = _getConditionName(weather.condition);
-      final String fileName = '${conditionName}_$roundedTemp.png';
       final Directory directory = await _localDataSource.getAppDirectory();
       final String filePath = '${directory.path}/$fileName';
 
@@ -110,6 +106,11 @@ class OutfitRepository {
       temperatureValue = temperatureValue.toCelsius();
     }
     return temperatureValue;
+  }
+
+  String _getFileName(WeatherCondition condition, int roundedTemp) {
+    final String conditionName = _getConditionName(condition);
+    return '${conditionName}_$roundedTemp.png';
   }
 
   String _getConditionName(WeatherCondition condition) {

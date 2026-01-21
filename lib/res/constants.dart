@@ -41,3 +41,6 @@ const String doNotReplySenderName = 'Do Not Reply';
 const String feedbackEmailSender =
     '$doNotReplySenderName $appName <no-reply@$resendEmailDomain>';
 const String feedbackScreenshotFileName = 'feedback.png';
+
+const String remoteOutfitBaseUrl =
+    'https://raw.githubusercontent.com/Turskyi/weather_fit/refs/heads/master/outfits/';
