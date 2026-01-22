@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:permission_handler/permission_handler.dart' as geolocator;
@@ -74,59 +75,69 @@ class _SearchPageState extends State<SearchPage> {
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
-        if (context.isExtraSmallScreen) {
-          return Dialog.fullscreen(
-            child: Padding(
-              padding: const EdgeInsets.only(
-                left: 20.0,
-                right: 20.0,
-                top: 24.0,
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text(
-                    translate('search.confirm_location_dialog_title'),
-                    textAlign: TextAlign.center,
+        final Widget dialog = context.isExtraSmallScreen
+            ? Dialog.fullscreen(
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                    left: 20.0,
+                    right: 20.0,
+                    top: 24.0,
                   ),
-                  Text(
-                    displayLocation,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  Row(
+                  child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      TextButton(
-                        onPressed: _handleLocationConfirmationNo,
-                        child: Text(translate('no')),
+                      Text(
+                        translate('search.confirm_location_dialog_title'),
+                        textAlign: TextAlign.center,
                       ),
-                      TextButton(
-                        child: Text(translate('yes')),
-                        onPressed: () => _confirmLocationAndPop(location),
+                      Text(
+                        displayLocation,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          TextButton(
+                            onPressed: _handleLocationConfirmationNo,
+                            child: Text(translate('no')),
+                          ),
+                          TextButton(
+                            autofocus: true,
+                            child: Text(translate('yes')),
+                            onPressed: () => _confirmLocationAndPop(location),
+                          ),
+                        ],
                       ),
                     ],
                   ),
+                ),
+              )
+            : AlertDialog(
+                title: Text(translate('search.confirm_location_dialog_title')),
+                content: Text(displayLocation),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: _handleLocationConfirmationNo,
+                    child: Text(translate('no')),
+                  ),
+                  TextButton(
+                    autofocus: true,
+                    child: Text(translate('yes')),
+                    onPressed: () => _confirmLocationAndPop(location),
+                  ),
                 ],
-              ),
-            ),
-          );
-        } else {
-          return AlertDialog(
-            title: Text(translate('search.confirm_location_dialog_title')),
-            content: Text(displayLocation),
-            actions: <Widget>[
-              TextButton(
-                onPressed: _handleLocationConfirmationNo,
-                child: Text(translate('no')),
-              ),
-              TextButton(
-                child: Text(translate('yes')),
-                onPressed: () => _confirmLocationAndPop(location),
-              ),
-            ],
-          );
-        }
+              );
+
+        return CallbackShortcuts(
+          bindings: <ShortcutActivator, VoidCallback>{
+            const SingleActivator(LogicalKeyboardKey.arrowLeft): () =>
+                FocusScope.of(context).previousFocus(),
+            const SingleActivator(LogicalKeyboardKey.arrowRight): () =>
+                FocusScope.of(context).nextFocus(),
+          },
+          child: dialog,
+        );
       },
     );
   }
@@ -145,57 +156,78 @@ class _SearchPageState extends State<SearchPage> {
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
-        if (context.isExtraSmallScreen) {
-          return Dialog.fullscreen(
-            child: Padding(
-              padding: const EdgeInsets.only(top: 20.0, left: 16, right: 16),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text(
-                    translate(
-                      'search.location_not_found_use_current_dialog_content',
-                    ),
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: Theme.of(context).textTheme.bodySmall?.fontSize,
-                    ),
+        final Widget dialog = context.isExtraSmallScreen
+            ? Dialog.fullscreen(
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                    top: 20.0,
+                    left: 16,
+                    right: 16,
                   ),
-                  Row(
+                  child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      TextButton(
-                        onPressed: Navigator.of(context).pop,
-                        child: Text(translate('cancel')),
+                      Text(
+                        translate(
+                          'search.'
+                          'location_not_found_use_current_dialog_content',
+                        ),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: Theme.of(
+                            context,
+                          ).textTheme.bodySmall?.fontSize,
+                        ),
                       ),
-                      TextButton(
-                        onPressed: _handleUseCurrentLocationConfirm,
-                        child: Text(translate('yes')),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          TextButton(
+                            onPressed: Navigator.of(context).pop,
+                            child: Text(translate('cancel')),
+                          ),
+                          TextButton(
+                            autofocus: true,
+                            onPressed: _handleUseCurrentLocationConfirm,
+                            child: Text(translate('yes')),
+                          ),
+                        ],
                       ),
                     ],
                   ),
+                ),
+              )
+            : AlertDialog(
+                title: Text(
+                  translate('search.use_current_location_dialog_title'),
+                ),
+                content: Text(
+                  translate(
+                    'search.location_not_found_use_current_dialog_content',
+                  ),
+                ),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: Navigator.of(context).pop,
+                    child: Text(translate('cancel')),
+                  ),
+                  TextButton(
+                    autofocus: true,
+                    onPressed: _handleUseCurrentLocationConfirm,
+                    child: Text(translate('yes')),
+                  ),
                 ],
-              ),
-            ),
-          );
-        } else {
-          return AlertDialog(
-            title: Text(translate('search.use_current_location_dialog_title')),
-            content: Text(
-              translate('search.location_not_found_use_current_dialog_content'),
-            ),
-            actions: <Widget>[
-              TextButton(
-                onPressed: Navigator.of(context).pop,
-                child: Text(translate('cancel')),
-              ),
-              TextButton(
-                onPressed: _handleUseCurrentLocationConfirm,
-                child: Text(translate('yes')),
-              ),
-            ],
-          );
-        }
+              );
+
+        return CallbackShortcuts(
+          bindings: <ShortcutActivator, VoidCallback>{
+            const SingleActivator(LogicalKeyboardKey.arrowLeft): () =>
+                FocusScope.of(context).previousFocus(),
+            const SingleActivator(LogicalKeyboardKey.arrowRight): () =>
+                FocusScope.of(context).nextFocus(),
+          },
+          child: dialog,
+        );
       },
     );
   }
@@ -210,35 +242,44 @@ class _SearchPageState extends State<SearchPage> {
     return showDialog<void>(
       context: context,
       builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          title: Text(translate('search.location_not_found_dialog_title')),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Text(
-                translate('search.location_not_found_suggestion_spell_check'),
+        return CallbackShortcuts(
+          bindings: <ShortcutActivator, VoidCallback>{
+            const SingleActivator(LogicalKeyboardKey.arrowLeft): () =>
+                FocusScope.of(dialogContext).previousFocus(),
+            const SingleActivator(LogicalKeyboardKey.arrowRight): () =>
+                FocusScope.of(dialogContext).nextFocus(),
+          },
+          child: AlertDialog(
+            title: Text(translate('search.location_not_found_dialog_title')),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Text(
+                  translate('search.location_not_found_suggestion_spell_check'),
+                ),
+                // Example translation key
+                const SizedBox(height: 16),
+                Text(translate('search.location_not_found_suggestion_use_gps')),
+                // Example translation key
+              ],
+            ),
+            actions: <Widget>[
+              TextButton(
+                onPressed: Navigator.of(dialogContext).pop,
+                child: Text(translate('cancel')),
               ),
-              // Example translation key
-              const SizedBox(height: 16),
-              Text(translate('search.location_not_found_suggestion_use_gps')),
-              // Example translation key
+              TextButton(
+                autofocus: true,
+                child: Text(translate('search.use_gps_button')),
+                onPressed: () {
+                  Navigator.of(dialogContext).pop();
+                  context.read<SearchBloc>().add(
+                    RequestPermissionAndSearchByLocation(_text),
+                  );
+                },
+              ),
             ],
           ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: Navigator.of(dialogContext).pop,
-              child: Text(translate('cancel')),
-            ),
-            TextButton(
-              child: Text(translate('search.use_gps_button')),
-              onPressed: () {
-                Navigator.of(dialogContext).pop();
-                context.read<SearchBloc>().add(
-                  RequestPermissionAndSearchByLocation(_text),
-                );
-              },
-            ),
-          ],
         );
       },
     );
@@ -261,39 +302,48 @@ class _SearchPageState extends State<SearchPage> {
           // User must interact with the dialog.
           barrierDismissible: false,
           builder: (BuildContext dialogContext) {
-            return AlertDialog(
-              title: Text(translate('error.connection_security_issue_title')),
-              content: SingleChildScrollView(
-                child: ListBody(
-                  children: <Widget>[
-                    Text(state.errorMessage),
-                    const SizedBox(height: 16),
-                    Text(translate('error.what_you_can_do')),
-                    Text(
-                      "- ${translate('error.'
-                      'ensure_os_updated')}",
-                    ),
-                    Text(
-                      "- ${translate('error.'
-                      'check_date_time')}",
-                    ),
-                  ],
+            return CallbackShortcuts(
+              bindings: <ShortcutActivator, VoidCallback>{
+                const SingleActivator(LogicalKeyboardKey.arrowLeft): () =>
+                    FocusScope.of(dialogContext).previousFocus(),
+                const SingleActivator(LogicalKeyboardKey.arrowRight): () =>
+                    FocusScope.of(dialogContext).nextFocus(),
+              },
+              child: AlertDialog(
+                title: Text(translate('error.connection_security_issue_title')),
+                content: SingleChildScrollView(
+                  child: ListBody(
+                    children: <Widget>[
+                      Text(state.errorMessage),
+                      const SizedBox(height: 16),
+                      Text(translate('error.what_you_can_do')),
+                      Text(
+                        "- ${translate('error.'
+                        'ensure_os_updated')}",
+                      ),
+                      Text(
+                        "- ${translate('error.'
+                        'check_date_time')}",
+                      ),
+                    ],
+                  ),
                 ),
+                actions: <Widget>[
+                  TextButton(
+                    child: Text(translate('error.report_issue_button')),
+                    onPressed: () =>
+                        _handleReportActionAndPop(state.errorMessage),
+                  ),
+                  TextButton(
+                    autofocus: true,
+                    child: Text(translate('ok')),
+                    onPressed: () {
+                      // Close the dialog.
+                      Navigator.of(dialogContext).pop();
+                    },
+                  ),
+                ],
               ),
-              actions: <Widget>[
-                TextButton(
-                  child: Text(translate('error.report_issue_button')),
-                  onPressed: () =>
-                      _handleReportActionAndPop(state.errorMessage),
-                ),
-                TextButton(
-                  child: Text(translate('ok')),
-                  onPressed: () {
-                    // Close the dialog.
-                    Navigator.of(dialogContext).pop();
-                  },
-                ),
-              ],
             );
           },
         );
@@ -328,20 +378,29 @@ class _SearchPageState extends State<SearchPage> {
           showDialog<void>(
             context: context,
             builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text(translate('error.unable_to_connect')),
-                content: Text(translate('error.connection_reset_suggestion')),
-                actions: <Widget>[
-                  TextButton(
-                    onPressed: () =>
-                        _handleReportActionAndPop(state.errorMessage),
-                    child: Text(translate('report_issue')),
-                  ),
-                  ElevatedButton(
-                    onPressed: _text.isEmpty ? null : () => _popAndSearch(),
-                    child: Text(translate('try_again')),
-                  ),
-                ],
+              return CallbackShortcuts(
+                bindings: <ShortcutActivator, VoidCallback>{
+                  const SingleActivator(LogicalKeyboardKey.arrowLeft): () =>
+                      FocusScope.of(context).previousFocus(),
+                  const SingleActivator(LogicalKeyboardKey.arrowRight): () =>
+                      FocusScope.of(context).nextFocus(),
+                },
+                child: AlertDialog(
+                  title: Text(translate('error.unable_to_connect')),
+                  content: Text(translate('error.connection_reset_suggestion')),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () =>
+                          _handleReportActionAndPop(state.errorMessage),
+                      child: Text(translate('report_issue')),
+                    ),
+                    ElevatedButton(
+                      autofocus: true,
+                      onPressed: _text.isEmpty ? null : () => _popAndSearch(),
+                      child: Text(translate('try_again')),
+                    ),
+                  ],
+                ),
               );
             },
           );
