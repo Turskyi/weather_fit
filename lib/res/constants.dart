@@ -44,3 +44,7 @@ const String feedbackScreenshotFileName = 'feedback.png';
 
 const String remoteOutfitBaseUrl =
     'https://raw.githubusercontent.com/Turskyi/weather_fit/refs/heads/master/outfits/';
+
+/// The minimum width threshold to switch to a multi-column layout on
+/// Web/Desktop.
+const double kWideLayoutBreakpoint = 800.0;
