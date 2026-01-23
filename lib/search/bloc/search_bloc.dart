@@ -176,12 +176,15 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     Emitter<SearchState> emit,
   ) async {
     emit(const SearchLoading());
-    final String eventQuery = event.query;
+
+    // It is important to `trim` the query before passing it to the repository,
+    // otherwise query with trailing spaces will return wrong location.
+    final String eventQuery = event.query.trim();
 
     if (eventQuery.isEmpty) {
-      throw Exception(
-        'For some reason the query is empty. This should not have happened.',
-      );
+      //TODO: For some reason the query is empty. This should not have
+      // happened. Maybe inform user that he has to type something "
+      emit(const SearchInitial());
     } else {
       try {
         final Location location = await _locationRepository.getLocation(

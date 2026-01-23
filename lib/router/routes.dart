@@ -9,28 +9,28 @@ import 'package:weather_fit/settings/ui/settings_page.dart';
 import 'package:weather_fit/support/support_page.dart';
 import 'package:weather_fit/weather/ui/weather_page.dart';
 
-Map<String, WidgetBuilder> getRouteMap(String languageIsoCode) {
+Map<String, WidgetBuilder> getRouteMap() {
   return <String, WidgetBuilder>{
     AppRoute.weather.path: (BuildContext _) {
       return const WeatherPage();
     },
-    AppRoute.search.path: (BuildContext context) {
-      return SearchPage(languageIsoCode: languageIsoCode);
+    AppRoute.search.path: (BuildContext _) {
+      return const SearchPage();
     },
     AppRoute.settings.path: (BuildContext _) {
       return const SettingsPage();
     },
     AppRoute.support.path: (BuildContext _) {
-      return SupportPage(languageIsoCode: languageIsoCode);
+      return const SupportPage();
     },
     AppRoute.about.path: (BuildContext _) {
-      return AboutPage(languageIsoCode: languageIsoCode);
+      return const AboutPage();
     },
     AppRoute.privacyPolicyAndroid.path: (BuildContext _) {
-      return PrivacyPolicyAndroidPage(languageIsoCode: languageIsoCode);
+      return const PrivacyPolicyAndroidPage();
     },
     AppRoute.privacyPolicy.path: (BuildContext _) {
-      return PrivacyPolicyPage(languageIsoCode: languageIsoCode);
+      return const PrivacyPolicyPage();
     },
     AppRoute.unableToConnect.path: (BuildContext _) {
       return const UnableToConnect();

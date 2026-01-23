@@ -10,9 +10,7 @@ import 'package:weather_fit/res/widgets/leading_widget.dart';
 import 'package:weather_fit/router/app_route.dart';
 
 class AboutPage extends StatelessWidget {
-  const AboutPage({required this.languageIsoCode, super.key});
-
-  final String languageIsoCode;
+  const AboutPage({super.key});
 
   bool get _showWidgetsFeature {
     if (kIsWeb) return false;

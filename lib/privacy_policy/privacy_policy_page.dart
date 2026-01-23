@@ -1,15 +1,15 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:weather_fit/privacy_policy/email_text.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
 import 'package:weather_fit/res/widgets/leading_widget.dart';
+import 'package:weather_fit/settings/bloc/settings_bloc.dart';
 import 'package:weather_fit/utils/date_util.dart';
 
 class PrivacyPolicyPage extends StatelessWidget {
-  const PrivacyPolicyPage({required this.languageIsoCode, super.key});
-
-  final String languageIsoCode;
+  const PrivacyPolicyPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +17,7 @@ class PrivacyPolicyPage extends StatelessWidget {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final double? titleSize = textTheme.titleLarge?.fontSize;
     final double? bodySize = textTheme.bodyLarge?.fontSize;
-    final String updatedDate = getPrivacyLastUpdatedDate(languageIsoCode);
+
     return Scaffold(
       appBar: AppBar(
         leading: kIsWeb ? const LeadingWidget() : null,
@@ -36,9 +36,16 @@ class PrivacyPolicyPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 10),
-            Text(
-              '${translate('last_updated')}: $updatedDate',
-              style: TextStyle(fontSize: bodySize),
+            BlocBuilder<SettingsBloc, SettingsState>(
+              builder: (BuildContext _, SettingsState state) {
+                final String updatedDate = getPrivacyLastUpdatedDate(
+                  state.languageIsoCode,
+                );
+                return Text(
+                  '${translate('last_updated')}: $updatedDate',
+                  style: TextStyle(fontSize: bodySize),
+                );
+              },
             ),
             const SizedBox(height: 20),
             Text(

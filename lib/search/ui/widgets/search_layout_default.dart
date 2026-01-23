@@ -12,7 +12,6 @@ class SearchLayoutDefault extends StatelessWidget {
   const SearchLayoutDefault({
     required this.textEditingController,
     required this.searchStateListener,
-    required this.languageIsoCode,
     super.key,
   });
 
@@ -21,8 +20,6 @@ class SearchLayoutDefault extends StatelessWidget {
   /// Takes the `BuildContext` along with the [bloc] `state`
   /// and is responsible for executing in response to `state` changes.
   final BlocWidgetListener<SearchState> searchStateListener;
-
-  final String languageIsoCode;
 
   @override
   Widget build(BuildContext context) {

@@ -13,9 +13,7 @@ import 'package:weather_fit/settings/bloc/settings_bloc.dart';
 import 'package:weather_repository/weather_repository.dart';
 
 class SearchPage extends StatefulWidget {
-  const SearchPage({required this.languageIsoCode, super.key});
-
-  final String languageIsoCode;
+  const SearchPage({super.key});
 
   @override
   State<SearchPage> createState() => _SearchPageState();
@@ -37,12 +35,10 @@ class _SearchPageState extends State<SearchPage> {
           ? SearchPageExtraSmallLayout(
               textEditingController: _textController,
               searchStateListener: _searchStateListener,
-              languageIsoCode: widget.languageIsoCode,
             )
           : SearchLayoutDefault(
               textEditingController: _textController,
               searchStateListener: _searchStateListener,
-              languageIsoCode: widget.languageIsoCode,
             ),
     );
   }

@@ -7,9 +7,7 @@ import 'package:weather_fit/res/widgets/leading_widget.dart';
 import 'package:weather_fit/widgets/language_selector.dart';
 
 class SupportPage extends StatefulWidget {
-  const SupportPage({required this.languageIsoCode, super.key});
-
-  final String languageIsoCode;
+  const SupportPage({super.key});
 
   @override
   State<SupportPage> createState() => _SupportPageState();

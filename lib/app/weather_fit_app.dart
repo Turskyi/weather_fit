@@ -47,16 +47,16 @@ class WeatherFitApp extends StatelessWidget {
         RepositoryProvider<WeatherRepository>.value(value: weatherRepository),
         RepositoryProvider<OutfitRepository>.value(value: outfitRepository),
         RepositoryProvider<HomeWidgetService>(
-          create: (_) => const HomeWidgetServiceImpl(),
+          create: (BuildContext _) => const HomeWidgetServiceImpl(),
         ),
         RepositoryProvider<UpdateService>(
-          create: (_) => const UpdateServiceImpl(),
+          create: (BuildContext _) => const UpdateServiceImpl(),
         ),
       ],
       child: MultiBlocProvider(
         providers: <SingleChildWidget>[
           // Provide the theme cubit.
-          BlocProvider<ThemeCubit>(create: (_) => ThemeCubit()),
+          BlocProvider<ThemeCubit>(create: (BuildContext _) => ThemeCubit()),
           BlocProvider<WeatherBloc>(
             create: (BuildContext context) {
               return WeatherBloc(
@@ -86,7 +86,7 @@ class WeatherFitApp extends StatelessWidget {
           ),
         ],
         child: BlocBuilder<ThemeCubit, Color>(
-          builder: (BuildContext _, Color color) {
+          builder: (BuildContext context, Color color) {
             final DateTime now = DateTime.now();
             final int hour = now.hour;
             // Assume darkness from 10 PM to 6 AM.
@@ -111,7 +111,7 @@ class WeatherFitApp extends StatelessWidget {
                 supportedLocales: localizationDelegate.supportedLocales,
                 locale: localizationDelegate.currentLocale,
                 initialRoute: AppRoute.weather.path,
-                routes: routes.getRouteMap(initialLanguage.isoLanguageCode),
+                routes: routes.getRouteMap(),
                 builder: (BuildContext _, Widget? child) {
                   return SettingsStateListenerContent(child: child);
                 },
