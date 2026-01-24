@@ -87,7 +87,7 @@ class _DailyForecastState extends State<DailyForecast> {
           return GestureDetector(
             behavior: HitTestBehavior.translucent,
             onTap: _hidePreview,
-            child: Container(color: Colors.transparent),
+            child: const ColoredBox(color: Colors.transparent),
           );
         },
       );
