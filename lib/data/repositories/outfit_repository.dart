@@ -29,46 +29,44 @@ class OutfitRepository {
         path: '${constants.remoteOutfitBaseUrl}$fileName',
         source: OutfitImageSource.network,
       );
-    }
-
-    // 1. If the temperature ends with 0, return the asset image path
-    // immediately.
-    if (roundedTemp % 10 == 0) {
+    } else if (roundedTemp % 10 == 0) {
+      // 1. If the temperature ends with 0, return the asset image path
+      // immediately.
       return OutfitImage(
         path: getOutfitImageAssetPath(weather),
         source: OutfitImageSource.asset,
       );
-    }
+    } else {
+      // 2. If the temperature does not end with 0, handle remote/cached image.
+      try {
+        final Directory directory = await _localDataSource.getAppDirectory();
+        final String filePath = '${directory.path}/$fileName';
 
-    // 2. If the temperature does not end with 0, handle remote/cached image.
-    try {
-      final Directory directory = await _localDataSource.getAppDirectory();
-      final String filePath = '${directory.path}/$fileName';
+        // Check if the image is already downloaded locally.
+        if (await _localDataSource.fileExists(filePath)) {
+          return OutfitImage(path: filePath, source: OutfitImageSource.file);
+        }
 
-      // Check if the image is already downloaded locally.
-      if (await _localDataSource.fileExists(filePath)) {
+        // Attempt to download from remote source.
+        final List<int> bytes = await _remoteDataSource
+            .downloadOutfitImage(fileName)
+            .timeout(const Duration(seconds: 5));
+
+        // Save to local app storage.
+        final File file = File(filePath);
+        await file.writeAsBytes(bytes);
+
         return OutfitImage(path: filePath, source: OutfitImageSource.file);
+      } catch (e) {
+        debugPrint(
+          'Error handling remote outfit image: $e. Falling back to asset.',
+        );
+        // 3. Fallback to existing asset-based logic.
+        return OutfitImage(
+          path: getOutfitImageAssetPath(weather),
+          source: OutfitImageSource.asset,
+        );
       }
-
-      // Attempt to download from remote source.
-      final List<int> bytes = await _remoteDataSource
-          .downloadOutfitImage(fileName)
-          .timeout(const Duration(seconds: 5));
-
-      // Save to local app storage.
-      final File file = File(filePath);
-      await file.writeAsBytes(bytes);
-
-      return OutfitImage(path: filePath, source: OutfitImageSource.file);
-    } catch (e) {
-      debugPrint(
-        'Error handling remote outfit image: $e. Falling back to asset.',
-      );
-      // 3. Fallback to existing asset-based logic.
-      return OutfitImage(
-        path: getOutfitImageAssetPath(weather),
-        source: OutfitImageSource.asset,
-      );
     }
   }
 
