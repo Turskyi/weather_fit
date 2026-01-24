@@ -106,6 +106,7 @@ class _CustomFeedbackFormState extends State<FeedbackForm> {
 
   Widget _ratingToIcon(FeedbackRating rating) {
     final bool isSelected = _customFeedback.rating == rating;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
     late IconData icon;
     switch (rating) {
       case FeedbackRating.bad:
@@ -119,7 +120,7 @@ class _CustomFeedbackFormState extends State<FeedbackForm> {
         break;
     }
     return IconButton(
-      color: isSelected ? Theme.of(context).colorScheme.secondary : Colors.grey,
+      color: isSelected ? colorScheme.secondary : colorScheme.outline,
       onPressed: () => setState(
         () => _customFeedback = _customFeedback.copyWith(rating: rating),
       ),
