@@ -40,8 +40,23 @@ class _DailyForecastState extends State<DailyForecast> {
     final Size size = renderBox.size;
     final Offset offset = renderBox.localToGlobal(Offset.zero);
 
-    final double left = offset.dx;
+    final double itemLeft = offset.dx;
     final double top = offset.dy;
+
+    // Preview card is approximately 156px wide (140 image + 16 padding)
+    const double previewWidth = 156.0;
+    final double screenWidth = MediaQuery.of(context).size.width;
+
+    // Center the preview on the item
+    double left = itemLeft + (size.width / 2) - (previewWidth / 2);
+
+    // Keep preview within screen bounds with 8px padding
+    const double screenPadding = 8.0;
+    if (left < screenPadding) {
+      left = screenPadding;
+    } else if (left + previewWidth > screenWidth - screenPadding) {
+      left = screenWidth - previewWidth - screenPadding;
+    }
 
     _overlayEntry = OverlayEntry(
       builder: (BuildContext context) {
