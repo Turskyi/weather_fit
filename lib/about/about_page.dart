@@ -30,7 +30,8 @@ class AboutPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextTheme textTheme = Theme.of(context).textTheme;
+    final ThemeData theme = Theme.of(context);
+    final TextTheme textTheme = theme.textTheme;
 
     final List<String> features = <String>[
       translate('about.feature_outfit_suggestions'),
@@ -91,7 +92,7 @@ class AboutPage extends StatelessWidget {
                   TextSpan(
                     text: translate('anna_turska'),
                     style: textTheme.bodyMedium?.copyWith(
-                      color: Colors.blue,
+                      color: theme.colorScheme.primary,
                       decoration: TextDecoration.underline,
                     ),
                     recognizer: TapGestureRecognizer()
