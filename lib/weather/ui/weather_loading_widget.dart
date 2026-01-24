@@ -8,6 +8,7 @@ class WeatherLoadingWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
+    final ColorScheme colorScheme = theme.colorScheme;
     final TextStyle? textStyle = context.isExtraSmallScreen
         ? theme.textTheme.bodySmall
         : theme.textTheme.titleLarge;
@@ -17,10 +18,14 @@ class WeatherLoadingWidget extends StatelessWidget {
         Container(
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: theme.primaryColor.withAlpha(99),
+            color: colorScheme.primary.withValues(alpha: 0.4),
           ),
           padding: const EdgeInsets.all(16.0),
-          child: const Icon(Icons.cloud, size: 64, color: Colors.white),
+          child: Icon(
+            Icons.cloud,
+            size: 64,
+            color: colorScheme.onPrimary,
+          ),
         ),
         const SizedBox(height: 16.0),
         Text(
@@ -29,7 +34,7 @@ class WeatherLoadingWidget extends StatelessWidget {
         ),
         const SizedBox(height: 8.0),
         CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(theme.primaryColor),
+          valueColor: AlwaysStoppedAnimation<Color>(colorScheme.primary),
         ),
       ],
     );

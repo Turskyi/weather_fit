@@ -209,9 +209,9 @@ class _PrivacyPolicyAndroidPageState extends State<PrivacyPolicyAndroidPage> {
                   ),
                   TextSpan(
                     text: translate('anna_turska'),
-                    style: const TextStyle(
+                    style: TextStyle(
                       decoration: TextDecoration.underline,
-                      color: Colors.blue,
+                      color: themeData.colorScheme.primary,
                     ),
                     recognizer: TapGestureRecognizer()
                       ..onTap = () =>
