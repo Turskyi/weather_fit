@@ -11,7 +11,7 @@ import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
 import 'package:weather_fit/data/repositories/location_repository.dart';
 import 'package:weather_fit/data/repositories/outfit_repository.dart';
 import 'package:weather_fit/entities/enums/language.dart';
-import 'package:weather_fit/localization/localization_delelegate_getter.dart';
+import 'package:weather_fit/localization/localization_delegate_getter.dart';
 import 'package:weather_fit/router/app_route.dart';
 import 'package:weather_fit/router/routes.dart' as router;
 import 'package:weather_fit/search/bloc/search_bloc.dart';

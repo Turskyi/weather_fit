@@ -1,3 +1,4 @@
+import 'package:feedback/feedback.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -10,6 +11,7 @@ import 'package:weather_fit/data/repositories/location_repository.dart';
 import 'package:weather_fit/data/repositories/outfit_repository.dart';
 import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/env/env.dart';
+import 'package:weather_fit/feedback/feedback_form.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
 import 'package:weather_fit/res/resources.dart';
 import 'package:weather_fit/res/theme/cubit/theme_cubit.dart';
@@ -98,57 +100,77 @@ class WeatherFitApp extends StatelessWidget {
             const String fontFamily = 'Montserrat';
 
             return Resources(
-              child: MaterialApp(
-                navigatorKey: navigatorKey,
-                debugShowCheckedModeBanner: false,
-                title: constants.appName,
-                localizationsDelegates: <LocalizationsDelegate<Object>>[
-                  GlobalMaterialLocalizations.delegate,
-                  GlobalWidgetsLocalizations.delegate,
-                  GlobalCupertinoLocalizations.delegate,
-                  localizationDelegate,
-                ],
-                supportedLocales: localizationDelegate.supportedLocales,
-                locale: localizationDelegate.currentLocale,
-                initialRoute: AppRoute.weather.path,
-                routes: routes.getRouteMap(),
-                builder: (BuildContext _, Widget? child) {
-                  return SettingsStateListenerContent(child: child);
-                },
-                theme: ThemeData(
-                  useMaterial3: true,
-                  fontFamily: fontFamily,
-                  appBarTheme: const AppBarTheme(
-                    backgroundColor: Colors.transparent,
-                    elevation: 0,
-                    titleTextStyle: TextStyle(
-                      fontFamily: fontFamily,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black,
+              child: BetterFeedback(
+                feedbackBuilder:
+                    (
+                      BuildContext _,
+                      OnSubmit onSubmit,
+                      ScrollController? scrollController,
+                    ) {
+                      return FeedbackForm(
+                        onSubmit: onSubmit,
+                        scrollController: scrollController,
+                      );
+                    },
+                theme: FeedbackThemeData(
+                  feedbackSheetColor: completeDarkness
+                      ? const Color(0xFF1C1C1E)
+                      : Colors.grey.shade50,
+                ),
+                child: MaterialApp(
+                  navigatorKey: navigatorKey,
+                  debugShowCheckedModeBanner: false,
+                  title: constants.appName,
+                  localizationsDelegates: <LocalizationsDelegate<Object>>[
+                    GlobalMaterialLocalizations.delegate,
+                    GlobalWidgetsLocalizations.delegate,
+                    GlobalCupertinoLocalizations.delegate,
+                    localizationDelegate,
+                  ],
+                  supportedLocales: localizationDelegate.supportedLocales,
+                  locale: localizationDelegate.currentLocale,
+                  initialRoute: AppRoute.weather.path,
+                  routes: routes.getRouteMap(),
+                  builder: (BuildContext _, Widget? child) {
+                    return SettingsStateListenerContent(child: child);
+                  },
+                  theme: ThemeData(
+                    useMaterial3: true,
+                    fontFamily: fontFamily,
+                    appBarTheme: const AppBarTheme(
+                      backgroundColor: Colors.transparent,
+                      elevation: 0,
+                      titleTextStyle: TextStyle(
+                        fontFamily: fontFamily,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black,
+                      ),
+                    ),
+                    colorScheme: ColorScheme.fromSeed(seedColor: color),
+                  ),
+                  darkTheme: ThemeData(
+                    useMaterial3: true,
+                    fontFamily: fontFamily,
+                    appBarTheme: const AppBarTheme(
+                      backgroundColor: Colors.transparent,
+                      elevation: 0,
+                      titleTextStyle: TextStyle(
+                        fontFamily: fontFamily,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                    colorScheme: ColorScheme.fromSeed(
+                      seedColor: color,
+                      brightness: Brightness.dark,
                     ),
                   ),
-                  colorScheme: ColorScheme.fromSeed(seedColor: color),
+                  themeMode: completeDarkness
+                      ? ThemeMode.dark
+                      : ThemeMode.light,
                 ),
-                darkTheme: ThemeData(
-                  useMaterial3: true,
-                  fontFamily: fontFamily,
-                  appBarTheme: const AppBarTheme(
-                    backgroundColor: Colors.transparent,
-                    elevation: 0,
-                    titleTextStyle: TextStyle(
-                      fontFamily: fontFamily,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
-                  ),
-                  colorScheme: ColorScheme.fromSeed(
-                    seedColor: color,
-                    brightness: Brightness.dark,
-                  ),
-                ),
-                themeMode: completeDarkness ? ThemeMode.dark : ThemeMode.light,
               ),
             );
           },

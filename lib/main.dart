@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:feedback/feedback.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
@@ -15,8 +14,7 @@ import 'package:weather_fit/data/repositories/location_repository.dart';
 import 'package:weather_fit/data/repositories/outfit_repository.dart';
 import 'package:weather_fit/di/injector.dart' as di;
 import 'package:weather_fit/entities/enums/language.dart';
-import 'package:weather_fit/feedback/feedback_form.dart';
-import 'package:weather_fit/localization/localization_delelegate_getter.dart'
+import 'package:weather_fit/localization/localization_delegate_getter.dart'
     as locale;
 import 'package:weather_fit/router/app_route.dart';
 import 'package:weather_repository/weather_repository.dart';
@@ -71,30 +69,16 @@ void main() async {
   runApp(
     LocalizedApp(
       localizationDelegate,
-      BetterFeedback(
-        feedbackBuilder:
-            (
-              BuildContext _,
-              OnSubmit onSubmit,
-              ScrollController? scrollController,
-            ) {
-              return FeedbackForm(
-                onSubmit: onSubmit,
-                scrollController: scrollController,
-              );
-            },
-        theme: FeedbackThemeData(feedbackSheetColor: Colors.grey.shade50),
-        child: WeatherFitApp(
-          weatherRepository: WeatherRepository(),
-          locationRepository: LocationRepository(
-            NominatimApiClient(),
-            OpenMeteoApiClient(),
-            localDataSource,
-          ),
-          outfitRepository: OutfitRepository(localDataSource, remoteDataSource),
-          localDataSource: localDataSource,
-          initialLanguage: initialLanguage,
+      WeatherFitApp(
+        weatherRepository: WeatherRepository(),
+        locationRepository: LocationRepository(
+          NominatimApiClient(),
+          OpenMeteoApiClient(),
+          localDataSource,
         ),
+        outfitRepository: OutfitRepository(localDataSource, remoteDataSource),
+        localDataSource: localDataSource,
+        initialLanguage: initialLanguage,
       ),
     ),
   );

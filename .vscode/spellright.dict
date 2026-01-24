@@ -13,3 +13,6 @@ typescriptreact
 arraybuffer
 axios
 cors
+Intl.defaultLocale
+intl
+nominatim_api
