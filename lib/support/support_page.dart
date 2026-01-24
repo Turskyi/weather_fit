@@ -16,7 +16,8 @@ class SupportPage extends StatefulWidget {
 class _SupportPageState extends State<SupportPage> {
   @override
   Widget build(BuildContext context) {
-    final TextTheme textTheme = Theme.of(context).textTheme;
+    final ThemeData theme = Theme.of(context);
+    final TextTheme textTheme = theme.textTheme;
 
     return Scaffold(
       appBar: AppBar(
@@ -152,7 +153,7 @@ class _SupportPageState extends State<SupportPage> {
               child: SelectableText(
                 '${translate('email')}: ${constants.supportEmail}',
                 style: textTheme.bodySmall?.copyWith(
-                  color: Colors.blue,
+                  color: theme.colorScheme.primary,
                   decoration: TextDecoration.underline,
                 ),
               ),
