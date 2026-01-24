@@ -181,36 +181,41 @@ class _DailyForecastState extends State<DailyForecast> {
                                   _hidePreview();
                                 }
                               },
-                              child: GestureDetector(
-                                behavior: HitTestBehavior.translucent,
-                                onTap: () {
-                                  if (!kIsWeb) {
-                                    if (_visibleIndex == i) {
-                                      _hidePreview();
-                                    } else {
-                                      _showPreview(
-                                        context: context,
-                                        index: i,
-                                        item: forecast[i],
-                                        state: state,
-                                      );
+                              child: Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  onTap: () {
+                                    if (!kIsWeb) {
+                                      if (_visibleIndex == i) {
+                                        _hidePreview();
+                                      } else {
+                                        _showPreview(
+                                          context: context,
+                                          index: i,
+                                          item: forecast[i],
+                                          state: state,
+                                        );
+                                      }
                                     }
-                                  }
-                                },
-                                child: Container(
-                                  key: _itemKeys[i],
-                                  constraints: const BoxConstraints(
-                                    minWidth: 90,
-                                  ),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8.0,
-                                  ),
-                                  child: AnimatedScale(
-                                    scale: _visibleIndex == i ? 0.98 : 1.0,
-                                    duration: const Duration(milliseconds: 150),
-                                    child: ForecastItemWidget(
-                                      item: forecast[i],
-                                      isCelsius: isCelsius,
+                                  },
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Container(
+                                    key: _itemKeys[i],
+                                    constraints: const BoxConstraints(
+                                      minWidth: 90,
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8.0,
+                                    ),
+                                    child: AnimatedScale(
+                                      scale: _visibleIndex == i ? 0.98 : 1.0,
+                                      duration: const Duration(
+                                        milliseconds: 150,
+                                      ),
+                                      child: ForecastItemWidget(
+                                        item: forecast[i],
+                                        isCelsius: isCelsius,
+                                      ),
                                     ),
                                   ),
                                 ),
