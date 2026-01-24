@@ -59,6 +59,57 @@ Future<void> _initializeWebHydratedStorage() async {
   }
 }
 
+/// Initializes background widget updates using Workmanager plugin.
+///
+/// **iOS BACKGROUND TASK BEHAVIOR (Critical Understanding)**
+///
+/// On iOS, background task execution is NOT guaranteed and is controlled
+/// entirely by the OS.
+/// This is a fundamental iOS limitation, NOT a bug in our implementation.
+///
+/// **Key iOS Constraints:**
+/// - Minimum frequency: 15 minutes (but this is merely a floor; actual
+/// execution is much less frequent)
+/// - Actual execution frequency: ~1 per day (controlled by iOS based on user
+/// behavior & battery state)
+/// - No guarantee: iOS may never execute the task, especially if:
+///   - User hasn't opened the app recently
+///   - Device is in low-power mode
+///   - App is not frequently used (iOS throttles background tasks for
+///   rarely-used apps)
+///   - User has disabled "Background App Refresh" in iOS Settings
+/// - Task execution limits: ~30 seconds for standard background fetch tasks
+/// - Cannot be forced: Unlike Android, iOS does not guarantee background task
+/// execution
+///
+/// **Comparison with Android:**
+/// - Android: Workmanager respects minimum 15-minute frequency and is more
+/// predictable
+/// - iOS: Frequency is a suggestion; OS schedules based on app usage patterns
+/// and device state
+///
+/// **What we're doing correctly:**
+/// ✅ Registering task with 2-hour frequency (workmanager minimum on iOS is
+/// 15 min)
+/// ✅ Using NetworkType.connected constraint to avoid draining battery
+/// ✅ Handling errors gracefully with try-catch and debug logging
+/// ✅ Using @pragma('vm:entry-point') for callback dispatcher
+/// ✅ Initializing all necessary dependencies in background context
+///
+/// **Expected behavior on iOS:**
+/// - Widget may update ~1-2 times per day when iOS decides to execute
+/// background fetch
+/// - Updates are NOT tied to the 120-minute frequency we request; that's just
+/// a hint
+/// - Device state, battery, and user behavior are primary factors in iOS
+/// scheduling
+/// - This is why widget updates on iOS appear irregular and unpredictable
+///
+/// **References:**
+/// - https://pub.dev/packages/workmanager (iOS limitations documented)
+/// - https://developer.apple.com/documentation/backgroundtasks
+/// - Apple's BGTaskScheduler APIs have hard execution time limits
+///
 Future<void> _setupBackgroundWidgetUpdates() async {
   try {
     await Workmanager().initialize(_callbackDispatcher);
@@ -66,7 +117,10 @@ Future<void> _setupBackgroundWidgetUpdates() async {
       await Workmanager().registerPeriodicTask(
         'weatherfit_background_update',
         'updateWidgetTask',
-        // Home widget will be updated every two hours.
+        // Request 2-hour frequency, but iOS will schedule based on its own
+        // heuristics.
+        // On iOS, actual execution may be much less frequent (~1x daily).
+        // This is an OS-level limitation, not a configuration issue.
         frequency: const Duration(minutes: 120),
         constraints: Constraints(networkType: NetworkType.connected),
       );
