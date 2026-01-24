@@ -99,6 +99,14 @@ class WeatherFitApp extends StatelessWidget {
 
             const String fontFamily = 'Montserrat';
 
+            final ColorScheme lightColorScheme = ColorScheme.fromSeed(
+              seedColor: color,
+            );
+            final ColorScheme darkColorScheme = ColorScheme.fromSeed(
+              seedColor: color,
+              brightness: Brightness.dark,
+            );
+
             return Resources(
               child: BetterFeedback(
                 feedbackBuilder:
@@ -114,8 +122,8 @@ class WeatherFitApp extends StatelessWidget {
                     },
                 theme: FeedbackThemeData(
                   feedbackSheetColor: completeDarkness
-                      ? const Color(0xFF1C1C1E)
-                      : Colors.grey.shade50,
+                      ? darkColorScheme.surface
+                      : lightColorScheme.surface,
                 ),
                 child: MaterialApp(
                   navigatorKey: navigatorKey,
@@ -137,35 +145,32 @@ class WeatherFitApp extends StatelessWidget {
                   theme: ThemeData(
                     useMaterial3: true,
                     fontFamily: fontFamily,
-                    appBarTheme: const AppBarTheme(
+                    appBarTheme: AppBarTheme(
                       backgroundColor: Colors.transparent,
                       elevation: 0,
                       titleTextStyle: TextStyle(
                         fontFamily: fontFamily,
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
-                        color: Colors.black,
+                        color: lightColorScheme.onSurface,
                       ),
                     ),
-                    colorScheme: ColorScheme.fromSeed(seedColor: color),
+                    colorScheme: lightColorScheme,
                   ),
                   darkTheme: ThemeData(
                     useMaterial3: true,
                     fontFamily: fontFamily,
-                    appBarTheme: const AppBarTheme(
+                    appBarTheme: AppBarTheme(
                       backgroundColor: Colors.transparent,
                       elevation: 0,
                       titleTextStyle: TextStyle(
                         fontFamily: fontFamily,
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
-                        color: Colors.white,
+                        color: darkColorScheme.onSurface,
                       ),
                     ),
-                    colorScheme: ColorScheme.fromSeed(
-                      seedColor: color,
-                      brightness: Brightness.dark,
-                    ),
+                    colorScheme: darkColorScheme,
                   ),
                   themeMode: completeDarkness
                       ? ThemeMode.dark

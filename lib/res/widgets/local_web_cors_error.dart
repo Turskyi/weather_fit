@@ -6,7 +6,10 @@ class LocalWebCorsError extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextTheme textTheme = Theme.of(context).textTheme;
+    final ThemeData theme = Theme.of(context);
+    final TextTheme textTheme = theme.textTheme;
+    final ColorScheme colorScheme = theme.colorScheme;
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
@@ -25,7 +28,7 @@ class LocalWebCorsError extends StatelessWidget {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(20),
             child: Container(
-              color: Colors.white,
+              color: colorScheme.surfaceContainerHighest,
               alignment: Alignment.center,
               padding: const EdgeInsets.all(16),
               child: SelectableText(
@@ -33,6 +36,7 @@ class LocalWebCorsError extends StatelessWidget {
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: textTheme.titleMedium?.fontSize,
+                  color: colorScheme.onSurfaceVariant,
                 ),
               ),
             ),
