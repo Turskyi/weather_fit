@@ -137,6 +137,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
           ..writeln('${translate('build_number')}: ${packageInfo.buildNumber}')
           ..writeln()
           ..writeln('${translate('platform')}: $platform')
+          ..writeln()
+          ..writeln('${translate('settings.language')}: ${state.language}')
           ..write(
             screenSize == null
                 ? ''
