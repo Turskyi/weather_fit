@@ -54,7 +54,7 @@ class OutfitWidget extends StatelessWidget {
         borderRadius: borderRadius,
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
+            color: colorScheme.shadow.withValues(alpha: 0.2),
             // How far the shadow spreads.
             spreadRadius: 2,
             // How blurry the shadow is.
@@ -120,7 +120,7 @@ class OutfitWidget extends StatelessWidget {
                     Expanded(
                       flex: 2,
                       child: Container(
-                        color: theme.colorScheme.surface,
+                        color: colorScheme.surface,
                         padding: const EdgeInsets.all(10),
                         child: Center(
                           child: SelectableText(

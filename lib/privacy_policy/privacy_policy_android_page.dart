@@ -1,18 +1,18 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:weather_fit/privacy_policy/email_text.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
 import 'package:weather_fit/res/widgets/leading_widget.dart';
+import 'package:weather_fit/settings/bloc/settings_bloc.dart';
 import 'package:weather_fit/utils/date_util.dart';
 import 'package:weather_fit/widgets/language_selector.dart';
 
 class PrivacyPolicyAndroidPage extends StatefulWidget {
-  const PrivacyPolicyAndroidPage({required this.languageIsoCode, super.key});
-
-  final String languageIsoCode;
+  const PrivacyPolicyAndroidPage({super.key});
 
   @override
   State<PrivacyPolicyAndroidPage> createState() =>
@@ -27,9 +27,7 @@ class _PrivacyPolicyAndroidPageState extends State<PrivacyPolicyAndroidPage> {
     final TextTheme textTheme = themeData.textTheme;
     final double? titleSize = textTheme.titleLarge?.fontSize;
     final double? bodySize = textTheme.bodyLarge?.fontSize;
-    final String privacyLastUpdatedDate = getPrivacyLastUpdatedDate(
-      widget.languageIsoCode,
-    );
+
     return Scaffold(
       appBar: AppBar(
         leading: kIsWeb ? const LeadingWidget() : null,
@@ -63,9 +61,16 @@ class _PrivacyPolicyAndroidPageState extends State<PrivacyPolicyAndroidPage> {
           spacing: 10,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Text(
-              '${translate('last_update')}: $privacyLastUpdatedDate',
-              style: TextStyle(fontSize: bodySize),
+            BlocBuilder<SettingsBloc, SettingsState>(
+              builder: (BuildContext _, SettingsState state) {
+                final String privacyLastUpdatedDate = getPrivacyLastUpdatedDate(
+                  state.languageIsoCode,
+                );
+                return Text(
+                  '${translate('last_update')}: $privacyLastUpdatedDate',
+                  style: TextStyle(fontSize: bodySize),
+                );
+              },
             ),
             const SizedBox(height: 10),
             Text(
@@ -204,9 +209,9 @@ class _PrivacyPolicyAndroidPageState extends State<PrivacyPolicyAndroidPage> {
                   ),
                   TextSpan(
                     text: translate('anna_turska'),
-                    style: const TextStyle(
+                    style: TextStyle(
                       decoration: TextDecoration.underline,
-                      color: Colors.blue,
+                      color: themeData.colorScheme.primary,
                     ),
                     recognizer: TapGestureRecognizer()
                       ..onTap = () =>

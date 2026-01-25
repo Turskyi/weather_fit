@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:weather_fit/entities/enums/outfit_image_source.dart';
 import 'package:weather_fit/entities/models/outfit/outfit_image.dart';
 import 'package:weather_fit/weather/ui/error/outfit_image_error_widget.dart';
@@ -23,7 +24,12 @@ class OutfitImageWidget extends StatelessWidget {
     return Container(
       color: colorScheme.surface,
       alignment: Alignment.center,
-      padding: const EdgeInsets.only(left: 8.0),
+      padding: const EdgeInsets.only(
+        left: 8.0,
+        top: 8.0,
+        bottom: 8.0,
+        right: 4.0,
+      ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20.0),
         clipBehavior: Clip.antiAlias,
@@ -36,6 +42,32 @@ class OutfitImageWidget extends StatelessWidget {
           OutfitImageSource.file => Image.file(
             File(outfitImage.path),
             fit: fit,
+            errorBuilder: _errorBuilder,
+          ),
+          OutfitImageSource.network => Image.network(
+            outfitImage.path,
+            fit: fit,
+            loadingBuilder:
+                (
+                  BuildContext _,
+                  Widget child,
+                  ImageChunkEvent? loadingProgress,
+                ) {
+                  if (loadingProgress == null) {
+                    return child;
+                  } else {
+                    return Shimmer.fromColors(
+                      baseColor: colorScheme.surfaceContainerHighest,
+                      highlightColor: colorScheme.surface.withValues(
+                        alpha: 0.5,
+                      ),
+                      child: ColoredBox(
+                        color: colorScheme.surface,
+                        child: const SizedBox.expand(),
+                      ),
+                    );
+                  }
+                },
             errorBuilder: _errorBuilder,
           ),
         },

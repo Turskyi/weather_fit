@@ -7,9 +7,7 @@ import 'package:weather_fit/res/widgets/leading_widget.dart';
 import 'package:weather_fit/widgets/language_selector.dart';
 
 class SupportPage extends StatefulWidget {
-  const SupportPage({required this.languageIsoCode, super.key});
-
-  final String languageIsoCode;
+  const SupportPage({super.key});
 
   @override
   State<SupportPage> createState() => _SupportPageState();
@@ -18,7 +16,8 @@ class SupportPage extends StatefulWidget {
 class _SupportPageState extends State<SupportPage> {
   @override
   Widget build(BuildContext context) {
-    final TextTheme textTheme = Theme.of(context).textTheme;
+    final ThemeData theme = Theme.of(context);
+    final TextTheme textTheme = theme.textTheme;
 
     return Scaffold(
       appBar: AppBar(
@@ -154,7 +153,7 @@ class _SupportPageState extends State<SupportPage> {
               child: SelectableText(
                 '${translate('email')}: ${constants.supportEmail}',
                 style: textTheme.bodySmall?.copyWith(
-                  color: Colors.blue,
+                  color: theme.colorScheme.primary,
                   decoration: TextDecoration.underline,
                 ),
               ),

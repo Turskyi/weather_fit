@@ -1,3 +1,4 @@
+import 'package:feedback/feedback.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -10,6 +11,7 @@ import 'package:weather_fit/data/repositories/location_repository.dart';
 import 'package:weather_fit/data/repositories/outfit_repository.dart';
 import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/env/env.dart';
+import 'package:weather_fit/feedback/feedback_form.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
 import 'package:weather_fit/res/resources.dart';
 import 'package:weather_fit/res/theme/cubit/theme_cubit.dart';
@@ -47,16 +49,16 @@ class WeatherFitApp extends StatelessWidget {
         RepositoryProvider<WeatherRepository>.value(value: weatherRepository),
         RepositoryProvider<OutfitRepository>.value(value: outfitRepository),
         RepositoryProvider<HomeWidgetService>(
-          create: (_) => const HomeWidgetServiceImpl(),
+          create: (BuildContext _) => const HomeWidgetServiceImpl(),
         ),
         RepositoryProvider<UpdateService>(
-          create: (_) => const UpdateServiceImpl(),
+          create: (BuildContext _) => const UpdateServiceImpl(),
         ),
       ],
       child: MultiBlocProvider(
         providers: <SingleChildWidget>[
           // Provide the theme cubit.
-          BlocProvider<ThemeCubit>(create: (_) => ThemeCubit()),
+          BlocProvider<ThemeCubit>(create: (BuildContext _) => ThemeCubit()),
           BlocProvider<WeatherBloc>(
             create: (BuildContext context) {
               return WeatherBloc(
@@ -86,7 +88,7 @@ class WeatherFitApp extends StatelessWidget {
           ),
         ],
         child: BlocBuilder<ThemeCubit, Color>(
-          builder: (BuildContext _, Color color) {
+          builder: (BuildContext context, Color color) {
             final DateTime now = DateTime.now();
             final int hour = now.hour;
             // Assume darkness from 10 PM to 6 AM.
@@ -97,58 +99,83 @@ class WeatherFitApp extends StatelessWidget {
 
             const String fontFamily = 'Montserrat';
 
+            final ColorScheme lightColorScheme = ColorScheme.fromSeed(
+              seedColor: color,
+            );
+            final ColorScheme darkColorScheme = ColorScheme.fromSeed(
+              seedColor: color,
+              brightness: Brightness.dark,
+            );
+
             return Resources(
-              child: MaterialApp(
-                navigatorKey: navigatorKey,
-                debugShowCheckedModeBanner: false,
-                title: constants.appName,
-                localizationsDelegates: <LocalizationsDelegate<Object>>[
-                  GlobalMaterialLocalizations.delegate,
-                  GlobalWidgetsLocalizations.delegate,
-                  GlobalCupertinoLocalizations.delegate,
-                  localizationDelegate,
-                ],
-                supportedLocales: localizationDelegate.supportedLocales,
-                locale: localizationDelegate.currentLocale,
-                initialRoute: AppRoute.weather.path,
-                routes: routes.getRouteMap(initialLanguage.isoLanguageCode),
-                builder: (BuildContext _, Widget? child) {
-                  return SettingsStateListenerContent(child: child);
-                },
-                theme: ThemeData(
-                  useMaterial3: true,
-                  fontFamily: fontFamily,
-                  appBarTheme: const AppBarTheme(
-                    backgroundColor: Colors.transparent,
-                    elevation: 0,
-                    titleTextStyle: TextStyle(
-                      fontFamily: fontFamily,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black,
-                    ),
-                  ),
-                  colorScheme: ColorScheme.fromSeed(seedColor: color),
+              child: BetterFeedback(
+                feedbackBuilder:
+                    (
+                      BuildContext _,
+                      OnSubmit onSubmit,
+                      ScrollController? scrollController,
+                    ) {
+                      return FeedbackForm(
+                        onSubmit: onSubmit,
+                        scrollController: scrollController,
+                      );
+                    },
+                theme: FeedbackThemeData(
+                  feedbackSheetColor: completeDarkness
+                      ? darkColorScheme.surface
+                      : lightColorScheme.surface,
                 ),
-                darkTheme: ThemeData(
-                  useMaterial3: true,
-                  fontFamily: fontFamily,
-                  appBarTheme: const AppBarTheme(
-                    backgroundColor: Colors.transparent,
-                    elevation: 0,
-                    titleTextStyle: TextStyle(
-                      fontFamily: fontFamily,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
+                child: MaterialApp(
+                  navigatorKey: navigatorKey,
+                  debugShowCheckedModeBanner: false,
+                  title: constants.appName,
+                  localizationsDelegates: <LocalizationsDelegate<Object>>[
+                    GlobalMaterialLocalizations.delegate,
+                    GlobalWidgetsLocalizations.delegate,
+                    GlobalCupertinoLocalizations.delegate,
+                    localizationDelegate,
+                  ],
+                  supportedLocales: localizationDelegate.supportedLocales,
+                  locale: localizationDelegate.currentLocale,
+                  initialRoute: AppRoute.weather.path,
+                  routes: routes.getRouteMap(),
+                  builder: (BuildContext _, Widget? child) {
+                    return SettingsStateListenerContent(child: child);
+                  },
+                  theme: ThemeData(
+                    useMaterial3: true,
+                    fontFamily: fontFamily,
+                    appBarTheme: AppBarTheme(
+                      backgroundColor: Colors.transparent,
+                      elevation: 0,
+                      titleTextStyle: TextStyle(
+                        fontFamily: fontFamily,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        color: lightColorScheme.onSurface,
+                      ),
                     ),
+                    colorScheme: lightColorScheme,
                   ),
-                  colorScheme: ColorScheme.fromSeed(
-                    seedColor: color,
-                    brightness: Brightness.dark,
+                  darkTheme: ThemeData(
+                    useMaterial3: true,
+                    fontFamily: fontFamily,
+                    appBarTheme: AppBarTheme(
+                      backgroundColor: Colors.transparent,
+                      elevation: 0,
+                      titleTextStyle: TextStyle(
+                        fontFamily: fontFamily,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        color: darkColorScheme.onSurface,
+                      ),
+                    ),
+                    colorScheme: darkColorScheme,
                   ),
+                  themeMode: completeDarkness
+                      ? ThemeMode.dark
+                      : ThemeMode.light,
                 ),
-                themeMode: completeDarkness ? ThemeMode.dark : ThemeMode.light,
               ),
             );
           },

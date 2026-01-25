@@ -1,1 +1,1 @@
-enum OutfitImageSource { asset, file }
+enum OutfitImageSource { asset, file, network }

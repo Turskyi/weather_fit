@@ -11,7 +11,7 @@ class LoadingIndicator extends StatelessWidget {
     final int? loadedBytes = loadingProgress?.cumulativeBytesLoaded;
     return Center(
       child: CircularProgressIndicator(
-        color: Theme.of(context).colorScheme.primary.withAlpha(90),
+        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.35),
         backgroundColor: Colors.transparent,
         strokeAlign: BorderSide.strokeAlignOutside,
         strokeWidth: 12,

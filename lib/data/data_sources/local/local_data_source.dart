@@ -289,7 +289,9 @@ class LocalDataSource {
   }
 
   Future<Directory> getAppDirectory() async {
-    if (!kIsWeb && Platform.isIOS) {
+    if (kIsWeb) {
+      return Directory('');
+    } else if (Platform.isIOS) {
       try {
         final String? sharedPath = await _channel.invokeMethod<String>(
           'getSharedContainerPath',

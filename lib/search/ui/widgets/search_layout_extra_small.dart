@@ -9,7 +9,6 @@ class SearchPageExtraSmallLayout extends StatelessWidget {
   const SearchPageExtraSmallLayout({
     required this.textEditingController,
     required this.searchStateListener,
-    required this.languageIsoCode,
     super.key,
   });
 
@@ -18,8 +17,6 @@ class SearchPageExtraSmallLayout extends StatelessWidget {
   /// Takes the `BuildContext` along with the [bloc] `state`
   /// and is responsible for executing in response to `state` changes.
   final BlocWidgetListener<SearchState> searchStateListener;
-
-  final String languageIsoCode;
 
   void _onSearchSubmitted(BuildContext context, String value) {
     final SearchState state = context.read<SearchBloc>().state;

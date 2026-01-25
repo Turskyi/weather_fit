@@ -10,10 +10,11 @@ class OutfitImage extends Equatable {
 
   const OutfitImage.empty() : path = '', source = OutfitImageSource.asset;
 
-  factory OutfitImage.fromJson(Map<String, dynamic> json) =>
-      _$OutfitImageFromJson(json);
+  factory OutfitImage.fromJson(Map<String, Object?> json) {
+    return _$OutfitImageFromJson(json);
+  }
 
-  Map<String, dynamic> toJson() => _$OutfitImageToJson(this);
+  Map<String, Object?> toJson() => _$OutfitImageToJson(this);
 
   final String path;
   final OutfitImageSource source;

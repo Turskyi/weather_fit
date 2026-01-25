@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -46,7 +45,8 @@ class WeatherContentDefault extends StatelessWidget {
       child: Center(
         child: LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
-            final bool isWide = kIsWeb && constraints.maxWidth > 800;
+            final bool isWide =
+                constraints.maxWidth > constants.kWideLayoutBreakpoint;
 
             final Widget mainWeatherInfo = Column(
               children: <Widget>[
@@ -168,7 +168,6 @@ class WeatherContentDefault extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(width: 24),
                   Expanded(
                     flex: 3,
                     child: Container(
