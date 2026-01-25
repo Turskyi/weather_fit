@@ -45,7 +45,13 @@ final class FeedbackState extends SettingsState {
   final String errorMessage;
 
   @override
-  String toString() => 'FeedbackState()';
+  String toString() {
+    return 'FeedbackState('
+        '  errorMessage: $errorMessage,'
+        '  language: $language,'
+        '  appVersion: $appVersion,'
+        ')';
+  }
 
   FeedbackState copyWith({
     String? errorMessage,
@@ -64,7 +70,12 @@ final class FeedbackSent extends SettingsState {
   const FeedbackSent({required super.language, super.appVersion});
 
   @override
-  String toString() => 'FeedbackSent()';
+  String toString() {
+    return 'FeedbackSent('
+        '  language: $language,'
+        '  appVersion: $appVersion,'
+        ')';
+  }
 
   FeedbackSent copyWith({Language? language, String? appVersion}) {
     return FeedbackSent(
@@ -78,7 +89,12 @@ final class LoadingSettingsState extends SettingsState {
   const LoadingSettingsState({required super.language, super.appVersion});
 
   @override
-  String toString() => 'LoadingSettingsState()';
+  String toString() {
+    return 'LoadingSettingsState('
+        '  language: $language,'
+        '  appVersion: $appVersion,'
+        ')';
+  }
 }
 
 final class SettingsError extends SettingsState {
@@ -117,5 +133,11 @@ final class SettingsError extends SettingsState {
       errorMessage.hashCode ^ language.hashCode ^ appVersion.hashCode;
 
   @override
-  String toString() => 'SettingsError(errorMessage: $errorMessage)';
+  String toString() {
+    return 'SettingsError('
+        '  language: $language,'
+        '  appVersion: $appVersion,'
+        '  errorMessage: $errorMessage,'
+        ')';
+  }
 }

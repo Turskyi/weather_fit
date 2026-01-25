@@ -62,6 +62,7 @@
   "ok": "OK",
   "try_again": "Spróbuj ponownie",
   "screen_size": "Rozmiar ekranu",
+  "state": "Status",
   "feedback": {
     "title": "Opinia",
     "app_feedback": "Opinia o aplikacji",
