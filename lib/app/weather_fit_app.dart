@@ -17,7 +17,6 @@ import 'package:weather_fit/res/resources.dart';
 import 'package:weather_fit/res/theme/cubit/theme_cubit.dart';
 import 'package:weather_fit/router/app_route.dart';
 import 'package:weather_fit/router/navigator.dart';
-import 'package:weather_fit/router/routes.dart' as routes;
 import 'package:weather_fit/search/bloc/search_bloc.dart';
 import 'package:weather_fit/services/home_widget_service.dart';
 import 'package:weather_fit/services/update_service.dart';
@@ -32,6 +31,7 @@ class WeatherFitApp extends StatelessWidget {
     required this.outfitRepository,
     required this.localDataSource,
     required this.initialLanguage,
+    required this.routes,
     super.key,
   });
 
@@ -40,6 +40,7 @@ class WeatherFitApp extends StatelessWidget {
   final OutfitRepository outfitRepository;
   final LocalDataSource localDataSource;
   final Language initialLanguage;
+  final Map<String, WidgetBuilder> routes;
 
   @override
   Widget build(BuildContext context) {
@@ -138,7 +139,7 @@ class WeatherFitApp extends StatelessWidget {
                   supportedLocales: localizationDelegate.supportedLocales,
                   locale: localizationDelegate.currentLocale,
                   initialRoute: AppRoute.weather.path,
-                  routes: routes.getRouteMap(),
+                  routes: routes,
                   builder: (BuildContext _, Widget? child) {
                     return SettingsStateListenerContent(child: child);
                   },
