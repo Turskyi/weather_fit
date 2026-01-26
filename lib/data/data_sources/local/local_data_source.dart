@@ -30,10 +30,13 @@ class LocalDataSource {
     double temperatureValue = weather.temperature.value;
     final TemperatureUnits units = weather.temperatureUnits;
 
+    // Normalize Fahrenheit to Celsius intentionally for asset mapping,
+    // as all outfit images are named based on the Celsius scale.
     if (units.isFahrenheit) {
       temperatureValue = temperatureValue.toCelsius();
     }
 
+    // Do not use "else if", because for Fahrenheit we need both.
     if (temperatureValue < -40) {
       return '${constants.outfitImagePath}-40.png';
     }
