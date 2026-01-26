@@ -24,9 +24,9 @@ void main() {
     test('should round temperature down to nearest 10 degrees and clamp to '
         '[-30, 30]', () {
       final List<Map<String, Object?>> testCases = <Map<String, Object?>>[
-        <String, Object?>{'temp': 25.0, 'expected': 20},
-        <String, Object?>{'temp': 15.0, 'expected': 10},
-        <String, Object?>{'temp': 5.0, 'expected': 0},
+        <String, Object?>{'temp': 25.0, 'expected': 30},
+        <String, Object?>{'temp': 15.0, 'expected': 20},
+        <String, Object?>{'temp': 5.0, 'expected': 10},
         <String, Object?>{'temp': -5.0, 'expected': -10},
         <String, Object?>{'temp': -15.0, 'expected': -20},
         <String, Object?>{'temp': 35.0, 'expected': 30},
@@ -34,6 +34,7 @@ void main() {
         <String, Object?>{'temp': 45.0, 'expected': 30},
         <String, Object?>{'temp': 0, 'expected': 0},
         <String, Object?>{'temp': 0.0, 'expected': 0},
+        <String, Object?>{'temp': -1.0, 'expected': 0},
       ];
 
       for (final Map<String, dynamic> testCase in testCases) {
@@ -95,15 +96,15 @@ void main() {
       );
 
       final String path = localDataSource.getOutfitImageAssetPath(weather);
-      expect(path, contains('clear_20.png'));
+      expect(path, contains('clear_30.png'));
     });
 
     test('should return "precipitation_0.png" when condition is rainy and '
-        'temperature is 0', () {
+        'temperature is -1', () {
       final Weather weather = const Weather(
         condition: WeatherCondition.rainy,
         location: dummy_constants.dummyLocation,
-        temperature: Temperature(value: 0),
+        temperature: Temperature(value: -1.0),
         temperatureUnits: TemperatureUnits.celsius,
         countryCode: dummy_constants.dummyCountryCode,
         description: dummy_constants.dummyWeatherDescription,
@@ -143,11 +144,9 @@ void main() {
     test('should round down correctly for positive and negative values', () {
       final Map<double, int> testCases = <double, int>{
         10.0: 10,
-        19.9: 10,
-        25.0: 20,
-        5.0: 0,
+        19.9: 20,
         -5.0: -10,
-        -10.1: -20,
+        -10.1: -10,
       };
 
       for (final MapEntry<double, int> entry in testCases.entries) {
@@ -175,6 +174,63 @@ void main() {
           assetPath,
           contains('clear_$expectedRounded.png'),
           reason: 'Failed for temperature ${entry.key}',
+        );
+      }
+    });
+  });
+
+  group('LocalDataSource - getOutfitImageAssetPath Rounding Logic', () {
+    test('should return 0 for -1.0 degrees after fix (nearest decade)', () {
+      // Arrange
+      const Weather weather = Weather(
+        condition: WeatherCondition.clear,
+        temperature: Temperature(value: -1.0),
+        temperatureUnits: TemperatureUnits.celsius,
+        location: dummy_constants.dummyLocation,
+        countryCode: dummy_constants.dummyCountryCode,
+        description: dummy_constants.dummyWeatherDescription,
+        code: dummy_constants.dummyWeatherCode,
+        locale: dummy_constants.dummyLocale,
+      );
+
+      // Act
+      final String assetPath = localDataSource.getOutfitImageAssetPath(weather);
+
+      // Assert: (-1.0 / 10).round() = 0. 0 * 10 = 0.
+      expect(assetPath, contains('clear_0.png'));
+    });
+
+    test('should round to the nearest decade correctly', () {
+      final Map<double, int> testCases = <double, int>{
+        -14.9: -10, // Closer to -10
+        -15.0: -20, // Midpoint rounds to -20
+        -4.0: 0, // Closer to 0
+        4.0: 0, // Closer to 0
+        5.0: 10, // Midpoint rounds up
+        26.0: 30, // Closer to 30
+      };
+
+      for (final MapEntry<double, int> entry in testCases.entries) {
+        final Weather weather = Weather(
+          condition: WeatherCondition.clear,
+          temperature: Temperature(value: entry.key),
+          temperatureUnits: TemperatureUnits.celsius,
+          location: dummy_constants.dummyLocation,
+          countryCode: dummy_constants.dummyCountryCode,
+          description: dummy_constants.dummyWeatherDescription,
+          code: dummy_constants.dummyWeatherCode,
+          locale: dummy_constants.dummyLocale,
+        );
+
+        final String assetPath = localDataSource.getOutfitImageAssetPath(
+          weather,
+        );
+
+        expect(
+          assetPath,
+          contains('clear_${entry.value}.png'),
+          reason:
+              'Failed for temperature ${entry.key}: expected ${entry.value}',
         );
       }
     });
