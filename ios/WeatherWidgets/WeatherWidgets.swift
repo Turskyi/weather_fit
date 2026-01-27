@@ -155,7 +155,7 @@ struct ForecastItemView: View {
 
     var body: some View {
         VStack(spacing: 4) {
-            Text(DateHelper.getDay(from: item.time))
+            Text(DateHelper.getDay(from: item.time, locale: locale ?? "en"))
                 .font(.caption2).bold()
             Text(DateHelper.getTimeOfDay(from: item.time, locale: locale ?? "en"))
                 .font(.caption)
@@ -372,14 +372,26 @@ struct DateHelper {
         return formatter.date(from: string)
     }
 
-    static func getDay(from dateString: String) -> String {
+    static func getDay(from dateString: String, locale: String = "en") -> String {
         guard let date = parseDateTime(from: dateString) else {
             return ""
         }
+
+        // Simple locale map for day labels.
+        let isUk = locale.lowercased().hasPrefix("uk")
+        let isPl = locale.lowercased().hasPrefix("pl")
+        let isDe = locale.lowercased().hasPrefix("de")
+
         if Calendar.current.isDateInToday(date) {
+            if isUk { return "Сьогодні" }
+            if isPl { return "Dzisiaj" }
+            if isDe { return "Heute" }
             return "Today"
         }
         if Calendar.current.isDateInTomorrow(date) {
+            if isUk { return "Завтра" }
+            if isPl { return "Jutro" }
+            if isDe { return "Morgen" }
             return "Tomorrow"
         }
         let dayFormatter = DateFormatter()
