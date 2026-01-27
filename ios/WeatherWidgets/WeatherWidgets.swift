@@ -63,6 +63,7 @@ struct WeatherData: Codable {
     let temperature: String?
     let recommendation: String?
     let lastUpdated: String?
+    let locale: String?
     let imagePath: String?
     let forecast: [ForecastItem]?
 }
@@ -102,7 +103,8 @@ struct Provider: TimelineProvider {
 
         var forecast: [ForecastItem]?
         if let forecastDataString = forecastDataString,
-           let data = forecastDataString.data(using: .utf8) {
+            let data = forecastDataString.data(using: .utf8)
+        {
             do {
                 let decoder = JSONDecoder()
                 decoder.keyDecodingStrategy = .convertFromSnakeCase
@@ -113,10 +115,18 @@ struct Provider: TimelineProvider {
             }
         }
 
+        let locale = sharedDefaults.string(forKey: "selected_language")
+
         return WeatherData(
-            emoji: emoji, location: location, temperature: temperature,
-            recommendation: recommendation, lastUpdated: lastUpdated, imagePath: imagePath,
-            forecast: forecast)
+            emoji: emoji,
+            location: location,
+            temperature: temperature,
+            recommendation: recommendation,
+            lastUpdated: lastUpdated,
+            locale: locale,
+            imagePath: imagePath,
+            forecast: forecast,
+        )
     }
 
     func placeholder(in context: Context) -> SimpleEntry {
@@ -141,12 +151,13 @@ struct Provider: TimelineProvider {
 
 struct ForecastItemView: View {
     let item: ForecastItem
+    let locale: String?
 
     var body: some View {
         VStack(spacing: 4) {
             Text(DateHelper.getDay(from: item.time))
                 .font(.caption2).bold()
-            Text(DateHelper.getTimeOfDay(from: item.time))
+            Text(DateHelper.getTimeOfDay(from: item.time, locale: locale ?? "en"))
                 .font(.caption)
             Text(WeatherHelper.getWeatherEmoji(for: item.weatherCode))
                 .font(.title3)
@@ -202,7 +213,7 @@ struct WeatherWidgetsEntryView: View {
                 HStack(alignment: .bottom) {
                     if let forecast = entry.weatherData.forecast, !forecast.isEmpty {
                         ForEach(Array(forecast.enumerated()), id: \.element.time) { index, item in
-                            ForecastItemView(item: item)
+                            ForecastItemView(item: item, locale: entry.weatherData.locale)
                             if index < forecast.count - 1 {
                                 Spacer()
                             }
@@ -376,16 +387,38 @@ struct DateHelper {
         return dayFormatter.string(from: date)
     }
 
-    static func getTimeOfDay(from dateString: String) -> String {
+    static func getTimeOfDay(from dateString: String, locale: String) -> String {
         guard let date = parseDateTime(from: dateString) else {
             return ""
         }
         let hour = Calendar.current.component(.hour, from: date)
+
+        // Simple locale map for time-of-day labels. Extend as needed.
+        let isUk = locale.lowercased().hasPrefix("uk")
+        let isPl = locale.lowercased().hasPrefix("pl")
+        let isDe = locale.lowercased().hasPrefix("de")
+
         switch hour {
-        case 5...11: return "Morning"
-        case 12...16: return "Lunch"
-        case 17...21: return "Evening"
-        default: return "Night"
+        case 5...11:
+            if isUk { return "Ранок" }
+            if isPl { return "Poranek" }
+            if isDe { return "Morgen" }
+            return "Morning"
+        case 12...16:
+            if isUk { return "Обід" }
+            if isPl { return "Południe" }
+            if isDe { return "Mittag" }
+            return "Lunch"
+        case 17...21:
+            if isUk { return "Вечір" }
+            if isPl { return "Wieczór" }
+            if isDe { return "Abend" }
+            return "Evening"
+        default:
+            if isUk { return "Ніч" }
+            if isPl { return "Noc" }
+            if isDe { return "Nacht" }
+            return "Night"
         }
     }
 }
@@ -438,6 +471,7 @@ extension WeatherData {
             temperature: "24°C",
             recommendation: "A light jacket and jeans would be perfect for today.",
             lastUpdated: "just now",
+            locale: "en",
             imagePath: nil,
             forecast: [
                 .init(time: "2023-10-27T09:00", temperature: 18.0, weatherCode: 1),
