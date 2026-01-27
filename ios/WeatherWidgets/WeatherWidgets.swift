@@ -218,8 +218,6 @@ struct WeatherWidgetsEntryView: View {
                                 Spacer()
                             }
                         }
-                    } else {
-                        Text("No forecast data.").font(.caption)
                     }
                 }
             }
