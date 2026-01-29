@@ -61,6 +61,14 @@ class _SearchLayoutDefaultState extends State<SearchLayoutDefault> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        flexibleSpace: ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(color: colorScheme.surface.withValues(alpha: 0.2)),
+          ),
+        ),
         leading: kIsWeb ? const LeadingWidget() : null,
         title: KeyboardVisibilityBuilder(
           builder: (bool isKeyboardVisible) {
