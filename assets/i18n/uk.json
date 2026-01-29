@@ -141,7 +141,11 @@
     "location_not_found_dialog_title": "Місцезнаходження не знайдено",
     "location_not_found_suggestion_spell_check": "Будь ласка, переконайтеся, що назва міста чи країни написана правильно.",
     "location_not_found_suggestion_use_gps": "Як варіант, ви можете отримати погоду для вашого поточного місцезнаходження за допомогою GPS.",
-    "use_gps_button": "Використати GPS"
+    "use_gps_button": "Використати GPS",
+    "quick_city_toronto": "Торонто",
+    "quick_city_zielona_gora": "Зелена Гура",
+    "quick_city_zaporizhzhia": "Запоріжжя",
+    "quick_city_waldshut_tiengen": "Вальдсхут-Тінген"
   },
   "about": {
     "title": "Про застосунок",

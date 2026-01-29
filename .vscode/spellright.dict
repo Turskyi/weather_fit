@@ -17,3 +17,4 @@ Intl.defaultLocale
 intl
 nominatim_api
 weatherfit_background_update
+geolocator

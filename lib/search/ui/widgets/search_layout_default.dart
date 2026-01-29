@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -6,9 +8,10 @@ import 'package:weather_fit/extensions/build_context_extensions.dart';
 import 'package:weather_fit/res/widgets/background.dart';
 import 'package:weather_fit/res/widgets/leading_widget.dart';
 import 'package:weather_fit/search/bloc/search_bloc.dart';
+import 'package:weather_fit/search/ui/widgets/quick_cities_suggestions.dart';
 import 'package:weather_fit/widgets/keyboard_visibility_builder.dart';
 
-class SearchLayoutDefault extends StatelessWidget {
+class SearchLayoutDefault extends StatefulWidget {
   const SearchLayoutDefault({
     required this.textEditingController,
     required this.searchStateListener,
@@ -22,8 +25,37 @@ class SearchLayoutDefault extends StatelessWidget {
   final BlocWidgetListener<SearchState> searchStateListener;
 
   @override
+  State<SearchLayoutDefault> createState() => _SearchLayoutDefaultState();
+}
+
+class _SearchLayoutDefaultState extends State<SearchLayoutDefault> {
+  late final FocusNode _searchFieldFocus;
+  bool _isSearchFieldFocused = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchFieldFocus = FocusNode();
+    _searchFieldFocus.addListener(_onFocusChanged);
+  }
+
+  @override
+  void dispose() {
+    _searchFieldFocus.removeListener(_onFocusChanged);
+    _searchFieldFocus.dispose();
+    super.dispose();
+  }
+
+  void _onFocusChanged() {
+    setState(() {
+      _isSearchFieldFocused = _searchFieldFocus.hasFocus;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -68,29 +100,91 @@ class SearchLayoutDefault extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 constraints: BoxConstraints(maxWidth: context.maxWidth),
-                child: TextField(
-                  controller: textEditingController,
-                  autofocus: true,
-                  textInputAction: TextInputAction.search,
-                  onSubmitted: (String value) {
-                    _onSearchSubmitted(context: context, value: value);
-                  },
-                  decoration: InputDecoration(
-                    labelText: translate('search.city_or_country'),
-                    hintText: translate('search.enter_city_or_country'),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(28.0),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      decoration: BoxDecoration(
+                        color: colorScheme.surface.withValues(alpha: 0.5),
+                        borderRadius: BorderRadius.circular(28.0),
+                        border: Border.all(
+                          color: colorScheme.onSurface.withValues(alpha: 0.12),
+                        ),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          TextField(
+                            focusNode: _searchFieldFocus,
+                            controller: widget.textEditingController,
+                            autofocus: true,
+                            textInputAction: TextInputAction.search,
+                            onSubmitted: (String value) {
+                              _onSearchSubmitted(
+                                context: context,
+                                value: value,
+                              );
+                            },
+                            style: textTheme.bodyLarge,
+                            decoration: InputDecoration(
+                              prefixIcon: Padding(
+                                padding: const EdgeInsets.only(left: 8.0),
+                                child: Icon(
+                                  Icons.search,
+                                  color: colorScheme.onSurface.withValues(
+                                    alpha: 0.6,
+                                  ),
+                                ),
+                              ),
+                              hintText: translate('search.city_or_country'),
+                              hintStyle: textTheme.bodyLarge?.copyWith(
+                                color: colorScheme.onSurface.withValues(
+                                  alpha: 0.4,
+                                ),
+                              ),
+                              border: InputBorder.none,
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 20.0,
+                                vertical: 16.0,
+                              ),
+                            ),
+                          ),
+                          ValueListenableBuilder<TextEditingValue>(
+                            valueListenable: widget.textEditingController,
+                            builder:
+                                (
+                                  BuildContext context,
+                                  TextEditingValue value,
+                                  Widget? child,
+                                ) {
+                                  final bool hasInput = value.text
+                                      .trim()
+                                      .isNotEmpty;
+                                  final bool showSuggestions =
+                                      _isSearchFieldFocused && !hasInput;
+
+                                  return QuickCitiesSuggestions(
+                                    isVisible: showSuggestions,
+                                    suggestions: _getQuickCitiesSuggestions(),
+                                    textEditingController:
+                                        widget.textEditingController,
+                                  );
+                                },
+                          ),
+                        ],
+                      ),
                     ),
-                    contentPadding: const EdgeInsets.all(12.0),
                   ),
                 ),
               ),
               BlocConsumer<SearchBloc, SearchState>(
-                listener: searchStateListener,
+                listener: widget.searchStateListener,
                 builder: (BuildContext _, SearchState state) {
                   final double progressIndicatorSize = 20.0;
                   return ValueListenableBuilder<TextEditingValue>(
-                    valueListenable: textEditingController,
+                    valueListenable: widget.textEditingController,
                     child: state is SearchLoading
                         ? SizedBox(
                             height: progressIndicatorSize,
@@ -131,6 +225,27 @@ class SearchLayoutDefault extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  List<QuickCitySuggestion> _getQuickCitiesSuggestions() {
+    return <QuickCitySuggestion>[
+      QuickCitySuggestion(
+        name: translate('search.quick_city_toronto'),
+        flag: '🇨🇦',
+      ),
+      QuickCitySuggestion(
+        name: translate('search.quick_city_zielona_gora'),
+        flag: '🇵🇱',
+      ),
+      QuickCitySuggestion(
+        name: translate('search.quick_city_zaporizhzhia'),
+        flag: '🇺🇦',
+      ),
+      QuickCitySuggestion(
+        name: translate('search.quick_city_waldshut_tiengen'),
+        flag: '🇩🇪',
+      ),
+    ];
   }
 
   void _onSearchSubmitted({
