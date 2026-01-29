@@ -38,7 +38,7 @@ class WeatherContentDefault extends StatelessWidget {
       padding: const EdgeInsets.only(
         // This top padding is tricky, it might look off on one of the
         // platforms, before changing check Android physical device.
-        top: 24,
+        top: 36,
         left: 16,
         right: 16,
       ),
