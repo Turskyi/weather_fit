@@ -1,14 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:weather_fit/entities/models/quick_city_suggestion.dart';
 import 'package:weather_fit/search/bloc/search_bloc.dart';
-
-/// Represents a quick city suggestion with its name and flag emoji.
-class QuickCitySuggestion {
-  const QuickCitySuggestion({required this.name, required this.flag});
-
-  final String name;
-  final String flag;
-}
 
 /// Displays quick city suggestions as an animated list.
 /// Shown when the search field is focused and hidden when user starts typing.
@@ -70,39 +64,40 @@ class _QuickCitiesSuggestionsState extends State<QuickCitiesSuggestions>
 
   @override
   Widget build(BuildContext context) {
-    if (widget.suggestions.isEmpty) {
+    // Feature is temporarily limited to Web.
+    if (!kIsWeb || widget.suggestions.isEmpty) {
       return const SizedBox.shrink();
-    }
+    } else {
+      final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
-
-    return AnimatedBuilder(
-      animation: _animationController,
-      builder: (BuildContext context, Widget? child) {
-        return ClipRect(
-          child: Align(
-            heightFactor: _heightFactorAnimation.value,
-            alignment: Alignment.topCenter,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Divider(
-                  height: 1,
-                  color: colorScheme.onSurface.withValues(alpha: 0.1),
-                ),
-                for (int i = 0; i < widget.suggestions.length; i++)
-                  _SuggestionTile(
-                    suggestion: widget.suggestions[i],
-                    onTap: () =>
-                        _handleCityTap(context, widget.suggestions[i].name),
-                    isLast: i == widget.suggestions.length - 1,
+      return AnimatedBuilder(
+        animation: _animationController,
+        builder: (BuildContext context, Widget? child) {
+          return ClipRect(
+            child: Align(
+              heightFactor: _heightFactorAnimation.value,
+              alignment: Alignment.topCenter,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Divider(
+                    height: 1,
+                    color: colorScheme.onSurface.withValues(alpha: 0.1),
                   ),
-              ],
+                  for (int i = 0; i < widget.suggestions.length; i++)
+                    _SuggestionTile(
+                      suggestion: widget.suggestions[i],
+                      onTap: () =>
+                          _handleCityTap(context, widget.suggestions[i].name),
+                      isLast: i == widget.suggestions.length - 1,
+                    ),
+                ],
+              ),
             ),
-          ),
-        );
-      },
-    );
+          );
+        },
+      );
+    }
   }
 
   void _handleCityTap(BuildContext context, String cityName) {

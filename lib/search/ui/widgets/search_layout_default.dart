@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
+import 'package:weather_fit/entities/models/quick_city_suggestion.dart';
 import 'package:weather_fit/extensions/build_context_extensions.dart';
 import 'package:weather_fit/res/widgets/background.dart';
 import 'package:weather_fit/res/widgets/leading_widget.dart';
@@ -151,28 +152,29 @@ class _SearchLayoutDefaultState extends State<SearchLayoutDefault> {
                               ),
                             ),
                           ),
-                          ValueListenableBuilder<TextEditingValue>(
-                            valueListenable: widget.textEditingController,
-                            builder:
-                                (
-                                  BuildContext context,
-                                  TextEditingValue value,
-                                  Widget? child,
-                                ) {
-                                  final bool hasInput = value.text
-                                      .trim()
-                                      .isNotEmpty;
-                                  final bool showSuggestions =
-                                      _isSearchFieldFocused && !hasInput;
+                          if (kIsWeb)
+                            ValueListenableBuilder<TextEditingValue>(
+                              valueListenable: widget.textEditingController,
+                              builder:
+                                  (
+                                    BuildContext context,
+                                    TextEditingValue value,
+                                    Widget? child,
+                                  ) {
+                                    final bool hasInput = value.text
+                                        .trim()
+                                        .isNotEmpty;
+                                    final bool showSuggestions =
+                                        _isSearchFieldFocused && !hasInput;
 
-                                  return QuickCitiesSuggestions(
-                                    isVisible: showSuggestions,
-                                    suggestions: _getQuickCitiesSuggestions(),
-                                    textEditingController:
-                                        widget.textEditingController,
-                                  );
-                                },
-                          ),
+                                    return QuickCitiesSuggestions(
+                                      isVisible: showSuggestions,
+                                      suggestions: _getQuickCitiesSuggestions(),
+                                      textEditingController:
+                                          widget.textEditingController,
+                                    );
+                                  },
+                            ),
                         ],
                       ),
                     ),
