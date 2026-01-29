@@ -63,6 +63,7 @@ struct WeatherData: Codable {
     let temperature: String?
     let recommendation: String?
     let lastUpdated: String?
+    let locale: String?
     let imagePath: String?
     let forecast: [ForecastItem]?
 }
@@ -102,7 +103,8 @@ struct Provider: TimelineProvider {
 
         var forecast: [ForecastItem]?
         if let forecastDataString = forecastDataString,
-           let data = forecastDataString.data(using: .utf8) {
+            let data = forecastDataString.data(using: .utf8)
+        {
             do {
                 let decoder = JSONDecoder()
                 decoder.keyDecodingStrategy = .convertFromSnakeCase
@@ -113,10 +115,18 @@ struct Provider: TimelineProvider {
             }
         }
 
+        let locale = sharedDefaults.string(forKey: "selected_language")
+
         return WeatherData(
-            emoji: emoji, location: location, temperature: temperature,
-            recommendation: recommendation, lastUpdated: lastUpdated, imagePath: imagePath,
-            forecast: forecast)
+            emoji: emoji,
+            location: location,
+            temperature: temperature,
+            recommendation: recommendation,
+            lastUpdated: lastUpdated,
+            locale: locale,
+            imagePath: imagePath,
+            forecast: forecast,
+        )
     }
 
     func placeholder(in context: Context) -> SimpleEntry {
@@ -141,20 +151,20 @@ struct Provider: TimelineProvider {
 
 struct ForecastItemView: View {
     let item: ForecastItem
+    let locale: String?
 
     var body: some View {
-        VStack(spacing: 4) {
-            Text(DateHelper.getDay(from: item.time))
-                .font(.caption2).bold()
-            Text(DateHelper.getTimeOfDay(from: item.time))
-                .font(.caption)
+        VStack(spacing: 2) {
+            Text(DateHelper.getDay(from: item.time, locale: locale ?? "en"))
+                .font(.system(size: 8, weight: .bold))
+            Text(DateHelper.getTimeOfDay(from: item.time, locale: locale ?? "en"))
+                .font(.system(size: 8))
             Text(WeatherHelper.getWeatherEmoji(for: item.weatherCode))
                 .font(.title3)
             Text("\(Int(item.temperature.rounded()))°")
-                .font(.caption)
+                .font(.system(size: 9, weight: .medium))
         }
         .foregroundColor(.white)
-        .shadow(color: .black.opacity(0.8), radius: 2, x: 0, y: 1)
     }
 }
 
@@ -163,59 +173,82 @@ struct WeatherWidgetsEntryView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // Top section: Aligned to corners to keep the center (faces) clear
+            // Top section: Split into two bubbles to keep the center clear
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 0) {
-                    Text(entry.weatherData.location ?? "Unknown Location")
+                    Text(entry.weatherData.location ?? "")
                         .font(.subheadline).fontWeight(.semibold)
-                    Text(entry.weatherData.temperature ?? "--")
+                    Text(entry.weatherData.temperature ?? "")
                         .font(.title2).fontWeight(.bold)
                 }
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .background(Color.black.opacity(0.35))
+                .cornerRadius(10)
+
                 Spacer()
+
                 VStack(alignment: .trailing, spacing: 0) {
                     Text(entry.weatherData.emoji ?? "")
                         .font(.largeTitle)
                     Text(entry.weatherData.lastUpdated ?? "")
                         .font(.system(size: 8))
                 }
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .background(Color.black.opacity(0.35))
+                .cornerRadius(10)
             }
-            .padding(.horizontal, 12)
+            .padding(.horizontal, 10)
             .padding(.top, 8)
             .foregroundColor(.white)
-            .shadow(color: .black.opacity(0.8), radius: 2, x: 0, y: 1)
 
             Spacer()
 
-            // Lower section: Recommendation and Forecast
-            // Moved to the bottom to avoid covering the person's upper body/face
-            VStack(spacing: 8) {
-                if let recommendation = entry.weatherData.recommendation {
-                    Text(recommendation)
-                        .font(.caption).fontWeight(.medium)
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(Color.black.opacity(0.25).cornerRadius(6))
-                }
+            // Lower section: Split into three pieces: left/right forecast and middle recommendation + forecast
+            HStack(alignment: .bottom, spacing: 8) {
+                if let forecast = entry.weatherData.forecast, !forecast.isEmpty {
+                    // Left Forecast Item
+                    ForecastItemView(item: forecast[0], locale: entry.weatherData.locale)
+                        .padding(8)
+                        .background(Color.black.opacity(0.35))
+                        .cornerRadius(12)
 
-                // Forecast
-                HStack(alignment: .bottom) {
-                    if let forecast = entry.weatherData.forecast, !forecast.isEmpty {
-                        ForEach(Array(forecast.enumerated()), id: \.element.time) { index, item in
-                            ForecastItemView(item: item)
-                            if index < forecast.count - 1 {
-                                Spacer()
-                            }
+                    Spacer()
+
+                    // Middle Piece: Recommendation + Middle Forecast
+                    VStack(spacing: 4) {
+                        if let recommendation = entry.weatherData.recommendation {
+                            Text(recommendation)
+                                .font(.system(size: 9, weight: .medium))
+                                .multilineTextAlignment(.center)
+                                .lineLimit(3)
+                                .fixedSize(horizontal: false, vertical: true)
                         }
-                    } else {
-                        Text("No forecast data.").font(.caption)
+                        
+                        if forecast.count > 1 {
+                            ForecastItemView(item: forecast[1], locale: entry.weatherData.locale)
+                        }
+                    }
+                    .padding(8)
+                    .background(Color.black.opacity(0.35))
+                    .cornerRadius(12)
+                    .frame(maxWidth: 160) // Prevents the middle bubble from spanning the entire width
+
+                    Spacer()
+
+                    // Right Forecast Item
+                    if forecast.count > 2 {
+                        ForecastItemView(item: forecast[2], locale: entry.weatherData.locale)
+                            .padding(8)
+                            .background(Color.black.opacity(0.35))
+                            .cornerRadius(12)
                     }
                 }
             }
-            .padding(.horizontal, 12)
+            .padding(.horizontal, 10)
             .padding(.bottom, 8)
             .foregroundColor(.white)
-            .shadow(color: .black.opacity(0.8), radius: 2, x: 0, y: 1)
         }
         .widgetURL(URL(string: "weatherfit://open")!)
     }
@@ -246,8 +279,7 @@ struct WeatherWidgets: Widget {
                         // If image fails to load, we gracefully degrade to just the gradient and text.
                         // This is expected behavior in WidgetKit when the image path becomes invalid.
 
-                        // Added a subtle dark overlay to ensure text readability on light images
-                        Color.black.opacity(0.2)
+                        // Removed general dark overlay as separate bubbles now provide enough contrast
                     }
                 }
         }
@@ -361,14 +393,26 @@ struct DateHelper {
         return formatter.date(from: string)
     }
 
-    static func getDay(from dateString: String) -> String {
+    static func getDay(from dateString: String, locale: String = "en") -> String {
         guard let date = parseDateTime(from: dateString) else {
             return ""
         }
+
+        // Simple locale map for day labels.
+        let isUk = locale.lowercased().hasPrefix("uk")
+        let isPl = locale.lowercased().hasPrefix("pl")
+        let isDe = locale.lowercased().hasPrefix("de")
+
         if Calendar.current.isDateInToday(date) {
+            if isUk { return "Сьогодні" }
+            if isPl { return "Dzisiaj" }
+            if isDe { return "Heute" }
             return "Today"
         }
         if Calendar.current.isDateInTomorrow(date) {
+            if isUk { return "Завтра" }
+            if isPl { return "Jutro" }
+            if isDe { return "Morgen" }
             return "Tomorrow"
         }
         let dayFormatter = DateFormatter()
@@ -376,16 +420,38 @@ struct DateHelper {
         return dayFormatter.string(from: date)
     }
 
-    static func getTimeOfDay(from dateString: String) -> String {
+    static func getTimeOfDay(from dateString: String, locale: String) -> String {
         guard let date = parseDateTime(from: dateString) else {
             return ""
         }
         let hour = Calendar.current.component(.hour, from: date)
+
+        // Simple locale map for time-of-day labels. Extend as needed.
+        let isUk = locale.lowercased().hasPrefix("uk")
+        let isPl = locale.lowercased().hasPrefix("pl")
+        let isDe = locale.lowercased().hasPrefix("de")
+
         switch hour {
-        case 5...11: return "Morning"
-        case 12...16: return "Lunch"
-        case 17...21: return "Evening"
-        default: return "Night"
+        case 5...11:
+            if isUk { return "Ранок" }
+            if isPl { return "Poranek" }
+            if isDe { return "Morgen" }
+            return "Morning"
+        case 12...16:
+            if isUk { return "Обід" }
+            if isPl { return "Południe" }
+            if isDe { return "Mittag" }
+            return "Lunch"
+        case 17...21:
+            if isUk { return "Вечір" }
+            if isPl { return "Wieczór" }
+            if isDe { return "Abend" }
+            return "Evening"
+        default:
+            if isUk { return "Ніч" }
+            if isPl { return "Noc" }
+            if isDe { return "Nacht" }
+            return "Night"
         }
     }
 }
@@ -438,6 +504,7 @@ extension WeatherData {
             temperature: "24°C",
             recommendation: "A light jacket and jeans would be perfect for today.",
             lastUpdated: "just now",
+            locale: "en",
             imagePath: nil,
             forecast: [
                 .init(time: "2023-10-27T09:00", temperature: 18.0, weatherCode: 1),

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:home_widget/home_widget.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:path_provider/path_provider.dart';
@@ -150,6 +151,18 @@ void _callbackDispatcher() {
 
         final LocalDataSource localDataSource = LocalDataSource(preferences);
         final RemoteDataSource remoteDataSource = RemoteDataSource(Dio());
+
+        // Save currently selected language to widget data so native widgets
+        // (Android/iOS) can use it to localize strings.
+        try {
+          final String languageCode = localDataSource.getLanguageIsoCode();
+          await HomeWidget.saveWidgetData<String>(
+            'selected_language',
+            languageCode,
+          );
+        } catch (e) {
+          debugPrint('Failed to save widget language: $e');
+        }
 
         final Location lastSavedLocation = localDataSource
             .getLastSavedLocation();

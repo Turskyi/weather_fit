@@ -128,7 +128,9 @@ internal fun updateAppWidget(
         if (weatherCode != -1) {
             val backgroundResId: Int = getBackgroundResource(weatherCode)
             setInt(
-                R.id.widget_container, "setBackgroundResource", backgroundResId
+                R.id.widget_container,
+                "setBackgroundResource",
+                backgroundResId
             )
 
             // Ensure text is readable on colored backgrounds.
@@ -164,12 +166,19 @@ internal fun updateAppWidget(
         val isImageAvailable: Boolean = imageFile?.exists() == true
 
         if (isImageAvailable) {
-            @Suppress("UNNECESSARY_SAFE_CALL") imageFile?.let { file: File ->
+            @Suppress("UNNECESSARY_SAFE_CALL")
+            imageFile?.let { file: File ->
                 val bitmap: android.graphics.Bitmap? =
                     BitmapFactory.decodeFile(file.absolutePath)
                 bitmap?.let { bmp: android.graphics.Bitmap ->
-                    setImageViewBitmap(R.id.image_weather, bmp)
-                    setViewVisibility(R.id.image_weather, View.VISIBLE)
+                    setImageViewBitmap(
+                        R.id.image_weather,
+                        bmp,
+                    )
+                    setViewVisibility(
+                        R.id.image_weather,
+                        View.VISIBLE,
+                    )
                 }
             }
         } else {
@@ -181,6 +190,12 @@ internal fun updateAppWidget(
             WeatherWidget.KEY_FORECAST_DATA,
             null,
         )
+
+        // Retrieve selected language for localization (saved from Flutter)
+        val languageCode: String = widgetData.getString(
+            "selected_language",
+            "en",
+        ) ?: "en"
 
         if (forecastJson != null) {
             val gson = Gson()
@@ -212,7 +227,8 @@ internal fun updateAppWidget(
                         sortedForecast.getOrNull(0),
                         R.id.forecast_morning_time,
                         R.id.forecast_morning_emoji,
-                        R.id.forecast_morning_temp
+                        R.id.forecast_morning_temp,
+                        languageCode,
                     )
                     // Lunch slot
                     bindForecastItem(
@@ -221,7 +237,8 @@ internal fun updateAppWidget(
                         sortedForecast.getOrNull(1),
                         R.id.forecast_lunch_time,
                         R.id.forecast_lunch_emoji,
-                        R.id.forecast_lunch_temp
+                        R.id.forecast_lunch_temp,
+                        languageCode,
                     )
                     // Evening slot
                     bindForecastItem(
@@ -230,7 +247,8 @@ internal fun updateAppWidget(
                         sortedForecast.getOrNull(2),
                         R.id.forecast_evening_time,
                         R.id.forecast_evening_emoji,
-                        R.id.forecast_evening_temp
+                        R.id.forecast_evening_temp,
+                        languageCode,
                     )
                 } else {
                     setViewVisibility(
@@ -254,7 +272,9 @@ private fun getBackgroundResource(code: Int): Int {
     return when (code) {
         0 -> R.drawable.widget_background_sunny
         1, 2, 3, 45, 48 -> R.drawable.widget_background_cloudy
-        51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82, 95, 96, 99 -> R.drawable.widget_background_rainy
+        51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82, 95, 96, 99 ->
+            R.drawable.widget_background_rainy
+
         71, 73, 75, 77, 85, 86 -> R.drawable.widget_background_snowy
         else -> R.drawable.widget_background
     }
@@ -266,14 +286,15 @@ private fun bindForecastItem(
     item: ForecastItem?,
     timeId: Int,
     emojiId: Int,
-    tempId: Int
+    tempId: Int,
+    languageCode: String
 ) {
     if (item != null) {
         val date: Date? = parseDate(item.time)
         if (date != null) {
             views.setTextViewText(
                 timeId,
-                getTimeOfDay(context, date),
+                getTimeOfDay(context, date, languageCode),
             )
             views.setTextViewText(
                 emojiId,
@@ -287,7 +308,7 @@ private fun bindForecastItem(
     }
 }
 
-private val dateParser = SimpleDateFormat(
+private val dateParser: SimpleDateFormat = SimpleDateFormat(
     "yyyy-MM-dd'T'HH:mm",
     Locale.US,
 )
@@ -299,14 +320,41 @@ private fun parseDate(dateString: String): Date? = try {
     null
 }
 
-private fun getTimeOfDay(context: Context, date: Date): String {
+
+// Create a localized context for resource lookups based on the provided
+// language code.
+private fun getLocalizedContext(
+    context: Context,
+    languageCode: String
+): Context {
+    // Use forLanguageTag for standard BCP 47 tags (e.g., "en", "uk").
+    val locale: Locale = Locale.forLanguageTag(languageCode)
+    Locale.setDefault(locale)
+    val config: android.content.res.Configuration =
+        android.content.res.Configuration(
+            context.resources.configuration,
+        )
+    config.setLocale(locale)
+
+    // `createConfigurationContext` is safe and will NOT crash the widget.
+    // It is specifically designed to create a Context with overridden
+    // resources.
+    return context.createConfigurationContext(config)
+}
+
+private fun getTimeOfDay(
+    context: Context,
+    date: Date,
+    languageCode: String
+): String {
+    val localizedContext: Context = getLocalizedContext(context, languageCode)
     val cal: Calendar = Calendar.getInstance()
     cal.time = date
     return when (cal.get(Calendar.HOUR_OF_DAY)) {
-        in 5..11 -> context.getString(R.string.morning)
-        in 12..16 -> context.getString(R.string.lunch)
-        in 17..21 -> context.getString(R.string.evening)
-        else -> context.getString(R.string.night)
+        in 5..11 -> localizedContext.getString(R.string.morning)
+        in 12..16 -> localizedContext.getString(R.string.lunch)
+        in 17..21 -> localizedContext.getString(R.string.evening)
+        else -> localizedContext.getString(R.string.night)
     }
 }
 

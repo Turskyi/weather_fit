@@ -30,16 +30,19 @@ class LocalDataSource {
     double temperatureValue = weather.temperature.value;
     final TemperatureUnits units = weather.temperatureUnits;
 
+    // Normalize Fahrenheit to Celsius intentionally for asset mapping,
+    // as all outfit images are named based on the Celsius scale.
     if (units.isFahrenheit) {
       temperatureValue = temperatureValue.toCelsius();
     }
 
+    // Do not use "else if", because for Fahrenheit we need both.
     if (temperatureValue < -40) {
       return '${constants.outfitImagePath}-40.png';
     }
 
-    // Round down temperature to nearest 10 degrees.
-    int roundedTemp = (temperatureValue / 10).floor() * 10;
+    // Round to the nearest 10 degrees (e.g., -4 becomes 0 and 5 becomes 10).
+    int roundedTemp = (temperatureValue / 10).round() * 10;
 
     // Clamp to -30...30.
     if (roundedTemp > 30) roundedTemp = 30;

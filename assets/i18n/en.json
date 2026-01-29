@@ -141,7 +141,11 @@
     "location_not_found_dialog_title": "Location Not Found",
     "location_not_found_suggestion_spell_check": "Please make sure the city or country is spelled correctly.",
     "location_not_found_suggestion_use_gps": "Alternatively, you can get the weather for your current location using GPS.",
-    "use_gps_button": "Use GPS"
+    "use_gps_button": "Use GPS",
+    "quick_city_toronto": "Toronto",
+    "quick_city_zielona_gora": "Zielona Góra",
+    "quick_city_zaporizhzhia": "Zaporizhzhia",
+    "quick_city_waldshut_tiengen": "Waldshut-Tiengen"
   },
   "about": {
     "title": "About",

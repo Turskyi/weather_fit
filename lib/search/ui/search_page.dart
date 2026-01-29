@@ -351,7 +351,7 @@ class _SearchPageState extends State<SearchPage> {
             action: SnackBarAction(
               label: translate('settings.title'),
               onPressed: () {
-                // Helper from geolocator to open app
+                // Helper from `geolocator` to open app
                 // settings.
                 geolocator.openAppSettings();
                 ScaffoldMessenger.of(context).hideCurrentSnackBar();

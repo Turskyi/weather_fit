@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_translate/flutter_translate.dart';
+import 'package:home_widget/home_widget.dart';
 import 'package:http/http.dart' as http;
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -482,6 +483,17 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
       try {
         final Weather weather = state.weather;
         final DailyForecastDomain? dailyForecastDomain = state.dailyForecast;
+
+        // Ensure native widget receives current locale for localization.
+        try {
+          final String languageCode = _localDataSource.getLanguageIsoCode();
+          await HomeWidget.saveWidgetData<String>(
+            'selected_language',
+            languageCode,
+          );
+        } catch (e) {
+          debugPrint('Failed to save widget language: $e');
+        }
 
         await _homeWidgetService.updateHomeWidget(
           localDataSource: _localDataSource,

@@ -141,7 +141,11 @@
     "location_not_found_dialog_title": "Lokalizacja nie została znaleziona",
     "location_not_found_suggestion_spell_check": "Upewnij się, że nazwa miasta lub kraju jest napisana poprawnie.",
     "location_not_found_suggestion_use_gps": "Alternatywnie możesz pobrać pogodę dla swojej aktualnej lokalizacji za pomocą GPS.",
-    "use_gps_button": "Użyj GPS"
+    "use_gps_button": "Użyj GPS",
+    "quick_city_toronto": "Toronto",
+    "quick_city_zielona_gora": "Zielona Góra",
+    "quick_city_zaporizhzhia": "Zaporizhzhia",
+    "quick_city_waldshut_tiengen": "Waldshut-Tiengen"
   },
   "about": {
     "title": "O aplikacji",
