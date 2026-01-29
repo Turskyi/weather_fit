@@ -24,6 +24,10 @@ class _DailyForecastState extends State<DailyForecast> {
   int? _visibleIndex;
   final List<GlobalKey> _itemKeys = <GlobalKey>[];
 
+  bool get _isMobile =>
+      defaultTargetPlatform == TargetPlatform.iOS ||
+      defaultTargetPlatform == TargetPlatform.android;
+
   void _showPreview({
     required BuildContext context,
     required int index,
@@ -80,8 +84,9 @@ class _DailyForecastState extends State<DailyForecast> {
 
     Overlay.of(context).insert(_overlayEntry!);
 
-    // On mobile, add a dismissible backdrop to allow tapping outside to close.
-    if (!kIsWeb) {
+    // On mobile (app or web), add a dismissible backdrop to allow tapping
+    // outside to close.
+    if (_isMobile) {
       final OverlayEntry backdropEntry = OverlayEntry(
         builder: (BuildContext context) {
           return GestureDetector(
@@ -182,7 +187,7 @@ class _DailyForecastState extends State<DailyForecast> {
                             MouseRegion(
                               cursor: SystemMouseCursors.click,
                               onEnter: (PointerEnterEvent _) {
-                                if (kIsWeb) {
+                                if (kIsWeb && !_isMobile) {
                                   _showPreview(
                                     context: context,
                                     index: i,
@@ -192,7 +197,7 @@ class _DailyForecastState extends State<DailyForecast> {
                                 }
                               },
                               onExit: (PointerExitEvent _) {
-                                if (kIsWeb) {
+                                if (kIsWeb && !_isMobile) {
                                   _hidePreview();
                                 }
                               },
@@ -200,7 +205,7 @@ class _DailyForecastState extends State<DailyForecast> {
                                 color: Colors.transparent,
                                 child: InkWell(
                                   onTap: () {
-                                    if (!kIsWeb) {
+                                    if (_isMobile) {
                                       if (_visibleIndex == i) {
                                         _hidePreview();
                                       } else {
