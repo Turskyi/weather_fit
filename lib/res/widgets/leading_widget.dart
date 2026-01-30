@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:weather_fit/router/app_route.dart';
-import 'package:weather_fit/weather/ui/weather_page.dart';
+import 'package:weather_fit/weather/ui/page/weather_page.dart';
 
 import '../constants.dart' as constants;
 

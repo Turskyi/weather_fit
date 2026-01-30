@@ -6,8 +6,8 @@ import 'package:weather_fit/res/theme/cubit/theme_cubit.dart';
 import 'package:weather_fit/router/app_route.dart';
 import 'package:weather_fit/settings/bloc/settings_bloc.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
-import 'package:weather_fit/weather/ui/weather_page_default_layout.dart';
-import 'package:weather_fit/weather/ui/weather_page_extra_small_layout.dart';
+import 'package:weather_fit/weather/ui/page/weather_page_default_layout.dart';
+import 'package:weather_fit/weather/ui/page/weather_page_extra_small_layout.dart';
 
 class WeatherPage extends StatefulWidget {
   const WeatherPage({super.key});

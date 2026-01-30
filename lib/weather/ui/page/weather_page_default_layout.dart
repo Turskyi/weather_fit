@@ -11,9 +11,9 @@ import 'package:weather_fit/router/app_route.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 import 'package:weather_fit/weather/ui/empty/weather_empty.dart';
 import 'package:weather_fit/weather/ui/error/weather_error.dart';
-import 'package:weather_fit/weather/ui/outfit_widget.dart';
 import 'package:weather_fit/weather/ui/populated/weather_populated.dart';
-import 'package:weather_fit/weather/ui/weather_loading_widget.dart';
+import 'package:weather_fit/weather/ui/widgets/outfit_widget.dart';
+import 'package:weather_fit/weather/ui/widgets/weather_loading_widget.dart';
 
 class WeatherPageDefaultLayout extends StatelessWidget {
   const WeatherPageDefaultLayout({
@@ -164,6 +164,19 @@ class WeatherPageDefaultLayout extends StatelessWidget {
       persistentFooterAlignment: AlignmentDirectional.center,
       persistentFooterButtons: (kIsWeb && isLargeScreen)
           ? _buildSettingsButtons(context)
+          : kIsWeb
+          ? <Widget>[
+              const StoreBadge(
+                url: constants.googlePlayUrl,
+                assetPath: constants.playStoreBadgePath,
+              ),
+              const StoreBadge(
+                url: constants.appStoreUrl,
+                assetPath: constants.appStoreBadgeAssetPath,
+                height: constants.appStoreBadgeHeight,
+                width: constants.appStoreBadgeWidth,
+              ),
+            ]
           : null,
       persistentFooterDecoration: BoxDecoration(
         color: colorScheme.surface,

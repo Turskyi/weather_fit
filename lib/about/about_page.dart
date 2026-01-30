@@ -7,6 +7,7 @@ import 'package:flutter_translate/flutter_translate.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
 import 'package:weather_fit/res/widgets/leading_widget.dart';
+import 'package:weather_fit/res/widgets/store_badge.dart';
 import 'package:weather_fit/router/app_route.dart';
 
 class AboutPage extends StatelessWidget {
@@ -162,6 +163,20 @@ class AboutPage extends StatelessWidget {
           ],
         ),
       ),
+      persistentFooterButtons: kIsWeb
+          ? <Widget>[
+              const StoreBadge(
+                url: constants.googlePlayUrl,
+                assetPath: constants.playStoreBadgePath,
+              ),
+              const StoreBadge(
+                url: constants.appStoreUrl,
+                assetPath: constants.appStoreBadgeAssetPath,
+                height: constants.appStoreBadgeHeight,
+                width: constants.appStoreBadgeWidth,
+              ),
+            ]
+          : null,
     );
   }
 }

@@ -32,9 +32,10 @@ class _SupportPageState extends State<SupportPage> {
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 16.0),
         child: ListView(
           children: <Widget>[
+            const SizedBox(height: 8),
             Text(
               '«${translate('title')}» ${translate('support.title')}',
               style: textTheme.headlineMedium?.copyWith(

@@ -9,9 +9,9 @@ import 'package:weather_fit/res/widgets/local_web_cors_error.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 import 'package:weather_fit/weather/ui/empty/weather_empty.dart';
 import 'package:weather_fit/weather/ui/error/weather_error.dart';
-import 'package:weather_fit/weather/ui/outfit_widget.dart';
 import 'package:weather_fit/weather/ui/populated/weather_populated.dart';
-import 'package:weather_fit/weather/ui/weather_loading_widget.dart';
+import 'package:weather_fit/weather/ui/widgets/outfit_widget.dart';
+import 'package:weather_fit/weather/ui/widgets/weather_loading_widget.dart';
 
 class WeatherPageExtraSmallLayout extends StatelessWidget {
   const WeatherPageExtraSmallLayout({
