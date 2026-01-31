@@ -86,8 +86,10 @@ class UpdateServiceImpl implements UpdateService {
 
   bool _isUpdateAvailable(String currentVersion, String storeVersion) {
     try {
-      // final List<int> currentParts = currentVersion
-      final List<int> currentParts = '0.3.2'.split('.').map(int.parse).toList();
+      final List<int> currentParts = currentVersion
+          .split('.')
+          .map(int.parse)
+          .toList();
       final List<int> storeParts = storeVersion
           .split('.')
           .map(int.parse)
