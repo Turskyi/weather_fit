@@ -7,6 +7,7 @@ import 'package:in_app_update/in_app_update.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
+import 'package:weather_fit/res/extensions/http_response_extension.dart';
 
 /// Service to handle in-app updates for Android and iOS.
 abstract class UpdateService {
