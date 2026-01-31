@@ -17,6 +17,27 @@
 		66ECC3CE2B93A1A0005B25C9 /* WeatherWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66ECC3CD2B93A1A0005B25C9 /* WeatherWidgets.swift */; };
 		66ECC3D02B93A1A1005B25C9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 66ECC3CF2B93A1A1005B25C9 /* Assets.xcassets */; };
 		66ECC3D42B93A1A1005B25C9 /* WeatherWidgetsExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 66ECC3C42B93A1A0005B25C9 /* WeatherWidgetsExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		66F0FCDB2F2EB23800142A1A /* cloudy_20.png in Resources */ = {isa = PBXBuildFile; fileRef = 66F0FCD22F2EB23800142A1A /* cloudy_20.png */; };
+		66F0FCDC2F2EB23800142A1A /* clear_30.png in Resources */ = {isa = PBXBuildFile; fileRef = 66F0FCCC2F2EB23800142A1A /* clear_30.png */; };
+		66F0FCDD2F2EB23800142A1A /* cloudy_-10.png in Resources */ = {isa = PBXBuildFile; fileRef = 66F0FCCD2F2EB23800142A1A /* cloudy_-10.png */; };
+		66F0FCDE2F2EB23800142A1A /* clear_-30.png in Resources */ = {isa = PBXBuildFile; fileRef = 66F0FCC82F2EB23800142A1A /* clear_-30.png */; };
+		66F0FCDF2F2EB23800142A1A /* clear_10.png in Resources */ = {isa = PBXBuildFile; fileRef = 66F0FCCA2F2EB23800142A1A /* clear_10.png */; };
+		66F0FCE02F2EB23800142A1A /* clear_20.png in Resources */ = {isa = PBXBuildFile; fileRef = 66F0FCCB2F2EB23800142A1A /* clear_20.png */; };
+		66F0FCE12F2EB23800142A1A /* precipitation_20.png in Resources */ = {isa = PBXBuildFile; fileRef = 66F0FCD92F2EB23800142A1A /* precipitation_20.png */; };
+		66F0FCE22F2EB23800142A1A /* clear_-20.png in Resources */ = {isa = PBXBuildFile; fileRef = 66F0FCC72F2EB23800142A1A /* clear_-20.png */; };
+		66F0FCE32F2EB23800142A1A /* precipitation_-10.png in Resources */ = {isa = PBXBuildFile; fileRef = 66F0FCD42F2EB23800142A1A /* precipitation_-10.png */; };
+		66F0FCE42F2EB23800142A1A /* precipitation_-30.png in Resources */ = {isa = PBXBuildFile; fileRef = 66F0FCD62F2EB23800142A1A /* precipitation_-30.png */; };
+		66F0FCE52F2EB23800142A1A /* cloudy_-20.png in Resources */ = {isa = PBXBuildFile; fileRef = 66F0FCCE2F2EB23800142A1A /* cloudy_-20.png */; };
+		66F0FCE62F2EB23800142A1A /* clear_0.png in Resources */ = {isa = PBXBuildFile; fileRef = 66F0FCC92F2EB23800142A1A /* clear_0.png */; };
+		66F0FCE72F2EB23800142A1A /* cloudy_-30.png in Resources */ = {isa = PBXBuildFile; fileRef = 66F0FCCF2F2EB23800142A1A /* cloudy_-30.png */; };
+		66F0FCE82F2EB23800142A1A /* cloudy_10.png in Resources */ = {isa = PBXBuildFile; fileRef = 66F0FCD12F2EB23800142A1A /* cloudy_10.png */; };
+		66F0FCE92F2EB23800142A1A /* precipitation_0.png in Resources */ = {isa = PBXBuildFile; fileRef = 66F0FCD72F2EB23800142A1A /* precipitation_0.png */; };
+		66F0FCEA2F2EB23800142A1A /* precipitation_10.png in Resources */ = {isa = PBXBuildFile; fileRef = 66F0FCD82F2EB23800142A1A /* precipitation_10.png */; };
+		66F0FCEB2F2EB23800142A1A /* cloudy_30.png in Resources */ = {isa = PBXBuildFile; fileRef = 66F0FCD32F2EB23800142A1A /* cloudy_30.png */; };
+		66F0FCEC2F2EB23800142A1A /* precipitation_30.png in Resources */ = {isa = PBXBuildFile; fileRef = 66F0FCDA2F2EB23800142A1A /* precipitation_30.png */; };
+		66F0FCED2F2EB23800142A1A /* precipitation_-20.png in Resources */ = {isa = PBXBuildFile; fileRef = 66F0FCD52F2EB23800142A1A /* precipitation_-20.png */; };
+		66F0FCEE2F2EB23800142A1A /* clear_-10.png in Resources */ = {isa = PBXBuildFile; fileRef = 66F0FCC62F2EB23800142A1A /* clear_-10.png */; };
+		66F0FCEF2F2EB23800142A1A /* cloudy_0.png in Resources */ = {isa = PBXBuildFile; fileRef = 66F0FCD02F2EB23800142A1A /* cloudy_0.png */; };
 		741287B6165243DFB7496B89 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B733836E4DBA60A00A854C94 /* Pods_Runner.framework */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
@@ -85,6 +106,27 @@
 		66ECC3D12B93A1A1005B25C9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		66ECC3DA2B93A3CE005B25C9 /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
 		66ECC3DB2B93A40B005B25C9 /* WeatherWidgetsExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WeatherWidgetsExtension.entitlements; sourceTree = "<group>"; };
+		66F0FCC62F2EB23800142A1A /* clear_-10.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "clear_-10.png"; sourceTree = "<group>"; };
+		66F0FCC72F2EB23800142A1A /* clear_-20.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "clear_-20.png"; sourceTree = "<group>"; };
+		66F0FCC82F2EB23800142A1A /* clear_-30.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "clear_-30.png"; sourceTree = "<group>"; };
+		66F0FCC92F2EB23800142A1A /* clear_0.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = clear_0.png; sourceTree = "<group>"; };
+		66F0FCCA2F2EB23800142A1A /* clear_10.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = clear_10.png; sourceTree = "<group>"; };
+		66F0FCCB2F2EB23800142A1A /* clear_20.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = clear_20.png; sourceTree = "<group>"; };
+		66F0FCCC2F2EB23800142A1A /* clear_30.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = clear_30.png; sourceTree = "<group>"; };
+		66F0FCCD2F2EB23800142A1A /* cloudy_-10.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "cloudy_-10.png"; sourceTree = "<group>"; };
+		66F0FCCE2F2EB23800142A1A /* cloudy_-20.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "cloudy_-20.png"; sourceTree = "<group>"; };
+		66F0FCCF2F2EB23800142A1A /* cloudy_-30.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "cloudy_-30.png"; sourceTree = "<group>"; };
+		66F0FCD02F2EB23800142A1A /* cloudy_0.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = cloudy_0.png; sourceTree = "<group>"; };
+		66F0FCD12F2EB23800142A1A /* cloudy_10.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = cloudy_10.png; sourceTree = "<group>"; };
+		66F0FCD22F2EB23800142A1A /* cloudy_20.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = cloudy_20.png; sourceTree = "<group>"; };
+		66F0FCD32F2EB23800142A1A /* cloudy_30.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = cloudy_30.png; sourceTree = "<group>"; };
+		66F0FCD42F2EB23800142A1A /* precipitation_-10.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "precipitation_-10.png"; sourceTree = "<group>"; };
+		66F0FCD52F2EB23800142A1A /* precipitation_-20.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "precipitation_-20.png"; sourceTree = "<group>"; };
+		66F0FCD62F2EB23800142A1A /* precipitation_-30.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "precipitation_-30.png"; sourceTree = "<group>"; };
+		66F0FCD72F2EB23800142A1A /* precipitation_0.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = precipitation_0.png; sourceTree = "<group>"; };
+		66F0FCD82F2EB23800142A1A /* precipitation_10.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = precipitation_10.png; sourceTree = "<group>"; };
+		66F0FCD92F2EB23800142A1A /* precipitation_20.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = precipitation_20.png; sourceTree = "<group>"; };
+		66F0FCDA2F2EB23800142A1A /* precipitation_30.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = precipitation_30.png; sourceTree = "<group>"; };
 		6A80DD5A50CAC6832528967C /* Pods_RunnerTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RunnerTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
 		74858FAE1ED2DC5600515810 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -155,6 +197,27 @@
 		66ECC3CA2B93A1A0005B25C9 /* WeatherWidgets */ = {
 			isa = PBXGroup;
 			children = (
+				66F0FCC62F2EB23800142A1A /* clear_-10.png */,
+				66F0FCC72F2EB23800142A1A /* clear_-20.png */,
+				66F0FCC82F2EB23800142A1A /* clear_-30.png */,
+				66F0FCC92F2EB23800142A1A /* clear_0.png */,
+				66F0FCCA2F2EB23800142A1A /* clear_10.png */,
+				66F0FCCB2F2EB23800142A1A /* clear_20.png */,
+				66F0FCCC2F2EB23800142A1A /* clear_30.png */,
+				66F0FCCD2F2EB23800142A1A /* cloudy_-10.png */,
+				66F0FCCE2F2EB23800142A1A /* cloudy_-20.png */,
+				66F0FCCF2F2EB23800142A1A /* cloudy_-30.png */,
+				66F0FCD02F2EB23800142A1A /* cloudy_0.png */,
+				66F0FCD12F2EB23800142A1A /* cloudy_10.png */,
+				66F0FCD22F2EB23800142A1A /* cloudy_20.png */,
+				66F0FCD32F2EB23800142A1A /* cloudy_30.png */,
+				66F0FCD42F2EB23800142A1A /* precipitation_-10.png */,
+				66F0FCD52F2EB23800142A1A /* precipitation_-20.png */,
+				66F0FCD62F2EB23800142A1A /* precipitation_-30.png */,
+				66F0FCD72F2EB23800142A1A /* precipitation_0.png */,
+				66F0FCD82F2EB23800142A1A /* precipitation_10.png */,
+				66F0FCD92F2EB23800142A1A /* precipitation_20.png */,
+				66F0FCDA2F2EB23800142A1A /* precipitation_30.png */,
 				66ECC3CB2B93A1A0005B25C9 /* WeatherWidgetsBundle.swift */,
 				66ECC3CD2B93A1A0005B25C9 /* WeatherWidgets.swift */,
 				66ECC3CF2B93A1A1005B25C9 /* Assets.xcassets */,
@@ -347,6 +410,27 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				66F0FCDB2F2EB23800142A1A /* cloudy_20.png in Resources */,
+				66F0FCDC2F2EB23800142A1A /* clear_30.png in Resources */,
+				66F0FCDD2F2EB23800142A1A /* cloudy_-10.png in Resources */,
+				66F0FCDE2F2EB23800142A1A /* clear_-30.png in Resources */,
+				66F0FCDF2F2EB23800142A1A /* clear_10.png in Resources */,
+				66F0FCE02F2EB23800142A1A /* clear_20.png in Resources */,
+				66F0FCE12F2EB23800142A1A /* precipitation_20.png in Resources */,
+				66F0FCE22F2EB23800142A1A /* clear_-20.png in Resources */,
+				66F0FCE32F2EB23800142A1A /* precipitation_-10.png in Resources */,
+				66F0FCE42F2EB23800142A1A /* precipitation_-30.png in Resources */,
+				66F0FCE52F2EB23800142A1A /* cloudy_-20.png in Resources */,
+				66F0FCE62F2EB23800142A1A /* clear_0.png in Resources */,
+				66F0FCE72F2EB23800142A1A /* cloudy_-30.png in Resources */,
+				66F0FCE82F2EB23800142A1A /* cloudy_10.png in Resources */,
+				66F0FCE92F2EB23800142A1A /* precipitation_0.png in Resources */,
+				66F0FCEA2F2EB23800142A1A /* precipitation_10.png in Resources */,
+				66F0FCEB2F2EB23800142A1A /* cloudy_30.png in Resources */,
+				66F0FCEC2F2EB23800142A1A /* precipitation_30.png in Resources */,
+				66F0FCED2F2EB23800142A1A /* precipitation_-20.png in Resources */,
+				66F0FCEE2F2EB23800142A1A /* clear_-10.png in Resources */,
+				66F0FCEF2F2EB23800142A1A /* cloudy_0.png in Resources */,
 				66ECC3D02B93A1A1005B25C9 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -373,9 +457,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -428,9 +516,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
