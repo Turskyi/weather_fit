@@ -82,9 +82,8 @@ class LocationRepository {
 
   /// Use Nominatim if query contains Cyrillic characters.
   bool _shouldUseNominatim(String query) {
-    final String locale = _localDataSource.getLanguageIsoCode();
+    final Language language = _localDataSource.getSavedLanguage();
 
-    return locale == Language.uk.isoLanguageCode ||
-        RegExp(r'[а-яА-ЯіїєІЇЄ]').hasMatch(query);
+    return language.isUkrainian || RegExp(r'[а-яА-ЯіїєІЇЄ]').hasMatch(query);
   }
 }

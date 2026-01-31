@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:weather_fit/entities/models/quick_city_suggestion.dart';
 import 'package:weather_fit/extensions/build_context_extensions.dart';
 import 'package:weather_fit/res/widgets/background.dart';
 import 'package:weather_fit/res/widgets/leading_widget.dart';
@@ -175,11 +174,17 @@ class _SearchLayoutDefaultState extends State<SearchLayoutDefault> {
                                     final bool showSuggestions =
                                         _isSearchFieldFocused && !hasInput;
 
-                                    return QuickCitiesSuggestions(
-                                      isVisible: showSuggestions,
-                                      suggestions: _getQuickCitiesSuggestions(),
-                                      textEditingController:
-                                          widget.textEditingController,
+                                    return BlocBuilder<SearchBloc, SearchState>(
+                                      builder:
+                                          (BuildContext _, SearchState state) {
+                                            return QuickCitiesSuggestions(
+                                              isVisible: showSuggestions,
+                                              suggestions:
+                                                  state.quickCitiesSuggestions,
+                                              textEditingController:
+                                                  widget.textEditingController,
+                                            );
+                                          },
                                     );
                                   },
                             ),
@@ -235,27 +240,6 @@ class _SearchLayoutDefaultState extends State<SearchLayoutDefault> {
         ],
       ),
     );
-  }
-
-  List<QuickCitySuggestion> _getQuickCitiesSuggestions() {
-    return <QuickCitySuggestion>[
-      QuickCitySuggestion(
-        name: translate('search.quick_city_toronto'),
-        flag: '🇨🇦',
-      ),
-      QuickCitySuggestion(
-        name: translate('search.quick_city_zielona_gora'),
-        flag: '🇵🇱',
-      ),
-      QuickCitySuggestion(
-        name: translate('search.quick_city_zaporizhzhia'),
-        flag: '🇺🇦',
-      ),
-      QuickCitySuggestion(
-        name: translate('search.quick_city_waldshut_tiengen'),
-        flag: '🇩🇪',
-      ),
-    ];
   }
 
   void _onSearchSubmitted({

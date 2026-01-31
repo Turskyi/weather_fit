@@ -10,6 +10,7 @@ import 'package:open_meteo_api/open_meteo_api.dart';
 import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
 import 'package:weather_fit/data/repositories/location_repository.dart';
 import 'package:weather_fit/entities/enums/search_error_type.dart';
+import 'package:weather_fit/entities/models/quick_city_suggestion.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_repository/weather_repository.dart';
 
@@ -21,7 +22,32 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     this._weatherRepository,
     this._locationRepository,
     this._localDataSource,
-  ) : super(const SearchInitial()) {
+  ) : super(
+        SearchInitial(
+          quickCitiesSuggestions: <QuickCitySuggestion>[
+            QuickCitySuggestion(
+              name: translate(
+                _localDataSource.getSavedLanguage().isUkrainian
+                    ? 'search.quick_city_north_york'
+                    : 'search.quick_city_toronto',
+              ),
+              flag: '🇨🇦',
+            ),
+            QuickCitySuggestion(
+              name: translate('search.quick_city_zielona_gora'),
+              flag: '🇵🇱',
+            ),
+            QuickCitySuggestion(
+              name: translate('search.quick_city_zaporizhzhia'),
+              flag: '🇺🇦',
+            ),
+            QuickCitySuggestion(
+              name: translate('search.quick_city_waldshut_tiengen'),
+              flag: '🇩🇪',
+            ),
+          ],
+        ),
+      ) {
     on<SearchLocation>(_searchLocation);
     on<ConfirmLocation>(_confirmLocation);
     on<SearchByLocation>(_searchByLocation);
@@ -36,7 +62,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     SearchByLocation event,
     Emitter<SearchState> emit,
   ) async {
-    emit(const SearchLoading());
+    emit(SearchLoading(quickCitiesSuggestions: _quickCitiesSuggestions));
     try {
       final WeatherDomain weather = await _weatherRepository
           .getWeatherByLocation(
@@ -46,7 +72,12 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
               locale: _localDataSource.getLanguageIsoCode(),
             ),
           );
-      emit(SearchWeatherLoaded(Weather.fromRepository(weather)));
+      emit(
+        SearchWeatherLoaded(
+          weather: Weather.fromRepository(weather),
+          quickCitiesSuggestions: _quickCitiesSuggestions,
+        ),
+      );
     } catch (e, stackTrace) {
       // 1. Log the detailed error with function name for debugging.
       final String debugErrorMessage =
@@ -63,6 +94,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
           errorMessage: userFriendlyErrorMessage,
           errorType: SearchErrorType.unknown,
           query: '${event.latitude}, ${event.longitude}',
+          quickCitiesSuggestions: _quickCitiesSuggestions,
         ),
       );
     }
@@ -72,11 +104,16 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     ConfirmLocation event,
     Emitter<SearchState> emit,
   ) async {
-    emit(const SearchLoading());
+    emit(SearchLoading(quickCitiesSuggestions: _quickCitiesSuggestions));
     try {
       final WeatherDomain weather = await _weatherRepository
           .getWeatherByLocation(event.location);
-      emit(SearchWeatherLoaded(Weather.fromRepository(weather)));
+      emit(
+        SearchWeatherLoaded(
+          weather: Weather.fromRepository(weather),
+          quickCitiesSuggestions: _quickCitiesSuggestions,
+        ),
+      );
     } catch (e, stackTrace) {
       // 1. Log the detailed error with function name for debugging.
       final String debugErrorMessage =
@@ -93,6 +130,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
           errorMessage: userFriendlyErrorMessage,
           query: '${event.location}',
           errorType: SearchErrorType.unknown,
+          quickCitiesSuggestions: _quickCitiesSuggestions,
         ),
       );
     }
@@ -102,7 +140,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     RequestPermissionAndSearchByLocation event,
     Emitter<SearchState> emit,
   ) async {
-    emit(const SearchLoading());
+    emit(SearchLoading(quickCitiesSuggestions: _quickCitiesSuggestions));
 
     try {
       await _requestLocationPermission();
@@ -121,7 +159,12 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
             ),
           );
       final Weather weather = Weather.fromRepository(domainWeather);
-      emit(SearchWeatherLoaded(weather));
+      emit(
+        SearchWeatherLoaded(
+          weather: weather,
+          quickCitiesSuggestions: _quickCitiesSuggestions,
+        ),
+      );
     } catch (e, stackTrace) {
       // 1. Log the detailed error with function name for debugging
       final String debugErrorMessage =
@@ -166,6 +209,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
           errorMessage: userFriendlyErrorMessage,
           errorType: searchErrorType,
           query: event.query,
+          quickCitiesSuggestions: _quickCitiesSuggestions,
         ),
       );
     }
@@ -175,7 +219,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     SearchLocation event,
     Emitter<SearchState> emit,
   ) async {
-    emit(const SearchLoading());
+    emit(SearchLoading(quickCitiesSuggestions: _quickCitiesSuggestions));
 
     // It is important to `trim` the query before passing it to the repository,
     // otherwise query with trailing spaces will return wrong location.
@@ -184,14 +228,19 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     if (eventQuery.isEmpty) {
       //TODO: For some reason the query is empty. This should not have
       // happened. Maybe inform user that he has to type something "
-      emit(const SearchInitial());
+      emit(SearchInitial(quickCitiesSuggestions: _quickCitiesSuggestions));
     } else {
       try {
         final Location location = await _locationRepository.getLocation(
           eventQuery,
         );
 
-        emit(SearchLocationFound(location));
+        emit(
+          SearchLocationFound(
+            location: location,
+            quickCitiesSuggestions: _quickCitiesSuggestions,
+          ),
+        );
       } catch (e, stackTrace) {
         // The logging of this error in in the end of this block.
         String userFriendlyMessage = translate('error.searching_location');
@@ -217,16 +266,23 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
               errorMessage: userFriendlyMessage,
               errorType: errorType,
               query: eventQuery,
+              quickCitiesSuggestions: _quickCitiesSuggestions,
             ),
           );
         } else if (e is LocationNotFoundFailure) {
-          emit(SearchLocationNotFound(eventQuery));
+          emit(
+            SearchLocationNotFound(
+              query: eventQuery,
+              quickCitiesSuggestions: _quickCitiesSuggestions,
+            ),
+          );
         } else {
           emit(
             SearchError(
               errorMessage: userFriendlyMessage,
               errorType: errorType,
               query: eventQuery,
+              quickCitiesSuggestions: _quickCitiesSuggestions,
             ),
           );
         }
@@ -285,5 +341,30 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     }
     // We expect here `LocationPermission.whileInUse`.
     debugPrint('Location permission granted with value: $permission.');
+  }
+
+  List<QuickCitySuggestion> get _quickCitiesSuggestions {
+    return <QuickCitySuggestion>[
+      QuickCitySuggestion(
+        name: translate(
+          _localDataSource.getSavedLanguage().isUkrainian
+              ? 'search.quick_city_north_york'
+              : 'search.quick_city_toronto',
+        ),
+        flag: '🇨🇦',
+      ),
+      QuickCitySuggestion(
+        name: translate('search.quick_city_zielona_gora'),
+        flag: '🇵🇱',
+      ),
+      QuickCitySuggestion(
+        name: translate('search.quick_city_zaporizhzhia'),
+        flag: '🇺🇦',
+      ),
+      QuickCitySuggestion(
+        name: translate('search.quick_city_waldshut_tiengen'),
+        flag: '🇩🇪',
+      ),
+    ];
   }
 }

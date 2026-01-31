@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:weather_fit/entities/models/quick_city_suggestion.dart';
 import 'package:weather_fit/search/bloc/search_bloc.dart';
+import 'package:weather_fit/search/ui/widgets/suggestion_tile.dart';
 
 /// Displays quick city suggestions as an animated list.
 /// Shown when the search field is focused and hidden when user starts typing.
@@ -85,10 +86,11 @@ class _QuickCitiesSuggestionsState extends State<QuickCitiesSuggestions>
                     color: colorScheme.onSurface.withValues(alpha: 0.1),
                   ),
                   for (int i = 0; i < widget.suggestions.length; i++)
-                    _SuggestionTile(
+                    SuggestionTile(
                       suggestion: widget.suggestions[i],
-                      onTap: () =>
-                          _handleCityTap(context, widget.suggestions[i].name),
+                      onTap: () {
+                        _handleCityTap(widget.suggestions[i].name);
+                      },
                       isLast: i == widget.suggestions.length - 1,
                     ),
                 ],
@@ -100,76 +102,8 @@ class _QuickCitiesSuggestionsState extends State<QuickCitiesSuggestions>
     }
   }
 
-  void _handleCityTap(BuildContext context, String cityName) {
+  void _handleCityTap(String cityName) {
     widget.textEditingController.text = cityName;
     context.read<SearchBloc>().add(SearchLocation(cityName));
-  }
-}
-
-/// Individual suggestion tile with hover effects.
-class _SuggestionTile extends StatefulWidget {
-  const _SuggestionTile({
-    required this.suggestion,
-    required this.onTap,
-    required this.isLast,
-  });
-
-  final QuickCitySuggestion suggestion;
-  final VoidCallback onTap;
-  final bool isLast;
-
-  @override
-  State<_SuggestionTile> createState() => _SuggestionTileState();
-}
-
-class _SuggestionTileState extends State<_SuggestionTile> {
-  bool _isHovered = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
-
-    return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      child: Material(
-        color: _isHovered
-            ? colorScheme.onSurface.withValues(alpha: 0.08)
-            : Colors.transparent,
-        child: InkWell(
-          onTap: widget.onTap,
-          child: Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 20.0,
-              vertical: 14.0,
-            ),
-            child: Row(
-              children: <Widget>[
-                Text(
-                  widget.suggestion.flag,
-                  style: const TextStyle(fontSize: 20.0),
-                ),
-                const SizedBox(width: 16.0),
-                Expanded(
-                  child: Text(
-                    widget.suggestion.name,
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      fontWeight: _isHovered
-                          ? FontWeight.w600
-                          : FontWeight.normal,
-                    ),
-                  ),
-                ),
-                Icon(
-                  Icons.north_west,
-                  size: 16,
-                  color: colorScheme.onSurface.withValues(alpha: 0.3),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
   }
 }
