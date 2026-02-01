@@ -18,3 +18,7 @@ intl
 nominatim_api
 weatherfit_background_update
 geolocator
+open_meteo_api_client
+Meteo
+meteo
+weathercode
