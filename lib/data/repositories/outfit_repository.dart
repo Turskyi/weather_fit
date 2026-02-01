@@ -17,6 +17,8 @@ class OutfitRepository {
   final LocalDataSource _localDataSource;
   final RemoteDataSource _remoteDataSource;
 
+  static const String _precipitation = 'precipitation';
+
   Future<OutfitImage> getOutfitImage(Weather weather) async {
     final double temperatureValue = _getTemperatureInCelsius(weather);
     final int roundedTemp = temperatureValue.round();
@@ -115,12 +117,24 @@ class OutfitRepository {
     }
   }
 
+  List<String> _getFileNames(WeatherCondition condition, int roundedTemp) {
+    final String conditionName = _getConditionName(condition);
+    if (conditionName == WeatherCondition.unknown.name) {
+      return <String>[
+        '${WeatherCondition.clear.name}_$roundedTemp.png',
+        '${WeatherCondition.cloudy.name}_$roundedTemp.png',
+        '${_precipitation}_$roundedTemp.png',
+      ];
+    } else {
+      return <String>['${conditionName}_$roundedTemp.png'];
+    }
+  }
+
   String _getConditionName(WeatherCondition condition) {
-    const String precipitation = 'precipitation';
     return switch (condition) {
       WeatherCondition.clear => condition.name,
       WeatherCondition.cloudy => condition.name,
-      WeatherCondition.rainy || WeatherCondition.snowy => precipitation,
+      WeatherCondition.rainy || WeatherCondition.snowy => _precipitation,
       _ => WeatherCondition.unknown.name,
     };
   }
