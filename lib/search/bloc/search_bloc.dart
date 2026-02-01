@@ -6,6 +6,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:nominatim_api/nominatim_api.dart';
 import 'package:open_meteo_api/open_meteo_api.dart';
 import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
 import 'package:weather_fit/data/repositories/location_repository.dart';
@@ -276,6 +277,13 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
               quickCitiesSuggestions: _quickCitiesSuggestions,
             ),
           );
+        } else if (e is NominatimLocationRequestFailure) {
+          emit(
+            SearchLocationNotFound(
+              query: eventQuery,
+              quickCitiesSuggestions: _quickCitiesSuggestions,
+            ),
+          );
         } else {
           emit(
             SearchError(
@@ -286,7 +294,14 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
             ),
           );
         }
-        debugPrint('[_searchLocation] Error: $detailedMessage\n$stackTrace');
+        debugPrint(
+          '[_searchLocation] '
+          'Error: ${e.runtimeType}\n'
+          'errorType: $errorType\n'
+          'query: $eventQuery\n'
+          'detailedMessage: $detailedMessage\n'
+          'Stack trace: $stackTrace',
+        );
       }
     }
   }

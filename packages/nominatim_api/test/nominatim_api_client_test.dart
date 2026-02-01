@@ -1,7 +1,6 @@
 import 'package:http/http.dart' as http;
 import 'package:mocktail/mocktail.dart';
 import 'package:nominatim_api/nominatim_api.dart';
-import 'package:nominatim_api/src/models/exceptions/nominatim_location_request_failure.dart';
 import 'package:test/test.dart';
 
 import 'helpers/mocks.dart';
