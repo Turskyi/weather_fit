@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:weather_fit/entities/models/outfit/outfit_image.dart';
 import 'package:weather_fit/extensions/build_context_extensions.dart';
-import 'package:weather_fit/weather/ui/outfit_image_widget.dart';
-import 'package:weather_fit/weather/ui/text_recommendation_widget.dart';
+import 'package:weather_fit/weather/ui/widgets/outfit_image_widget.dart';
+import 'package:weather_fit/weather/ui/widgets/text_recommendation_widget.dart';
 
 class OutfitWidget extends StatelessWidget {
   const OutfitWidget({

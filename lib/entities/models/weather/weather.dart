@@ -27,6 +27,10 @@ class Weather extends Equatable {
     return _$WeatherFromJson(json);
   }
 
+  factory Weather.fromDomain(WeatherDomain weatherDomain) {
+    return Weather.fromRepository(weatherDomain);
+  }
+
   factory Weather.fromRepository(WeatherDomain weatherDomain) {
     final DateTime now = DateTime.now();
     final DateTime parsedDateTime = DateTime(

@@ -48,6 +48,60 @@ class WeatherRepository {
 
     return DailyForecastDomain(forecast: forecastItems);
   }
+
+  Future<WeatherDomain> getClimateProjection({
+    required Location location,
+    required DateTime date,
+  }) async {
+    final ClimateChangeProjectionsResponse response = await _openMeteoApiClient
+        .getClimateProjection(
+          latitude: location.latitude,
+          longitude: location.longitude,
+          date: date,
+        );
+
+    final List<double> maxTemperatures = response.daily.temperature2mMax;
+    final List<double> minTemperatures = response.daily.temperature2mMin;
+    if (maxTemperatures.isNotEmpty && minTemperatures.isNotEmpty) {
+      final double maxTemp = response.daily.temperature2mMax.firstOrNull ?? 0;
+      final double minTemp = response.daily.temperature2mMin.firstOrNull ?? 0;
+      final double avgTemp = (maxTemp + minTemp) / 2;
+
+      return WeatherDomain(
+        temperature: avgTemp,
+        maxTemperature: maxTemp,
+        minTemperature: minTemp,
+        location: location,
+        condition: WeatherCondition.unknown,
+        countryCode: location.countryCode,
+        description: 'Projected',
+        // Climate API doesn't provide codes
+        weatherCode: -1,
+        locale: location.locale,
+      );
+    } else {
+      throw Exception('No max or min temperatures found');
+    }
+  }
+
+  Future<Location> searchLocation({
+    required String query,
+    required String locale,
+  }) async {
+    final LocationResponse response = await _openMeteoApiClient.locationSearch(
+      query,
+    );
+
+    return Location(
+      latitude: response.latitude,
+      longitude: response.longitude,
+      name: response.name,
+      country: response.country,
+      province: response.admin1,
+      countryCode: response.countryCode,
+      locale: locale,
+    );
+  }
 }
 
 extension on int {

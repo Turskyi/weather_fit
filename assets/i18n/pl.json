@@ -143,9 +143,25 @@
     "location_not_found_suggestion_use_gps": "Alternatywnie możesz pobrać pogodę dla swojej aktualnej lokalizacji za pomocą GPS.",
     "use_gps_button": "Użyj GPS",
     "quick_city_toronto": "Toronto",
+    "quick_city_north_york": "North York",
     "quick_city_zielona_gora": "Zielona Góra",
     "quick_city_zaporizhzhia": "Zaporizhzhia",
-    "quick_city_waldshut_tiengen": "Waldshut-Tiengen"
+    "quick_city_waldshut_tiengen": "Waldshut-Tiengen",
+    "outfit_planner_title": "Planer stroju na podróż",
+    "destination_label": "Miejsce docelowe",
+    "city_or_country_hint": "Miasto lub kraj",
+    "date_label": "Data",
+    "select_date": "Wybierz datę",
+    "climate_projection_disclaimer": "Uwaga: Te prognozy opierają się na średnich sezonowych i zakładają bezchmurny, słoneczny dzień.",
+    "generate_preview_button": "Generuj podgląd",
+    "change_details_button": "Zmień szczegóły",
+    "location_not_found_clarification": "Spróbuj wyszukać według kraju dla lepszej dokładności.",
+    "projection_fetch_failed": "Nie udało się pobrać prognozy. Spróbuj ponownie.",
+    "plan_future_outfit": "Zaplanuj strój na podróż",
+    "typical_temperature": "Zazwyczaj: {minTemp}°C - {maxTemp}°C",
+    "temperature_coolest": "Najchłodniej",
+    "temperature_typical": "Zazwyczaj",
+    "temperature_warmest": "Najcieplej"
   },
   "about": {
     "title": "O aplikacji",
@@ -174,7 +190,7 @@
     "consent_agreement": "Korzystając z naszych usług, wyrażasz zgodę na gromadzenie i wykorzystywanie Twoich informacji w sposób opisany w niniejszej polityce prywatności.",
     "security_measures": "Środki bezpieczeństwa",
     "security_measures_description": "Podejmujemy uzasadnione środki w celu ochrony Twoich informacji przed nieautoryzowanym dostępem, ujawnieniem lub modyfikacją.",
-    "children_description": "Nasze usługi nie są skierowane do dzieci poniżej {age} roku życia. Nie gromadzimy świadomie danych osobowych od dzieci poniżej {age} roku życia. Chociaż staramy się minimalizować gromadzenie danych, usługi stron trzecich, z których korzystamy (takie jak Firebase Crashlytics i Google Analytics), mogą gromadzić niektóre dane. Dane te są jednak gromadzone anonimowo i nie są powiązane z żadnymi danymi osobowymi. Jeśli uważasz, że dziecko poniżej {age} roku życia przekazało nam dane osobowe, skontaktuj się z nami, a my zbadamy sprawę.",
+    "children_description": "Nasze usługi nie są skierowane do dzieci poniżej {age} roku życia. Nie gromadzimy świadomie danych osobowych od dzieci poniżej {age} roku życia. Chociaż staramy się minimalizować gromadzenie danych, usługi stron trzecich, z których korzystamy (takie jak Firebase Crashlytics i Google Analytics), mogą gromadzić niektóre dane. Dane te są jednak gromadzone anonimowo i nie są powiązane z żadnymi danymi osobowymi. Jeśli uważasz, że dziecko poniżej {age} roku życia przekazało nam dane osobowe, skontaktuj się z nami, a we zbadamy sprawę.",
     "crashlytics_description": "«{appName}» korzysta z Firebase Crashlytics, usługi Google, do anonimowego gromadzenia raportów o awariach, co pomaga nam poprawić stabilność aplikacji i naprawiać błędy. Dane gromadzone przez Crashlytics nie zawierają żadnych danych osobowych.",
     "ai_content_description": "«{appName}» nie używa już sztucznej inteligencji (AI) do generowania obrazów strojów w czasie rzeczywistym. Zamiast tego wszystkie obrazy są teraz wstępnie narysowane i dołączone do aplikacji. Chociaż niektóre obrazy mogły być wspomagane przez narzędzia AI podczas procesu projektowania, żadne dane użytkownika nie są wysyłane do zewnętrznych usług AI podczas użytkowania.\n\nJeśli masz wątpliwości lub chcesz przekazać opinię na temat jakiejkolwiek treści, skorzystaj z opcji „Opinia” w ustawieniach aplikacji.",
     "outfit_illustrations_created_by": "Ilustracje strojów zostały stworzone przez",
@@ -186,7 +202,7 @@
     "platform_macos_description": "W systemie macOS aplikacja korzysta z przybliżonej lokalizacji (za zgodą), aby zapewnić lokalną pogodę i odpowiednie rekomendacje strojów, podobnie jak na urządzeniach mobilnych.",
     "platform_image_generation_explanation": "Na platformach mobilnych i stacjonarnych obrazy strojów nie są generowane w czasie rzeczywistym przy użyciu AI. Zamiast tego są to wstępnie narysowane ilustracje dołączone do aplikacji. Niektóre z tych zasobów mogły zostać wstępnie naszkicowane lub dopracowane za pomocą narzędzi AI podczas procesu twórczego, ale żadne dane użytkownika nie są udostępniane usługom AI podczas korzystania z aplikacji.",
     "platform_web_description": "W sieci «{appName}» wyświetla zarówno tekstowe, jak i wizualne rekomendacje strojów, tak samo jak na platformach mobilnych i stacjonarnych. Jednak widżety ekranu głównego nie są dostępne w sieci ze względu na obecne ograniczenia techniczne.",
-    "image_attribution_and_rights_description": "Wszystkie ilustracje strojów w «{appName}» zostały stworzone i zredagowane przez artystkę Annę Turską, przy użyciu połączenia oryginalnych projektów i szkiców wspomaganych przez AI (np. Bing Image Creator). Obrazy te są dołączone do aplikacji i nie są pobierane z żadnego zewnętrznego źródła podczas użytkowania. Wszelkie prawa do ostatecznych obrazów są zastrzeżone przez programistę."
+    "image_attribution_and_rights_description": "Wszystkie ilustracje strojów w «{appName}» zostały stworzone i zredagowane przez artystkę Annę Turską, przy użyciu połączenia oryginalnych projektów i szkiców wspomaganych przez AI (np. Bing Image Creator). Obrazy te są dołączone do aplikacji i nie są pobierane z żadnego zewnętrznego źródła podczas użytkowania. Wszystkie prawa do ostatecznych obrazów są zastrzeżone przez programistę."
   },
   "support": {
     "title": "Wsparcie",
@@ -251,7 +267,7 @@
     "oops": "🛑 Ups! Brak sugestii stroju.",
     "could_not_pick": "🤷 Wygląda na to, że tym razem nie mogliśmy wybrać stroju.",
     "mix_and_match": "🎨 Brak rekomendacji? Czas na własne zestawienia!",
-    "fashion_instincts": "✨ Twoja modowa intuicja przejmuje dziś stery!",
+    "fashion_instincts": "✨ Twoja modowa intuja przejmuje dziś stery!",
     "pajama_day": "😴 Brak wybranego stroju — może dzisiaj jest dzień piżamy?",
     "unavailable_short": "👕 Strój niedostępny.",
     "no_recommendation_short": "🚫 brak rekomendacji.",

@@ -7,7 +7,7 @@ import 'package:weather_fit/extensions/build_context_extensions.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
 import 'package:weather_fit/settings/bloc/settings_bloc.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
-import 'package:weather_fit/weather/ui/weather_icon.dart';
+import 'package:weather_fit/weather/ui/widgets/weather_icon.dart';
 
 class WeatherContentExtraSmall extends StatelessWidget {
   const WeatherContentExtraSmall({

@@ -33,7 +33,6 @@ void main() {
   });
 
   setUp(() async {
-    // ...
     mockHomeWidgetService = MockHomeWidgetService();
     mockWeatherRepository = MockWeatherRepository();
     mockOutfitRepository = MockOutfitRepository();
@@ -97,8 +96,8 @@ void main() {
       ).thenAnswer((Invocation _) => 'Wear a T-shirt and shorts');
 
       when(
-        () => mockOutfitRepository.getOutfitImageAssetPath(any()),
-      ).thenReturn('assets/images/outfits/clear_0.png');
+        () => mockOutfitRepository.getOutfitImageAssetPaths(any()),
+      ).thenReturn(<String>['assets/images/outfits/clear_0.png']);
 
       final SharedPreferences preferences =
           await SharedPreferences.getInstance();

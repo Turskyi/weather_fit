@@ -20,7 +20,7 @@ void main() {
     localDataSource = localDataSource = LocalDataSource(mockSharedPreferences);
   });
 
-  group('getOutfitImageAssetPath', () {
+  group('getOutfitImageAssetPaths', () {
     test('should round temperature down to nearest 10 degrees and clamp to '
         '[-30, 30]', () {
       final List<Map<String, Object?>> testCases = <Map<String, Object?>>[
@@ -56,9 +56,11 @@ void main() {
             locale: dummy_constants.dummyLocale,
           );
 
-          final String path = localDataSource.getOutfitImageAssetPath(weather);
+          final List<String> paths = localDataSource.getOutfitImageAssetPaths(
+            weather,
+          );
           expect(
-            path,
+            paths.first,
             contains('clear_$expectedRounded.png'),
             reason: 'Failed for temperature $temp',
           );
@@ -78,8 +80,10 @@ void main() {
         locale: dummy_constants.dummyLocale,
       );
 
-      final String path = localDataSource.getOutfitImageAssetPath(weather);
-      expect(path, contains('-40.png'));
+      final List<String> paths = localDataSource.getOutfitImageAssetPaths(
+        weather,
+      );
+      expect(paths.first, contains('-40.png'));
     });
 
     test('should convert Fahrenheit to Celsius before rounding', () {
@@ -95,8 +99,10 @@ void main() {
         locale: dummy_constants.dummyLocale,
       );
 
-      final String path = localDataSource.getOutfitImageAssetPath(weather);
-      expect(path, contains('clear_30.png'));
+      final List<String> paths = localDataSource.getOutfitImageAssetPaths(
+        weather,
+      );
+      expect(paths.first, contains('clear_30.png'));
     });
 
     test('should return "precipitation_0.png" when condition is rainy and '
@@ -112,8 +118,31 @@ void main() {
         locale: dummy_constants.dummyLocale,
       );
 
-      final String path = localDataSource.getOutfitImageAssetPath(weather);
-      expect(path, contains('precipitation_0.png'));
+      final List<String> paths = localDataSource.getOutfitImageAssetPaths(
+        weather,
+      );
+      expect(paths.first, contains('precipitation_0.png'));
+    });
+
+    test('should return multiple paths when condition is unknown', () {
+      const Weather weather = Weather(
+        condition: WeatherCondition.unknown,
+        location: dummy_constants.dummyLocation,
+        temperature: Temperature(value: 20),
+        temperatureUnits: TemperatureUnits.celsius,
+        countryCode: dummy_constants.dummyCountryCode,
+        description: dummy_constants.dummyWeatherDescription,
+        code: dummy_constants.dummyWeatherCode,
+        locale: dummy_constants.dummyLocale,
+      );
+
+      final List<String> paths = localDataSource.getOutfitImageAssetPaths(
+        weather,
+      );
+      expect(paths.length, 3);
+      expect(paths[0], contains('clear_20.png'));
+      expect(paths[1], contains('cloudy_20.png'));
+      expect(paths[2], contains('precipitation_20.png'));
     });
   });
 
@@ -133,12 +162,12 @@ void main() {
       );
 
       // Act
-      final String assetPath = localDataSource.getOutfitImageAssetPath(weather);
+      final List<String> assetPaths = localDataSource.getOutfitImageAssetPaths(
+        weather,
+      );
 
-      // Assert
-      // The formula: (0.0 / 10).floor() * 10 = 0
-      // Expected path segment: clear_0.png
-      expect(assetPath, contains('clear_0.png'));
+      // Assert: The formula: (0.0 / 10).round() * 10 = 0
+      expect(assetPaths.first, contains('clear_0.png'));
     });
 
     test('should round down correctly for positive and negative values', () {
@@ -161,9 +190,8 @@ void main() {
           locale: dummy_constants.dummyLocale,
         );
 
-        final String assetPath = localDataSource.getOutfitImageAssetPath(
-          weather,
-        );
+        final List<String> assetPaths = localDataSource
+            .getOutfitImageAssetPaths(weather);
 
         // Note: The code clamps results to -30...30
         int expectedRounded = entry.value;
@@ -171,7 +199,7 @@ void main() {
         if (expectedRounded < -30) expectedRounded = -30;
 
         expect(
-          assetPath,
+          assetPaths.first,
           contains('clear_$expectedRounded.png'),
           reason: 'Failed for temperature ${entry.key}',
         );
@@ -179,7 +207,7 @@ void main() {
     });
   });
 
-  group('LocalDataSource - getOutfitImageAssetPath Rounding Logic', () {
+  group('LocalDataSource - getOutfitImageAssetPaths Rounding Logic', () {
     test('should return 0 for -1.0 degrees after fix (nearest decade)', () {
       // Arrange
       const Weather weather = Weather(
@@ -194,10 +222,12 @@ void main() {
       );
 
       // Act
-      final String assetPath = localDataSource.getOutfitImageAssetPath(weather);
+      final List<String> assetPaths = localDataSource.getOutfitImageAssetPaths(
+        weather,
+      );
 
       // Assert: (-1.0 / 10).round() = 0. 0 * 10 = 0.
-      expect(assetPath, contains('clear_0.png'));
+      expect(assetPaths.first, contains('clear_0.png'));
     });
 
     test('should round to the nearest decade correctly', () {
@@ -222,12 +252,11 @@ void main() {
           locale: dummy_constants.dummyLocale,
         );
 
-        final String assetPath = localDataSource.getOutfitImageAssetPath(
-          weather,
-        );
+        final List<String> assetPaths = localDataSource
+            .getOutfitImageAssetPaths(weather);
 
         expect(
-          assetPath,
+          assetPaths.first,
           contains('clear_${entry.value}.png'),
           reason:
               'Failed for temperature ${entry.key}: expected ${entry.value}',

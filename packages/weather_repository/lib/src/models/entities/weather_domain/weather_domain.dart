@@ -15,6 +15,8 @@ class WeatherDomain extends Equatable {
     required this.description,
     required this.weatherCode,
     required this.locale,
+    this.maxTemperature,
+    this.minTemperature,
   });
 
   factory WeatherDomain.fromJson(Map<String, Object?> json) {
@@ -30,6 +32,8 @@ class WeatherDomain extends Equatable {
   final String description;
   final int weatherCode;
   final String locale;
+  final double? maxTemperature;
+  final double? minTemperature;
 
   String get locationName {
     final Map<String, String> latLabels = <String, String>{
@@ -54,7 +58,7 @@ class WeatherDomain extends Equatable {
   }
 
   @override
-  List<Object> get props => <Object>[
+  List<Object?> get props => <Object?>[
     location,
     temperature,
     condition,
@@ -62,5 +66,7 @@ class WeatherDomain extends Equatable {
     description,
     weatherCode,
     locale,
+    maxTemperature,
+    minTemperature,
   ];
 }

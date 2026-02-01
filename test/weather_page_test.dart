@@ -18,8 +18,8 @@ import 'package:weather_fit/search/bloc/search_bloc.dart';
 import 'package:weather_fit/services/home_widget_service.dart';
 import 'package:weather_fit/settings/bloc/settings_bloc.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
-import 'package:weather_fit/weather/ui/weather.dart';
-import 'package:weather_fit/weather/ui/weather_page.dart';
+import 'package:weather_fit/weather/ui/page/weather_page.dart';
+import 'package:weather_fit/weather/weather.dart';
 import 'package:weather_repository/weather_repository.dart';
 
 import 'constants/dummy_constants.dart' as dummy_constants;

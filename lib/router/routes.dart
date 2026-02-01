@@ -7,7 +7,7 @@ import 'package:weather_fit/router/app_route.dart';
 import 'package:weather_fit/search/ui/search_page.dart';
 import 'package:weather_fit/settings/ui/settings_page.dart';
 import 'package:weather_fit/support/support_page.dart';
-import 'package:weather_fit/weather/ui/weather_page.dart';
+import 'package:weather_fit/weather/ui/page/weather_page.dart';
 
 Map<String, WidgetBuilder> getRouteMap() {
   return <String, WidgetBuilder>{

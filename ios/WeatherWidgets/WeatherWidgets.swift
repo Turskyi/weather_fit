@@ -34,21 +34,6 @@ import WidgetKit
 ///   ↓ (fails if bundled image not found)
 /// Level 3: Render without image (gradient + text only)
 /// ```
-///
-/// This is necessary because WidgetKit has strict constraints that can invalidate
-/// cached file paths. See WidgetImageLoader for detailed explanation.
-///
-/// **iOS Background Updates:**
-///
-/// The app uses workmanager to schedule background updates, but iOS has fundamental
-/// limitations on background task execution. See injector.dart for detailed explanation
-/// of iOS constraints and why widget updates appear infrequent (~1x daily).
-///
-/// **Key Design Decisions:**
-/// - Images are optional and decorative; missing images don't break the UI
-/// - Widget degrades gracefully if data is unavailable
-/// - All text labels include safe fallbacks (e.g., "Unknown Location")
-/// - Error handling is silent (no alerts or logs that could break the widget)
 
 // --- Data Models ---
 struct ForecastItem: Codable, Hashable {
@@ -170,87 +155,128 @@ struct ForecastItemView: View {
 
 struct WeatherWidgetsEntryView: View {
     var entry: Provider.Entry
+    @Environment(\.widgetFamily) var family
 
     var body: some View {
-        VStack(spacing: 0) {
-            // Top section: Split into two bubbles to keep the center clear
-            HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: 0) {
-                    Text(entry.weatherData.location ?? "")
-                        .font(.subheadline).fontWeight(.semibold)
-                    Text(entry.weatherData.temperature ?? "")
-                        .font(.title2).fontWeight(.bold)
-                }
-                .padding(.horizontal, 10)
-                .padding(.vertical, 6)
-                .background(Color.black.opacity(0.35))
-                .cornerRadius(10)
+        // Horizontal layout for wide widgets (Medium, ExtraLarge)
+        let isWide = family == .systemMedium || family == .systemExtraLarge
 
-                Spacer()
+        Group {
+            if isWide {
+                HStack(alignment: .top, spacing: 12) {
+                    // Left Column: Image and Recommendation (kept together as requested)
+                    VStack(alignment: .center, spacing: 8) {
+                        imageSection
+                        recommendationSection
+                    }
+                    .frame(maxWidth: .infinity)
 
-                VStack(alignment: .trailing, spacing: 0) {
-                    Text(entry.weatherData.emoji ?? "")
-                        .font(.largeTitle)
-                    Text(entry.weatherData.lastUpdated ?? "")
-                        .font(.system(size: 8))
+                    // Right Column: Header [location, temp, emoji, updated] and Forecast
+                    VStack(alignment: .leading, spacing: 12) {
+                        headerSection
+                        forecastSection
+                    }
+                    .frame(maxWidth: .infinity)
                 }
-                .padding(.horizontal, 10)
-                .padding(.vertical, 6)
-                .background(Color.black.opacity(0.35))
-                .cornerRadius(10)
+            } else {
+                // Vertical layout for Small and Large widgets
+                // Image -> Recommendation -> Header -> Forecast
+                VStack(spacing: 8) {
+                    imageSection
+                        .frame(maxHeight: .infinity)
+                    
+                    recommendationSection
+                    
+                    headerSection
+                    
+                    if family != .systemSmall {
+                        forecastSection
+                    }
+                }
             }
-            .padding(.horizontal, 10)
-            .padding(.top, 8)
-            .foregroundColor(.white)
+        }
+        // Paddings surrounding the widget removed completely as requested
+        .widgetURL(URL(string: "weatherfit://open")!)
+    }
 
+    /// The Outfit Image section with rounded corners
+    private var imageSection: some View {
+        Group {
+            if let uiImage = WidgetImageLoader.loadOutfitImage(
+                imagePath: entry.weatherData.imagePath,
+                forecast: entry.weatherData.forecast
+            ) {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .scaledToFit()
+                    .clipShape(RoundedRectangle(cornerRadius: 16)) // Rounded corners for outfit image
+            } else {
+                Image(systemName: "tshirt.fill")
+                    .font(.system(size: 40))
+                    .foregroundColor(.white.opacity(0.3))
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    /// Recommendation text - now placed right below the image
+    private var recommendationSection: some View {
+        Group {
+            if let recommendation = entry.weatherData.recommendation {
+                Text(recommendation)
+                    .font(.system(size: 9, weight: .medium))
+                    .multilineTextAlignment(.center)
+                    .lineLimit(family == .systemSmall ? 2 : 4)
+                    .padding(8)
+                    .background(Color.black.opacity(0.2))
+                    .cornerRadius(10)
+                    .foregroundColor(.white)
+            }
+        }
+    }
+
+    /// Header components: [location, temperature], [emoji, last updated]
+    private var headerSection: some View {
+        HStack(alignment: .center) {
+            VStack(alignment: .leading, spacing: 0) {
+                Text(entry.weatherData.location ?? "Unknown")
+                    .font(.system(size: 10, weight: .semibold))
+                Text(entry.weatherData.temperature ?? "--°")
+                    .font(.system(size: 16, weight: .bold))
+            }
+            
             Spacer()
 
-            // Lower section: Split into three pieces: left/right forecast and middle recommendation + forecast
-            HStack(alignment: .bottom, spacing: 8) {
-                if let forecast = entry.weatherData.forecast, !forecast.isEmpty {
-                    // Left Forecast Item
-                    ForecastItemView(item: forecast[0], locale: entry.weatherData.locale)
-                        .padding(8)
-                        .background(Color.black.opacity(0.35))
-                        .cornerRadius(12)
+            VStack(alignment: .trailing, spacing: 0) {
+                Text(entry.weatherData.emoji ?? "☀️")
+                    .font(.system(size: 18))
+                Text(entry.weatherData.lastUpdated ?? "")
+                    .font(.system(size: 7))
+                    .opacity(0.8)
+            }
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background(Color.black.opacity(0.3))
+        .cornerRadius(10)
+        .foregroundColor(.white)
+    }
 
-                    Spacer()
-
-                    // Middle Piece: Recommendation + Middle Forecast
-                    VStack(spacing: 4) {
-                        if let recommendation = entry.weatherData.recommendation {
-                            Text(recommendation)
-                                .font(.system(size: 9, weight: .medium))
-                                .multilineTextAlignment(.center)
-                                .lineLimit(3)
-                                .fixedSize(horizontal: false, vertical: true)
-                        }
-                        
-                        if forecast.count > 1 {
-                            ForecastItemView(item: forecast[1], locale: entry.weatherData.locale)
-                        }
-                    }
-                    .padding(8)
-                    .background(Color.black.opacity(0.35))
-                    .cornerRadius(12)
-                    .frame(maxWidth: 160) // Prevents the middle bubble from spanning the entire width
-
-                    Spacer()
-
-                    // Right Forecast Item
-                    if forecast.count > 2 {
-                        ForecastItemView(item: forecast[2], locale: entry.weatherData.locale)
-                            .padding(8)
-                            .background(Color.black.opacity(0.35))
-                            .cornerRadius(12)
+    /// Forecast components (three parts)
+    private var forecastSection: some View {
+        Group {
+            if let forecast = entry.weatherData.forecast, !forecast.isEmpty {
+                HStack(spacing: 12) {
+                    ForEach(forecast.prefix(3), id: \.self) { item in
+                        ForecastItemView(item: item, locale: entry.weatherData.locale)
                     }
                 }
+                .padding(10)
+                .background(Color.black.opacity(0.2))
+                .cornerRadius(12)
+                .foregroundColor(.white)
             }
-            .padding(.horizontal, 10)
-            .padding(.bottom, 8)
-            .foregroundColor(.white)
         }
-        .widgetURL(URL(string: "weatherfit://open")!)
     }
 }
 
@@ -262,25 +288,8 @@ struct WeatherWidgets: Widget {
         StaticConfiguration(kind: kind, provider: Provider()) { entry in
             WeatherWidgetsEntryView(entry: entry)
                 .containerBackground(for: .widget) {
-                    ZStack {
-                        WeatherHelper.getGradient(
-                            for: entry.weatherData.forecast?.first?.weatherCode ?? 0)
-
-                        // Attempt to load outfit image with fallback mechanism.
-                        // See WidgetImageLoader for detailed fallback strategy.
-                        if let uiImage = WidgetImageLoader.loadOutfitImage(
-                            imagePath: entry.weatherData.imagePath,
-                            forecast: entry.weatherData.forecast
-                        ) {
-                            Image(uiImage: uiImage)
-                                .resizable()
-                                .scaledToFit()
-                        }
-                        // If image fails to load, we gracefully degrade to just the gradient and text.
-                        // This is expected behavior in WidgetKit when the image path becomes invalid.
-
-                        // Removed general dark overlay as separate bubbles now provide enough contrast
-                    }
+                    WeatherHelper.getGradient(
+                        for: entry.weatherData.forecast?.first?.weatherCode ?? 0)
                 }
         }
         .configurationDisplayName("WeatherFit")
@@ -290,89 +299,39 @@ struct WeatherWidgets: Widget {
 
 // --- Helpers & Extensions ---
 
-/// Manages outfit image loading with a robust fallback mechanism.
-///
-/// **Why Images Disappear on iOS Widgets:**
-///
-/// WidgetKit has strict lifecycle constraints that can cause image paths to become invalid:
-/// - File path is cached in UserDefaults and passed to the widget
-/// - When the widget is refreshed (e.g., during background task), the file may have been deleted
-/// - iOS may evict files from the app's document directory to free space
-/// - Cached files are not guaranteed to persist across app lifecycle events
-/// - If the app is killed while the widget is being updated, the file may be incomplete
-///
-/// **Our Fallback Strategy (Mirrors Flutter OutfitRepository):**
-/// 1. **Primary**: Attempt to load from the provided file path (freshly downloaded image)
-/// 2. **Fallback**: Parse weather condition from forecast and load bundled asset
-/// 3. **Graceful degradation**: If all else fails, render without image (gradient + text)
-///
-/// This is similar to the Flutter-side logic:
-/// ```
-/// network → file → asset → fallback_asset
-/// ```
-///
-/// By bundling a subset of outfit images, we ensure the widget always looks intentional,
-/// never broken. The widget is decorative, so graceful degradation is acceptable.
-///
 struct WidgetImageLoader {
-    /// Loads outfit image with multi-level fallback mechanism.
-    ///
-    /// - Parameter imagePath: Path to the cached image file from Flutter
-    /// - Parameter forecast: Forecast data to determine weather condition
-    /// - Returns: UIImage if available from any source, nil for graceful degradation
     static func loadOutfitImage(
         imagePath: String?,
         forecast: [ForecastItem]?
     ) -> UIImage? {
-        // Level 1: Try to load from the provided file path (freshly downloaded or cached)
         if let imagePath = imagePath, let image = UIImage(contentsOfFile: imagePath) {
             return image
         }
 
-        // Level 2: Fallback to bundled asset based on weather condition
-        // Parse weather condition and temperature from the first forecast item
         if let forecast = forecast, !forecast.isEmpty {
             let weatherCode = forecast.first?.weatherCode ?? 0
             let temperature = Int(forecast.first?.temperature.rounded() ?? 0)
-
-            // Determine condition name from weather code
             let conditionName = getConditionName(from: weatherCode)
-
-            // Round temperature to nearest 10 for cleaner image names
             let roundedTemp = roundTemperatureToBucket(temperature)
-
-            // Construct image name matching our bundled assets
             let fallbackImageName = "\(conditionName)_\(roundedTemp).png"
 
-            // Try to load from bundle
             if let image = UIImage(named: fallbackImageName) {
                 return image
             }
         }
-
-        // Level 3: If even fallback fails, return nil to gracefully degrade to gradient + text
         return nil
     }
 
-    /// Maps WMO weather codes to condition names matching Flutter's logic.
     private static func getConditionName(from weatherCode: Int) -> String {
-        // Maps WMO codes to our image naming convention
         switch weatherCode {
         case 0: return "clear"
         case 1, 2, 3, 45, 48: return "cloudy"
         case 51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82, 85, 86:
             return "precipitation"
-        default: return "clear"  // Default to clear if unknown
+        default: return "clear"
         }
     }
 
-    /// Rounds temperature to the nearest bucket used in outfit images (±10°C increments).
-    ///
-    /// Examples:
-    /// - 15°C → 10°C
-    /// - 25°C → 20°C
-    /// - 5°C → 0°C
-    /// - -15°C → -20°C
     private static func roundTemperatureToBucket(_ temperature: Int) -> Int {
         let remainder = temperature % 10
         if remainder >= 5 {
@@ -398,7 +357,6 @@ struct DateHelper {
             return ""
         }
 
-        // Simple locale map for day labels.
         let isUk = locale.lowercased().hasPrefix("uk")
         let isPl = locale.lowercased().hasPrefix("pl")
         let isDe = locale.lowercased().hasPrefix("de")
@@ -426,7 +384,6 @@ struct DateHelper {
         }
         let hour = Calendar.current.component(.hour, from: date)
 
-        // Simple locale map for time-of-day labels. Extend as needed.
         let isUk = locale.lowercased().hasPrefix("uk")
         let isPl = locale.lowercased().hasPrefix("pl")
         let isDe = locale.lowercased().hasPrefix("de")

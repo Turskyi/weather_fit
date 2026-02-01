@@ -1,14 +1,11 @@
-import 'dart:io';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:weather_fit/data/repositories/outfit_repository.dart';
-import 'package:weather_fit/entities/enums/outfit_image_source.dart';
 import 'package:weather_fit/entities/enums/temperature_units.dart';
 import 'package:weather_fit/entities/models/outfit/outfit_image.dart';
 import 'package:weather_fit/entities/models/temperature/temperature.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
+import 'package:weather_fit/weather/ui/widgets/outfit_image_widget.dart';
 import 'package:weather_repository/weather_repository.dart';
 
 class ForecastOutfitPreview extends StatefulWidget {
@@ -65,51 +62,26 @@ class _ForecastOutfitPreviewState extends State<ForecastOutfitPreview>
             final OutfitImage? outfit = snapshot.data;
             if (snapshot.connectionState == ConnectionState.waiting) {
               content = const SizedBox(
-                width: 120,
-                height: 120,
+                width: 140,
+                height: 140,
                 child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
               );
             } else if (snapshot.hasError || outfit == null || outfit.isEmpty) {
               content = const SizedBox(
-                width: 120,
-                height: 120,
+                width: 140,
+                height: 140,
                 child: Center(child: Icon(Icons.error_outline)),
               );
             } else {
-              final OutfitImage? outfit = snapshot.data;
-              if (outfit?.source == OutfitImageSource.asset && outfit != null) {
-                content = Image.asset(
-                  outfit.path,
-                  width: 140,
-                  height: 140,
+              content = SizedBox(
+                width: 140,
+                height: 140,
+                child: OutfitImageWidget(
+                  outfitImage: outfit,
+                  onRefresh: () async {},
                   fit: BoxFit.contain,
-                );
-              } else if (outfit != null &&
-                  outfit.source == OutfitImageSource.network) {
-                content = Image.network(
-                  outfit.path,
-                  width: 140,
-                  height: 140,
-                  fit: BoxFit.contain,
-                );
-              } else {
-                // file
-                if (!kIsWeb && outfit != null) {
-                  content = Image.file(
-                    File(outfit.path),
-                    width: 140,
-                    height: 140,
-                    fit: BoxFit.contain,
-                  );
-                } else if (outfit != null) {
-                  content = Image.network(
-                    outfit.path,
-                    width: 140,
-                    height: 140,
-                    fit: BoxFit.contain,
-                  );
-                }
-              }
+                ),
+              );
             }
 
             return Card(
@@ -118,14 +90,7 @@ class _ForecastOutfitPreviewState extends State<ForecastOutfitPreview>
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(20.0),
-                  clipBehavior: Clip.antiAlias,
-                  child: content,
-                ),
-              ),
+              child: content,
             );
           },
         ),
@@ -142,9 +107,6 @@ class _ForecastOutfitPreviewState extends State<ForecastOutfitPreview>
   Future<OutfitImage> _loadImage() async {
     final OutfitRepository outfitRepository =
         RepositoryProvider.of<OutfitRepository>(context);
-
-    // Build a Weather model for the forecast item reusing baseWeather for
-    // location / locale / countryCode to avoid duplicating logic.
 
     final Weather forecastWeather = Weather(
       condition: widget.item.toCondition(),

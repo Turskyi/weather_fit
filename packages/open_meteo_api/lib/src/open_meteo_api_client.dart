@@ -19,6 +19,7 @@ class OpenMeteoApiClient {
 
   static const String _baseUrlWeather = 'api.open-meteo.com';
   static const String _baseUrlGeocoding = 'geocoding-api.open-meteo.com';
+  static const String _baseUrlClimate = 'climate-api.open-meteo.com';
 
   final http.Client _httpClient;
 
@@ -123,5 +124,37 @@ class OpenMeteoApiClient {
     }
 
     throw WeatherResponseFailure();
+  }
+
+  /// Fetches [ClimateChangeProjectionsResponse] for a given [latitude],
+  /// [longitude] and [date].
+  Future<ClimateChangeProjectionsResponse> getClimateProjection({
+    required double latitude,
+    required double longitude,
+    required DateTime date,
+  }) async {
+    final String formattedDate = date.toIso8601String().split('T').first;
+
+    final Uri climateRequest =
+        Uri.https(_baseUrlClimate, 'v1/climate', <String, String>{
+          'latitude': '$latitude',
+          'longitude': '$longitude',
+          'start_date': formattedDate,
+          'end_date': formattedDate,
+          'models': 'EC_Earth3P_HR',
+          'daily': 'temperature_2m_max,temperature_2m_min',
+        });
+
+    final http.Response climateResponse = await _httpClient.get(climateRequest);
+
+    if (climateResponse.statusCode != HttpStatus.ok) {
+      throw WeatherRequestFailure(
+        message: 'Climate request failed for getClimateProjection',
+        statusCode: climateResponse.statusCode,
+      );
+    }
+
+    final Map<String, dynamic> climateData = jsonDecode(climateResponse.body);
+    return ClimateChangeProjectionsResponse.fromJson(climateData);
   }
 }

@@ -11,6 +11,7 @@ const String googlePlayUrl =
     'https://play.google.com/store/apps/details?id=com.turskyi.weather_fit';
 const String appStoreUrl =
     'https://apps.apple.com/ca/app/weatherfit/id6743688355';
+const String itunesLookupUrl = 'https://itunes.apple.com/lookup?bundleId=';
 const String developerName = 'Dmytro Turskyi';
 const double appStoreBadgeHeight = 80.0;
 const double appStoreBadgeWidth = 140.0;
@@ -47,4 +48,4 @@ const String remoteOutfitBaseUrl =
 
 /// The minimum width threshold to switch to a multi-column layout on
 /// Web/Desktop.
-const double kWideLayoutBreakpoint = 800.0;
+const double kWideLayoutBreakpoint = 1000.0;

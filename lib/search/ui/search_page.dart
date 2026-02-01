@@ -368,6 +368,7 @@ class _SearchPageState extends State<SearchPage> {
               errorMessage: state.errorMessage,
               query: _text,
               errorType: SearchErrorType.network,
+              quickCitiesSuggestions: state.quickCitiesSuggestions,
             ),
           );
         } else {

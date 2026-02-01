@@ -2,25 +2,33 @@ part of 'search_bloc.dart';
 
 @immutable
 sealed class SearchState {
-  const SearchState();
+  const SearchState({required this.quickCitiesSuggestions});
+
+  final List<QuickCitySuggestion> quickCitiesSuggestions;
 }
 
 final class SearchInitial extends SearchState {
-  const SearchInitial();
+  const SearchInitial({required super.quickCitiesSuggestions});
 }
 
 final class SearchLoading extends SearchState {
-  const SearchLoading();
+  const SearchLoading({required super.quickCitiesSuggestions});
 }
 
 final class SearchLocationFound extends SearchState {
-  const SearchLocationFound(this.location);
+  const SearchLocationFound({
+    required this.location,
+    required super.quickCitiesSuggestions,
+  });
 
   final Location location;
 }
 
 final class SearchLocationNotFound extends SearchState {
-  const SearchLocationNotFound(this.query);
+  const SearchLocationNotFound({
+    required this.query,
+    required super.quickCitiesSuggestions,
+  });
 
   final String query;
 }
@@ -30,6 +38,7 @@ final class SearchError extends SearchState {
     required this.errorMessage,
     required this.query,
     required this.errorType,
+    required super.quickCitiesSuggestions,
   });
 
   final String errorMessage;
@@ -52,7 +61,10 @@ final class SearchError extends SearchState {
 }
 
 final class SearchWeatherLoaded extends SearchState {
-  const SearchWeatherLoaded(this.weather);
+  const SearchWeatherLoaded({
+    required this.weather,
+    required super.quickCitiesSuggestions,
+  });
 
   final Weather weather;
 }
