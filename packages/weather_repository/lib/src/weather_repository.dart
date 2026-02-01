@@ -72,10 +72,11 @@ class WeatherRepository {
         maxTemperature: maxTemp,
         minTemperature: minTemp,
         location: location,
-        condition: WeatherCondition.clear,
+        condition: WeatherCondition.unknown,
         countryCode: location.countryCode,
         description: 'Projected',
-        weatherCode: 0,
+        // Climate API doesn't provide codes
+        weatherCode: -1,
         locale: location.locale,
       );
     } else {

@@ -91,9 +91,8 @@ class HomeWidgetServiceImpl implements HomeWidgetService {
     final String outfitRecommendation = outfitRepository
         .getOutfitRecommendation(updatedWeather);
 
-    final String outfitFilePath = await outfitRepository.downloadAndSaveImage(
-      weather,
-    );
+    final List<String> outfitFilePaths = await outfitRepository
+        .downloadAndSaveImages(weather);
 
     // Set app group ID.
     await setAppGroupId(constants.appleAppGroupId);
@@ -131,9 +130,10 @@ class HomeWidgetServiceImpl implements HomeWidgetService {
     );
 
     // The image feature is temporarily disabled.
+    // For now, we take the first path if multiple are available.
     await saveWidgetData<String>(
       HomeWidgetKey.imageWeather.stringValue,
-      outfitFilePath,
+      outfitFilePaths.firstOrNull ?? '',
     );
 
     // Filter the forecast to send only the data the widget needs.

@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -26,6 +25,10 @@ class LocalDataSource {
   );
 
   String getOutfitImageAssetPath(Weather weather) {
+    return getOutfitImageAssetPaths(weather).firstOrNull ?? '';
+  }
+
+  List<String> getOutfitImageAssetPaths(Weather weather) {
     final WeatherCondition condition = weather.condition;
     double temperatureValue = weather.temperature.value;
     final TemperatureUnits units = weather.temperatureUnits;
@@ -38,7 +41,7 @@ class LocalDataSource {
 
     // Do not use "else if", because for Fahrenheit we need both.
     if (temperatureValue < -40) {
-      return '${constants.outfitImagePath}-40.png';
+      return <String>['${constants.outfitImagePath}-40.png'];
     }
 
     // Round to the nearest 10 degrees (e.g., -4 becomes 0 and 5 becomes 10).
@@ -50,19 +53,15 @@ class LocalDataSource {
 
     const String precipitation = 'precipitation';
 
-    // Random condition for unknown states.
-    final List<String> possibleConditions = <String>[
-      WeatherCondition.clear.name,
-      WeatherCondition.cloudy.name,
-      precipitation,
-    ];
-
     // Handle unknowns early.
     if (condition.isUnknown) {
-      final int index = Random().nextInt(possibleConditions.length);
-      final String randomConditionName = possibleConditions[index];
-      return '${constants.outfitImagePath}${randomConditionName}_$roundedTemp'
-          '.png';
+      return <String>[
+        '${constants.outfitImagePath}'
+            '${WeatherCondition.clear.name}_$roundedTemp.png',
+        '${constants.outfitImagePath}'
+            '${WeatherCondition.cloudy.name}_$roundedTemp.png',
+        '${constants.outfitImagePath}${precipitation}_$roundedTemp.png',
+      ];
     }
 
     // Normalize snowy → precipitation for shared assets
@@ -73,7 +72,9 @@ class LocalDataSource {
       _ => WeatherCondition.unknown.name,
     };
 
-    return '${constants.outfitImagePath}${conditionName}_$roundedTemp.png';
+    return <String>[
+      '${constants.outfitImagePath}${conditionName}_$roundedTemp.png',
+    ];
   }
 
   String getOutfitRecommendation(Weather weather) {

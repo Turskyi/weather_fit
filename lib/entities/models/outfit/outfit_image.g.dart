@@ -6,21 +6,28 @@ part of 'outfit_image.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-OutfitImage _$OutfitImageFromJson(Map<String, dynamic> json) =>
-    $checkedCreate('OutfitImage', json, ($checkedConvert) {
-      final val = OutfitImage(
-        path: $checkedConvert('path', (v) => v as String),
-        source: $checkedConvert(
-          'source',
-          (v) => $enumDecode(_$OutfitImageSourceEnumMap, v),
-        ),
-      );
-      return val;
-    });
+OutfitImage _$OutfitImageFromJson(Map<String, dynamic> json) => $checkedCreate(
+  'OutfitImage',
+  json,
+  ($checkedConvert) {
+    final val = OutfitImage(
+      paths: $checkedConvert(
+        'paths',
+        (v) =>
+            (v as List<dynamic>?)?.map((e) => e as String).toList() ?? const [],
+      ),
+      source: $checkedConvert(
+        'source',
+        (v) => $enumDecode(_$OutfitImageSourceEnumMap, v),
+      ),
+    );
+    return val;
+  },
+);
 
 Map<String, dynamic> _$OutfitImageToJson(OutfitImage instance) =>
     <String, dynamic>{
-      'path': instance.path,
+      'paths': instance.paths,
       'source': _$OutfitImageSourceEnumMap[instance.source]!,
     };
 

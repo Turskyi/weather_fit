@@ -6,9 +6,11 @@ part 'outfit_image.g.dart';
 
 @JsonSerializable()
 class OutfitImage extends Equatable {
-  const OutfitImage({required this.path, required this.source});
+  const OutfitImage({required this.paths, required this.source});
 
-  const OutfitImage.empty() : path = '', source = OutfitImageSource.asset;
+  const OutfitImage.empty()
+    : paths = const <String>[],
+      source = OutfitImageSource.asset;
 
   factory OutfitImage.fromJson(Map<String, Object?> json) {
     return _$OutfitImageFromJson(json);
@@ -16,13 +18,13 @@ class OutfitImage extends Equatable {
 
   Map<String, Object?> toJson() => _$OutfitImageToJson(this);
 
-  final String path;
+  final List<String> paths;
   final OutfitImageSource source;
 
-  bool get isEmpty => path.isEmpty;
+  bool get isEmpty => paths.isEmpty;
 
-  bool get isNotEmpty => path.isNotEmpty;
+  bool get isNotEmpty => paths.isNotEmpty;
 
   @override
-  List<Object?> get props => <Object?>[path, source];
+  List<Object?> get props => <Object?>[paths, source];
 }
