@@ -5,15 +5,19 @@ part 'daily.g.dart';
 
 @JsonSerializable(createToJson: true)
 class Daily {
-  const Daily({this.time, this.temperature2mMax, this.temperature2mMin});
+  const Daily({
+    this.time = const <String>[],
+    this.temperature2mMax = const <double>[],
+    this.temperature2mMin = const <double>[],
+  });
 
   factory Daily.fromJson(Map<String, dynamic> json) => _$DailyFromJson(json);
 
-  final List<String>? time;
+  final List<String> time;
   @JsonKey(name: 'temperature_2m_max')
-  final List<double>? temperature2mMax;
+  final List<double> temperature2mMax;
   @JsonKey(name: 'temperature_2m_min')
-  final List<double>? temperature2mMin;
+  final List<double> temperature2mMin;
 
   @override
   String toString() {

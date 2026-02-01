@@ -108,7 +108,11 @@ class OutfitRepository {
 
   String _getFileName(WeatherCondition condition, int roundedTemp) {
     final String conditionName = _getConditionName(condition);
-    return '${conditionName}_$roundedTemp.png';
+    if (conditionName == WeatherCondition.unknown.name) {
+      return '${WeatherCondition.clear.name}_$roundedTemp.png';
+    } else {
+      return '${conditionName}_$roundedTemp.png';
+    }
   }
 
   String _getConditionName(WeatherCondition condition) {

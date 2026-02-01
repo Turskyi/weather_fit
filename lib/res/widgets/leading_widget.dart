@@ -17,18 +17,7 @@ class LeadingWidget extends StatelessWidget {
           // Ensures the background remains unchanged.
           color: Colors.transparent,
           child: InkWell(
-            onTap: () {
-              // TODO: change with route navigation or add a comment, why.
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute<void>(
-                  builder: (BuildContext _) {
-                    return const WeatherPage();
-                  },
-                  settings: RouteSettings(name: AppRoute.weather.path),
-                ),
-                (Route<void> _) => false,
-              );
-            },
+            onTap: () => _navigateToWeather(context),
             child: SizedBox(
               height: kMinInteractiveDimension,
               width: kMinInteractiveDimension,
@@ -40,6 +29,18 @@ class LeadingWidget extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  void _navigateToWeather(BuildContext context) {
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute<void>(
+        builder: (BuildContext _) {
+          return const WeatherPage();
+        },
+        settings: RouteSettings(name: AppRoute.weather.path),
+      ),
+      (Route<void> _) => false,
     );
   }
 }

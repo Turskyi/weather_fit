@@ -13,14 +13,14 @@ DailyUnits _$DailyUnitsFromJson(Map<String, dynamic> json) => $checkedCreate(
   json,
   ($checkedConvert) {
     final val = DailyUnits(
-      time: $checkedConvert('time', (v) => v as String?),
+      time: $checkedConvert('time', (v) => v as String? ?? ''),
       temperature2mMax: $checkedConvert(
         'temperature_2m_max',
-        (v) => v as String?,
+        (v) => v as String? ?? '',
       ),
       temperature2mMin: $checkedConvert(
         'temperature_2m_min',
-        (v) => v as String?,
+        (v) => v as String? ?? '',
       ),
     );
     return val;

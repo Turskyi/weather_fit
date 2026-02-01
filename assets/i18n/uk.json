@@ -146,7 +146,18 @@
     "quick_city_north_york": "North York",
     "quick_city_zielona_gora": "Зелена Гура",
     "quick_city_zaporizhzhia": "Запоріжжя",
-    "quick_city_waldshut_tiengen": "Вальдсхут-Тінген"
+    "quick_city_waldshut_tiengen": "Вальдсхут-Тінген",
+    "outfit_planner_title": "Планувальник образу для подорожі",
+    "destination_label": "Місце призначення",
+    "city_or_country_hint": "Місто або країна",
+    "date_label": "Дата",
+    "select_date": "Оберіть дату",
+    "climate_projection_disclaimer": "Примітка: Ці прогнози базуються на сезонних середніх показниках і передбачають ясний, сонячний день.",
+    "generate_preview_button": "Створити попередній перегляд",
+    "change_details_button": "Змінити деталі",
+    "location_not_found_clarification": "Спробуйте пошукати за країною для кращої точності.",
+    "projection_fetch_failed": "Не вдалося отримати прогноз. Будь ласка, спробуйте ще раз.",
+    "plan_future_outfit": "Запланувати образ для подорожі"
   },
   "about": {
     "title": "Про застосунок",

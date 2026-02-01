@@ -48,6 +48,55 @@ class WeatherRepository {
 
     return DailyForecastDomain(forecast: forecastItems);
   }
+
+  Future<WeatherDomain> getClimateProjection({
+    required Location location,
+    required DateTime date,
+  }) async {
+    final ClimateChangeProjectionsResponse response = await _openMeteoApiClient
+        .getClimateProjection(
+          latitude: location.latitude,
+          longitude: location.longitude,
+          date: date,
+        );
+
+    // Climate API returns daily arrays. We take the first (and only) element.
+    final double avgTemp =
+        (response.daily.temperature2mMax.first +
+            response.daily.temperature2mMin.first) /
+        2;
+
+    return WeatherDomain(
+      temperature: avgTemp,
+      location: location,
+      // Climate API doesn't provide codes
+      condition: WeatherCondition.unknown,
+      countryCode: location.countryCode,
+      description: 'Projected',
+      // Climate API doesn't provide codes
+      weatherCode: 0,
+      locale: location.locale,
+    );
+  }
+
+  Future<Location> searchLocation({
+    required String query,
+    required String locale,
+  }) async {
+    final LocationResponse response = await _openMeteoApiClient.locationSearch(
+      query,
+    );
+
+    return Location(
+      latitude: response.latitude,
+      longitude: response.longitude,
+      name: response.name,
+      country: response.country,
+      province: response.admin1,
+      countryCode: response.countryCode,
+      locale: locale,
+    );
+  }
 }
 
 extension on int {

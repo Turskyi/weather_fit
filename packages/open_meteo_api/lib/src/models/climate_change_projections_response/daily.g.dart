@@ -15,17 +15,21 @@ Daily _$DailyFromJson(Map<String, dynamic> json) => $checkedCreate(
     final val = Daily(
       time: $checkedConvert(
         'time',
-        (v) => (v as List<dynamic>?)?.map((e) => e as String).toList(),
+        (v) =>
+            (v as List<dynamic>?)?.map((e) => e as String).toList() ??
+            const <String>[],
       ),
       temperature2mMax: $checkedConvert(
         'temperature_2m_max',
         (v) =>
-            (v as List<dynamic>?)?.map((e) => (e as num).toDouble()).toList(),
+            (v as List<dynamic>?)?.map((e) => (e as num).toDouble()).toList() ??
+            const <double>[],
       ),
       temperature2mMin: $checkedConvert(
         'temperature_2m_min',
         (v) =>
-            (v as List<dynamic>?)?.map((e) => (e as num).toDouble()).toList(),
+            (v as List<dynamic>?)?.map((e) => (e as num).toDouble()).toList() ??
+            const <double>[],
       ),
     );
     return val;

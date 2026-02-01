@@ -10,15 +10,15 @@ part 'climate_change_projections_response.g.dart';
 @JsonSerializable(createToJson: true)
 class ClimateChangeProjectionsResponse {
   const ClimateChangeProjectionsResponse({
+    required this.daily,
     this.latitude,
     this.longitude,
     this.generationtimeMs,
     this.utcOffsetSeconds,
-    this.timezone,
-    this.timezoneAbbreviation,
+    this.timezone = '',
+    this.timezoneAbbreviation = '',
     this.elevation,
     this.dailyUnits,
-    this.daily,
   });
 
   factory ClimateChangeProjectionsResponse.fromJson(Map<String, dynamic> json) {
@@ -31,13 +31,13 @@ class ClimateChangeProjectionsResponse {
   final double? generationtimeMs;
   @JsonKey(name: 'utc_offset_seconds')
   final int? utcOffsetSeconds;
-  final String? timezone;
+  final String timezone;
   @JsonKey(name: 'timezone_abbreviation')
-  final String? timezoneAbbreviation;
+  final String timezoneAbbreviation;
   final int? elevation;
   @JsonKey(name: 'daily_units')
   final DailyUnits? dailyUnits;
-  final Daily? daily;
+  final Daily daily;
 
   @override
   String toString() {

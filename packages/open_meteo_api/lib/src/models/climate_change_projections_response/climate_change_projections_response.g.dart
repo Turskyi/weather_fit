@@ -15,6 +15,10 @@ ClimateChangeProjectionsResponse _$ClimateChangeProjectionsResponseFromJson(
   json,
   ($checkedConvert) {
     final val = ClimateChangeProjectionsResponse(
+      daily: $checkedConvert(
+        'daily',
+        (v) => Daily.fromJson(v as Map<String, dynamic>),
+      ),
       latitude: $checkedConvert('latitude', (v) => (v as num?)?.toDouble()),
       longitude: $checkedConvert('longitude', (v) => (v as num?)?.toDouble()),
       generationtimeMs: $checkedConvert(
@@ -25,20 +29,16 @@ ClimateChangeProjectionsResponse _$ClimateChangeProjectionsResponseFromJson(
         'utc_offset_seconds',
         (v) => (v as num?)?.toInt(),
       ),
-      timezone: $checkedConvert('timezone', (v) => v as String?),
+      timezone: $checkedConvert('timezone', (v) => v as String? ?? ''),
       timezoneAbbreviation: $checkedConvert(
         'timezone_abbreviation',
-        (v) => v as String?,
+        (v) => v as String? ?? '',
       ),
       elevation: $checkedConvert('elevation', (v) => (v as num?)?.toInt()),
       dailyUnits: $checkedConvert(
         'daily_units',
         (v) =>
             v == null ? null : DailyUnits.fromJson(v as Map<String, dynamic>),
-      ),
-      daily: $checkedConvert(
-        'daily',
-        (v) => v == null ? null : Daily.fromJson(v as Map<String, dynamic>),
       ),
     );
     return val;
