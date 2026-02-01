@@ -48,4 +48,4 @@ const String remoteOutfitBaseUrl =
 
 /// The minimum width threshold to switch to a multi-column layout on
 /// Web/Desktop.
-const double kWideLayoutBreakpoint = 800.0;
+const double kWideLayoutBreakpoint = 1000.0;
