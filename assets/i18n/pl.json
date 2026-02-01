@@ -158,7 +158,10 @@
     "location_not_found_clarification": "Spróbuj wyszukać według kraju dla lepszej dokładności.",
     "projection_fetch_failed": "Nie udało się pobrać prognozy. Spróbuj ponownie.",
     "plan_future_outfit": "Zaplanuj strój na podróż",
-    "typical_temperature": "Zazwyczaj: {minTemp}°C – {maxTemp}°C"
+    "typical_temperature": "Zazwyczaj: {minTemp}°C - {maxTemp}°C",
+    "temperature_coolest": "Najchłodniej",
+    "temperature_typical": "Zazwyczaj",
+    "temperature_warmest": "Najcieplej"
   },
   "about": {
     "title": "O aplikacji",
@@ -264,7 +267,7 @@
     "oops": "🛑 Ups! Brak sugestii stroju.",
     "could_not_pick": "🤷 Wygląda na to, że tym razem nie mogliśmy wybrać stroju.",
     "mix_and_match": "🎨 Brak rekomendacji? Czas na własne zestawienia!",
-    "fashion_instincts": "✨ Twoja modowa intuicja przejmuje dziś stery!",
+    "fashion_instincts": "✨ Twoja modowa intuja przejmuje dziś stery!",
     "pajama_day": "😴 Brak wybranego stroju — może dzisiaj jest dzień piżamy?",
     "unavailable_short": "👕 Strój niedostępny.",
     "no_recommendation_short": "🚫 brak rekomendacji.",

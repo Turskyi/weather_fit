@@ -158,7 +158,10 @@
     "location_not_found_clarification": "Спробуйте пошукати за країною для кращої точності.",
     "projection_fetch_failed": "Не вдалося отримати прогноз. Будь ласка, спробуйте ще раз.",
     "plan_future_outfit": "Запланувати образ для подорожі",
-    "typical_temperature": "Зазвичай: {minTemp}°C – {maxTemp}°C"
+    "typical_temperature": "Зазвичай: {minTemp}°C - {maxTemp}°C",
+    "temperature_coolest": "Найхолодніше",
+    "temperature_typical": "Зазвичай",
+    "temperature_warmest": "Найтепліше"
   },
   "about": {
     "title": "Про застосунок",
