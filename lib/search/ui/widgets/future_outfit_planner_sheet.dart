@@ -24,6 +24,7 @@ class _FutureOutfitPlannerSheetState extends State<FutureOutfitPlannerSheet> {
 
   OutfitImage? _resultOutfitImage;
   String? _resultRecommendation;
+  WeatherDomain? _resultWeather;
 
   @override
   void dispose() {
@@ -56,6 +57,7 @@ class _FutureOutfitPlannerSheetState extends State<FutureOutfitPlannerSheet> {
       _isLoading = true;
       _errorMessage = null;
       _resultOutfitImage = null;
+      _resultWeather = null;
     });
 
     try {
@@ -120,6 +122,7 @@ class _FutureOutfitPlannerSheetState extends State<FutureOutfitPlannerSheet> {
         setState(() {
           _resultOutfitImage = outfitImage;
           _resultRecommendation = recommendation;
+          _resultWeather = weatherDomain;
           _isLoading = false;
         });
       }
@@ -164,6 +167,7 @@ class _FutureOutfitPlannerSheetState extends State<FutureOutfitPlannerSheet> {
   Widget build(BuildContext context) {
     final OutfitImage? outfitImage = _resultOutfitImage;
     final String? recommendation = _resultRecommendation;
+    final WeatherDomain? weather = _resultWeather;
 
     return SingleChildScrollView(
       child: Padding(
@@ -179,7 +183,9 @@ class _FutureOutfitPlannerSheetState extends State<FutureOutfitPlannerSheet> {
           children: <Widget>[
             const _Header(),
             const SizedBox(height: 16),
-            if (outfitImage == null || recommendation == null)
+            if (outfitImage == null ||
+                recommendation == null ||
+                weather == null)
               _PlannerForm(
                 locationController: _locationController,
                 selectedDate: _selectedDate,
@@ -192,10 +198,12 @@ class _FutureOutfitPlannerSheetState extends State<FutureOutfitPlannerSheet> {
               _PlannerResult(
                 outfitImage: outfitImage,
                 recommendation: recommendation,
+                weather: weather,
                 onReset: () {
                   setState(() {
                     _resultOutfitImage = null;
                     _resultRecommendation = null;
+                    _resultWeather = null;
                   });
                 },
                 onRefresh: _onGeneratePreview,
@@ -324,19 +332,39 @@ class _PlannerResult extends StatelessWidget {
   const _PlannerResult({
     required this.outfitImage,
     required this.recommendation,
+    required this.weather,
     required this.onReset,
     required this.onRefresh,
   });
 
   final OutfitImage outfitImage;
   final String recommendation;
+  final WeatherDomain weather;
   final VoidCallback onReset;
   final VoidCallback onRefresh;
 
   @override
   Widget build(BuildContext context) {
+    final TextTheme textTheme = Theme.of(context).textTheme;
+
+    final String minTemp = weather.minTemperature?.toStringAsFixed(0) ?? '';
+    final String maxTemp = weather.maxTemperature?.toStringAsFixed(0) ?? '';
+    final String tempRange = minTemp.isNotEmpty && maxTemp.isNotEmpty
+        ? translate(
+            'search.typical_temperature',
+            args: <String, String>{'minTemp': minTemp, 'maxTemp': maxTemp},
+          )
+        : '';
+
     return Column(
       children: <Widget>[
+        if (tempRange.isNotEmpty) ...<Widget>[
+          Text(
+            tempRange,
+            style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 12),
+        ],
         OutfitWidget(
           outfitImage: outfitImage,
           outfitRecommendation: recommendation,

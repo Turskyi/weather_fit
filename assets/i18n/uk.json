@@ -157,7 +157,8 @@
     "change_details_button": "Змінити деталі",
     "location_not_found_clarification": "Спробуйте пошукати за країною для кращої точності.",
     "projection_fetch_failed": "Не вдалося отримати прогноз. Будь ласка, спробуйте ще раз.",
-    "plan_future_outfit": "Запланувати образ для подорожі"
+    "plan_future_outfit": "Запланувати образ для подорожі",
+    "typical_temperature": "Зазвичай: {minTemp}°C – {maxTemp}°C"
   },
   "about": {
     "title": "Про застосунок",

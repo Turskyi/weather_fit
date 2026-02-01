@@ -60,23 +60,27 @@ class WeatherRepository {
           date: date,
         );
 
-    // Climate API returns daily arrays. We take the first (and only) element.
-    final double avgTemp =
-        (response.daily.temperature2mMax.first +
-            response.daily.temperature2mMin.first) /
-        2;
+    final List<double> maxTemperatures = response.daily.temperature2mMax;
+    final List<double> minTemperatures = response.daily.temperature2mMin;
+    if (maxTemperatures.isNotEmpty && minTemperatures.isNotEmpty) {
+      final double maxTemp = response.daily.temperature2mMax.firstOrNull ?? 0;
+      final double minTemp = response.daily.temperature2mMin.firstOrNull ?? 0;
+      final double avgTemp = (maxTemp + minTemp) / 2;
 
-    return WeatherDomain(
-      temperature: avgTemp,
-      location: location,
-      // Climate API doesn't provide codes
-      condition: WeatherCondition.unknown,
-      countryCode: location.countryCode,
-      description: 'Projected',
-      // Climate API doesn't provide codes
-      weatherCode: 0,
-      locale: location.locale,
-    );
+      return WeatherDomain(
+        temperature: avgTemp,
+        maxTemperature: maxTemp,
+        minTemperature: minTemp,
+        location: location,
+        condition: WeatherCondition.clear,
+        countryCode: location.countryCode,
+        description: 'Projected',
+        weatherCode: 0,
+        locale: location.locale,
+      );
+    } else {
+      throw Exception('No max or min temperatures found');
+    }
   }
 
   Future<Location> searchLocation({

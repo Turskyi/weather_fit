@@ -157,7 +157,8 @@
     "change_details_button": "Change Details",
     "location_not_found_clarification": "Try searching by country for better accuracy.",
     "projection_fetch_failed": "Failed to fetch projection. Please try again.",
-    "plan_future_outfit": "Plan outfit for a trip"
+    "plan_future_outfit": "Plan outfit for a trip",
+    "typical_temperature": "Typical: {minTemp}°C – {maxTemp}°C"
   },
   "about": {
     "title": "About",
