@@ -63,6 +63,7 @@
   "try_again": "Try again",
   "screen_size": "Screen size",
   "state": "State",
+  "report_issue": "Report issue",
   "feedback": {
     "title": "Feedback",
     "app_feedback": "App Feedback",
@@ -108,7 +109,7 @@
     "check_date_time": "Check that your device's date and time are set correctly.",
     "report_issue_button": "Report Issue",
     "unable_to_connect": "Unable to connect",
-    "connection_reset_suggestion": "The weather service closed the connection unexpectedly.\nPlease check your connection or try again later.",
+    "connection_reset_suggestion": "The weather service closed the connection unexpectedly.\nPlease check your internet connection or try again later.",
     "report_issue": "Report issue",
     "unable_to_connect_short": "Can’t connect. Try again?",
     "location_unavailable": "We couldn't get your location.",

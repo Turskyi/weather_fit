@@ -137,8 +137,8 @@ class Weather extends Equatable {
 
   String get emoji => condition.toEmoji;
 
-  bool get isUnknown {
-    return condition.isUnknown || location.isEmpty;
+  bool get isNoLocation {
+    return location.isEmpty;
   }
 
   /// Output: e.g., "Dec 12, Monday at 03:45 PM".

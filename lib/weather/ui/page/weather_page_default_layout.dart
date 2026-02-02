@@ -78,7 +78,7 @@ class WeatherPageDefaultLayout extends StatelessWidget {
                 );
               }
             case WeatherSuccess():
-              if (stateWeather.isUnknown) {
+              if (stateWeather.isNoLocation) {
                 return const WeatherEmpty();
               }
               Widget outfitImageWidget = const SizedBox();

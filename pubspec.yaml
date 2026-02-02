@@ -16,7 +16,7 @@ again. 🌤️👕👖👞"
 
 publish_to: 'none'
 
-version: 0.3.4+34
+version: 0.3.5+35
 
 environment:
   sdk: '>=3.9.2 <4.0.0'
