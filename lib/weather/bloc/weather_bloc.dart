@@ -145,6 +145,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           emit(
             LocalWebCorsFailure(
               locale: savedLocale,
+              weather: state.weather,
               message: translate('error.cors'),
               outfitRecommendation: stateOutfitRecommendation,
               dailyForecast: state.dailyForecast,
@@ -154,6 +155,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           emit(
             WeatherFailure(
               locale: savedLocale,
+              weather: state.weather,
               message: _mapExceptionToMessage(exception),
               outfitRecommendation: stateOutfitRecommendation,
               dailyForecast: state.dailyForecast,
@@ -244,6 +246,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           emit(
             WeatherFailure(
               locale: savedLocale,
+              weather: stateWeather,
               message: _mapExceptionToMessage(e),
               outfitRecommendation: stateOutfitRecommendation,
               outfitImage: stateOutfitImage,
@@ -252,6 +255,9 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           );
         }
       }
+    } else if (state is WeatherFailure) {
+      debugPrint('Failed to get weather: $state');
+      emit(state);
     } else {
       emit(
         WeatherInitial(
@@ -392,6 +398,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           emit(
             LocalWebCorsFailure(
               locale: savedLocale,
+              weather: state.weather,
               message: translate('error.cors'),
               outfitRecommendation: stateOutfitRecommendation,
               dailyForecast: state.dailyForecast,
@@ -401,6 +408,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           emit(
             WeatherFailure(
               locale: savedLocale,
+              weather: state.weather,
               message: _mapExceptionToMessage(e),
               outfitRecommendation: stateOutfitRecommendation,
               dailyForecast: state.dailyForecast,
@@ -445,6 +453,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
       emit(
         WeatherFailure(
           locale: savedLocale,
+          weather: state.weather,
           message: _mapExceptionToMessage(e),
           outfitRecommendation: state.outfitRecommendation,
           outfitImage: state.outfitImage,

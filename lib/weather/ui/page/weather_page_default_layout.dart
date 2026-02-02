@@ -61,7 +61,23 @@ class WeatherPageDefaultLayout extends StatelessWidget {
         ],
       ),
       body: BlocConsumer<WeatherBloc, WeatherState>(
-        listener: weatherStateListener,
+        listener: (BuildContext context, WeatherState state) {
+          if ((state is WeatherFailure || state is LocalWebCorsFailure) &&
+              state.weather.isNotEmpty) {
+            ScaffoldMessenger.of(context)
+              ..hideCurrentSnackBar()
+              ..showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  action: SnackBarAction(
+                    label: translate('try_again'),
+                    onPressed: onRefresh,
+                  ),
+                ),
+              );
+          }
+          weatherStateListener(context, state);
+        },
         builder: (BuildContext context, WeatherState state) {
           final Weather stateWeather = state.weather;
           switch (state) {
@@ -147,8 +163,30 @@ class WeatherPageDefaultLayout extends StatelessWidget {
                 ),
               );
             case LocalWebCorsFailure():
+              if (stateWeather.isNotEmpty) {
+                return WeatherPopulated(
+                  weather: stateWeather,
+                  onRefresh: onRefresh,
+                  child: OutfitWidget(
+                    outfitImage: state.outfitImage,
+                    outfitRecommendation: state.outfitRecommendation,
+                    onRefresh: onRefresh,
+                  ),
+                );
+              }
               return const LocalWebCorsError();
             case WeatherFailure():
+              if (stateWeather.isNotEmpty) {
+                return WeatherPopulated(
+                  weather: stateWeather,
+                  onRefresh: onRefresh,
+                  child: OutfitWidget(
+                    outfitImage: state.outfitImage,
+                    outfitRecommendation: state.outfitRecommendation,
+                    onRefresh: onRefresh,
+                  ),
+                );
+              }
               return WeatherError(
                 message: state.message,
                 onReportPressed: onReportPressed,
