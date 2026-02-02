@@ -174,7 +174,10 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     final String stateOutfitRecommendation = state.outfitRecommendation;
     final OutfitImage stateOutfitImage = state.outfitImage;
     final String savedLocale = _localDataSource.getLanguageIsoCode();
-    if (state is WeatherSuccess) {
+    if (state is WeatherSuccess || state is WeatherFailure) {
+      if (state is WeatherFailure) {
+        debugPrint('Failed to get weather on refresh: $state');
+      }
       if (stateWeather.isNoLocation) {
         emit(
           WeatherInitial(
@@ -255,9 +258,6 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           );
         }
       }
-    } else if (state is WeatherFailure) {
-      debugPrint('Failed to get weather: $state');
-      emit(state);
     } else {
       emit(
         WeatherInitial(

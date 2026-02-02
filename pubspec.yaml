@@ -47,7 +47,7 @@ dependencies:
   hydrated_bloc: ^10.1.1
   in_app_update: ^4.2.5
   intl: ^0.20.2
-  json_annotation: ^4.9.0
+  json_annotation: any
   meta: any
   nested: ^1.0.0
   nominatim_api:
