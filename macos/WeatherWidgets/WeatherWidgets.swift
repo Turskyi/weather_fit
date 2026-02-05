@@ -49,12 +49,12 @@ struct Provider: TimelineProvider {
 
         // Use the correct keys, matching Android's SharedPreferences keys.
         let keys: [String: String] = [
-            "emoji": "text_emoji",
             "location": "text_location",
             "temperature": "text_temperature",
-            "recommendation": "text_recommendation",
-            "lastUpdated": "text_last_updated",
             "imagePath": "image_weather",
+            "lastUpdated": "weatherfit_text_last_updated",
+            "recommendation": "weatherfit_text_recommendation",
+            "emoji": "weatherfit_text_emoji",
         ]
 
         //Retrieve data from Shared Defaults.

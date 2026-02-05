@@ -36,14 +36,14 @@ data class ForecastData(val forecast: List<ForecastItem>)
 @RequiresApi(Build.VERSION_CODES.CUPCAKE)
 class WeatherWidget : AppWidgetProvider() {
     companion object {
-        const val KEY_EMOJI = "text_emoji"
         const val KEY_TEXT_LOCATION = "text_location"
         const val KEY_TEXT_TEMPERATURE = "text_temperature"
-        const val KEY_TEXT_LAST_UPDATED = "text_last_updated"
         const val KEY_IMAGE_WEATHER = "image_weather"
-        const val KEY_TEXT_RECOMMENDATION = "text_recommendation"
         const val KEY_FORECAST_DATA = "forecast_data"
         const val KEY_WEATHER_CODE = "weather_code"
+        const val KEY_EMOJI = "weatherfit_text_emoji"
+        const val KEY_TEXT_LAST_UPDATED = "weatherfit_text_last_updated"
+        const val KEY_TEXT_RECOMMENDATION = "weatherfit_text_recommendation"
     }
 
     override fun onUpdate(

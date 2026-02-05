@@ -69,13 +69,13 @@ struct Provider: TimelineProvider {
         }
 
         let keys: [String: String] = [
-            "emoji": "text_emoji",
             "location": "text_location",
             "temperature": "text_temperature",
-            "recommendation": "text_recommendation",
-            "lastUpdated": "text_last_updated",
             "imagePath": "image_weather",
             "forecastData": "forecast_data",
+            "emoji": "weatherfit_text_emoji",
+            "recommendation": "weatherfit_text_recommendation",
+            "lastUpdated": "weatherfit_text_last_updated",
         ]
 
         let emoji = sharedDefaults.string(forKey: keys["emoji"]!)
@@ -88,8 +88,7 @@ struct Provider: TimelineProvider {
 
         var forecast: [ForecastItem]?
         if let forecastDataString = forecastDataString,
-            let data = forecastDataString.data(using: .utf8)
-        {
+           let data = forecastDataString.data(using: .utf8) {
             do {
                 let decoder = JSONDecoder()
                 decoder.keyDecodingStrategy = .convertFromSnakeCase
@@ -111,7 +110,7 @@ struct Provider: TimelineProvider {
             locale: locale,
             imagePath: imagePath,
             forecast: forecast,
-        )
+            )
     }
 
     func placeholder(in context: Context) -> SimpleEntry {
@@ -184,18 +183,18 @@ struct WeatherWidgetsEntryView: View {
                 VStack(spacing: 8) {
                     imageSection
                         .frame(maxHeight: .infinity)
-                    
+
                     recommendationSection
-                    
+
                     headerSection
-                    
+
                     if family != .systemSmall {
                         forecastSection
                     }
                 }
             }
         }
-        // Paddings surrounding the widget removed completely as requested
+            // Paddings surrounding the widget removed completely as requested
         .widgetURL(URL(string: "weatherfit://open")!)
     }
 
@@ -244,7 +243,7 @@ struct WeatherWidgetsEntryView: View {
                 Text(entry.weatherData.temperature ?? "--°")
                     .font(.system(size: 16, weight: .bold))
             }
-            
+
             Spacer()
 
             VStack(alignment: .trailing, spacing: 0) {
@@ -362,15 +361,27 @@ struct DateHelper {
         let isDe = locale.lowercased().hasPrefix("de")
 
         if Calendar.current.isDateInToday(date) {
-            if isUk { return "Сьогодні" }
-            if isPl { return "Dzisiaj" }
-            if isDe { return "Heute" }
+            if isUk {
+                return "Сьогодні"
+            }
+            if isPl {
+                return "Dzisiaj"
+            }
+            if isDe {
+                return "Heute"
+            }
             return "Today"
         }
         if Calendar.current.isDateInTomorrow(date) {
-            if isUk { return "Завтра" }
-            if isPl { return "Jutro" }
-            if isDe { return "Morgen" }
+            if isUk {
+                return "Завтра"
+            }
+            if isPl {
+                return "Jutro"
+            }
+            if isDe {
+                return "Morgen"
+            }
             return "Tomorrow"
         }
         let dayFormatter = DateFormatter()
@@ -390,24 +401,48 @@ struct DateHelper {
 
         switch hour {
         case 5...11:
-            if isUk { return "Ранок" }
-            if isPl { return "Poranek" }
-            if isDe { return "Morgen" }
+            if isUk {
+                return "Ранок"
+            }
+            if isPl {
+                return "Poranek"
+            }
+            if isDe {
+                return "Morgen"
+            }
             return "Morning"
         case 12...16:
-            if isUk { return "Обід" }
-            if isPl { return "Południe" }
-            if isDe { return "Mittag" }
+            if isUk {
+                return "Обід"
+            }
+            if isPl {
+                return "Południe"
+            }
+            if isDe {
+                return "Mittag"
+            }
             return "Lunch"
         case 17...21:
-            if isUk { return "Вечір" }
-            if isPl { return "Wieczór" }
-            if isDe { return "Abend" }
+            if isUk {
+                return "Вечір"
+            }
+            if isPl {
+                return "Wieczór"
+            }
+            if isDe {
+                return "Abend"
+            }
             return "Evening"
         default:
-            if isUk { return "Ніч" }
-            if isPl { return "Noc" }
-            if isDe { return "Nacht" }
+            if isUk {
+                return "Ніч"
+            }
+            if isPl {
+                return "Noc"
+            }
+            if isDe {
+                return "Nacht"
+            }
             return "Night"
         }
     }
