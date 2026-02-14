@@ -9,7 +9,7 @@ import 'package:weather_fit/res/widgets/background.dart';
 import 'package:weather_fit/res/widgets/leading_widget.dart';
 import 'package:weather_fit/search/bloc/search_bloc.dart';
 import 'package:weather_fit/search/ui/widgets/future_outfit_planner_sheet.dart';
-import 'package:weather_fit/search/ui/widgets/quick_cities_suggestions.dart';
+import 'package:weather_fit/search/ui/widgets/search_input.dart';
 import 'package:weather_fit/widgets/keyboard_visibility_builder.dart';
 
 class SearchLayoutDefault extends StatefulWidget {
@@ -30,27 +30,14 @@ class SearchLayoutDefault extends StatefulWidget {
 }
 
 class _SearchLayoutDefaultState extends State<SearchLayoutDefault> {
-  late final FocusNode _searchFieldFocus;
+  final FocusNode _searchFieldFocus = FocusNode();
   bool _isSearchFieldFocused = false;
 
   @override
   void initState() {
     super.initState();
-    _searchFieldFocus = FocusNode();
+
     _searchFieldFocus.addListener(_onFocusChanged);
-  }
-
-  @override
-  void dispose() {
-    _searchFieldFocus.removeListener(_onFocusChanged);
-    _searchFieldFocus.dispose();
-    super.dispose();
-  }
-
-  void _onFocusChanged() {
-    setState(() {
-      _isSearchFieldFocused = _searchFieldFocus.hasFocus;
-    });
   }
 
   @override
@@ -87,175 +74,138 @@ class _SearchLayoutDefaultState extends State<SearchLayoutDefault> {
         alignment: Alignment.topCenter,
         children: <Widget>[
           const Background(),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            spacing: 16.0,
-            children: <Widget>[
-              const Spacer(flex: 1),
-              Text(
-                '🏙️',
-                style: TextStyle(fontSize: textTheme.displayLarge?.fontSize),
-              ),
-              Text(
-                translate('explore_weather_prompt'),
-                style: textTheme.headlineMedium,
-                textAlign: TextAlign.center,
-              ),
-              Text(
-                translate('search.instructions'),
-                style: textTheme.titleSmall,
-                textAlign: TextAlign.center,
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                constraints: BoxConstraints(maxWidth: context.maxWidth),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(28.0),
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      decoration: BoxDecoration(
-                        color: colorScheme.surface.withValues(alpha: 0.5),
-                        borderRadius: BorderRadius.circular(28.0),
-                        border: Border.all(
-                          color: colorScheme.onSurface.withValues(alpha: 0.12),
+          LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) {
+              return SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: IntrinsicHeight(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      spacing: 16.0,
+                      children: <Widget>[
+                        const Spacer(flex: 1),
+                        Text(
+                          '🏙️',
+                          style: TextStyle(
+                            fontSize: textTheme.displayLarge?.fontSize,
+                          ),
                         ),
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          TextField(
-                            focusNode: _searchFieldFocus,
-                            controller: widget.textEditingController,
-                            autofocus: true,
-                            textInputAction: TextInputAction.search,
-                            onSubmitted: (String value) {
-                              _onSearchSubmitted(
-                                context: context,
-                                value: value,
-                              );
-                            },
-                            style: textTheme.bodyLarge,
-                            decoration: InputDecoration(
-                              prefixIcon: Padding(
-                                padding: const EdgeInsets.only(left: 8.0),
-                                child: Icon(
-                                  Icons.search,
-                                  color: colorScheme.onSurface.withValues(
-                                    alpha: 0.6,
-                                  ),
-                                ),
-                              ),
-                              hintText: translate('search.city_or_country'),
-                              hintStyle: textTheme.bodyLarge?.copyWith(
-                                color: colorScheme.onSurface.withValues(
-                                  alpha: 0.4,
-                                ),
-                              ),
-                              border: InputBorder.none,
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 20.0,
-                                vertical: 16.0,
+                        Text(
+                          translate('explore_weather_prompt'),
+                          style: textTheme.headlineMedium,
+                          textAlign: TextAlign.center,
+                        ),
+                        Text(
+                          translate('search.instructions'),
+                          style: textTheme.titleSmall,
+                          textAlign: TextAlign.center,
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          constraints: BoxConstraints(
+                            maxWidth: context.maxWidth,
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(28.0),
+                            child: BackdropFilter(
+                              filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+                              child: SearchInput(
+                                textEditingController:
+                                    widget.textEditingController,
+                                focusNode: _searchFieldFocus,
+                                isFocused: _isSearchFieldFocused,
+                                onSubmitted: (String value) {
+                                  _onSearchSubmitted(
+                                    context: context,
+                                    value: value,
+                                  );
+                                },
                               ),
                             ),
                           ),
-                          if (kIsWeb)
-                            ValueListenableBuilder<TextEditingValue>(
+                        ),
+                        BlocConsumer<SearchBloc, SearchState>(
+                          listener: widget.searchStateListener,
+                          builder: (BuildContext _, SearchState state) {
+                            final double progressIndicatorSize = 20.0;
+                            return ValueListenableBuilder<TextEditingValue>(
                               valueListenable: widget.textEditingController,
+                              child: state is SearchLoading
+                                  ? SizedBox(
+                                      height: progressIndicatorSize,
+                                      width: progressIndicatorSize,
+                                      child: const CircularProgressIndicator(),
+                                    )
+                                  : Text(
+                                      translate('submit'),
+                                      semanticsLabel: translate('submit'),
+                                    ),
                               builder:
                                   (
                                     BuildContext context,
                                     TextEditingValue value,
-                                    Widget? child,
+                                    Widget? textSubmit,
                                   ) {
-                                    final bool hasInput = value.text
-                                        .trim()
-                                        .isNotEmpty;
-                                    final bool showSuggestions =
-                                        _isSearchFieldFocused && !hasInput;
-
-                                    return BlocBuilder<SearchBloc, SearchState>(
-                                      builder:
-                                          (BuildContext _, SearchState state) {
-                                            return QuickCitiesSuggestions(
-                                              isVisible: showSuggestions,
-                                              suggestions:
-                                                  state.quickCitiesSuggestions,
-                                              textEditingController:
-                                                  widget.textEditingController,
-                                            );
-                                          },
+                                    return ElevatedButton(
+                                      key: const Key(
+                                        'searchPage_search_iconButton',
+                                      ),
+                                      onPressed:
+                                          state is! SearchLoading &&
+                                              value.text.trim().isNotEmpty
+                                          ? () {
+                                              _onSearchSubmitted(
+                                                context: context,
+                                                value: value.text,
+                                              );
+                                            }
+                                          : null,
+                                      child: textSubmit,
                                     );
                                   },
-                            ),
-                        ],
-                      ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 8),
+                        TextButton.icon(
+                          onPressed: () {
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              useSafeArea: true,
+                              builder: (BuildContext _) {
+                                return const FutureOutfitPlannerSheet();
+                              },
+                            );
+                          },
+                          icon: const Icon(Icons.auto_awesome),
+                          label: Text(translate('search.plan_future_outfit')),
+                        ),
+                        const Spacer(flex: 2),
+                      ],
                     ),
                   ),
                 ),
-              ),
-              BlocConsumer<SearchBloc, SearchState>(
-                listener: widget.searchStateListener,
-                builder: (BuildContext _, SearchState state) {
-                  final double progressIndicatorSize = 20.0;
-                  return ValueListenableBuilder<TextEditingValue>(
-                    valueListenable: widget.textEditingController,
-                    child: state is SearchLoading
-                        ? SizedBox(
-                            height: progressIndicatorSize,
-                            width: progressIndicatorSize,
-                            child: const CircularProgressIndicator(),
-                          )
-                        : Text(
-                            translate('submit'),
-                            semanticsLabel: translate('submit'),
-                          ),
-                    builder:
-                        (
-                          BuildContext context,
-                          TextEditingValue value,
-                          Widget? textSubmit,
-                        ) {
-                          return ElevatedButton(
-                            key: const Key('searchPage_search_iconButton'),
-                            onPressed:
-                                state is! SearchLoading &&
-                                    value.text.trim().isNotEmpty
-                                ? () {
-                                    _onSearchSubmitted(
-                                      context: context,
-                                      value: value.text,
-                                    );
-                                  }
-                                : null,
-                            child: textSubmit,
-                          );
-                        },
-                  );
-                },
-              ),
-              const SizedBox(height: 8),
-              TextButton.icon(
-                onPressed: () {
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    useSafeArea: true,
-                    builder: (BuildContext _) {
-                      return const FutureOutfitPlannerSheet();
-                    },
-                  );
-                },
-                icon: const Icon(Icons.auto_awesome),
-                label: Text(translate('search.plan_future_outfit')),
-              ),
-              const Spacer(flex: 2),
-            ],
+              );
+            },
           ),
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _searchFieldFocus.removeListener(_onFocusChanged);
+    _searchFieldFocus.dispose();
+    super.dispose();
+  }
+
+  void _onFocusChanged() {
+    setState(() {
+      _isSearchFieldFocused = _searchFieldFocus.hasFocus;
+    });
   }
 
   void _onSearchSubmitted({

@@ -26,7 +26,7 @@ dependencies:
   collection: ^1.19.1
   dart_openai: ^6.1.1
   dio: ^5.9.1
-  envied: ^1.3.2
+  envied: ^1.3.3
   equatable: ^2.0.8
   feedback: ^3.2.0
   flutter:
@@ -68,14 +68,14 @@ dependencies:
 
 dev_dependencies:
   bloc_test: ^10.0.0
-  build_runner: ^2.10.5
-  envied_generator: ^1.3.2
+  build_runner: ^2.11.1
+  envied_generator: ^1.3.3
   flutter_lints: ^6.0.0
   flutter_test:
     sdk: flutter
   json_serializable: any
   mocktail: ^1.0.4
-  retrofit_generator: ^10.2.1
+  retrofit_generator: ^10.2.3
 
 flutter:
   uses-material-design: true
