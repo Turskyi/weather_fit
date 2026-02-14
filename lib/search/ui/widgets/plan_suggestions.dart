@@ -30,7 +30,9 @@ class PlanSuggestions extends StatelessWidget {
         for (final SavedPlan plan in plans.reversed)
           _PlanSuggestionTile(
             plan: plan,
-            onTap: () => onPlanSelected(plan.cityName, plan.date),
+            onTap: () {
+              onPlanSelected(plan.cityName, plan.date);
+            },
           ),
       ],
     );

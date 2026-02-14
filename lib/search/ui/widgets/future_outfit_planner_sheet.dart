@@ -63,6 +63,7 @@ class _FutureOutfitPlannerSheetState extends State<FutureOutfitPlannerSheet> {
   }
 
   Future<void> _onPlanSelected(String cityName, DateTime date) async {
+    if (_isLoading) return;
     setState(() {
       _locationController.text = cityName;
       _selectedDate = date;
@@ -73,6 +74,8 @@ class _FutureOutfitPlannerSheetState extends State<FutureOutfitPlannerSheet> {
   }
 
   Future<void> _onGeneratePreview({bool skipConfirmation = false}) async {
+    if (_isLoading) return;
+
     final String query = _locationController.text.trim();
     if (query.isEmpty) return;
     final DateTime? date = _selectedDate;

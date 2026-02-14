@@ -49,9 +49,22 @@ class _PlannerFormState extends State<PlannerForm> {
   }
 
   void _onFocusChange() {
-    setState(() {
-      _isFocused = _focusNode.hasFocus;
-    });
+    if (_focusNode.hasFocus) {
+      setState(() {
+        _isFocused = true;
+      });
+    } else {
+      // Small delay to allow tap events on suggestions to fire before hiding
+      // them. This is especially important on desktop platforms where mouse
+      // clicks might otherwise be interrupted by an immediate rebuild.
+      Future<void>.delayed(const Duration(milliseconds: 150)).then((_) {
+        if (mounted) {
+          setState(() {
+            _isFocused = _focusNode.hasFocus;
+          });
+        }
+      });
+    }
   }
 
   @override
