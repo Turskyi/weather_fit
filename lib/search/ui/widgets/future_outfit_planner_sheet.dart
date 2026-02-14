@@ -226,11 +226,14 @@ class _Header extends StatelessWidget {
       children: <Widget>[
         Icon(Icons.auto_awesome, color: colorScheme.primary),
         const SizedBox(width: 8),
-        Text(
-          translate('search.outfit_planner_title'),
-          style: textTheme.titleLarge,
+        Expanded(
+          child: Text(
+            translate('search.outfit_planner_title'),
+            style: textTheme.titleLarge,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
-        const Spacer(),
         IconButton(
           onPressed: () => Navigator.pop(context),
           icon: const Icon(Icons.close),
