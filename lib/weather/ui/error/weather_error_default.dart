@@ -14,30 +14,32 @@ class WeatherErrorDefault extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        SizedBox(height: MediaQuery.paddingOf(context).top),
-        Text(
-          '🫠',
-          style: TextStyle(fontSize: textTheme.displayLarge?.fontSize),
-        ),
-        Text(
-          translate('error.something_went_wrong'),
-          style: textTheme.headlineMedium,
-        ),
-        const SizedBox(height: 20),
-        Container(
-          alignment: Alignment.center,
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: SelectableText(message, style: textTheme.headlineSmall),
-        ),
-        const SizedBox(height: 32),
-        ElevatedButton(
-          onPressed: onRetryPressed,
-          child: Text(translate('try_again')),
-        ),
-      ],
+    return SelectionArea(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          SizedBox(height: MediaQuery.paddingOf(context).top),
+          Text(
+            '🫠',
+            style: TextStyle(fontSize: textTheme.displayLarge?.fontSize),
+          ),
+          Text(
+            translate('error.something_went_wrong'),
+            style: textTheme.headlineMedium,
+          ),
+          const SizedBox(height: 20),
+          Container(
+            alignment: Alignment.center,
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Text(message, style: textTheme.headlineSmall),
+          ),
+          const SizedBox(height: 32),
+          ElevatedButton(
+            onPressed: onRetryPressed,
+            child: Text(translate('try_again')),
+          ),
+        ],
+      ),
     );
   }
 }

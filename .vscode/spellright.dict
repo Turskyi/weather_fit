@@ -22,3 +22,5 @@ open_meteo_api_client
 Meteo
 meteo
 weathercode
+weatherfit_text_last_updated
+weatherfit

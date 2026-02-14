@@ -49,6 +49,7 @@ class WeatherFitApp extends StatelessWidget {
       providers: <SingleChildWidget>[
         RepositoryProvider<WeatherRepository>.value(value: weatherRepository),
         RepositoryProvider<OutfitRepository>.value(value: outfitRepository),
+        RepositoryProvider<LocalDataSource>.value(value: localDataSource),
         RepositoryProvider<HomeWidgetService>(
           create: (BuildContext _) => const HomeWidgetServiceImpl(),
         ),

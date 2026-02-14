@@ -9,6 +9,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/entities/enums/temperature_units.dart';
+import 'package:weather_fit/entities/models/search/saved_plan.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/res/constants.dart' as constants;
 import 'package:weather_fit/res/enums/settings.dart';
@@ -312,6 +313,47 @@ class LocalDataSource {
 
   Future<bool> fileExists(String filePath) async {
     return File(filePath).exists();
+  }
+
+  Future<bool> savePlan(SavedPlan plan) async {
+    final List<SavedPlan> plans = getSavedPlans();
+    if (plans.contains(plan)) return true;
+    plans.add(plan);
+    return _savePlansList(plans);
+  }
+
+  Future<bool> removePlan(SavedPlan plan) async {
+    final List<SavedPlan> plans = getSavedPlans();
+    plans.remove(plan);
+    return _savePlansList(plans);
+  }
+
+  List<SavedPlan> getSavedPlans() {
+    final List<String> jsonList =
+        _preferences.getStringList(Settings.savedPlans.key) ?? <String>[];
+    return jsonList.map((String json) {
+      return SavedPlan.fromJson(jsonDecode(json) as Map<String, Object?>);
+    }).toList();
+  }
+
+  Future<bool> removePastPlans() async {
+    final DateTime now = DateTime.now();
+    final DateTime today = DateTime(now.year, now.month, now.day);
+    final List<SavedPlan> plans = getSavedPlans();
+    final List<SavedPlan> futurePlans = plans.where((SavedPlan p) {
+      return p.date.isAtSameMomentAs(today) || p.date.isAfter(today);
+    }).toList();
+
+    if (plans.length == futurePlans.length) return true;
+
+    return _savePlansList(futurePlans);
+  }
+
+  Future<bool> _savePlansList(List<SavedPlan> plans) {
+    final List<String> jsonList = plans
+        .map((SavedPlan p) => jsonEncode(p.toJson()))
+        .toList();
+    return _preferences.setStringList(Settings.savedPlans.key, jsonList);
   }
 
   String _translateError(String key, String locale) {

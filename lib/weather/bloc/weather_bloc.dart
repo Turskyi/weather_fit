@@ -145,34 +145,22 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           emit(
             LocalWebCorsFailure(
               locale: savedLocale,
+              weather: state.weather,
               message: translate('error.cors'),
               outfitRecommendation: stateOutfitRecommendation,
               dailyForecast: state.dailyForecast,
             ),
           );
         } else {
-          debugPrint('WeatherBloc _onFetchWeather Exception: $exception.');
-          if (exception is WeatherRequestFailure) {
-            //TODO: handle this better
-            emit(
-              WeatherFailure(
-                locale: savedLocale,
-                message: '$exception',
-                outfitRecommendation: stateOutfitRecommendation,
-                dailyForecast: state.dailyForecast,
-              ),
-            );
-          } else {
-            emit(
-              WeatherFailure(
-                locale: savedLocale,
-                //TODO: replace with localizable message
-                message: '$exception',
-                outfitRecommendation: stateOutfitRecommendation,
-                dailyForecast: state.dailyForecast,
-              ),
-            );
-          }
+          emit(
+            WeatherFailure(
+              locale: savedLocale,
+              weather: state.weather,
+              message: _mapExceptionToMessage(exception),
+              outfitRecommendation: stateOutfitRecommendation,
+              dailyForecast: state.dailyForecast,
+            ),
+          );
         }
       }
     }
@@ -186,8 +174,11 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     final String stateOutfitRecommendation = state.outfitRecommendation;
     final OutfitImage stateOutfitImage = state.outfitImage;
     final String savedLocale = _localDataSource.getLanguageIsoCode();
-    if (state is WeatherSuccess) {
-      if (stateWeather.isUnknown) {
+    if (state is WeatherSuccess || state is WeatherFailure) {
+      if (state is WeatherFailure) {
+        debugPrint('Failed to get weather on refresh: $state');
+      }
+      if (stateWeather.isNoLocation) {
         emit(
           WeatherInitial(
             locale: savedLocale,
@@ -258,8 +249,8 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           emit(
             WeatherFailure(
               locale: savedLocale,
-              // TODO: replace with localizable message
-              message: '$e',
+              weather: stateWeather,
+              message: _mapExceptionToMessage(e),
               outfitRecommendation: stateOutfitRecommendation,
               outfitImage: stateOutfitImage,
               dailyForecast: state.dailyForecast,
@@ -407,6 +398,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           emit(
             LocalWebCorsFailure(
               locale: savedLocale,
+              weather: state.weather,
               message: translate('error.cors'),
               outfitRecommendation: stateOutfitRecommendation,
               dailyForecast: state.dailyForecast,
@@ -416,8 +408,8 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           emit(
             WeatherFailure(
               locale: savedLocale,
-              //TODO: use localizable message
-              message: '$e',
+              weather: state.weather,
+              message: _mapExceptionToMessage(e),
               outfitRecommendation: stateOutfitRecommendation,
               dailyForecast: state.dailyForecast,
             ),
@@ -461,8 +453,8 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
       emit(
         WeatherFailure(
           locale: savedLocale,
-          //TODO: use localizable message
-          message: '$e',
+          weather: state.weather,
+          message: _mapExceptionToMessage(e),
           outfitRecommendation: state.outfitRecommendation,
           outfitImage: state.outfitImage,
           dailyForecast: state.dailyForecast,
@@ -507,5 +499,22 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
         debugPrint('Failed to update home screen widget: $e');
       }
     }
+  }
+
+  /// Maps an [Exception] to a localized user-friendly message.
+  String _mapExceptionToMessage(Object e) {
+    final String errorString = e.toString();
+    if (e is SocketException ||
+        errorString.contains('SocketException') ||
+        errorString.contains('Failed host lookup') ||
+        errorString.contains('HandshakeException') ||
+        errorString.contains('Connection refused') ||
+        errorString.contains('Connection closed')) {
+      return translate('error.network_error');
+    }
+    if (e is WeatherRequestFailure) {
+      return translate('error.getting_weather_generic');
+    }
+    return translate('error.something_went_wrong');
   }
 }

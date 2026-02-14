@@ -11,7 +11,7 @@ class OutfitImageWidget extends StatefulWidget {
   const OutfitImageWidget({
     required this.outfitImage,
     required this.onRefresh,
-    this.fit = BoxFit.fitHeight,
+    this.fit = BoxFit.cover,
     super.key,
   });
 
@@ -47,16 +47,11 @@ class _OutfitImageWidgetState extends State<OutfitImageWidget> {
     return Container(
       color: colorScheme.surface,
       alignment: Alignment.center,
-      padding: const EdgeInsets.only(
-        left: 8.0,
-        top: 8.0,
-        bottom: 8.0,
-        right: 4.0,
-      ),
+      padding: const EdgeInsets.all(8.0),
       child: Stack(
         children: <Widget>[
           ClipRRect(
-            borderRadius: BorderRadius.circular(20.0),
+            borderRadius: BorderRadius.circular(24.0),
             clipBehavior: Clip.antiAlias,
             child: ScrollConfiguration(
               behavior: const _MouseDragScrollBehavior(),
@@ -116,7 +111,7 @@ class _OutfitImageItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    return switch (source) {
+    final Widget image = switch (source) {
       OutfitImageSource.asset => Image.asset(
         path,
         fit: fit,
@@ -148,6 +143,14 @@ class _OutfitImageItem extends StatelessWidget {
             __ErrorView(path: path, onRefresh: onRefresh, error: error),
       ),
     };
+
+    return Center(
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24.0),
+        clipBehavior: Clip.antiAlias,
+        child: image,
+      ),
+    );
   }
 }
 

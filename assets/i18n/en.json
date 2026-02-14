@@ -63,6 +63,7 @@
   "try_again": "Try again",
   "screen_size": "Screen size",
   "state": "State",
+  "report_issue": "Report issue",
   "feedback": {
     "title": "Feedback",
     "app_feedback": "App Feedback",
@@ -108,7 +109,7 @@
     "check_date_time": "Check that your device's date and time are set correctly.",
     "report_issue_button": "Report Issue",
     "unable_to_connect": "Unable to connect",
-    "connection_reset_suggestion": "The weather service closed the connection unexpectedly.\nPlease check your connection or try again later.",
+    "connection_reset_suggestion": "The weather service closed the connection unexpectedly.\nPlease check your internet connection or try again later.",
     "report_issue": "Report issue",
     "unable_to_connect_short": "Can’t connect. Try again?",
     "location_unavailable": "We couldn't get your location.",
@@ -135,7 +136,7 @@
     "page_semantics_label": "City or country search page",
     "page_app_bar_title": "City or country search",
     "instructions": "Type the city or country name and tap \"Submit\" to see the weather.",
-    "confirm_location_dialog_title": "Is this your location?",
+    "confirm_location_dialog_title": "Is this the location you are looking for?",
     "use_current_location_dialog_title": "Use your current location?",
     "location_not_found_use_current_dialog_content": "We couldn't find the correct location. Would you like to use your current location instead?",
     "location_not_found_dialog_title": "Location Not Found",
@@ -161,7 +162,9 @@
     "typical_temperature": "Typical: {minTemp}°C - {maxTemp}°C",
     "temperature_coolest": "Coolest",
     "temperature_typical": "Typical",
-    "temperature_warmest": "Warmest"
+    "temperature_warmest": "Warmest",
+    "plan_saved": "Plan saved!",
+    "bookmark_plan": "Bookmark plan"
   },
   "about": {
     "title": "About",

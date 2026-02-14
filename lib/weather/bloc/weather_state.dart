@@ -202,6 +202,7 @@ final class LoadingOutfitState extends WeatherSuccess {
 class WeatherFailure extends WeatherState {
   const WeatherFailure({
     required super.locale,
+    super.weather,
     super.outfitImage,
     super.outfitRecommendation,
     super.message,
@@ -216,8 +217,14 @@ class WeatherFailure extends WeatherState {
   Map<String, Object?> toJson() => _$WeatherFailureToJson(this);
 
   @override
+  String toString() {
+    return '${toJson()}';
+  }
+
+  @override
   List<Object?> get props => <Object?>[
     locale,
+    weather,
     outfitRecommendation,
     outfitImage,
     message,
@@ -229,6 +236,7 @@ class WeatherFailure extends WeatherState {
 class LocalWebCorsFailure extends WeatherFailure {
   const LocalWebCorsFailure({
     required super.locale,
+    super.weather,
     super.outfitRecommendation,
     super.message,
     super.dailyForecast,
@@ -242,5 +250,5 @@ class LocalWebCorsFailure extends WeatherFailure {
   Map<String, Object?> toJson() => _$LocalWebCorsFailureToJson(this);
 
   @override
-  List<Object?> get props => <Object?>[locale, message, dailyForecast];
+  List<Object?> get props => <Object?>[locale, weather, message, dailyForecast];
 }
