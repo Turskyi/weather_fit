@@ -98,3 +98,6 @@ flutter:
     - family: NotoSans
       fonts:
         - asset: assets/fonts/NotoSans-Regular.ttf
+
+  config:
+    enable-lldb-debugging: false

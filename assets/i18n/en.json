@@ -136,7 +136,7 @@
     "page_semantics_label": "City or country search page",
     "page_app_bar_title": "City or country search",
     "instructions": "Type the city or country name and tap \"Submit\" to see the weather.",
-    "confirm_location_dialog_title": "Is this your location?",
+    "confirm_location_dialog_title": "Is this the location you are looking for?",
     "use_current_location_dialog_title": "Use your current location?",
     "location_not_found_use_current_dialog_content": "We couldn't find the correct location. Would you like to use your current location instead?",
     "location_not_found_dialog_title": "Location Not Found",
@@ -162,7 +162,9 @@
     "typical_temperature": "Typical: {minTemp}°C - {maxTemp}°C",
     "temperature_coolest": "Coolest",
     "temperature_typical": "Typical",
-    "temperature_warmest": "Warmest"
+    "temperature_warmest": "Warmest",
+    "plan_saved": "Plan saved!",
+    "bookmark_plan": "Bookmark plan"
   },
   "about": {
     "title": "About",

@@ -136,7 +136,7 @@
     "page_semantics_label": "Сторінка пошуку міста або країни",
     "page_app_bar_title": "Пошук міста або країни",
     "instructions": "Введіть назву міста чи країни та натисніть \"Відправити\", щоб побачити погоду.",
-    "confirm_location_dialog_title": "Це ваше місцезнаходження?",
+    "confirm_location_dialog_title": "Чи це те що ви шукаєте?",
     "use_current_location_dialog_title": "Використати ваше поточне місцезнаходження?",
     "location_not_found_use_current_dialog_content": "Нам не вдалося знайти правильне місцезнаходження. Бажаєте натомість використати ваше поточне місцезнаходження?",
     "location_not_found_dialog_title": "Місцезнаходження не знайдено",
@@ -162,7 +162,9 @@
     "typical_temperature": "Зазвичай: {minTemp}°C - {maxTemp}°C",
     "temperature_coolest": "Найхолодніше",
     "temperature_typical": "Зазвичай",
-    "temperature_warmest": "Найтепліше"
+    "temperature_warmest": "Найтепліше",
+    "plan_saved": "План збережено!",
+    "bookmark_plan": "Зберегти план"
   },
   "about": {
     "title": "Про застосунок",

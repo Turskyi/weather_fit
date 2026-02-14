@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
+import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
 import 'package:weather_fit/extensions/build_context_extensions.dart';
 import 'package:weather_fit/res/widgets/background.dart';
 import 'package:weather_fit/res/widgets/leading_widget.dart';
@@ -170,12 +171,16 @@ class _SearchLayoutDefaultState extends State<SearchLayoutDefault> {
                         const SizedBox(height: 8),
                         TextButton.icon(
                           onPressed: () {
+                            final LocalDataSource localDataSource = context
+                                .read<LocalDataSource>();
                             showModalBottomSheet(
                               context: context,
                               isScrollControlled: true,
                               useSafeArea: true,
                               builder: (BuildContext _) {
-                                return const FutureOutfitPlannerSheet();
+                                return FutureOutfitPlannerSheet(
+                                  localDataSource: localDataSource,
+                                );
                               },
                             );
                           },

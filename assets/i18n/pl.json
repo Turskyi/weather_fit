@@ -136,7 +136,7 @@
     "page_semantics_label": "Strona wyszukiwania miasta lub kraju",
     "page_app_bar_title": "Wyszukiwanie miasta lub kraju",
     "instructions": "Wpisz nazwę miasta lub kraju i dotknij „Prześlij”, aby zobaczyć pogodę.",
-    "confirm_location_dialog_title": "Czy to Twoja lokalizacja?",
+    "confirm_location_dialog_title": "Czy to jest lokalizacja, której szukasz?",
     "use_current_location_dialog_title": "Użyć Twojej aktualnej lokalizacji?",
     "location_not_found_use_current_dialog_content": "Nie udało nam się znaleźć właściwej lokalizacji. Czy chcesz zamiast tego użyć swojej aktualnej lokalizacji?",
     "location_not_found_dialog_title": "Lokalizacja nie została znaleziona",
@@ -162,7 +162,9 @@
     "typical_temperature": "Zazwyczaj: {minTemp}°C - {maxTemp}°C",
     "temperature_coolest": "Najchłodniej",
     "temperature_typical": "Zazwyczaj",
-    "temperature_warmest": "Najcieplej"
+    "temperature_warmest": "Najcieplej",
+    "plan_saved": "Plan zapisany!",
+    "bookmark_plan": "Zapisz plan"
   },
   "about": {
     "title": "O aplikacji",

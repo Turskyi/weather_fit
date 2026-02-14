@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
+import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
 import 'package:weather_fit/data/repositories/outfit_repository.dart';
 import 'package:weather_fit/entities/models/outfit/outfit_image.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
@@ -11,7 +12,9 @@ import 'package:weather_fit/settings/bloc/settings_bloc.dart';
 import 'package:weather_repository/weather_repository.dart';
 
 class FutureOutfitPlannerSheet extends StatefulWidget {
-  const FutureOutfitPlannerSheet({super.key});
+  const FutureOutfitPlannerSheet({required this.localDataSource, super.key});
+
+  final LocalDataSource localDataSource;
 
   @override
   State<FutureOutfitPlannerSheet> createState() =>
@@ -29,9 +32,19 @@ class _FutureOutfitPlannerSheetState extends State<FutureOutfitPlannerSheet> {
   WeatherDomain? _resultWeather;
 
   @override
+  void initState() {
+    super.initState();
+    _cleanupPastPlans();
+  }
+
+  @override
   void dispose() {
     _locationController.dispose();
     super.dispose();
+  }
+
+  Future<void> _cleanupPastPlans() async {
+    await widget.localDataSource.removePastPlans();
   }
 
   Future<void> _selectDate(BuildContext context) async {
@@ -49,7 +62,17 @@ class _FutureOutfitPlannerSheetState extends State<FutureOutfitPlannerSheet> {
     }
   }
 
-  Future<void> _onGeneratePreview() async {
+  Future<void> _onPlanSelected(String cityName, DateTime date) async {
+    setState(() {
+      _locationController.text = cityName;
+      _selectedDate = date;
+    });
+    // Automatically trigger search and skip confirmation for previously saved
+    // plans.
+    await _onGeneratePreview(skipConfirmation: true);
+  }
+
+  Future<void> _onGeneratePreview({bool skipConfirmation = false}) async {
     final String query = _locationController.text.trim();
     if (query.isEmpty) return;
     final DateTime? date = _selectedDate;
@@ -73,16 +96,22 @@ class _FutureOutfitPlannerSheetState extends State<FutureOutfitPlannerSheet> {
       );
 
       if (mounted) {
-        final bool? confirmed = await _showLocationConfirmationDialog(location);
-        if (confirmed == true) {
+        if (skipConfirmation) {
           await _fetchProjectionAndOutfit(location, date);
         } else {
-          setState(() {
-            _isLoading = false;
-            _errorMessage = translate(
-              'search.location_not_found_clarification',
-            );
-          });
+          final bool? confirmed = await _showLocationConfirmationDialog(
+            location,
+          );
+          if (confirmed == true) {
+            await _fetchProjectionAndOutfit(location, date);
+          } else {
+            setState(() {
+              _isLoading = false;
+              _errorMessage = translate(
+                'search.location_not_found_clarification',
+              );
+            });
+          }
         }
       }
     } catch (e) {
@@ -189,16 +218,25 @@ class _FutureOutfitPlannerSheetState extends State<FutureOutfitPlannerSheet> {
                 recommendation == null ||
                 weather == null)
               PlannerForm(
+                localDataSource: widget.localDataSource,
                 locationController: _locationController,
                 selectedDate: _selectedDate,
                 isLoading: _isLoading,
                 errorMessage: _errorMessage,
                 onSelectDate: () => _selectDate(context),
                 onGenerate: _onGeneratePreview,
+                onDateSelected: (DateTime date) {
+                  setState(() {
+                    _selectedDate = date;
+                  });
+                },
+                onPlanSelected: _onPlanSelected,
               )
             else
               PlannerResult(
+                localDataSource: widget.localDataSource,
                 weather: weather,
+                date: _selectedDate ?? DateTime.now(),
                 onReset: () {
                   setState(() {
                     _resultOutfitImage = null;
