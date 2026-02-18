@@ -200,11 +200,17 @@ class HomeWidgetServiceImpl implements HomeWidgetService {
       );
 
       // 3. Build the result list, removing any nulls.
-      final List<ForecastItemDomain> result =
-          <ForecastItemDomain?>[morning, lunch, evening]
-              .where((ForecastItemDomain? item) => item != null)
-              .cast<ForecastItemDomain>()
-              .toList();
+      final List<ForecastItemDomain> result = <ForecastItemDomain?>[
+        morning,
+        lunch,
+        evening,
+      ].whereType<ForecastItemDomain>().toList();
+
+      // 4. Sort by time to ensure chronological order.
+      result.sort(
+        (ForecastItemDomain a, ForecastItemDomain b) =>
+            a.time.compareTo(b.time),
+      );
 
       return result;
     } else {
