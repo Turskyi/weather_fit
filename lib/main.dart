@@ -36,6 +36,9 @@ void main() async {
   // `await` operation, otherwise app may stuck on black/white screen.
   WidgetsFlutterBinding.ensureInitialized();
 
+  //TODO: make `injectDependencies` to return Dependencies class, move
+  // `await SharedPreferences.getInstance();` inside the `injectDependencies`
+  // and get an instance of "SharedPreferences" out of it.
   await di.injectDependencies();
 
   final SharedPreferences preferences = await SharedPreferences.getInstance();
