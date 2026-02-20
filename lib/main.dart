@@ -1,17 +1,12 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:intl/intl.dart';
-import 'package:nominatim_api/nominatim_api.dart';
-import 'package:open_meteo_api/open_meteo_api.dart';
-import 'package:shared_preferences/shared_preferences.dart'
-    show SharedPreferences;
 import 'package:weather_fit/app/weather_fit_app.dart';
 import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
-import 'package:weather_fit/data/data_sources/remote/remote_data_source.dart';
 import 'package:weather_fit/data/repositories/location_repository.dart';
 import 'package:weather_fit/data/repositories/outfit_repository.dart';
+import 'package:weather_fit/di/dependencies.dart';
 import 'package:weather_fit/di/injector.dart' as di;
 import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/localization/localization_delegate_getter.dart'
@@ -36,15 +31,9 @@ void main() async {
   // `await` operation, otherwise app may stuck on black/white screen.
   WidgetsFlutterBinding.ensureInitialized();
 
-  //TODO: make `injectDependencies` to return Dependencies class, move
-  // `await SharedPreferences.getInstance();` inside the `injectDependencies`
-  // and get an instance of "SharedPreferences" out of it.
-  await di.injectDependencies();
+  final Dependencies dependencies = await di.injectDependencies();
 
-  final SharedPreferences preferences = await SharedPreferences.getInstance();
-
-  final LocalDataSource localDataSource = LocalDataSource(preferences);
-  final RemoteDataSource remoteDataSource = RemoteDataSource(Dio());
+  final LocalDataSource localDataSource = dependencies.localDataSource;
 
   Language initialLanguage = localDataSource.getSavedLanguage();
 
@@ -70,19 +59,21 @@ void main() async {
     );
   }
 
+  final OutfitRepository outfitRepository = dependencies.outfitRepository;
+
+  final WeatherRepository weatherRepository = dependencies.weatherRepository;
+
+  final LocationRepository locationRepository = dependencies.locationRepository;
+
   final Map<String, WidgetBuilder> routes = router.getRouteMap();
 
   runApp(
     LocalizedApp(
       localizationDelegate,
       WeatherFitApp(
-        weatherRepository: WeatherRepository(),
-        locationRepository: LocationRepository(
-          NominatimApiClient(),
-          OpenMeteoApiClient(),
-          localDataSource,
-        ),
-        outfitRepository: OutfitRepository(localDataSource, remoteDataSource),
+        weatherRepository: weatherRepository,
+        locationRepository: locationRepository,
+        outfitRepository: outfitRepository,
         localDataSource: localDataSource,
         initialLanguage: initialLanguage,
         routes: routes,
