@@ -67,7 +67,10 @@ class UpdateServiceImpl implements UpdateService {
               if (storeVersion is String && trackViewUrl is String) {
                 if (_isUpdateAvailable(currentVersion, storeVersion)) {
                   final Uri appStoreUri = Uri.parse(trackViewUrl);
-                  if (await canLaunchUrl(appStoreUri)) {
+                  final bool canLaunchAppStoreUrl = await canLaunchUrl(
+                    appStoreUri,
+                  );
+                  if (canLaunchAppStoreUrl) {
                     await launchUrl(
                       appStoreUri,
                       mode: LaunchMode.externalApplication,

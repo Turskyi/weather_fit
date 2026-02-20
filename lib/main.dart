@@ -17,7 +17,7 @@ import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/localization/localization_delegate_getter.dart'
     as locale;
 import 'package:weather_fit/router/app_route.dart';
-import 'package:weather_fit/router/routes.dart' as routes;
+import 'package:weather_fit/router/routes.dart' as router;
 import 'package:weather_repository/weather_repository.dart';
 
 /// The [main] is the ultimate detail — the lowest-level policy.
@@ -70,6 +70,8 @@ void main() async {
     );
   }
 
+  final Map<String, WidgetBuilder> routes = router.getRouteMap();
+
   runApp(
     LocalizedApp(
       localizationDelegate,
@@ -83,7 +85,7 @@ void main() async {
         outfitRepository: OutfitRepository(localDataSource, remoteDataSource),
         localDataSource: localDataSource,
         initialLanguage: initialLanguage,
-        routes: routes.getRouteMap(),
+        routes: routes,
       ),
     ),
   );

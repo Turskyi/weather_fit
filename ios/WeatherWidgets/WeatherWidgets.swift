@@ -63,7 +63,8 @@ struct Provider: TimelineProvider {
     let appGroupIdentifier = "group.dmytrowidget"
 
     func getWeatherData() -> WeatherData? {
-        guard let sharedDefaults = UserDefaults(suiteName: appGroupIdentifier) else {
+        guard let sharedDefaults = UserDefaults(suiteName: appGroupIdentifier)
+        else {
             print("Could not load shared defaults.")
             return nil
         }
@@ -81,18 +82,26 @@ struct Provider: TimelineProvider {
         let emoji = sharedDefaults.string(forKey: keys["emoji"]!)
         let location = sharedDefaults.string(forKey: keys["location"]!)
         let temperature = sharedDefaults.string(forKey: keys["temperature"]!)
-        let recommendation = sharedDefaults.string(forKey: keys["recommendation"]!)
+        let recommendation = sharedDefaults.string(
+            forKey: keys["recommendation"]!
+        )
         let lastUpdated = sharedDefaults.string(forKey: keys["lastUpdated"]!)
         let imagePath = sharedDefaults.string(forKey: keys["imagePath"]!)
-        let forecastDataString = sharedDefaults.string(forKey: keys["forecastData"]!)
+        let forecastDataString = sharedDefaults.string(
+            forKey: keys["forecastData"]!
+        )
 
         var forecast: [ForecastItem]?
         if let forecastDataString = forecastDataString,
-           let data = forecastDataString.data(using: .utf8) {
+            let data = forecastDataString.data(using: .utf8)
+        {
             do {
                 let decoder = JSONDecoder()
                 decoder.keyDecodingStrategy = .convertFromSnakeCase
-                let forecastResponse = try decoder.decode([String: [ForecastItem]].self, from: data)
+                let forecastResponse = try decoder.decode(
+                    [String: [ForecastItem]].self,
+                    from: data
+                )
                 forecast = forecastResponse["forecast"]
             } catch {
                 print("WIDGET FORECAST DECODING FAILED: \(error)")
@@ -110,22 +119,38 @@ struct Provider: TimelineProvider {
             locale: locale,
             imagePath: imagePath,
             forecast: forecast,
-            )
+        )
     }
 
     func placeholder(in context: Context) -> SimpleEntry {
         SimpleEntry(date: Date(), weatherData: .placeholder)
     }
 
-    func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> Void) {
-        let entry = SimpleEntry(date: Date(), weatherData: getWeatherData() ?? .placeholder)
+    func getSnapshot(
+        in context: Context,
+        completion: @escaping (SimpleEntry) -> Void
+    ) {
+        let entry = SimpleEntry(
+            date: Date(),
+            weatherData: getWeatherData() ?? .placeholder
+        )
         completion(entry)
     }
 
-    func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> Void) {
+    func getTimeline(
+        in context: Context,
+        completion: @escaping (Timeline<Entry>) -> Void
+    ) {
         let currentDate = Date()
-        let entry = SimpleEntry(date: currentDate, weatherData: getWeatherData() ?? .placeholder)
-        let nextUpdate = Calendar.current.date(byAdding: .minute, value: 15, to: currentDate)!
+        let entry = SimpleEntry(
+            date: currentDate,
+            weatherData: getWeatherData() ?? .placeholder
+        )
+        let nextUpdate = Calendar.current.date(
+            byAdding: .minute,
+            value: 15,
+            to: currentDate
+        )!
         let timeline = Timeline(entries: [entry], policy: .after(nextUpdate))
         completion(timeline)
     }
@@ -141,8 +166,10 @@ struct ForecastItemView: View {
         VStack(spacing: 2) {
             Text(DateHelper.getDay(from: item.time, locale: locale ?? "en"))
                 .font(.system(size: 8, weight: .bold))
-            Text(DateHelper.getTimeOfDay(from: item.time, locale: locale ?? "en"))
-                .font(.system(size: 8))
+            Text(
+                DateHelper.getTimeOfDay(from: item.time, locale: locale ?? "en")
+            )
+            .font(.system(size: 8))
             Text(WeatherHelper.getWeatherEmoji(for: item.weatherCode))
                 .font(.title3)
             Text("\(Int(item.temperature.rounded()))°")
@@ -181,12 +208,12 @@ struct WeatherWidgetsEntryView: View {
                 // Vertical layout for Small and Large widgets
                 // Image -> Recommendation -> Header -> Forecast
                 VStack(spacing: 8) {
+                    headerSection
+
                     imageSection
                         .frame(maxHeight: .infinity)
 
                     recommendationSection
-
-                    headerSection
 
                     if family != .systemSmall {
                         forecastSection
@@ -194,7 +221,7 @@ struct WeatherWidgetsEntryView: View {
                 }
             }
         }
-            // Paddings surrounding the widget removed completely as requested
+        // Paddings surrounding the widget removed completely as requested
         .widgetURL(URL(string: "weatherfit://open")!)
     }
 
@@ -208,7 +235,7 @@ struct WeatherWidgetsEntryView: View {
                 Image(uiImage: uiImage)
                     .resizable()
                     .scaledToFit()
-                    .clipShape(RoundedRectangle(cornerRadius: 16)) // Rounded corners for outfit image
+                    .clipShape(RoundedRectangle(cornerRadius: 16))  // Rounded corners for outfit image
             } else {
                 Image(systemName: "tshirt.fill")
                     .font(.system(size: 40))
@@ -267,7 +294,10 @@ struct WeatherWidgetsEntryView: View {
             if let forecast = entry.weatherData.forecast, !forecast.isEmpty {
                 HStack(spacing: 12) {
                     ForEach(forecast.prefix(3), id: \.self) { item in
-                        ForecastItemView(item: item, locale: entry.weatherData.locale)
+                        ForecastItemView(
+                            item: item,
+                            locale: entry.weatherData.locale
+                        )
                     }
                 }
                 .padding(10)
@@ -288,7 +318,8 @@ struct WeatherWidgets: Widget {
             WeatherWidgetsEntryView(entry: entry)
                 .containerBackground(for: .widget) {
                     WeatherHelper.getGradient(
-                        for: entry.weatherData.forecast?.first?.weatherCode ?? 0)
+                        for: entry.weatherData.forecast?.first?.weatherCode ?? 0
+                    )
                 }
         }
         .configurationDisplayName("WeatherFit")
@@ -303,7 +334,9 @@ struct WidgetImageLoader {
         imagePath: String?,
         forecast: [ForecastItem]?
     ) -> UIImage? {
-        if let imagePath = imagePath, let image = UIImage(contentsOfFile: imagePath) {
+        if let imagePath = imagePath,
+            let image = UIImage(contentsOfFile: imagePath)
+        {
             return image
         }
 
@@ -351,7 +384,8 @@ struct DateHelper {
         return formatter.date(from: string)
     }
 
-    static func getDay(from dateString: String, locale: String = "en") -> String {
+    static func getDay(from dateString: String, locale: String = "en") -> String
+    {
         guard let date = parseDateTime(from: dateString) else {
             return ""
         }
@@ -389,7 +423,8 @@ struct DateHelper {
         return dayFormatter.string(from: date)
     }
 
-    static func getTimeOfDay(from dateString: String, locale: String) -> String {
+    static func getTimeOfDay(from dateString: String, locale: String) -> String
+    {
         guard let date = parseDateTime(from: dateString) else {
             return ""
         }
@@ -469,22 +504,31 @@ struct WeatherHelper {
         switch code {
         case 0:  // Sunny
             gradient = Gradient(colors: [
-                Color(red: 1.0, green: 0.75, blue: 0.0), Color(red: 0.9, green: 0.45, blue: 0.0),
+                Color(red: 1.0, green: 0.75, blue: 0.0),
+                Color(red: 0.9, green: 0.45, blue: 0.0),
             ])
         case 1, 2, 3, 45, 48:  // Cloudy/Foggy
             gradient = Gradient(colors: [
-                Color(red: 0.6, green: 0.7, blue: 0.8), Color(red: 0.4, green: 0.5, blue: 0.6),
+                Color(red: 0.6, green: 0.7, blue: 0.8),
+                Color(red: 0.4, green: 0.5, blue: 0.6),
             ])
         case 51...67, 80...82:  // Rain/Showers
             gradient = Gradient(colors: [
-                Color(red: 0.3, green: 0.4, blue: 0.5), Color(red: 0.1, green: 0.2, blue: 0.3),
+                Color(red: 0.3, green: 0.4, blue: 0.5),
+                Color(red: 0.1, green: 0.2, blue: 0.3),
             ])
         case 71...77, 85, 86:  // Snow
-            gradient = Gradient(colors: [Color(red: 0.8, green: 0.85, blue: 0.95), .gray])
+            gradient = Gradient(colors: [
+                Color(red: 0.8, green: 0.85, blue: 0.95), .gray,
+            ])
         default:
             gradient = Gradient(colors: [.indigo, .purple])
         }
-        return LinearGradient(gradient: gradient, startPoint: .top, endPoint: .bottom)
+        return LinearGradient(
+            gradient: gradient,
+            startPoint: .top,
+            endPoint: .bottom
+        )
     }
 }
 
@@ -494,14 +538,27 @@ extension WeatherData {
             emoji: "☀️",
             location: "Cupertino",
             temperature: "24°C",
-            recommendation: "A light jacket and jeans would be perfect for today.",
+            recommendation:
+                "A light jacket and jeans would be perfect for today.",
             lastUpdated: "just now",
             locale: "en",
             imagePath: nil,
             forecast: [
-                .init(time: "2023-10-27T09:00", temperature: 18.0, weatherCode: 1),
-                .init(time: "2023-10-27T13:00", temperature: 22.0, weatherCode: 0),
-                .init(time: "2023-10-27T18:00", temperature: 19.0, weatherCode: 80),
+                .init(
+                    time: "2023-10-27T09:00",
+                    temperature: 18.0,
+                    weatherCode: 1
+                ),
+                .init(
+                    time: "2023-10-27T13:00",
+                    temperature: 22.0,
+                    weatherCode: 0
+                ),
+                .init(
+                    time: "2023-10-27T18:00",
+                    temperature: 19.0,
+                    weatherCode: 80
+                ),
             ]
         )
     }
