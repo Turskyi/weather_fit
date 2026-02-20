@@ -38,7 +38,8 @@ void main() {
 
     final LocalDataSource localDataSource = LocalDataSource(preferences);
     await setUpFlutterTranslateForTests();
-    localizationDelegate = await getLocalizationDelegate(localDataSource);
+    final Language savedLanguage = localDataSource.getSavedLanguage();
+    localizationDelegate = await getLocalizationDelegate(savedLanguage);
   });
   late WeatherRepository weatherRepository;
   late OutfitRepository outfitRepository;

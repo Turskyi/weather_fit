@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -15,8 +16,11 @@ import 'package:weather_fit/data/data_sources/remote/remote_data_source.dart';
 import 'package:weather_fit/data/repositories/location_repository.dart';
 import 'package:weather_fit/data/repositories/outfit_repository.dart';
 import 'package:weather_fit/di/dependencies.dart';
+import 'package:weather_fit/di/use_cases/initialize_app_language_use_case.dart';
 import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
+import 'package:weather_fit/localization/localization_delegate_getter.dart'
+    as locale;
 import 'package:weather_fit/services/home_widget_service.dart';
 import 'package:weather_fit/weather_bloc_observer.dart';
 import 'package:weather_repository/weather_repository.dart';
@@ -51,6 +55,12 @@ Future<Dependencies> injectDependencies() async {
     OpenMeteoApiClient(),
     localDataSource,
   );
+  final InitializeAppLanguageUseCase initializeAppLanguageUseCase =
+      InitializeAppLanguageUseCase(localDataSource: localDataSource);
+
+  final Language savedLanguage = localDataSource.getSavedLanguage();
+  final LocalizationDelegate localizationDelegate = await locale
+      .getLocalizationDelegate(savedLanguage);
 
   return Dependencies(
     preferences: preferences,
@@ -59,6 +69,8 @@ Future<Dependencies> injectDependencies() async {
     outfitRepository: outfitRepository,
     weatherRepository: weatherRepository,
     locationRepository: locationRepository,
+    initializeAppLanguageUseCase: initializeAppLanguageUseCase,
+    localizationDelegate: localizationDelegate,
   );
 }
 
