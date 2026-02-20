@@ -3,22 +3,30 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:nominatim_api/nominatim_api.dart';
+import 'package:open_meteo_api/open_meteo_api.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
 import 'package:weather_fit/data/data_sources/remote/remote_data_source.dart';
+import 'package:weather_fit/data/repositories/location_repository.dart';
 import 'package:weather_fit/data/repositories/outfit_repository.dart';
+import 'package:weather_fit/di/dependencies.dart';
+import 'package:weather_fit/di/use_cases/initialize_app_language_use_case.dart';
 import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
+import 'package:weather_fit/localization/localization_delegate_getter.dart'
+    as locale;
 import 'package:weather_fit/services/home_widget_service.dart';
 import 'package:weather_fit/weather_bloc_observer.dart';
 import 'package:weather_repository/weather_repository.dart';
 import 'package:workmanager/workmanager.dart';
 
-Future<void> injectDependencies() async {
+Future<Dependencies> injectDependencies() async {
   await _initializeAllDateFormatting();
   // Make sure we run on supported platforms:
   // https://pub.dev/packages/workmanager
@@ -33,6 +41,37 @@ Future<void> injectDependencies() async {
   } else {
     await _setupMobileHydratedStorage();
   }
+
+  final SharedPreferences preferences = await SharedPreferences.getInstance();
+  final LocalDataSource localDataSource = LocalDataSource(preferences);
+  final RemoteDataSource remoteDataSource = RemoteDataSource(Dio());
+  final OutfitRepository outfitRepository = OutfitRepository(
+    localDataSource,
+    remoteDataSource,
+  );
+  final WeatherRepository weatherRepository = WeatherRepository();
+  final LocationRepository locationRepository = LocationRepository(
+    NominatimApiClient(),
+    OpenMeteoApiClient(),
+    localDataSource,
+  );
+  final InitializeAppLanguageUseCase initializeAppLanguageUseCase =
+      InitializeAppLanguageUseCase(localDataSource: localDataSource);
+
+  final Language savedLanguage = localDataSource.getSavedLanguage();
+  final LocalizationDelegate localizationDelegate = await locale
+      .getLocalizationDelegate(savedLanguage);
+
+  return Dependencies(
+    preferences: preferences,
+    localDataSource: localDataSource,
+    remoteDataSource: remoteDataSource,
+    outfitRepository: outfitRepository,
+    weatherRepository: weatherRepository,
+    locationRepository: locationRepository,
+    initializeAppLanguageUseCase: initializeAppLanguageUseCase,
+    localizationDelegate: localizationDelegate,
+  );
 }
 
 Future<void> _setupMobileHydratedStorage() async {
