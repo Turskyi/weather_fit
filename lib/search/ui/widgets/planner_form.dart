@@ -42,32 +42,6 @@ class _PlannerFormState extends State<PlannerForm> {
   }
 
   @override
-  void dispose() {
-    _focusNode.removeListener(_onFocusChange);
-    _focusNode.dispose();
-    super.dispose();
-  }
-
-  void _onFocusChange() {
-    if (_focusNode.hasFocus) {
-      setState(() {
-        _isFocused = true;
-      });
-    } else {
-      // Small delay to allow tap events on suggestions to fire before hiding
-      // them. This is especially important on desktop platforms where mouse
-      // clicks might otherwise be interrupted by an immediate rebuild.
-      Future<void>.delayed(const Duration(milliseconds: 150)).then((_) {
-        if (mounted) {
-          setState(() {
-            _isFocused = _focusNode.hasFocus;
-          });
-        }
-      });
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final TextTheme textTheme = Theme.of(context).textTheme;
@@ -104,6 +78,7 @@ class _PlannerFormState extends State<PlannerForm> {
                     vertical: 12,
                   ),
                   errorText: widget.errorMessage,
+                  errorMaxLines: 2,
                 ),
               ),
               ValueListenableBuilder<TextEditingValue>(
@@ -172,5 +147,31 @@ class _PlannerFormState extends State<PlannerForm> {
         ),
       ],
     );
+  }
+
+  @override
+  void dispose() {
+    _focusNode.removeListener(_onFocusChange);
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  void _onFocusChange() {
+    if (_focusNode.hasFocus) {
+      setState(() {
+        _isFocused = true;
+      });
+    } else {
+      // Small delay to allow tap events on suggestions to fire before hiding
+      // them. This is especially important on desktop platforms where mouse
+      // clicks might otherwise be interrupted by an immediate rebuild.
+      Future<void>.delayed(const Duration(milliseconds: 150)).then((_) {
+        if (mounted) {
+          setState(() {
+            _isFocused = _focusNode.hasFocus;
+          });
+        }
+      });
+    }
   }
 }

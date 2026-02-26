@@ -3,14 +3,16 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
+import 'package:nominatim_api/nominatim_api.dart';
+import 'package:open_meteo_api/open_meteo_api.dart';
 import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
+import 'package:weather_fit/data/repositories/location_repository.dart';
 import 'package:weather_fit/data/repositories/outfit_repository.dart';
 import 'package:weather_fit/entities/models/outfit/outfit_image.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/search/ui/widgets/header.dart';
 import 'package:weather_fit/search/ui/widgets/planner_form.dart';
 import 'package:weather_fit/search/ui/widgets/planner_result.dart';
-import 'package:weather_fit/settings/bloc/settings_bloc.dart';
 import 'package:weather_repository/weather_repository.dart';
 
 class FutureOutfitPlannerSheet extends StatefulWidget {
@@ -116,10 +118,47 @@ class _FutureOutfitPlannerSheetState extends State<FutureOutfitPlannerSheet> {
     return defaultMessage;
   }
 
+  Future<void> _showLocationNotFoundDialog() {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: Text(translate('search.location_not_found_dialog_title')),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Text(
+                translate('search.location_not_found_suggestion_spell_check'),
+              ),
+              const SizedBox(height: 16),
+              Text(translate('search.location_not_found_suggestion_use_gps')),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: Navigator.of(dialogContext).pop,
+              child: Text(translate('cancel')),
+            ),
+            TextButton(
+              autofocus: true,
+              child: Text(translate('ok')),
+              onPressed: () => Navigator.of(dialogContext).pop(),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<bool?> _showLocationConfirmationDialog(Location location) {
+    // Build a list of non-empty location parts for a consistent UI.
     final List<String> parts = <String>[location.name];
-    if (location.province.isNotEmpty) parts.add(location.province);
-    if (location.country.isNotEmpty) parts.add(location.country);
+    if (location.province.isNotEmpty) {
+      parts.add(location.province);
+    }
+    if (location.country.isNotEmpty) {
+      parts.add(location.country);
+    }
     final String displayLocation = parts.join(', ');
 
     return showDialog<bool>(
@@ -134,6 +173,7 @@ class _FutureOutfitPlannerSheetState extends State<FutureOutfitPlannerSheet> {
               child: Text(translate('no')),
             ),
             TextButton(
+              autofocus: true,
               onPressed: () => Navigator.of(context).pop(true),
               child: Text(translate('yes')),
             ),
@@ -153,14 +193,13 @@ class _FutureOutfitPlannerSheetState extends State<FutureOutfitPlannerSheet> {
       final OutfitRepository outfitRepository = context
           .read<OutfitRepository>();
 
-      // 2. Fetch Climate Projection
+      // Fetch Climate Projection for the resolved location.
       final WeatherDomain weatherDomain = await weatherRepository
           .getClimateProjection(location: location, date: date);
 
-      // Convert Domain to App Weather model for the OutfitRepository
       final Weather weather = Weather.fromDomain(weatherDomain);
 
-      // 3. Get Outfit Recommendation
+      // Get Outfit Recommendation and image.
       final String recommendation = outfitRepository.getOutfitRecommendation(
         weather,
       );
@@ -205,14 +244,11 @@ class _FutureOutfitPlannerSheetState extends State<FutureOutfitPlannerSheet> {
     });
 
     try {
-      final WeatherRepository weatherRepository = context
-          .read<WeatherRepository>();
+      final LocationRepository locationRepository = context
+          .read<LocationRepository>();
 
-      // 1. Resolve Location (independent flow, no GPS)
-      final Location location = await weatherRepository.searchLocation(
-        query: query,
-        locale: context.read<SettingsBloc>().state.locale,
-      );
+      // Similar to SearchBloc, we use LocationRepository to resolve the query.
+      final Location location = await locationRepository.getLocation(query);
 
       if (mounted) {
         if (skipConfirmation) {
@@ -226,9 +262,6 @@ class _FutureOutfitPlannerSheetState extends State<FutureOutfitPlannerSheet> {
           } else {
             setState(() {
               _isLoading = false;
-              _errorMessage = translate(
-                'search.location_not_found_clarification',
-              );
             });
           }
         }
@@ -237,13 +270,20 @@ class _FutureOutfitPlannerSheetState extends State<FutureOutfitPlannerSheet> {
       if (mounted) {
         setState(() {
           _isLoading = false;
-          _errorMessage = _mapExceptionToMessage(
-            e,
-            defaultMessage: translate(
-              'search.location_not_found_clarification',
-            ),
-          );
         });
+        if (e is LocationNotFoundFailure ||
+            e is NominatimLocationRequestFailure) {
+          _showLocationNotFoundDialog();
+        } else {
+          setState(() {
+            _errorMessage = _mapExceptionToMessage(
+              e,
+              defaultMessage: translate(
+                'search.location_not_found_clarification',
+              ),
+            );
+          });
+        }
       }
     }
   }
@@ -254,8 +294,6 @@ class _FutureOutfitPlannerSheetState extends State<FutureOutfitPlannerSheet> {
       _locationController.text = cityName;
       _selectedDate = date;
     });
-    // Automatically trigger search and skip confirmation for previously saved
-    // plans.
     await _onGeneratePreview(skipConfirmation: true);
   }
 
