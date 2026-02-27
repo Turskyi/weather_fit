@@ -53,11 +53,84 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     on<ConfirmLocation>(_confirmLocation);
     on<SearchByLocation>(_searchByLocation);
     on<RequestPermissionAndSearchByLocation>(_onRequestLocationPermission);
+    on<RetrySearchByCurrentLocation>(_onRetrySearchByCurrentLocation);
   }
 
   final WeatherRepository _weatherRepository;
   final LocationRepository _locationRepository;
   final LocalDataSource _localDataSource;
+
+  List<QuickCitySuggestion> get _quickCitiesSuggestions =>
+      state.quickCitiesSuggestions;
+
+  Future<void> _onRetrySearchByCurrentLocation(
+    RetrySearchByCurrentLocation event,
+    Emitter<SearchState> emit,
+  ) async {
+    emit(SearchLoading(quickCitiesSuggestions: _quickCitiesSuggestions));
+
+    try {
+      await _requestLocationPermission();
+
+      final Position position = await Geolocator.getCurrentPosition();
+      final String languageIsoCode = _localDataSource.getLanguageIsoCode();
+
+      final WeatherDomain domainWeather = await _weatherRepository
+          .getWeatherByLocation(
+            Location(
+              latitude: position.latitude,
+              longitude: position.longitude,
+              locale: languageIsoCode,
+            ),
+          );
+      final Weather weather = Weather.fromRepository(domainWeather);
+      emit(
+        SearchWeatherLoaded(
+          weather: weather,
+          quickCitiesSuggestions: _quickCitiesSuggestions,
+        ),
+      );
+    } catch (e, stackTrace) {
+      final String debugErrorMessage =
+          '[_onRetrySearchByCurrentLocation] Error getting weather: $e';
+      debugPrint('error: $debugErrorMessage\n$stackTrace');
+
+      String userFriendlyErrorMessage = translate(
+        'error.getting_weather_request_permission',
+      );
+      SearchErrorType searchErrorType = SearchErrorType.unknown;
+
+      if (e is LocationServiceDisabledException) {
+        userFriendlyErrorMessage = translate('error.location_unavailable');
+        searchErrorType = SearchErrorType.locationServiceDisabled;
+      } else if (e.toString().contains(
+        translate(
+          'error.location_permission_permanently_denied_cannot_request',
+        ),
+      )) {
+        userFriendlyErrorMessage = translate(
+          'error.location_permission_permanently_denied_cannot_request',
+        );
+        searchErrorType = SearchErrorType.permissionDeniedPermanently;
+      } else if (e.toString().contains(
+        translate('error.location_permission_denied'),
+      )) {
+        userFriendlyErrorMessage = translate(
+          'error.location_permission_denied',
+        );
+        searchErrorType = SearchErrorType.permissionDenied;
+      }
+
+      emit(
+        SearchError(
+          errorMessage: userFriendlyErrorMessage,
+          errorType: searchErrorType,
+          query: event.query,
+          quickCitiesSuggestions: _quickCitiesSuggestions,
+        ),
+      );
+    }
+  }
 
   FutureOr<void> _searchByLocation(
     SearchByLocation event,
@@ -87,7 +160,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
 
       // 2. Determine the user-facing error message.
       final String userFriendlyErrorMessage = translate(
-        'error.getting_weather_generic',
+        'error.getting_weather_search_by_location',
       );
 
       emit(
@@ -123,7 +196,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
 
       // 2. Determine the user-facing error message.
       final String userFriendlyErrorMessage = translate(
-        'error.getting_weather_generic',
+        'error.getting_weather_confirm_location',
       );
 
       emit(
@@ -174,7 +247,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
 
       // 2. Determine the user-facing error message.
       String userFriendlyErrorMessage = translate(
-        'error.getting_weather_generic',
+        'error.getting_weather_request_permission',
       );
       SearchErrorType searchErrorType = SearchErrorType.unknown;
 
@@ -354,32 +427,8 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         ),
       );
     }
+
     // We expect here `LocationPermission.whileInUse`.
     debugPrint('Location permission granted with value: $permission.');
-  }
-
-  List<QuickCitySuggestion> get _quickCitiesSuggestions {
-    return <QuickCitySuggestion>[
-      QuickCitySuggestion(
-        name: translate(
-          _localDataSource.getSavedLanguage().isUkrainian
-              ? 'search.quick_city_north_york'
-              : 'search.quick_city_toronto',
-        ),
-        flag: '🇨🇦',
-      ),
-      QuickCitySuggestion(
-        name: translate('search.quick_city_zielona_gora'),
-        flag: '🇵🇱',
-      ),
-      QuickCitySuggestion(
-        name: translate('search.quick_city_zaporizhzhia'),
-        flag: '🇺🇦',
-      ),
-      QuickCitySuggestion(
-        name: translate('search.quick_city_waldshut_tiengen'),
-        flag: '🇩🇪',
-      ),
-    ];
   }
 }

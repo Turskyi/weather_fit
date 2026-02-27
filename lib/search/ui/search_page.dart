@@ -455,8 +455,17 @@ class _SearchPageState extends State<SearchPage> {
               content: Text(state.errorMessage),
               duration: const Duration(seconds: 7),
               action: SnackBarAction(
-                label: translate('error.report'),
-                onPressed: _handleReportErrorSnackBarAction,
+                label: translate('try_again'),
+                onPressed: () {
+                  final String query = state.query;
+                  if (query.isNotEmpty) {
+                    context.read<SearchBloc>().add(SearchLocation(query));
+                  } else {
+                    context.read<SearchBloc>().add(
+                      RetrySearchByCurrentLocation(query),
+                    );
+                  }
+                },
               ),
             ),
           );

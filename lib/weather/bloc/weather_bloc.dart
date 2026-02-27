@@ -513,7 +513,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
       return translate('error.network_error');
     }
     if (e is WeatherRequestFailure) {
-      return translate('error.getting_weather_generic');
+      return translate('error.getting_weather_bloc_generic');
     }
     return translate('error.something_went_wrong');
   }
