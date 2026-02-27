@@ -1,10 +1,15 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:permission_handler/permission_handler.dart' as geolocator;
+import 'package:permission_handler/permission_handler.dart'
+    as permission_handler;
+import 'package:url_launcher/url_launcher.dart';
 import 'package:weather_fit/entities/enums/search_error_type.dart';
 import 'package:weather_fit/extensions/build_context_extensions.dart';
+import 'package:weather_fit/res/constants.dart' as constants;
 import 'package:weather_fit/router/app_route.dart';
 import 'package:weather_fit/search/bloc/search_bloc.dart';
 import 'package:weather_fit/search/ui/widgets/search_layout_default.dart';
@@ -293,115 +298,11 @@ class _SearchPageState extends State<SearchPage> {
       if (state.isCertificateValidationError) {
         // Show a more detailed, blocking dialog for
         // this specific error.
-        showDialog(
-          context: context,
-          // User must interact with the dialog.
-          barrierDismissible: false,
-          builder: (BuildContext dialogContext) {
-            return CallbackShortcuts(
-              bindings: <ShortcutActivator, VoidCallback>{
-                const SingleActivator(LogicalKeyboardKey.arrowLeft): () =>
-                    FocusScope.of(dialogContext).previousFocus(),
-                const SingleActivator(LogicalKeyboardKey.arrowRight): () =>
-                    FocusScope.of(dialogContext).nextFocus(),
-              },
-              child: AlertDialog(
-                title: Text(translate('error.connection_security_issue_title')),
-                content: SingleChildScrollView(
-                  child: ListBody(
-                    children: <Widget>[
-                      Text(state.errorMessage),
-                      const SizedBox(height: 16),
-                      Text(translate('error.what_you_can_do')),
-                      Text(
-                        "- ${translate('error.'
-                        'ensure_os_updated')}",
-                      ),
-                      Text(
-                        "- ${translate('error.'
-                        'check_date_time')}",
-                      ),
-                    ],
-                  ),
-                ),
-                actions: <Widget>[
-                  TextButton(
-                    child: Text(translate('error.report_issue_button')),
-                    onPressed: () =>
-                        _handleReportActionAndPop(state.errorMessage),
-                  ),
-                  TextButton(
-                    autofocus: true,
-                    child: Text(translate('ok')),
-                    onPressed: () {
-                      // Close the dialog.
-                      Navigator.of(dialogContext).pop();
-                    },
-                  ),
-                ],
-              ),
-            );
-          },
-        );
+        _handleCertificateValidationError(context, state);
       } else if (state.isPermissionDeniedError) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(state.errorMessage),
-            duration: const Duration(seconds: 7),
-            action: SnackBarAction(
-              label: translate('settings.title'),
-              onPressed: () {
-                // Helper from `geolocator` to open app
-                // settings.
-                geolocator.openAppSettings();
-                ScaffoldMessenger.of(context).hideCurrentSnackBar();
-              },
-            ),
-          ),
-        );
+        _handlePermissionDeniedError(context, state);
       } else if (state.isNetworkError) {
-        if (context.isExtraSmallScreen) {
-          Navigator.pushNamed(
-            context,
-            AppRoute.unableToConnect.path,
-            arguments: SearchError(
-              errorMessage: state.errorMessage,
-              query: _text,
-              errorType: SearchErrorType.network,
-              quickCitiesSuggestions: state.quickCitiesSuggestions,
-            ),
-          );
-        } else {
-          showDialog<void>(
-            context: context,
-            builder: (BuildContext context) {
-              return CallbackShortcuts(
-                bindings: <ShortcutActivator, VoidCallback>{
-                  const SingleActivator(LogicalKeyboardKey.arrowLeft): () =>
-                      FocusScope.of(context).previousFocus(),
-                  const SingleActivator(LogicalKeyboardKey.arrowRight): () =>
-                      FocusScope.of(context).nextFocus(),
-                },
-                child: AlertDialog(
-                  title: Text(translate('error.unable_to_connect')),
-                  content: Text(translate('error.connection_reset_suggestion')),
-                  actions: <Widget>[
-                    TextButton(
-                      onPressed: () =>
-                          _handleReportActionAndPop(state.errorMessage),
-                      child: Text(translate('report_issue')),
-                    ),
-                    ElevatedButton(
-                      autofocus: true,
-                      onPressed: _text.isEmpty ? null : () => _popAndSearch(),
-                      child: Text(translate('try_again')),
-                    ),
-                  ],
-                ),
-              );
-            },
-          );
-        }
+        _handleNetworkError(context, state);
       } else {
         if (context.isExtraSmallScreen) {
           showGeneralDialog<void>(
@@ -456,21 +357,150 @@ class _SearchPageState extends State<SearchPage> {
               duration: const Duration(seconds: 7),
               action: SnackBarAction(
                 label: translate('try_again'),
-                onPressed: () {
-                  final String query = state.query;
-                  if (query.isNotEmpty) {
-                    context.read<SearchBloc>().add(SearchLocation(query));
-                  } else {
-                    context.read<SearchBloc>().add(
-                      RetrySearchByCurrentLocation(query),
-                    );
-                  }
-                },
+                onPressed: () => _handleRetrySearch(state),
               ),
             ),
           );
         }
       }
+    }
+  }
+
+  void _handleRetrySearch(SearchError state) {
+    final String query = state.query;
+    if (query.isNotEmpty) {
+      context.read<SearchBloc>().add(SearchLocation(query));
+    } else {
+      context.read<SearchBloc>().add(RetrySearchByCurrentLocation(query));
+    }
+  }
+
+  void _handleCertificateValidationError(
+    BuildContext context,
+    SearchError state,
+  ) {
+    // Show a more detailed, blocking dialog for
+    // this specific error.
+    showDialog(
+      context: context,
+      // User must interact with the dialog.
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
+        return CallbackShortcuts(
+          bindings: <ShortcutActivator, VoidCallback>{
+            const SingleActivator(LogicalKeyboardKey.arrowLeft): () =>
+                FocusScope.of(dialogContext).previousFocus(),
+            const SingleActivator(LogicalKeyboardKey.arrowRight): () =>
+                FocusScope.of(dialogContext).nextFocus(),
+          },
+          child: AlertDialog(
+            title: Text(translate('error.connection_security_issue_title')),
+            content: SingleChildScrollView(
+              child: ListBody(
+                children: <Widget>[
+                  Text(state.errorMessage),
+                  const SizedBox(height: 16),
+                  Text(translate('error.what_you_can_do')),
+                  Text(
+                    "- ${translate('error.'
+                    'ensure_os_updated')}",
+                  ),
+                  Text(
+                    "- ${translate('error.'
+                    'check_date_time')}",
+                  ),
+                ],
+              ),
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: Text(translate('error.report_issue_button')),
+                onPressed: () => _handleReportActionAndPop(state.errorMessage),
+              ),
+              TextButton(
+                autofocus: true,
+                child: Text(translate('ok')),
+                onPressed: () {
+                  // Close the dialog.
+                  Navigator.of(dialogContext).pop();
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _handlePermissionDeniedError(BuildContext context, SearchError state) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(state.errorMessage),
+        duration: const Duration(seconds: 7),
+        action: SnackBarAction(
+          label: translate('settings.title'),
+          onPressed: () async {
+            if (Platform.isMacOS) {
+              final Uri url = Uri.parse(
+                constants.kMacOSLocationServicesSettingsUrl,
+              );
+              if (await canLaunchUrl(url)) {
+                await launchUrl(url);
+              }
+            } else {
+              permission_handler.openAppSettings();
+            }
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+            }
+          },
+        ),
+      ),
+    );
+  }
+
+  void _handleNetworkError(BuildContext context, SearchError state) {
+    if (context.isExtraSmallScreen) {
+      Navigator.pushNamed(
+        context,
+        AppRoute.unableToConnect.path,
+        arguments: SearchError(
+          errorMessage: state.errorMessage,
+          query: _text,
+          errorType: SearchErrorType.network,
+          quickCitiesSuggestions: state.quickCitiesSuggestions,
+        ),
+      );
+    } else {
+      showDialog<void>(
+        context: context,
+        builder: (BuildContext context) {
+          return CallbackShortcuts(
+            bindings: <ShortcutActivator, VoidCallback>{
+              const SingleActivator(LogicalKeyboardKey.arrowLeft): () =>
+                  FocusScope.of(context).previousFocus(),
+              const SingleActivator(LogicalKeyboardKey.arrowRight): () =>
+                  FocusScope.of(context).nextFocus(),
+            },
+            child: AlertDialog(
+              title: Text(translate('error.unable_to_connect')),
+              content: Text(translate('error.connection_reset_suggestion')),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () =>
+                      _handleReportActionAndPop(state.errorMessage),
+                  child: Text(translate('report_issue')),
+                ),
+                ElevatedButton(
+                  autofocus: true,
+                  onPressed: _text.isEmpty ? null : () => _popAndSearch(),
+                  child: Text(translate('try_again')),
+                ),
+              ],
+            ),
+          );
+        },
+      );
     }
   }
 

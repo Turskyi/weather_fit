@@ -100,6 +100,7 @@
     "getting_weather_search_by_location": "Nie udało się pobrać pogody dla Twojej lokalizacji. Spróbuj ponownie.",
     "getting_weather_confirm_location": "Nie udało się pobrać pogody dla wybranej lokalizacji. Spróbuj ponownie.",
     "getting_weather_request_permission": "Nie udało się pobrać pogody po udzieleniu pozwolenia. Spróbuj ponownie.",
+    "getting_weather_retry_request_permission": "Nie udało się pobrać danych pogodowych po udzieleniu pozwolenia. Spróbuj ponownie.",
     "getting_weather_bloc_generic": "Nie udało się pobrać danych pogodowych. Spróbuj ponownie.",
     "launch_email_app_to_address": "Nie udało się uruchomić aplikacji e-mail, aby wysłać wiadomość do {emailAddress}",
     "launch_email_failed": "Nie udało się uruchomić aplikacji e-mail.",

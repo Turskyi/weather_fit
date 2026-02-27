@@ -72,7 +72,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     try {
       await _requestLocationPermission();
 
-      final Position position = await Geolocator.getCurrentPosition();
+      final Position position = await _getCurrentPosition();
       final String languageIsoCode = _localDataSource.getLanguageIsoCode();
 
       final WeatherDomain domainWeather = await _weatherRepository
@@ -96,7 +96,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       debugPrint('error: $debugErrorMessage\n$stackTrace');
 
       String userFriendlyErrorMessage = translate(
-        'error.getting_weather_request_permission',
+        'error.getting_weather_retry_request_permission',
       );
       SearchErrorType searchErrorType = SearchErrorType.unknown;
 
@@ -221,7 +221,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
 
       // When we reach here, permissions are granted and we can
       // continue accessing the position of the device.
-      final Position position = await Geolocator.getCurrentPosition();
+      final Position position = await _getCurrentPosition();
       final String languageIsoCode = _localDataSource.getLanguageIsoCode();
 
       final WeatherDomain domainWeather = await _weatherRepository
@@ -430,5 +430,35 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
 
     // We expect here `LocationPermission.whileInUse`.
     debugPrint('Location permission granted with value: $permission.');
+  }
+
+  /// Helper method to get the current position with a fallback to the last
+  /// known position.
+  /// On some platforms (like macOS or Android), requesting a fresh position
+  /// immediately after permission is granted can sometimes fail or timeout.
+  Future<Position> _getCurrentPosition() async {
+    try {
+      // Try to get a fresh position with a 10-second timeout.
+      return await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.low,
+          timeLimit: Duration(seconds: 10),
+        ),
+      );
+    } catch (e) {
+      debugPrint(
+        'Geolocator.getCurrentPosition failed: $e. '
+        'Attempting to get last known position.',
+      );
+      // Fallback to the last known position if getting a fresh one fails.
+      final Position? lastKnownPosition =
+          await Geolocator.getLastKnownPosition();
+      if (lastKnownPosition != null) {
+        return lastKnownPosition;
+      } else {
+        // Re-throw if even the last known position is unavailable.
+        rethrow;
+      }
+    }
   }
 }

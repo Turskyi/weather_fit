@@ -100,6 +100,7 @@
     "getting_weather_search_by_location": "Could not get weather for your location. Please try again.",
     "getting_weather_confirm_location": "Could not get weather for the selected location. Please try again.",
     "getting_weather_request_permission": "Could not get weather after granting permission. Please try again.",
+    "getting_weather_retry_request_permission": "Could not fetch weather after granting permission. Please try again.",
     "getting_weather_bloc_generic": "Could not fetch weather data. Please try again.",
     "launch_email_app_to_address": "Could not launch email app to send an email to {emailAddress}",
     "launch_email_failed": "Could not launch the email application.",

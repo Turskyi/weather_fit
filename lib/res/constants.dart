@@ -49,3 +49,7 @@ const String remoteOutfitBaseUrl =
 /// The minimum width threshold to switch to a multi-column layout on
 /// Web/Desktop.
 const double kWideLayoutBreakpoint = 1000.0;
+
+const String kMacOSLocationServicesSettingsUrl =
+    'x-apple.systempreferences:com.apple.preference.security?'
+    'Privacy_LocationServices';
