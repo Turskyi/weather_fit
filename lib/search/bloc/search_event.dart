@@ -40,6 +40,7 @@ final class SearchByLocation extends SearchEvent {
 
 final class RequestPermissionAndSearchByLocation extends SearchEvent {
   const RequestPermissionAndSearchByLocation(this.query);
+
   final String query;
 
   @override
@@ -48,6 +49,7 @@ final class RequestPermissionAndSearchByLocation extends SearchEvent {
 
 final class RetrySearchByCurrentLocation extends SearchEvent {
   const RetrySearchByCurrentLocation(this.query);
+
   final String query;
 
   @override

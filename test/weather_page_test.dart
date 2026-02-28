@@ -103,13 +103,13 @@ void main() {
                     preferences,
                   );
                   return SearchBloc(
-                    weatherRepository,
-                    LocationRepository(
+                    weatherRepository: weatherRepository,
+                    locationRepository: LocationRepository(
                       NominatimApiClient(),
                       OpenMeteoApiClient(),
                       localDataSource,
                     ),
-                    localDataSource,
+                    localDataSource: localDataSource,
                   );
                 },
               ),

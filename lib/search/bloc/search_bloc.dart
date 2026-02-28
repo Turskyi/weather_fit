@@ -19,36 +19,39 @@ part 'search_event.dart';
 part 'search_state.dart';
 
 class SearchBloc extends Bloc<SearchEvent, SearchState> {
-  SearchBloc(
-    this._weatherRepository,
-    this._locationRepository,
-    this._localDataSource,
-  ) : super(
-        SearchInitial(
-          quickCitiesSuggestions: <QuickCitySuggestion>[
-            QuickCitySuggestion(
-              name: translate(
-                _localDataSource.getSavedLanguage().isUkrainian
-                    ? 'search.quick_city_north_york'
-                    : 'search.quick_city_toronto',
-              ),
-              flag: '🇨🇦',
-            ),
-            QuickCitySuggestion(
-              name: translate('search.quick_city_zielona_gora'),
-              flag: '🇵🇱',
-            ),
-            QuickCitySuggestion(
-              name: translate('search.quick_city_zaporizhzhia'),
-              flag: '🇺🇦',
-            ),
-            QuickCitySuggestion(
-              name: translate('search.quick_city_waldshut_tiengen'),
-              flag: '🇩🇪',
-            ),
-          ],
-        ),
-      ) {
+  SearchBloc({
+    required WeatherRepository weatherRepository,
+    required LocationRepository locationRepository,
+    required LocalDataSource localDataSource,
+  }) : _weatherRepository = weatherRepository,
+       _locationRepository = locationRepository,
+       _localDataSource = localDataSource,
+       super(
+         SearchInitial(
+           quickCitiesSuggestions: <QuickCitySuggestion>[
+             QuickCitySuggestion(
+               name: translate('search.quick_city_toronto'),
+               flag: '🇨🇦',
+             ),
+             QuickCitySuggestion(
+               name: translate('search.quick_city_north_york'),
+               flag: '🇨🇦',
+             ),
+             QuickCitySuggestion(
+               name: translate('search.quick_city_zielona_gora'),
+               flag: '🇵🇱',
+             ),
+             QuickCitySuggestion(
+               name: translate('search.quick_city_zaporizhzhia'),
+               flag: '🇺🇦',
+             ),
+             QuickCitySuggestion(
+               name: translate('search.quick_city_waldshut_tiengen'),
+               flag: '🇩🇪',
+             ),
+           ],
+         ),
+       ) {
     on<SearchLocation>(_searchLocation);
     on<ConfirmLocation>(_confirmLocation);
     on<SearchByLocation>(_searchByLocation);
@@ -252,12 +255,9 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       SearchErrorType searchErrorType = SearchErrorType.unknown;
 
       if (e is LocationServiceDisabledException) {
-        // TODO: implement displaying a full screen dialog where we would
-        //  explain, that if we get here and location permission is enabled
-        //  means app cannot find the location and we are very sorry. Suggest
-        //  to "type" another city, or country or report the error to developer
-        //  or uninstall the app.
-        userFriendlyErrorMessage = translate('error.location_unavailable');
+        userFriendlyErrorMessage = translate(
+          'error.location_services_disabled_content',
+        );
         searchErrorType = SearchErrorType.locationServiceDisabled;
       } else if (e.toString().contains(
         translate(
@@ -343,14 +343,16 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
               quickCitiesSuggestions: _quickCitiesSuggestions,
             ),
           );
-        } else if (e is LocationNotFoundFailure) {
+        } else if (e is LocationNotFoundFailure ||
+            detailedMessage.contains('LocationNotFoundFailure')) {
           emit(
             SearchLocationNotFound(
               query: eventQuery,
               quickCitiesSuggestions: _quickCitiesSuggestions,
             ),
           );
-        } else if (e is NominatimLocationRequestFailure) {
+        } else if (e is NominatimLocationRequestFailure ||
+            detailedMessage.contains('NominatimLocationRequestFailure')) {
           emit(
             SearchLocationNotFound(
               query: eventQuery,
@@ -385,21 +387,12 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       final bool isServiceEnabled = await Geolocator.isLocationServiceEnabled();
 
       if (!isServiceEnabled) {
-        // TODO: implement another dialog to inform user that we will open
-        //  system location settings with a call
-        //  `await Geolocator.openLocationSettings();`
-
-        // Location services are not enabled don't continue
-        // accessing the position and request users of the
-        // App to enable the location services.
-        return Future<void>.error('Location services are disabled.');
+        throw const LocationServiceDisabledException();
       }
     } catch (e) {
-      if (e.toString().contains('LOCATION_SERVICES_DISABLED')) {
-        // TODO: implement another dialog to inform user that we will open
-        //  system location settings with a call
-        //  `await Geolocator.openLocationSettings();`
-        return Future<void>.error('Location services are disabled.');
+      if (e is LocationServiceDisabledException ||
+          e.toString().contains('LOCATION_SERVICES_DISABLED')) {
+        throw const LocationServiceDisabledException();
       }
     }
     LocationPermission permission = await Geolocator.checkPermission();
@@ -410,9 +403,9 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       if (permission == LocationPermission.denied) {
         // Permissions are denied, next time you could try
         // requesting permissions again (this is also where
-        // Android's shouldShowRequestPermissionRationale
+        // Android's `shouldShowRequestPermissionRationale`
         // returned true. According to Android guidelines
-        // your App should show an explanatory UI now).
+        // the App should show an explanatory UI now).
         return Future<void>.error(
           translate('error.location_permission_denied'),
         );
@@ -456,6 +449,10 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       if (lastKnownPosition != null) {
         return lastKnownPosition;
       } else {
+        debugPrint(
+          'Geolocator.getLastKnownPosition() also returned null. '
+          'Rethrowing original error: $e',
+        );
         // Re-throw if even the last known position is unavailable.
         rethrow;
       }

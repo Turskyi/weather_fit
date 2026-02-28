@@ -83,9 +83,9 @@ class WeatherFitApp extends StatelessWidget {
           BlocProvider<SearchBloc>(
             create: (BuildContext _) {
               return SearchBloc(
-                weatherRepository,
-                locationRepository,
-                localDataSource,
+                weatherRepository: weatherRepository,
+                locationRepository: locationRepository,
+                localDataSource: localDataSource,
               );
             },
           ),
@@ -174,6 +174,7 @@ class WeatherFitApp extends StatelessWidget {
                       ),
                     ),
                     colorScheme: darkColorScheme,
+                    brightness: Brightness.dark,
                   ),
                   themeMode: completeDarkness
                       ? ThemeMode.dark

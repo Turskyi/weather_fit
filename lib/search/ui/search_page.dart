@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
+import 'package:geolocator/geolocator.dart' as geolocator;
 import 'package:permission_handler/permission_handler.dart'
     as permission_handler;
 import 'package:url_launcher/url_launcher.dart';
@@ -311,6 +312,8 @@ class _SearchPageState extends State<SearchPage> {
       _handlePermissionDeniedError(state);
     } else if (state.isNetworkError) {
       _handleNetworkError(state);
+    } else if (state.isLocationServiceDisabledError) {
+      _handleLocationServiceDisabledError(state);
     } else {
       if (context.isExtraSmallScreen) {
         showGeneralDialog<void>(
@@ -498,6 +501,34 @@ class _SearchPageState extends State<SearchPage> {
         },
       );
     }
+  }
+
+  Future<void> _handleLocationServiceDisabledError(SearchError state) {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: Text(translate('error.location_services_disabled_title')),
+          content: Text(translate('error.location_services_disabled_content')),
+          actions: <Widget>[
+            TextButton(
+              onPressed: Navigator.of(dialogContext).pop,
+              child: Text(translate('cancel')),
+            ),
+            TextButton(
+              autofocus: true,
+              onPressed: _handleOpenLocationSettingsAndPop,
+              child: Text(translate('settings.title')),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _handleOpenLocationSettingsAndPop() {
+    Navigator.of(context).pop();
+    return geolocator.Geolocator.openLocationSettings();
   }
 
   void _popAndSearch() {
