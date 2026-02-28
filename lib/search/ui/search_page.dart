@@ -315,6 +315,13 @@ class _SearchPageState extends State<SearchPage> {
     } else if (state.isLocationServiceDisabledError) {
       _handleLocationServiceDisabledError(state);
     } else {
+      debugPrint(
+        '[_handleSearchError] Unexpected SearchError state:\n'
+        'errorMessage: ${state.errorMessage}\n'
+        'query: ${state.query}\n'
+        'errorType: ${state.errorType}',
+      );
+
       if (context.isExtraSmallScreen) {
         showGeneralDialog<void>(
           context: context,
@@ -347,7 +354,7 @@ class _SearchPageState extends State<SearchPage> {
                             child: Text(translate('error.report_issue')),
                           ),
                           TextButton(
-                            onPressed: () => Navigator.of(context).pop(),
+                            onPressed: Navigator.of(context).pop,
                             child: Text(translate('close')),
                           ),
                         ],
