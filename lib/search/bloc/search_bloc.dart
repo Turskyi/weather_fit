@@ -6,6 +6,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:location/location.dart' as geo;
 import 'package:nominatim_api/nominatim_api.dart';
 import 'package:open_meteo_api/open_meteo_api.dart';
 import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
@@ -384,12 +385,20 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
   Future<void> _requestLocationPermission() async {
     try {
       // Test if location services are enabled.
-      final bool isServiceEnabled = await Geolocator.isLocationServiceEnabled();
+      bool isServiceEnabled = await Geolocator.isLocationServiceEnabled();
 
       if (!isServiceEnabled) {
-        throw const LocationServiceDisabledException();
+        final geo.Location location = geo.Location();
+        isServiceEnabled = await location.requestService();
+        if (!isServiceEnabled) {
+          throw const LocationServiceDisabledException();
+        }
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      final String debugErrorMessage =
+          '[_requestLocationPermission] '
+          'Location service check or request failed: $e';
+      debugPrint('$debugErrorMessage\n$stackTrace');
       if (e is LocationServiceDisabledException ||
           e.toString().contains('LOCATION_SERVICES_DISABLED')) {
         throw const LocationServiceDisabledException();
@@ -451,10 +460,33 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       } else {
         debugPrint(
           'Geolocator.getLastKnownPosition() also returned null. '
-          'Rethrowing original error: $e',
+          'Error: $e',
         );
-        // Re-throw if even the last known position is unavailable.
-        rethrow;
+        final geo.Location location = geo.Location();
+        try {
+          final geo.LocationData locationData = await location.getLocation();
+          final double? latitude = locationData.latitude;
+          final double? longitude = locationData.longitude;
+          if (latitude == null || longitude == null) {
+            rethrow;
+          } else {
+            return Position(
+              latitude: latitude,
+              longitude: longitude,
+              timestamp: DateTime.now(),
+              accuracy: locationData.accuracy ?? 0.0,
+              altitude: locationData.altitude ?? 0.0,
+              heading: locationData.heading ?? 0.0,
+              speed: locationData.speed ?? 0.0,
+              speedAccuracy: locationData.speedAccuracy ?? 0.0,
+              altitudeAccuracy: locationData.verticalAccuracy ?? 0.0,
+              headingAccuracy: locationData.headingAccuracy ?? 0.0,
+            );
+          }
+        } catch (e) {
+          debugPrint('Error: $e');
+          rethrow;
+        }
       }
     }
   }
