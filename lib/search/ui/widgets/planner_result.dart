@@ -50,8 +50,16 @@ class _PlannerResultState extends State<PlannerResult> {
       cityName: widget.weather.locationName,
       date: widget.date,
     );
+    // Since SavedPlan has weather now, we should compare only cityName and date
+    // or ensure props in SavedPlan are handled correctly.
+    // Actually, Equatable will compare all props.
+    // If we want to check if a plan for this city/date exists regardless of weather content:
     setState(() {
-      _isBookmarked = plans.contains(currentPlan);
+      _isBookmarked = plans.any(
+        (SavedPlan p) =>
+            p.cityName == currentPlan.cityName &&
+            p.date.isAtSameMomentAs(currentPlan.date),
+      );
     });
   }
 
@@ -92,10 +100,24 @@ class _PlannerResultState extends State<PlannerResult> {
     final SavedPlan plan = SavedPlan(
       cityName: widget.weather.locationName,
       date: widget.date,
+      weather: widget.weather,
     );
 
     if (_isBookmarked) {
-      await widget.localDataSource.removePlan(plan);
+      // Find the plan to remove by cityName and date
+      final List<SavedPlan> plans = widget.localDataSource.getSavedPlans();
+      final SavedPlan? planToRemove = plans
+          .where(
+            (SavedPlan p) =>
+                p.cityName == plan.cityName &&
+                p.date.isAtSameMomentAs(plan.date),
+          )
+          .firstOrNull;
+
+      if (planToRemove != null) {
+        await widget.localDataSource.removePlan(planToRemove);
+      }
+
       if (mounted) {
         setState(() => _isBookmarked = false);
       }
@@ -171,12 +193,7 @@ class _PlannerResultState extends State<PlannerResult> {
             ),
           ],
           selected: <TempOption>{_selectedOption},
-          onSelectionChanged: (Set<TempOption> newSelection) {
-            setState(() {
-              _selectedOption = newSelection.first;
-            });
-            _updateOutfit();
-          },
+          onSelectionChanged: _onTempOptionChanged,
         ),
         const SizedBox(height: 24),
         if (_isRefreshing || _outfitImage == null || _recommendation == null)
@@ -200,5 +217,12 @@ class _PlannerResultState extends State<PlannerResult> {
         ),
       ],
     );
+  }
+
+  void _onTempOptionChanged(Set<TempOption> newSelection) {
+    setState(() {
+      _selectedOption = newSelection.first;
+    });
+    _updateOutfit();
   }
 }

@@ -61,23 +61,7 @@ class WeatherPageDefaultLayout extends StatelessWidget {
         ],
       ),
       body: BlocConsumer<WeatherBloc, WeatherState>(
-        listener: (BuildContext context, WeatherState state) {
-          if ((state is WeatherFailure || state is LocalWebCorsFailure) &&
-              state.weather.isNotEmpty) {
-            ScaffoldMessenger.of(context)
-              ..hideCurrentSnackBar()
-              ..showSnackBar(
-                SnackBar(
-                  content: Text(state.message),
-                  action: SnackBarAction(
-                    label: translate('try_again'),
-                    onPressed: onRefresh,
-                  ),
-                ),
-              );
-          }
-          weatherStateListener(context, state);
-        },
+        listener: _onWeatherStateChanged,
         builder: (BuildContext context, WeatherState state) {
           final Weather stateWeather = state.weather;
           switch (state) {
@@ -227,6 +211,33 @@ class WeatherPageDefaultLayout extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  void _onWeatherStateChanged(BuildContext context, WeatherState state) {
+    if ((state is WeatherFailure || state is LocalWebCorsFailure) &&
+        state.weather.isNotEmpty) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            duration: const Duration(seconds: 4),
+            content: Row(
+              children: <Widget>[
+                Expanded(child: SelectableText(state.message)),
+                TextButton(
+                  onPressed: ScaffoldMessenger.of(context).hideCurrentSnackBar,
+                  child: Text(translate('ok')),
+                ),
+              ],
+            ),
+            action: SnackBarAction(
+              label: translate('try_again'),
+              onPressed: onRefresh,
+            ),
+          ),
+        );
+    }
+    weatherStateListener(context, state);
   }
 
   List<Widget> _buildSettingsButtons(BuildContext context) {

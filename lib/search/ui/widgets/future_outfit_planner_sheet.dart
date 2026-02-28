@@ -9,6 +9,7 @@ import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
 import 'package:weather_fit/data/repositories/location_repository.dart';
 import 'package:weather_fit/data/repositories/outfit_repository.dart';
 import 'package:weather_fit/entities/models/outfit/outfit_image.dart';
+import 'package:weather_fit/entities/models/search/saved_plan.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/search/ui/widgets/header.dart';
 import 'package:weather_fit/search/ui/widgets/planner_form.dart';
@@ -72,11 +73,7 @@ class _FutureOutfitPlannerSheetState extends State<FutureOutfitPlannerSheet> {
                 errorMessage: _errorMessage,
                 onSelectDate: () => _selectDate(context),
                 onGenerate: _onGeneratePreview,
-                onDateSelected: (DateTime date) {
-                  setState(() {
-                    _selectedDate = date;
-                  });
-                },
+                onDateSelected: _onDateChanged,
                 onPlanSelected: _onPlanSelected,
               )
             else
@@ -105,14 +102,27 @@ class _FutureOutfitPlannerSheetState extends State<FutureOutfitPlannerSheet> {
     super.dispose();
   }
 
-  String _mapExceptionToMessage(Object e, {required String defaultMessage}) {
+  void _onDateChanged(DateTime date) {
+    setState(() {
+      _selectedDate = date;
+    });
+  }
+
+  bool _isNetworkError(Object e) {
     final String errorString = e.toString();
-    if (e is SocketException ||
+    return e is SocketException ||
         errorString.contains('SocketException') ||
         errorString.contains('Failed host lookup') ||
         errorString.contains('HandshakeException') ||
         errorString.contains('Connection refused') ||
-        errorString.contains('Connection closed')) {
+        errorString.contains('Connection closed');
+  }
+
+  String _mapExceptionToMessage({
+    required Object e,
+    required String defaultMessage,
+  }) {
+    if (_isNetworkError(e)) {
       return translate('error.network_error');
     }
     return defaultMessage;
@@ -183,44 +193,50 @@ class _FutureOutfitPlannerSheetState extends State<FutureOutfitPlannerSheet> {
     );
   }
 
-  Future<void> _fetchProjectionAndOutfit(
-    Location location,
-    DateTime date,
-  ) async {
+  Future<void> _displayWeather(WeatherDomain weatherDomain) async {
+    final Weather weather = Weather.fromDomain(weatherDomain);
+    final OutfitRepository outfitRepository = context.read<OutfitRepository>();
+
+    final String recommendation = outfitRepository.getOutfitRecommendation(
+      weather,
+    );
+    final OutfitImage outfitImage = await outfitRepository.getOutfitImage(
+      weather,
+    );
+
+    if (mounted) {
+      setState(() {
+        _resultOutfitImage = outfitImage;
+        _resultRecommendation = recommendation;
+        _resultWeather = weatherDomain;
+        _isLoading = false;
+        _errorMessage = null;
+      });
+    }
+  }
+
+  Future<void> _fetchProjectionAndOutfit({
+    required Location location,
+    required DateTime date,
+    WeatherDomain? savedWeather,
+  }) async {
     try {
       final WeatherRepository weatherRepository = context
           .read<WeatherRepository>();
-      final OutfitRepository outfitRepository = context
-          .read<OutfitRepository>();
 
       // Fetch Climate Projection for the resolved location.
       final WeatherDomain weatherDomain = await weatherRepository
           .getClimateProjection(location: location, date: date);
 
-      final Weather weather = Weather.fromDomain(weatherDomain);
-
-      // Get Outfit Recommendation and image.
-      final String recommendation = outfitRepository.getOutfitRecommendation(
-        weather,
-      );
-      final OutfitImage outfitImage = await outfitRepository.getOutfitImage(
-        weather,
-      );
-
-      if (mounted) {
-        setState(() {
-          _resultOutfitImage = outfitImage;
-          _resultRecommendation = recommendation;
-          _resultWeather = weatherDomain;
-          _isLoading = false;
-        });
-      }
+      await _displayWeather(weatherDomain);
     } catch (e) {
-      if (mounted) {
+      if (savedWeather != null && _isNetworkError(e)) {
+        await _displayWeather(savedWeather);
+      } else if (mounted) {
         setState(() {
           _isLoading = false;
           _errorMessage = _mapExceptionToMessage(
-            e,
+            e: e,
             defaultMessage: translate('search.projection_fetch_failed'),
           );
         });
@@ -228,7 +244,10 @@ class _FutureOutfitPlannerSheetState extends State<FutureOutfitPlannerSheet> {
     }
   }
 
-  Future<void> _onGeneratePreview({bool skipConfirmation = false}) async {
+  Future<void> _onGeneratePreview({
+    bool skipConfirmation = false,
+    WeatherDomain? savedWeather,
+  }) async {
     if (_isLoading) return;
 
     final String query = _locationController.text.trim();
@@ -252,13 +271,17 @@ class _FutureOutfitPlannerSheetState extends State<FutureOutfitPlannerSheet> {
 
       if (mounted) {
         if (skipConfirmation) {
-          await _fetchProjectionAndOutfit(location, date);
+          await _fetchProjectionAndOutfit(
+            location: location,
+            date: date,
+            savedWeather: savedWeather,
+          );
         } else {
           final bool? confirmed = await _showLocationConfirmationDialog(
             location,
           );
           if (confirmed == true) {
-            await _fetchProjectionAndOutfit(location, date);
+            await _fetchProjectionAndOutfit(location: location, date: date);
           } else {
             setState(() {
               _isLoading = false;
@@ -266,8 +289,16 @@ class _FutureOutfitPlannerSheetState extends State<FutureOutfitPlannerSheet> {
           }
         }
       }
-    } catch (e) {
-      if (mounted) {
+    } catch (e, stackTrace) {
+      debugPrint(
+        'FutureOutfitPlannerSheet: Error resolving location for query '
+        '"$query": $e',
+      );
+      debugPrint('Stack trace: $stackTrace');
+
+      if (savedWeather != null && _isNetworkError(e)) {
+        await _displayWeather(savedWeather);
+      } else if (mounted) {
         setState(() {
           _isLoading = false;
         });
@@ -277,7 +308,7 @@ class _FutureOutfitPlannerSheetState extends State<FutureOutfitPlannerSheet> {
         } else {
           setState(() {
             _errorMessage = _mapExceptionToMessage(
-              e,
+              e: e,
               defaultMessage: translate(
                 'search.location_not_found_clarification',
               ),
@@ -288,13 +319,16 @@ class _FutureOutfitPlannerSheetState extends State<FutureOutfitPlannerSheet> {
     }
   }
 
-  Future<void> _onPlanSelected(String cityName, DateTime date) async {
+  Future<void> _onPlanSelected(SavedPlan plan) async {
     if (_isLoading) return;
     setState(() {
-      _locationController.text = cityName;
-      _selectedDate = date;
+      _locationController.text = plan.cityName;
+      _selectedDate = plan.date;
     });
-    await _onGeneratePreview(skipConfirmation: true);
+    await _onGeneratePreview(
+      skipConfirmation: true,
+      savedWeather: plan.weather,
+    );
   }
 
   Future<void> _cleanupPastPlans() async {
