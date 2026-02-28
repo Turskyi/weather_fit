@@ -207,7 +207,7 @@ class _PlannerResultState extends State<PlannerResult> {
           OutfitWidget(
             outfitImage: _outfitImage!,
             outfitRecommendation: _recommendation!,
-            onRefresh: () async => _updateOutfit(),
+            onRefresh: _updateOutfit,
           ),
         const SizedBox(height: 24),
         TextButton.icon(
