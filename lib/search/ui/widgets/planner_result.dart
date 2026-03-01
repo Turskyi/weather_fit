@@ -132,7 +132,10 @@ class _PlannerResultState extends State<PlannerResult> {
               segments: <ButtonSegment<TempOption>>[
                 ButtonSegment<TempOption>(
                   value: TempOption.coolest,
-                  label: Text(translate('search.temperature_coolest')),
+                  label: Text(
+                    translate('search.temperature_coolest'),
+                    style: textTheme.labelMedium,
+                  ),
                 ),
                 ButtonSegment<TempOption>(
                   value: TempOption.typical,
@@ -140,7 +143,10 @@ class _PlannerResultState extends State<PlannerResult> {
                 ),
                 ButtonSegment<TempOption>(
                   value: TempOption.warmest,
-                  label: Text(translate('search.temperature_warmest')),
+                  label: Text(
+                    translate('search.temperature_warmest'),
+                    style: textTheme.labelMedium,
+                  ),
                 ),
               ],
               selected: <TempOption>{_selectedOption},
