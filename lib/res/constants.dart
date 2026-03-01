@@ -2,6 +2,7 @@ const String appleAppGroupId = 'group.dmytrowidget';
 const String iOSWidgetName = 'WeatherWidgets';
 const String androidWidgetName = 'WeatherWidget';
 const String developerDomain = 'turskyi.com';
+const String developerUrl = 'https://$developerDomain';
 const String domain = 'weather-fit.com';
 const String supportEmail = 'support@$domain';
 const String imagePath = 'assets/images/';
@@ -19,7 +20,7 @@ const String countryFlagsBaseUrl =
     'https://open-meteo.com/images/country-flags/';
 const String artistInstagramUrl = 'https://www.instagram.com/anartistart/';
 const String telegramUrl = 'https://t.me/+J3nrwxVrxVE2MDdi';
-const String developerSupportUrl = 'https://$developerDomain/#/support';
+const String developerSupportUrl = '$developerUrl/#/support';
 const String mailToScheme = 'mailto';
 const String subjectParameter = 'subject';
 const String bodyParameter = 'body';

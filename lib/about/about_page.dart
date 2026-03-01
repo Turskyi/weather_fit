@@ -110,6 +110,29 @@ class AboutPage extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             Text(
+              '💻 ${translate('developer')}',
+              style: textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            SelectableText.rich(
+              TextSpan(
+                style: textTheme.bodyMedium,
+                children: <InlineSpan>[
+                  TextSpan(
+                    text: translate('developer_name'),
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.primary,
+                      decoration: TextDecoration.underline,
+                    ),
+                    recognizer: TapGestureRecognizer()..onTap = _onDeveloperTap,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
               '🔒 ${translate('about.privacy_title')}',
               style: textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
@@ -156,8 +179,9 @@ class AboutPage extends StatelessWidget {
             TextButton.icon(
               icon: const Icon(Icons.email_outlined),
               label: Text(translate('developer_contact_form')),
-              onPressed: () =>
-                  launchUrl(Uri.parse(constants.developerSupportUrl)),
+              onPressed: () {
+                launchUrl(Uri.parse(constants.developerSupportUrl));
+              },
             ),
             const SizedBox(height: 32),
           ],
@@ -177,6 +201,13 @@ class AboutPage extends StatelessWidget {
               ),
             ]
           : null,
+    );
+  }
+
+  void _onDeveloperTap() {
+    launchUrl(
+      Uri.parse(constants.developerUrl),
+      mode: LaunchMode.externalApplication,
     );
   }
 }
