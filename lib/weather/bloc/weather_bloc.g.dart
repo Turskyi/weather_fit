@@ -13,6 +13,12 @@ WeatherInitial _$WeatherInitialFromJson(Map<String, dynamic> json) =>
       ($checkedConvert) {
         final val = WeatherInitial(
           locale: $checkedConvert('locale', (v) => v as String),
+          dailyForecast: $checkedConvert(
+            'daily_forecast',
+            (v) => v == null
+                ? null
+                : DailyForecastDomain.fromJson(v as Map<String, dynamic>),
+          ),
           outfitRecommendation: $checkedConvert(
             'outfit_recommendation',
             (v) => v as String? ?? '',
@@ -28,19 +34,13 @@ WeatherInitial _$WeatherInitialFromJson(Map<String, dynamic> json) =>
                 ? const OutfitImage.empty()
                 : OutfitImage.fromJson(v as Map<String, dynamic>),
           ),
-          dailyForecast: $checkedConvert(
-            'daily_forecast',
-            (v) => v == null
-                ? null
-                : DailyForecastDomain.fromJson(v as Map<String, dynamic>),
-          ),
         );
         return val;
       },
       fieldKeyMap: const {
+        'dailyForecast': 'daily_forecast',
         'outfitRecommendation': 'outfit_recommendation',
         'outfitImage': 'outfit_image',
-        'dailyForecast': 'daily_forecast',
       },
     );
 

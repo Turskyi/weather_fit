@@ -22,11 +22,11 @@ class AboutPage extends StatelessWidget {
   String get _locationSupportKey {
     if (kIsWeb) {
       return 'about.feature_location_support_web';
-    }
-    if (Platform.isMacOS) {
+    } else if (Platform.isMacOS) {
       return 'about.feature_location_support_macos';
+    } else {
+      return 'about.feature_location_support_default';
     }
-    return 'about.feature_location_support_default';
   }
 
   @override

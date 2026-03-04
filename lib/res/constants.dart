@@ -1,4 +1,4 @@
-const String appleAppGroupId = 'group.dmytrowidget';
+const String kAppleAppGroupId = 'group.dmytrowidget';
 const String iOSWidgetName = 'WeatherWidgets';
 const String androidWidgetName = 'WeatherWidget';
 const String developerDomain = 'turskyi.com';

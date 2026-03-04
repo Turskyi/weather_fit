@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:home_widget/home_widget.dart';
 import 'package:http/http.dart' as http;
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -26,12 +25,23 @@ part 'weather_event.dart';
 part 'weather_state.dart';
 
 class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
-  WeatherBloc(
-    this._weatherRepository,
-    this._outfitRepository,
-    this._localDataSource,
-    this._homeWidgetService,
-  ) : super(WeatherInitial(locale: _localDataSource.getLanguageIsoCode())) {
+  WeatherBloc({
+    required WeatherRepository weatherRepository,
+    required OutfitRepository outfitRepository,
+    required LocalDataSource localDataSource,
+    required HomeWidgetService homeWidgetService,
+  }) : _weatherRepository = weatherRepository,
+       _outfitRepository = outfitRepository,
+       _localDataSource = localDataSource,
+       _homeWidgetService = homeWidgetService,
+       super(
+         WeatherInitial(
+           locale: localDataSource.getLanguageIsoCode(),
+           dailyForecast: const DailyForecastDomain(
+             forecast: <ForecastItemDomain>[],
+           ),
+         ),
+       ) {
     on<FetchWeather>(_onFetchWeather);
     on<RefreshWeather>(_onRefreshWeather);
     on<ToggleUnits>(_onToggleUnits);
@@ -479,7 +489,8 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
         // Ensure native widget receives current locale for localization.
         try {
           final String languageCode = _localDataSource.getLanguageIsoCode();
-          await HomeWidget.saveWidgetData<String>(
+          // Use the service instead of calling HomeWidget directly.
+          await _homeWidgetService.saveWidgetData<String>(
             'selected_language',
             languageCode,
           );

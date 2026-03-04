@@ -26,6 +26,7 @@ import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 import 'package:weather_fit/weather/ui/page/weather_page.dart';
 import 'package:weather_fit/weather/weather.dart';
 import 'package:weather_repository/weather_repository.dart' as repository;
+import 'package:weather_repository/weather_repository.dart';
 
 import 'constants/dummy_constants.dart' as dummy_constants;
 import 'helpers/flutter_translate_test_utils.dart';
@@ -90,10 +91,10 @@ void main() {
                     preferences,
                   );
                   return WeatherBloc(
-                    weatherRepository,
-                    outfitRepository,
-                    localDataSource,
-                    mockHomeWidgetService,
+                    weatherRepository: weatherRepository,
+                    outfitRepository: outfitRepository,
+                    localDataSource: localDataSource,
+                    homeWidgetService: mockHomeWidgetService,
                   );
                 },
               ),
@@ -155,14 +156,33 @@ void main() {
       whenListen(
         weatherBloc,
         Stream<WeatherState>.fromIterable(<WeatherState>[
-          WeatherInitial(locale: 'en', weather: weatherWithNoFlag),
+          WeatherInitial(
+            locale: 'en',
+            weather: weatherWithNoFlag,
+            dailyForecast: const DailyForecastDomain(
+              forecast: <ForecastItemDomain>[
+                ForecastItemDomain(
+                  time: dummy_constants.dummyForecastTime,
+                  temperature: dummy_constants.dummyWeatherTemperature,
+                  weatherCode: dummy_constants.dummyWeatherCode,
+                ),
+              ],
+            ),
+          ),
+          WeatherLoadingState(locale: 'en', weather: weatherWithNoFlag),
           WeatherFailure(
             message: errorMessage,
             locale: 'en',
             weather: weatherWithNoFlag,
           ),
         ]),
-        initialState: WeatherInitial(locale: 'en', weather: weatherWithNoFlag),
+        initialState: WeatherInitial(
+          locale: 'en',
+          weather: weatherWithNoFlag,
+          dailyForecast: const DailyForecastDomain(
+            forecast: <ForecastItemDomain>[],
+          ),
+        ),
       );
 
       when(() => weatherBloc.add(any())).thenReturn(null);

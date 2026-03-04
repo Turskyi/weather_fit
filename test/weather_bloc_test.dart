@@ -53,10 +53,10 @@ void main() {
     final SharedPreferences preferences = await SharedPreferences.getInstance();
     final LocalDataSource localDataSource = LocalDataSource(preferences);
     weatherBloc = WeatherBloc(
-      mockWeatherRepository,
-      mockOutfitRepository,
-      localDataSource,
-      mockHomeWidgetService,
+      weatherRepository: mockWeatherRepository,
+      outfitRepository: mockOutfitRepository,
+      localDataSource: localDataSource,
+      homeWidgetService: mockHomeWidgetService,
     );
   });
 
@@ -103,10 +103,10 @@ void main() {
           await SharedPreferences.getInstance();
       final LocalDataSource localDataSource = LocalDataSource(preferences);
       weatherBloc = WeatherBloc(
-        mockWeatherRepository,
-        mockOutfitRepository,
-        localDataSource,
-        mockHomeWidgetService,
+        weatherRepository: mockWeatherRepository,
+        outfitRepository: mockOutfitRepository,
+        localDataSource: localDataSource,
+        homeWidgetService: mockHomeWidgetService,
       );
     });
 
@@ -116,12 +116,20 @@ void main() {
       final LocalDataSource localDataSource = LocalDataSource(preferences);
       final String locale = localDataSource.getLanguageIsoCode();
       final WeatherBloc weatherBloc = WeatherBloc(
-        mockWeatherRepository,
-        mockOutfitRepository,
-        localDataSource,
-        mockHomeWidgetService,
+        weatherRepository: mockWeatherRepository,
+        outfitRepository: mockOutfitRepository,
+        localDataSource: localDataSource,
+        homeWidgetService: mockHomeWidgetService,
       );
-      expect(weatherBloc.state, WeatherInitial(locale: locale));
+      expect(
+        weatherBloc.state,
+        WeatherInitial(
+          locale: locale,
+          dailyForecast: const DailyForecastDomain(
+            forecast: <ForecastItemDomain>[],
+          ),
+        ),
+      );
     });
 
     group('toJson/fromJson', () {
@@ -131,12 +139,20 @@ void main() {
         final LocalDataSource localDataSource = LocalDataSource(preferences);
         final String locale = localDataSource.getLanguageIsoCode();
         final WeatherBloc weatherBloc = WeatherBloc(
-          mockWeatherRepository,
-          mockOutfitRepository,
-          localDataSource,
-          mockHomeWidgetService,
+          weatherRepository: mockWeatherRepository,
+          outfitRepository: mockOutfitRepository,
+          localDataSource: localDataSource,
+          homeWidgetService: mockHomeWidgetService,
         );
-        expect(WeatherInitial(locale: locale), weatherBloc.state);
+        expect(
+          WeatherInitial(
+            locale: locale,
+            dailyForecast: const DailyForecastDomain(
+              forecast: <ForecastItemDomain>[],
+            ),
+          ),
+          weatherBloc.state,
+        );
       });
     });
 

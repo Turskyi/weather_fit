@@ -21,6 +21,7 @@ import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/localization/localization_delegate_getter.dart'
     as locale;
 import 'package:weather_fit/services/home_widget_service.dart';
+import 'package:weather_fit/services/home_widget_service_impl.dart';
 import 'package:weather_fit/use_cases/initialize_app_language_use_case.dart';
 import 'package:weather_fit/weather_bloc_observer.dart';
 import 'package:weather_repository/weather_repository.dart';

@@ -70,10 +70,10 @@ sealed class WeatherState extends Equatable {
 final class WeatherInitial extends WeatherState {
   const WeatherInitial({
     required super.locale,
+    required super.dailyForecast,
     super.outfitRecommendation,
     super.weather,
     super.outfitImage,
-    super.dailyForecast,
   });
 
   factory WeatherInitial.fromJson(Map<String, Object?> json) {

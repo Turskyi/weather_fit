@@ -1,11 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:path_provider/path_provider.dart' as path;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/entities/enums/temperature_units.dart';
@@ -153,14 +154,13 @@ class LocalDataSource {
   }
 
   Future<String> downloadAndSaveImage(String assetPath) async {
-    // Check if the platform is web OR macOS.
-    // See issue: https://github.com/ABausG/home_widget/issues/137.
-    if (!kIsWeb && !Platform.isMacOS) {
+    // Check if the platform is web.
+    if (!kIsWeb) {
       try {
         // Load asset data as ByteData.
         final ByteData byteData = await rootBundle.load(assetPath);
 
-        // Get the application documents directory.
+        // Get the application documents directory (or shared container).
         final Directory directory = await getAppDirectory();
         final String filePath = '${directory.path}/outfit_image.png';
         // Write the bytes to the file.
@@ -295,20 +295,25 @@ class LocalDataSource {
 
   Future<Directory> getAppDirectory() async {
     if (kIsWeb) {
-      return Directory('');
-    } else if (Platform.isIOS) {
+      throw UnsupportedError('Directory access is not supported on Web.');
+    } else if (Platform.isIOS || Platform.isMacOS) {
       try {
         final String? sharedPath = await _channel.invokeMethod<String>(
           'getSharedContainerPath',
         );
-        if (sharedPath != null) {
+
+        if (sharedPath != null && sharedPath.isNotEmpty) {
           return Directory(sharedPath);
+        } else {
+          debugPrint(
+            'Using app documents directory instead of shared container.',
+          );
         }
       } catch (e) {
         debugPrint('Error getting shared container path: $e');
       }
     }
-    return getApplicationDocumentsDirectory();
+    return path.getApplicationDocumentsDirectory();
   }
 
   Future<bool> fileExists(String filePath) async {
