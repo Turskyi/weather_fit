@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
+import 'package:weather_fit/entities/models/search/saved_plan.dart';
 import 'package:weather_fit/search/ui/widgets/plan_suggestions.dart';
 
 class PlannerForm extends StatefulWidget {
@@ -25,7 +26,7 @@ class PlannerForm extends StatefulWidget {
   final VoidCallback onSelectDate;
   final VoidCallback onGenerate;
   final ValueChanged<DateTime> onDateSelected;
-  final void Function(String cityName, DateTime date) onPlanSelected;
+  final ValueChanged<SavedPlan> onPlanSelected;
 
   @override
   State<PlannerForm> createState() => _PlannerFormState();
@@ -39,32 +40,6 @@ class _PlannerFormState extends State<PlannerForm> {
   void initState() {
     super.initState();
     _focusNode.addListener(_onFocusChange);
-  }
-
-  @override
-  void dispose() {
-    _focusNode.removeListener(_onFocusChange);
-    _focusNode.dispose();
-    super.dispose();
-  }
-
-  void _onFocusChange() {
-    if (_focusNode.hasFocus) {
-      setState(() {
-        _isFocused = true;
-      });
-    } else {
-      // Small delay to allow tap events on suggestions to fire before hiding
-      // them. This is especially important on desktop platforms where mouse
-      // clicks might otherwise be interrupted by an immediate rebuild.
-      Future<void>.delayed(const Duration(milliseconds: 150)).then((_) {
-        if (mounted) {
-          setState(() {
-            _isFocused = _focusNode.hasFocus;
-          });
-        }
-      });
-    }
   }
 
   @override
@@ -104,6 +79,7 @@ class _PlannerFormState extends State<PlannerForm> {
                     vertical: 12,
                   ),
                   errorText: widget.errorMessage,
+                  errorMaxLines: 2,
                 ),
               ),
               ValueListenableBuilder<TextEditingValue>(
@@ -113,8 +89,8 @@ class _PlannerFormState extends State<PlannerForm> {
                   if (_isFocused && !hasInput) {
                     return PlanSuggestions(
                       localDataSource: widget.localDataSource,
-                      onPlanSelected: (String cityName, DateTime date) {
-                        widget.onPlanSelected(cityName, date);
+                      onPlanSelected: (SavedPlan plan) {
+                        widget.onPlanSelected(plan);
                         _focusNode.unfocus();
                       },
                     );
@@ -172,5 +148,31 @@ class _PlannerFormState extends State<PlannerForm> {
         ),
       ],
     );
+  }
+
+  @override
+  void dispose() {
+    _focusNode.removeListener(_onFocusChange);
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  void _onFocusChange() {
+    if (_focusNode.hasFocus) {
+      setState(() {
+        _isFocused = true;
+      });
+    } else {
+      // Small delay to allow tap events on suggestions to fire before hiding
+      // them. This is especially important on desktop platforms where mouse
+      // clicks might otherwise be interrupted by an immediate rebuild.
+      Future<void>.delayed(const Duration(milliseconds: 150)).then((_) {
+        if (mounted) {
+          setState(() {
+            _isFocused = _focusNode.hasFocus;
+          });
+        }
+      });
+    }
   }
 }

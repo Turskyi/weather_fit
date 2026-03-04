@@ -58,6 +58,11 @@ final class SearchError extends SearchState {
   bool get isPermissionDeniedError {
     return errorType.isPermissionDeniedPermanentlyError;
   }
+
+  /// Returns `true` if the error is due to location services being disabled.
+  bool get isLocationServiceDisabledError {
+    return errorType.isLocationServiceDisabled;
+  }
 }
 
 final class SearchWeatherLoaded extends SearchState {

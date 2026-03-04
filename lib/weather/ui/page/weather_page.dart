@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/extensions/build_context_extensions.dart';
 import 'package:weather_fit/res/theme/cubit/theme_cubit.dart';
@@ -99,9 +100,16 @@ class _WeatherPageState extends State<WeatherPage> {
       context.read<ThemeCubit>().updateTheme(state.weather);
       final String stateMessage = state.message;
       if (stateMessage.isNotEmpty) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(stateMessage)));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            duration: const Duration(seconds: 2),
+            content: SelectableText(stateMessage),
+            action: SnackBarAction(
+              label: translate('ok'),
+              onPressed: ScaffoldMessenger.of(context).hideCurrentSnackBar,
+            ),
+          ),
+        );
       }
     }
   }

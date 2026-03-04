@@ -6,6 +6,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:location/location.dart' as geo;
 import 'package:nominatim_api/nominatim_api.dart';
 import 'package:open_meteo_api/open_meteo_api.dart';
 import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
@@ -19,45 +20,121 @@ part 'search_event.dart';
 part 'search_state.dart';
 
 class SearchBloc extends Bloc<SearchEvent, SearchState> {
-  SearchBloc(
-    this._weatherRepository,
-    this._locationRepository,
-    this._localDataSource,
-  ) : super(
-        SearchInitial(
-          quickCitiesSuggestions: <QuickCitySuggestion>[
-            QuickCitySuggestion(
-              name: translate(
-                _localDataSource.getSavedLanguage().isUkrainian
-                    ? 'search.quick_city_north_york'
-                    : 'search.quick_city_toronto',
-              ),
-              flag: '🇨🇦',
-            ),
-            QuickCitySuggestion(
-              name: translate('search.quick_city_zielona_gora'),
-              flag: '🇵🇱',
-            ),
-            QuickCitySuggestion(
-              name: translate('search.quick_city_zaporizhzhia'),
-              flag: '🇺🇦',
-            ),
-            QuickCitySuggestion(
-              name: translate('search.quick_city_waldshut_tiengen'),
-              flag: '🇩🇪',
-            ),
-          ],
-        ),
-      ) {
+  SearchBloc({
+    required WeatherRepository weatherRepository,
+    required LocationRepository locationRepository,
+    required LocalDataSource localDataSource,
+  }) : _weatherRepository = weatherRepository,
+       _locationRepository = locationRepository,
+       _localDataSource = localDataSource,
+       super(
+         SearchInitial(
+           quickCitiesSuggestions: <QuickCitySuggestion>[
+             QuickCitySuggestion(
+               name: translate('search.quick_city_toronto'),
+               flag: '🇨🇦',
+             ),
+             QuickCitySuggestion(
+               name: translate('search.quick_city_north_york'),
+               flag: '🇨🇦',
+             ),
+             QuickCitySuggestion(
+               name: translate('search.quick_city_zielona_gora'),
+               flag: '🇵🇱',
+             ),
+             QuickCitySuggestion(
+               name: translate('search.quick_city_zaporizhzhia'),
+               flag: '🇺🇦',
+             ),
+             QuickCitySuggestion(
+               name: translate('search.quick_city_waldshut_tiengen'),
+               flag: '🇩🇪',
+             ),
+           ],
+         ),
+       ) {
     on<SearchLocation>(_searchLocation);
     on<ConfirmLocation>(_confirmLocation);
     on<SearchByLocation>(_searchByLocation);
     on<RequestPermissionAndSearchByLocation>(_onRequestLocationPermission);
+    on<RetrySearchByCurrentLocation>(_onRetrySearchByCurrentLocation);
   }
 
   final WeatherRepository _weatherRepository;
   final LocationRepository _locationRepository;
   final LocalDataSource _localDataSource;
+
+  List<QuickCitySuggestion> get _quickCitiesSuggestions =>
+      state.quickCitiesSuggestions;
+
+  Future<void> _onRetrySearchByCurrentLocation(
+    RetrySearchByCurrentLocation event,
+    Emitter<SearchState> emit,
+  ) async {
+    emit(SearchLoading(quickCitiesSuggestions: _quickCitiesSuggestions));
+
+    try {
+      await _requestLocationPermission();
+
+      final Position position = await _getCurrentPosition();
+      final String languageIsoCode = _localDataSource.getLanguageIsoCode();
+
+      final WeatherDomain domainWeather = await _weatherRepository
+          .getWeatherByLocation(
+            Location(
+              latitude: position.latitude,
+              longitude: position.longitude,
+              locale: languageIsoCode,
+            ),
+          );
+      final Weather weather = Weather.fromRepository(domainWeather);
+      emit(
+        SearchWeatherLoaded(
+          weather: weather,
+          quickCitiesSuggestions: _quickCitiesSuggestions,
+        ),
+      );
+    } catch (e, stackTrace) {
+      final String debugErrorMessage =
+          '[_onRetrySearchByCurrentLocation] Error getting weather: $e';
+      debugPrint('error: $debugErrorMessage\n$stackTrace');
+
+      String userFriendlyErrorMessage = translate(
+        'error.getting_weather_retry_request_permission',
+      );
+      SearchErrorType searchErrorType = SearchErrorType.unknown;
+
+      if (e is LocationServiceDisabledException) {
+        userFriendlyErrorMessage = translate('error.location_unavailable');
+        searchErrorType = SearchErrorType.locationServiceDisabled;
+      } else if (e.toString().contains(
+        translate(
+          'error.location_permission_permanently_denied_cannot_request',
+        ),
+      )) {
+        userFriendlyErrorMessage = translate(
+          'error.location_permission_permanently_denied_cannot_request',
+        );
+        searchErrorType = SearchErrorType.permissionDeniedPermanently;
+      } else if (e.toString().contains(
+        translate('error.location_permission_denied'),
+      )) {
+        userFriendlyErrorMessage = translate(
+          'error.location_permission_denied',
+        );
+        searchErrorType = SearchErrorType.permissionDenied;
+      }
+
+      emit(
+        SearchError(
+          errorMessage: userFriendlyErrorMessage,
+          errorType: searchErrorType,
+          query: event.query,
+          quickCitiesSuggestions: _quickCitiesSuggestions,
+        ),
+      );
+    }
+  }
 
   FutureOr<void> _searchByLocation(
     SearchByLocation event,
@@ -87,7 +164,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
 
       // 2. Determine the user-facing error message.
       final String userFriendlyErrorMessage = translate(
-        'error.getting_weather_generic',
+        'error.getting_weather_search_by_location',
       );
 
       emit(
@@ -123,7 +200,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
 
       // 2. Determine the user-facing error message.
       final String userFriendlyErrorMessage = translate(
-        'error.getting_weather_generic',
+        'error.getting_weather_confirm_location',
       );
 
       emit(
@@ -148,7 +225,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
 
       // When we reach here, permissions are granted and we can
       // continue accessing the position of the device.
-      final Position position = await Geolocator.getCurrentPosition();
+      final Position position = await _getCurrentPosition();
       final String languageIsoCode = _localDataSource.getLanguageIsoCode();
 
       final WeatherDomain domainWeather = await _weatherRepository
@@ -174,17 +251,14 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
 
       // 2. Determine the user-facing error message.
       String userFriendlyErrorMessage = translate(
-        'error.getting_weather_generic',
+        'error.getting_weather_request_permission',
       );
       SearchErrorType searchErrorType = SearchErrorType.unknown;
 
       if (e is LocationServiceDisabledException) {
-        // TODO: implement displaying a full screen dialog where we would
-        //  explain, that if we get here and location permission is enabled
-        //  means app cannot find the location and we are very sorry. Suggest
-        //  to "type" another city, or country or report the error to developer
-        //  or uninstall the app.
-        userFriendlyErrorMessage = translate('error.location_unavailable');
+        userFriendlyErrorMessage = translate(
+          'error.location_services_disabled_content',
+        );
         searchErrorType = SearchErrorType.locationServiceDisabled;
       } else if (e.toString().contains(
         translate(
@@ -270,14 +344,16 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
               quickCitiesSuggestions: _quickCitiesSuggestions,
             ),
           );
-        } else if (e is LocationNotFoundFailure) {
+        } else if (e is LocationNotFoundFailure ||
+            detailedMessage.contains('LocationNotFoundFailure')) {
           emit(
             SearchLocationNotFound(
               query: eventQuery,
               quickCitiesSuggestions: _quickCitiesSuggestions,
             ),
           );
-        } else if (e is NominatimLocationRequestFailure) {
+        } else if (e is NominatimLocationRequestFailure ||
+            detailedMessage.contains('NominatimLocationRequestFailure')) {
           emit(
             SearchLocationNotFound(
               query: eventQuery,
@@ -309,24 +385,23 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
   Future<void> _requestLocationPermission() async {
     try {
       // Test if location services are enabled.
-      final bool isServiceEnabled = await Geolocator.isLocationServiceEnabled();
+      bool isServiceEnabled = await Geolocator.isLocationServiceEnabled();
 
       if (!isServiceEnabled) {
-        // TODO: implement another dialog to inform user that we will open
-        //  system location settings with a call
-        //  `await Geolocator.openLocationSettings();`
-
-        // Location services are not enabled don't continue
-        // accessing the position and request users of the
-        // App to enable the location services.
-        return Future<void>.error('Location services are disabled.');
+        final geo.Location location = geo.Location();
+        isServiceEnabled = await location.requestService();
+        if (!isServiceEnabled) {
+          throw const LocationServiceDisabledException();
+        }
       }
-    } catch (e) {
-      if (e.toString().contains('LOCATION_SERVICES_DISABLED')) {
-        // TODO: implement another dialog to inform user that we will open
-        //  system location settings with a call
-        //  `await Geolocator.openLocationSettings();`
-        return Future<void>.error('Location services are disabled.');
+    } catch (e, stackTrace) {
+      final String debugErrorMessage =
+          '[_requestLocationPermission] '
+          'Location service check or request failed: $e';
+      debugPrint('$debugErrorMessage\n$stackTrace');
+      if (e is LocationServiceDisabledException ||
+          e.toString().contains('LOCATION_SERVICES_DISABLED')) {
+        throw const LocationServiceDisabledException();
       }
     }
     LocationPermission permission = await Geolocator.checkPermission();
@@ -337,9 +412,9 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       if (permission == LocationPermission.denied) {
         // Permissions are denied, next time you could try
         // requesting permissions again (this is also where
-        // Android's shouldShowRequestPermissionRationale
+        // Android's `shouldShowRequestPermissionRationale`
         // returned true. According to Android guidelines
-        // your App should show an explanatory UI now).
+        // the App should show an explanatory UI now).
         return Future<void>.error(
           translate('error.location_permission_denied'),
         );
@@ -354,32 +429,65 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         ),
       );
     }
+
     // We expect here `LocationPermission.whileInUse`.
     debugPrint('Location permission granted with value: $permission.');
   }
 
-  List<QuickCitySuggestion> get _quickCitiesSuggestions {
-    return <QuickCitySuggestion>[
-      QuickCitySuggestion(
-        name: translate(
-          _localDataSource.getSavedLanguage().isUkrainian
-              ? 'search.quick_city_north_york'
-              : 'search.quick_city_toronto',
+  /// Helper method to get the current position with a fallback to the last
+  /// known position.
+  /// On some platforms (like macOS or Android), requesting a fresh position
+  /// immediately after permission is granted can sometimes fail or timeout.
+  Future<Position> _getCurrentPosition() async {
+    try {
+      // Try to get a fresh position with a 10-second timeout.
+      return await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.low,
+          timeLimit: Duration(seconds: 10),
         ),
-        flag: '🇨🇦',
-      ),
-      QuickCitySuggestion(
-        name: translate('search.quick_city_zielona_gora'),
-        flag: '🇵🇱',
-      ),
-      QuickCitySuggestion(
-        name: translate('search.quick_city_zaporizhzhia'),
-        flag: '🇺🇦',
-      ),
-      QuickCitySuggestion(
-        name: translate('search.quick_city_waldshut_tiengen'),
-        flag: '🇩🇪',
-      ),
-    ];
+      );
+    } catch (e) {
+      debugPrint(
+        'Geolocator.getCurrentPosition failed: $e. '
+        'Attempting to get last known position.',
+      );
+      // Fallback to the last known position if getting a fresh one fails.
+      final Position? lastKnownPosition =
+          await Geolocator.getLastKnownPosition();
+      if (lastKnownPosition != null) {
+        return lastKnownPosition;
+      } else {
+        debugPrint(
+          'Geolocator.getLastKnownPosition() also returned null. '
+          'Error: $e',
+        );
+        final geo.Location location = geo.Location();
+        try {
+          final geo.LocationData locationData = await location.getLocation();
+          final double? latitude = locationData.latitude;
+          final double? longitude = locationData.longitude;
+          if (latitude == null || longitude == null) {
+            rethrow;
+          } else {
+            return Position(
+              latitude: latitude,
+              longitude: longitude,
+              timestamp: DateTime.now(),
+              accuracy: locationData.accuracy ?? 0.0,
+              altitude: locationData.altitude ?? 0.0,
+              heading: locationData.heading ?? 0.0,
+              speed: locationData.speed ?? 0.0,
+              speedAccuracy: locationData.speedAccuracy ?? 0.0,
+              altitudeAccuracy: locationData.verticalAccuracy ?? 0.0,
+              headingAccuracy: locationData.headingAccuracy ?? 0.0,
+            );
+          }
+        } catch (e) {
+          debugPrint('Error: $e');
+          rethrow;
+        }
+      }
+    }
   }
 }

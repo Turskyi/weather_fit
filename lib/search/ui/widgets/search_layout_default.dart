@@ -116,12 +116,7 @@ class _SearchLayoutDefaultState extends State<SearchLayoutDefault> {
                                     widget.textEditingController,
                                 focusNode: _searchFieldFocus,
                                 isFocused: _isSearchFieldFocused,
-                                onSubmitted: (String value) {
-                                  _onSearchSubmitted(
-                                    context: context,
-                                    value: value,
-                                  );
-                                },
+                                onSubmitted: _onSearchSubmitted,
                               ),
                             ),
                           ),
@@ -148,18 +143,16 @@ class _SearchLayoutDefaultState extends State<SearchLayoutDefault> {
                                     TextEditingValue value,
                                     Widget? textSubmit,
                                   ) {
+                                    final String query = value.text;
                                     return ElevatedButton(
                                       key: const Key(
                                         'searchPage_search_iconButton',
                                       ),
                                       onPressed:
                                           state is! SearchLoading &&
-                                              value.text.trim().isNotEmpty
+                                              query.trim().isNotEmpty
                                           ? () {
-                                              _onSearchSubmitted(
-                                                context: context,
-                                                value: value.text,
-                                              );
+                                              _onSearchSubmitted(query);
                                             }
                                           : null,
                                       child: textSubmit,
@@ -213,10 +206,7 @@ class _SearchLayoutDefaultState extends State<SearchLayoutDefault> {
     });
   }
 
-  void _onSearchSubmitted({
-    required BuildContext context,
-    required String value,
-  }) {
+  void _onSearchSubmitted(String value) {
     final SearchState state = context.read<SearchBloc>().state;
     if (state is! SearchLoading && value.trim().isNotEmpty) {
       context.read<SearchBloc>().add(SearchLocation(value));

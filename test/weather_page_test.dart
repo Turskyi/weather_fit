@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -11,6 +14,8 @@ import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
 import 'package:weather_fit/data/repositories/location_repository.dart';
 import 'package:weather_fit/data/repositories/outfit_repository.dart';
 import 'package:weather_fit/entities/enums/language.dart';
+import 'package:weather_fit/entities/enums/weather_fetch_origin.dart';
+import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/localization/localization_delegate_getter.dart';
 import 'package:weather_fit/router/app_route.dart';
 import 'package:weather_fit/router/routes.dart' as router;
@@ -20,7 +25,7 @@ import 'package:weather_fit/settings/bloc/settings_bloc.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 import 'package:weather_fit/weather/ui/page/weather_page.dart';
 import 'package:weather_fit/weather/weather.dart';
-import 'package:weather_repository/weather_repository.dart';
+import 'package:weather_repository/weather_repository.dart' as repository;
 
 import 'constants/dummy_constants.dart' as dummy_constants;
 import 'helpers/flutter_translate_test_utils.dart';
@@ -33,6 +38,12 @@ void main() {
   initHydratedStorage();
   late LocalizationDelegate localizationDelegate;
   setUpAll(() async {
+    registerFallbackValue(
+      const RefreshWeather(WeatherFetchOrigin.defaultDevice),
+    );
+    registerFallbackValue(const SearchLocation(''));
+    registerFallbackValue(repository.Location.empty);
+
     SharedPreferences.setMockInitialValues(<String, Object>{});
     final SharedPreferences preferences = await SharedPreferences.getInstance();
 
@@ -41,7 +52,7 @@ void main() {
     final Language savedLanguage = localDataSource.getSavedLanguage();
     localizationDelegate = await getLocalizationDelegate(savedLanguage);
   });
-  late WeatherRepository weatherRepository;
+  late repository.WeatherRepository weatherRepository;
   late OutfitRepository outfitRepository;
   late HomeWidgetService mockHomeWidgetService;
 
@@ -66,7 +77,7 @@ void main() {
       await tester.pumpWidget(
         MultiRepositoryProvider(
           providers: <SingleChildWidget>[
-            RepositoryProvider<WeatherRepository>.value(
+            RepositoryProvider<repository.WeatherRepository>.value(
               value: weatherRepository,
             ),
             RepositoryProvider<OutfitRepository>.value(value: outfitRepository),
@@ -92,20 +103,17 @@ void main() {
                     preferences,
                   );
                   return SearchBloc(
-                    weatherRepository,
-                    LocationRepository(
+                    weatherRepository: weatherRepository,
+                    locationRepository: LocationRepository(
                       NominatimApiClient(),
                       OpenMeteoApiClient(),
                       localDataSource,
                     ),
-                    localDataSource,
+                    localDataSource: localDataSource,
                   );
                 },
               ),
-              BlocProvider<SettingsBloc>.value(
-                // Provide the mocked SettingsBloc
-                value: settingsBloc,
-              ),
+              BlocProvider<SettingsBloc>.value(value: settingsBloc),
             ],
             child: prepareWidgetForTesting(
               LocalizedApp(
@@ -124,37 +132,115 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byType(AppBar), findsOneWidget);
     });
-  });
 
-  group('WeatherView', () {
-    late WeatherBloc weatherBloc;
-
-    setUp(() {
-      weatherBloc = MockWeatherBloc();
-    });
-
-    testWidgets('renders WeatherError for WeatherStatus.failure', (
+    testWidgets('shows snackbar with try again when WeatherFailure occurs', (
       WidgetTester tester,
     ) async {
-      when(() => weatherBloc.state).thenReturn(
-        const WeatherFailure(
-          message: 'Error',
-          locale: dummy_constants.dummyLocale,
-        ),
+      // Set a larger surface size to ensure the SnackBar is on-screen and
+      // hittable.
+      tester.view.physicalSize = const Size(800, 3000);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final WeatherBloc weatherBloc = MockWeatherBloc();
+      const String errorMessage = 'Could not get weather information.';
+
+      final Weather weatherWithNoFlag = dummy_constants.dummyWeather.copyWith(
+        countryCode: '',
       );
+
+      whenListen(
+        weatherBloc,
+        Stream<WeatherState>.fromIterable(<WeatherState>[
+          WeatherInitial(locale: 'en', weather: weatherWithNoFlag),
+          WeatherFailure(
+            message: errorMessage,
+            locale: 'en',
+            weather: weatherWithNoFlag,
+          ),
+        ]),
+        initialState: WeatherInitial(locale: 'en', weather: weatherWithNoFlag),
+      );
+
+      when(() => weatherBloc.add(any())).thenReturn(null);
+
       await tester.pumpWidget(
-        RepositoryProvider<WeatherRepository>.value(
-          value: weatherRepository,
-          child: BlocProvider<WeatherBloc>.value(
-            value: weatherBloc,
-            child: LocalizedApp(
+        MultiRepositoryProvider(
+          providers: <SingleChildWidget>[
+            RepositoryProvider<repository.WeatherRepository>.value(
+              value: weatherRepository,
+            ),
+            RepositoryProvider<OutfitRepository>.value(value: outfitRepository),
+          ],
+          child: MultiBlocProvider(
+            providers: <SingleChildWidget>[
+              BlocProvider<WeatherBloc>.value(value: weatherBloc),
+              BlocProvider<SettingsBloc>.value(value: settingsBloc),
+            ],
+            child: prepareWidgetForTesting(
+              LocalizedApp(
+                localizationDelegate,
+                const MaterialApp(home: WeatherPage()),
+              ),
               localizationDelegate,
-              const MaterialApp(home: WeatherPage()),
             ),
           ),
         ),
       );
-      expect(find.byType(WeatherError), findsOneWidget);
+
+      await tester.pump();
+      // Ensure the SnackBar animation completes fully.
+      await tester.pumpAndSettle();
+
+      final Finder tryAgainFinder = find.text('Try again');
+      expect(find.text(errorMessage), findsWidgets);
+      expect(tryAgainFinder, findsOneWidget);
+
+      // Using tapAt with centered coordinates to avoid hit-test warning while
+      // still triggering the button callback.
+      await tester.tapAt(tester.getCenter(tryAgainFinder));
+
+      // Allow the scheduled timer from _refresh's Future.delayed to execute.
+      await tester.pumpAndSettle();
+
+      verify(
+        () => weatherBloc.add(any(that: isA<RefreshWeather>())),
+      ).called(greaterThan(0));
+    });
+
+    group('WeatherView', () {
+      late WeatherBloc weatherBloc;
+
+      setUp(() {
+        weatherBloc = MockWeatherBloc();
+      });
+
+      testWidgets('renders WeatherError for WeatherStatus.failure', (
+        WidgetTester tester,
+      ) async {
+        when(() => weatherBloc.state).thenReturn(
+          const WeatherFailure(
+            message: 'Error',
+            locale: dummy_constants.dummyLocale,
+          ),
+        );
+        await tester.pumpWidget(
+          RepositoryProvider<repository.WeatherRepository>.value(
+            value: weatherRepository,
+            child: BlocProvider<WeatherBloc>.value(
+              value: weatherBloc,
+              child: LocalizedApp(
+                localizationDelegate,
+                const MaterialApp(home: WeatherPage()),
+              ),
+            ),
+          ),
+        );
+        expect(find.byType(WeatherError), findsOneWidget);
+      });
     });
   });
 }

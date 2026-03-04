@@ -78,7 +78,18 @@ class WeatherPageExtraSmallLayout extends StatelessWidget {
                     ..hideCurrentSnackBar()
                     ..showSnackBar(
                       SnackBar(
-                        content: Text(state.message),
+                        duration: const Duration(seconds: 2),
+                        content: Row(
+                          children: <Widget>[
+                            Expanded(child: SelectableText(state.message)),
+                            TextButton(
+                              onPressed: () => ScaffoldMessenger.of(
+                                context,
+                              ).hideCurrentSnackBar(),
+                              child: Text(translate('ok')),
+                            ),
+                          ],
+                        ),
                         action: SnackBarAction(
                           label: translate('try_again'),
                           onPressed: onRefresh,

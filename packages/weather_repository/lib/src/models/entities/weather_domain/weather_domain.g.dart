@@ -26,12 +26,22 @@ WeatherDomain _$WeatherDomainFromJson(
       description: $checkedConvert('description', (v) => v as String),
       weatherCode: $checkedConvert('weather_code', (v) => (v as num).toInt()),
       locale: $checkedConvert('locale', (v) => v as String),
+      maxTemperature: $checkedConvert(
+        'max_temperature',
+        (v) => (v as num?)?.toDouble(),
+      ),
+      minTemperature: $checkedConvert(
+        'min_temperature',
+        (v) => (v as num?)?.toDouble(),
+      ),
     );
     return val;
   },
   fieldKeyMap: const {
     'countryCode': 'country_code',
     'weatherCode': 'weather_code',
+    'maxTemperature': 'max_temperature',
+    'minTemperature': 'min_temperature',
   },
 );
 
@@ -44,6 +54,8 @@ Map<String, dynamic> _$WeatherDomainToJson(WeatherDomain instance) =>
       'description': instance.description,
       'weather_code': instance.weatherCode,
       'locale': instance.locale,
+      'max_temperature': instance.maxTemperature,
+      'min_temperature': instance.minTemperature,
     };
 
 const _$WeatherConditionEnumMap = {

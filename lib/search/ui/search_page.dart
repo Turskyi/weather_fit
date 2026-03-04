@@ -1,10 +1,17 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:permission_handler/permission_handler.dart' as geolocator;
+import 'package:geolocator/geolocator.dart' as geolocator;
+import 'package:permission_handler/permission_handler.dart'
+    as permission_handler;
+import 'package:url_launcher/url_launcher.dart';
 import 'package:weather_fit/entities/enums/search_error_type.dart';
 import 'package:weather_fit/extensions/build_context_extensions.dart';
+import 'package:weather_fit/res/constants.dart' as constants;
 import 'package:weather_fit/router/app_route.dart';
 import 'package:weather_fit/search/bloc/search_bloc.dart';
 import 'package:weather_fit/search/ui/widgets/search_layout_default.dart';
@@ -47,6 +54,19 @@ class _SearchPageState extends State<SearchPage> {
   void dispose() {
     _textController.dispose();
     super.dispose();
+  }
+
+  void _searchStateListener(BuildContext context, SearchState state) {
+    if (state is SearchLocationFound) {
+      _showLocationConfirmationDialog(state.location);
+    } else if (state is SearchLocationNotFound) {
+      _showLocationNotFoundDialog();
+    } else if (state is SearchWeatherLoaded) {
+      // Navigate to the weather details page.
+      Navigator.pop(context, state.weather);
+    } else if (state is SearchError) {
+      _handleSearchError(state);
+    }
   }
 
   Future<void> _showLocationConfirmationDialog(Location location) {
@@ -140,12 +160,12 @@ class _SearchPageState extends State<SearchPage> {
 
   void _confirmLocationAndPop(Location location) {
     context.read<SearchBloc>().add(ConfirmLocation(location));
-    Navigator.of(context).pop();
+    return Navigator.of(context).pop();
   }
 
-  void _handleLocationConfirmationNo() {
+  Future<void> _handleLocationConfirmationNo() {
     Navigator.of(context).pop();
-    _showUseCurrentLocationDialog();
+    return _showUseCurrentLocationDialog();
   }
 
   Future<void> _showUseCurrentLocationDialog() {
@@ -231,7 +251,9 @@ class _SearchPageState extends State<SearchPage> {
   void _handleUseCurrentLocationConfirm() {
     Navigator.of(context).pop();
 
-    context.read<SearchBloc>().add(RequestPermissionAndSearchByLocation(_text));
+    return context.read<SearchBloc>().add(
+      RequestPermissionAndSearchByLocation(_text),
+    );
   }
 
   Future<void> _showLocationNotFoundDialog() {
@@ -253,10 +275,8 @@ class _SearchPageState extends State<SearchPage> {
                 Text(
                   translate('search.location_not_found_suggestion_spell_check'),
                 ),
-                // Example translation key
                 const SizedBox(height: 16),
                 Text(translate('search.location_not_found_suggestion_use_gps')),
-                // Example translation key
               ],
             ),
             actions: <Widget>[
@@ -266,13 +286,8 @@ class _SearchPageState extends State<SearchPage> {
               ),
               TextButton(
                 autofocus: true,
+                onPressed: _handleUseGpsConfirm,
                 child: Text(translate('search.use_gps_button')),
-                onPressed: () {
-                  Navigator.of(dialogContext).pop();
-                  context.read<SearchBloc>().add(
-                    RequestPermissionAndSearchByLocation(_text),
-                  );
-                },
               ),
             ],
           ),
@@ -281,208 +296,264 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  void _searchStateListener(BuildContext context, SearchState state) {
-    if (state is SearchLocationFound) {
-      _showLocationConfirmationDialog(state.location);
-    } else if (state is SearchLocationNotFound) {
-      _showLocationNotFoundDialog();
-    } else if (state is SearchWeatherLoaded) {
-      // Navigate to the weather details page.
-      Navigator.pop(context, state.weather);
-    } else if (state is SearchError) {
-      if (state.isCertificateValidationError) {
-        // Show a more detailed, blocking dialog for
-        // this specific error.
-        showDialog(
+  void _handleUseGpsConfirm() {
+    Navigator.of(context).pop();
+    return context.read<SearchBloc>().add(
+      RequestPermissionAndSearchByLocation(_text),
+    );
+  }
+
+  void _handleSearchError(SearchError state) {
+    if (state.isCertificateValidationError) {
+      // Show a more detailed, blocking dialog for
+      // this specific error.
+      _handleCertificateValidationError(state);
+    } else if (state.isPermissionDeniedError) {
+      _handlePermissionDeniedError(state);
+    } else if (state.isNetworkError) {
+      _handleNetworkError(state);
+    } else if (state.isLocationServiceDisabledError) {
+      _handleLocationServiceDisabledError(state);
+    } else {
+      debugPrint(
+        '[_handleSearchError] Unexpected SearchError state:\n'
+        'errorMessage: ${state.errorMessage}\n'
+        'query: ${state.query}\n'
+        'errorType: ${state.errorType}',
+      );
+
+      if (context.isExtraSmallScreen) {
+        showGeneralDialog<void>(
           context: context,
-          // User must interact with the dialog.
-          barrierDismissible: false,
-          builder: (BuildContext dialogContext) {
-            return CallbackShortcuts(
-              bindings: <ShortcutActivator, VoidCallback>{
-                const SingleActivator(LogicalKeyboardKey.arrowLeft): () =>
-                    FocusScope.of(dialogContext).previousFocus(),
-                const SingleActivator(LogicalKeyboardKey.arrowRight): () =>
-                    FocusScope.of(dialogContext).nextFocus(),
+          barrierDismissible: true,
+          barrierLabel: translate('close'),
+          pageBuilder:
+              (BuildContext context, Animation<double> _, Animation<double> _) {
+                return Center(
+                  child: Container(
+                    constraints: const BoxConstraints(maxWidth: 200),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surface,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          const Text('📍', style: TextStyle(fontSize: 28)),
+                          const SizedBox(height: 8),
+                          Text(
+                            translate('error.gps_unavailable_watch'),
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.labelSmall,
+                          ),
+                          const SizedBox(height: 12),
+                          ElevatedButton(
+                            onPressed: _handleReportErrorSnackBarAction,
+                            child: Text(translate('error.report_issue')),
+                          ),
+                          TextButton(
+                            onPressed: Navigator.of(context).pop,
+                            child: Text(translate('close')),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
               },
-              child: AlertDialog(
-                title: Text(translate('error.connection_security_issue_title')),
-                content: SingleChildScrollView(
-                  child: ListBody(
-                    children: <Widget>[
-                      Text(state.errorMessage),
-                      const SizedBox(height: 16),
-                      Text(translate('error.what_you_can_do')),
-                      Text(
-                        "- ${translate('error.'
-                        'ensure_os_updated')}",
-                      ),
-                      Text(
-                        "- ${translate('error.'
-                        'check_date_time')}",
-                      ),
-                    ],
-                  ),
-                ),
-                actions: <Widget>[
-                  TextButton(
-                    child: Text(translate('error.report_issue_button')),
-                    onPressed: () =>
-                        _handleReportActionAndPop(state.errorMessage),
-                  ),
-                  TextButton(
-                    autofocus: true,
-                    child: Text(translate('ok')),
-                    onPressed: () {
-                      // Close the dialog.
-                      Navigator.of(dialogContext).pop();
-                    },
-                  ),
-                ],
-              ),
-            );
-          },
         );
-      } else if (state.isPermissionDeniedError) {
+      } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(state.errorMessage),
+            content: SelectableText(state.errorMessage),
             duration: const Duration(seconds: 7),
             action: SnackBarAction(
-              label: translate('settings.title'),
-              onPressed: () {
-                // Helper from `geolocator` to open app
-                // settings.
-                geolocator.openAppSettings();
-                ScaffoldMessenger.of(context).hideCurrentSnackBar();
-              },
+              label: translate('try_again'),
+              onPressed: () => _handleRetrySearch(state),
             ),
           ),
         );
-      } else if (state.isNetworkError) {
-        if (context.isExtraSmallScreen) {
-          Navigator.pushNamed(
-            context,
-            AppRoute.unableToConnect.path,
-            arguments: SearchError(
-              errorMessage: state.errorMessage,
-              query: _text,
-              errorType: SearchErrorType.network,
-              quickCitiesSuggestions: state.quickCitiesSuggestions,
-            ),
-          );
-        } else {
-          showDialog<void>(
-            context: context,
-            builder: (BuildContext context) {
-              return CallbackShortcuts(
-                bindings: <ShortcutActivator, VoidCallback>{
-                  const SingleActivator(LogicalKeyboardKey.arrowLeft): () =>
-                      FocusScope.of(context).previousFocus(),
-                  const SingleActivator(LogicalKeyboardKey.arrowRight): () =>
-                      FocusScope.of(context).nextFocus(),
-                },
-                child: AlertDialog(
-                  title: Text(translate('error.unable_to_connect')),
-                  content: Text(translate('error.connection_reset_suggestion')),
-                  actions: <Widget>[
-                    TextButton(
-                      onPressed: () =>
-                          _handleReportActionAndPop(state.errorMessage),
-                      child: Text(translate('report_issue')),
-                    ),
-                    ElevatedButton(
-                      autofocus: true,
-                      onPressed: _text.isEmpty ? null : () => _popAndSearch(),
-                      child: Text(translate('try_again')),
-                    ),
-                  ],
-                ),
-              );
-            },
-          );
-        }
-      } else {
-        if (context.isExtraSmallScreen) {
-          showGeneralDialog<void>(
-            context: context,
-            barrierDismissible: true,
-            barrierLabel: translate('close'),
-            pageBuilder:
-                (
-                  BuildContext context,
-                  Animation<double> _,
-                  Animation<double> _,
-                ) {
-                  return Center(
-                    child: Container(
-                      constraints: const BoxConstraints(maxWidth: 200),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surface,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: SingleChildScrollView(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            const Text('📍', style: TextStyle(fontSize: 28)),
-                            const SizedBox(height: 8),
-                            Text(
-                              translate('error.gps_unavailable_watch'),
-                              textAlign: TextAlign.center,
-                              style: Theme.of(context).textTheme.labelSmall,
-                            ),
-                            const SizedBox(height: 12),
-                            ElevatedButton(
-                              onPressed: _handleReportErrorSnackBarAction,
-                              child: Text(translate('error.report_issue')),
-                            ),
-                            TextButton(
-                              onPressed: () => Navigator.of(context).pop(),
-                              child: Text(translate('close')),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                },
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.errorMessage),
-              duration: const Duration(seconds: 7),
-              action: SnackBarAction(
-                label: translate('error.report'),
-                onPressed: _handleReportErrorSnackBarAction,
-              ),
-            ),
-          );
-        }
       }
     }
   }
 
+  void _handleRetrySearch(SearchError state) {
+    final String query = state.query;
+    if (query.isNotEmpty) {
+      return context.read<SearchBloc>().add(SearchLocation(query));
+    } else {
+      return context.read<SearchBloc>().add(
+        RetrySearchByCurrentLocation(query),
+      );
+    }
+  }
+
+  Future<void> _handleCertificateValidationError(SearchError state) {
+    // Show a more detailed, blocking dialog for
+    // this specific error.
+    return showDialog<void>(
+      context: context,
+      // User must interact with the dialog.
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
+        final String errorMessage = state.errorMessage;
+        return CallbackShortcuts(
+          bindings: <ShortcutActivator, VoidCallback>{
+            const SingleActivator(LogicalKeyboardKey.arrowLeft): () =>
+                FocusScope.of(dialogContext).previousFocus(),
+            const SingleActivator(LogicalKeyboardKey.arrowRight): () =>
+                FocusScope.of(dialogContext).nextFocus(),
+          },
+          child: AlertDialog(
+            title: Text(translate('error.connection_security_issue_title')),
+            content: SingleChildScrollView(
+              child: ListBody(
+                children: <Widget>[
+                  Text(errorMessage),
+                  const SizedBox(height: 16),
+                  Text(translate('error.what_you_can_do')),
+                  Text("- ${translate('error.ensure_os_updated')}"),
+                  Text("- ${translate('error.check_date_time')}"),
+                ],
+              ),
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: Text(translate('error.report_issue_button')),
+                onPressed: () => _handleReportActionAndPop(errorMessage),
+              ),
+              TextButton(
+                autofocus: true,
+                onPressed: Navigator.of(dialogContext).pop,
+                child: Text(translate('ok')),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  ScaffoldFeatureController<SnackBar, SnackBarClosedReason>
+  _handlePermissionDeniedError(SearchError state) {
+    return ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: SelectableText(state.errorMessage),
+        duration: const Duration(seconds: 7),
+        action: SnackBarAction(
+          label: translate('settings.title'),
+          onPressed: _handleOpenLocationSettings,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _handleOpenLocationSettings() async {
+    if (!kIsWeb && Platform.isMacOS) {
+      final Uri url = Uri.parse(constants.kMacOSLocationServicesSettingsUrl);
+      final bool canLaunch = await canLaunchUrl(url);
+      if (canLaunch) {
+        await launchUrl(url);
+      }
+    } else {
+      permission_handler.openAppSettings();
+    }
+    if (mounted) {
+      return ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    }
+  }
+
+  Future<void> _handleNetworkError(SearchError state) {
+    final String errorMessage = state.errorMessage;
+    if (context.isExtraSmallScreen) {
+      return Navigator.pushNamed<void>(
+        context,
+        AppRoute.unableToConnect.path,
+        arguments: SearchError(
+          errorMessage: errorMessage,
+          query: _text,
+          errorType: SearchErrorType.network,
+          quickCitiesSuggestions: state.quickCitiesSuggestions,
+        ),
+      );
+    } else {
+      return showDialog<void>(
+        context: context,
+        builder: (BuildContext context) {
+          return CallbackShortcuts(
+            bindings: <ShortcutActivator, VoidCallback>{
+              const SingleActivator(LogicalKeyboardKey.arrowLeft): () =>
+                  FocusScope.of(context).previousFocus(),
+              const SingleActivator(LogicalKeyboardKey.arrowRight): () =>
+                  FocusScope.of(context).nextFocus(),
+            },
+            child: AlertDialog(
+              title: Text(translate('error.unable_to_connect')),
+              content: Text(translate('error.connection_reset_suggestion')),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () => _handleReportActionAndPop(errorMessage),
+                  child: Text(translate('report_issue')),
+                ),
+                ElevatedButton(
+                  autofocus: true,
+                  onPressed: _text.isEmpty ? null : _popAndSearch,
+                  child: Text(translate('try_again')),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    }
+  }
+
+  Future<void> _handleLocationServiceDisabledError(SearchError state) {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: Text(translate('error.location_services_disabled_title')),
+          content: Text(translate('error.location_services_disabled_content')),
+          actions: <Widget>[
+            TextButton(
+              onPressed: Navigator.of(dialogContext).pop,
+              child: Text(translate('cancel')),
+            ),
+            TextButton(
+              autofocus: true,
+              onPressed: _handleOpenLocationSettingsAndPop,
+              child: Text(translate('settings.title')),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _handleOpenLocationSettingsAndPop() {
+    Navigator.of(context).pop();
+    return geolocator.Geolocator.openLocationSettings();
+  }
+
   void _popAndSearch() {
     Navigator.of(context).pop();
-    context.read<SearchBloc>().add(SearchLocation(_text));
+    return context.read<SearchBloc>().add(SearchLocation(_text));
   }
 
   void _handleReportActionAndPop(String errorText) {
     context.read<SettingsBloc>().add(BugReportPressedEvent(errorText));
-    Navigator.of(context).pop();
+    return Navigator.of(context).pop();
   }
 
   void _handleReportErrorSnackBarAction() {
-    if (mounted) {
-      final SearchState state = context.read<SearchBloc>().state;
+    final SearchState state = context.read<SearchBloc>().state;
 
-      context.read<SettingsBloc>().add(
-        BugReportPressedEvent(state is SearchError ? state.errorMessage : ''),
-      );
-      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    }
+    context.read<SettingsBloc>().add(
+      BugReportPressedEvent(state is SearchError ? state.errorMessage : ''),
+    );
+    return ScaffoldMessenger.of(context).hideCurrentSnackBar();
   }
 }

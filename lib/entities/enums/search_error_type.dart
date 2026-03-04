@@ -21,4 +21,7 @@ enum SearchErrorType {
 
   /// Returns `true` if the error is due to a network issue.
   bool get isNetworkError => this == SearchErrorType.network;
+
+  bool get isLocationServiceDisabled =>
+      this == SearchErrorType.locationServiceDisabled;
 }

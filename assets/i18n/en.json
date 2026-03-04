@@ -97,6 +97,11 @@
     "location_permission_denied": "Location permissions are denied",
     "location_permission_permanently_denied_cannot_request": "Location permissions are permanently denied, we cannot request permissions.",
     "getting_weather_generic": "Could not get weather information. Please try again.",
+    "getting_weather_search_by_location": "Could not get weather for your location. Please try again.",
+    "getting_weather_confirm_location": "Could not get weather for the selected location. Please try again.",
+    "getting_weather_request_permission": "Could not get weather after granting permission. Please try again.",
+    "getting_weather_retry_request_permission": "Could not fetch weather after granting permission. Please try again.",
+    "getting_weather_bloc_generic": "Could not fetch weather data. Please try again.",
     "launch_email_app_to_address": "Could not launch email app to send an email to {emailAddress}",
     "launch_email_failed": "Could not launch the email application.",
     "save_asset_image_failed": "Failed to save image to device storage",
@@ -115,7 +120,9 @@
     "location_unavailable": "We couldn't get your location.",
     "location_unavailable_details": "Location permission is enabled, but the app still cannot detect your position. We’re very sorry for the inconvenience.",
     "location_unavailable_suggestions": "You can type the name of another city or country, report the issue to the developer, or uninstall the app.",
-    "gps_unavailable_watch": "It looks like your watch’s GPS isn’t available for this app. You can try typing another city or country, report the issue, or uninstall the app."
+    "gps_unavailable_watch": "It looks like your watch’s GPS isn’t available for this app. You can try typing another city or country, report the issue, or uninstall the app.",
+    "location_services_disabled_title": "Location Services Disabled",
+    "location_services_disabled_content": "Location services are disabled on your device. Please enable them in the system settings to use your current location."
   },
   "settings": {
     "title": "Settings",

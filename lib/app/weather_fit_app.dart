@@ -48,6 +48,7 @@ class WeatherFitApp extends StatelessWidget {
     return MultiRepositoryProvider(
       providers: <SingleChildWidget>[
         RepositoryProvider<WeatherRepository>.value(value: weatherRepository),
+        RepositoryProvider<LocationRepository>.value(value: locationRepository),
         RepositoryProvider<OutfitRepository>.value(value: outfitRepository),
         RepositoryProvider<LocalDataSource>.value(value: localDataSource),
         RepositoryProvider<HomeWidgetService>(
@@ -82,9 +83,9 @@ class WeatherFitApp extends StatelessWidget {
           BlocProvider<SearchBloc>(
             create: (BuildContext _) {
               return SearchBloc(
-                weatherRepository,
-                locationRepository,
-                localDataSource,
+                weatherRepository: weatherRepository,
+                locationRepository: locationRepository,
+                localDataSource: localDataSource,
               );
             },
           ),
@@ -173,6 +174,7 @@ class WeatherFitApp extends StatelessWidget {
                       ),
                     ),
                     colorScheme: darkColorScheme,
+                    brightness: Brightness.dark,
                   ),
                   themeMode: completeDarkness
                       ? ThemeMode.dark

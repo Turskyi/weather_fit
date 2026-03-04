@@ -97,6 +97,11 @@
     "location_permission_denied": "Uprawnienia do lokalizacji zostały odrzucone",
     "location_permission_permanently_denied_cannot_request": "Uprawnienia do lokalizacji są trwale odrzucone, nie możemy o nie poprosić.",
     "getting_weather_generic": "Nie udało się pobrać informacji o pogodzie. Spróbuj ponownie.",
+    "getting_weather_search_by_location": "Nie udało się pobrać pogody dla Twojej lokalizacji. Spróbuj ponownie.",
+    "getting_weather_confirm_location": "Nie udało się pobrać pogody dla wybranej lokalizacji. Spróbuj ponownie.",
+    "getting_weather_request_permission": "Nie udało się pobrać pogody po udzieleniu pozwolenia. Spróbuj ponownie.",
+    "getting_weather_retry_request_permission": "Nie udało się pobrać danych pogodowych po udzieleniu pozwolenia. Spróbuj ponownie.",
+    "getting_weather_bloc_generic": "Nie udało się pobrać danych pogodowych. Spróbuj ponownie.",
     "launch_email_app_to_address": "Nie udało się uruchomić aplikacji e-mail, aby wysłać wiadomość do {emailAddress}",
     "launch_email_failed": "Nie udało się uruchomić aplikacji e-mail.",
     "save_asset_image_failed": "Nie udało się zapisać obrazu w pamięci urządzenia",
@@ -115,7 +120,9 @@
     "location_unavailable": "Nie udało nam się pobrać Twojej lokalizacji.",
     "location_unavailable_details": "Uprawnienie do lokalizacji jest włączone, ale aplikacja nadal nie może wykryć Twojej pozycji. Bardzo przepraszamy za niedogodności.",
     "location_unavailable_suggestions": "Możesz wpisać nazwę innego miasta lub kraju, zgłosić problem programiście lub odinstalować aplikację.",
-    "gps_unavailable_watch": "Wygląda na to, że GPS Twojego zegarka nie jest dostępny dla tej aplikacji. Możesz spróbować wpisać inne miasto lub kraj, zgłosić problem lub odinstalować aplikację."
+    "gps_unavailable_watch": "Wygląda na to, że GPS Twojego zegarka nie jest dostępny dla tej aplikacji. Możesz spróbować wpisać inne miasto lub kraj, zgłosić problem lub odinstalować aplikację.",
+    "location_services_disabled_title": "Usługi lokalizacji są wyłączone",
+    "location_services_disabled_content": "Usługi lokalizacji są wyłączone на Twoim urządzeniu. Włącz je w ustawieniach systemowych, aby korzystać z aktualnej lokalizacji."
   },
   "settings": {
     "title": "Ustawienia",

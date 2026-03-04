@@ -1,14 +1,19 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
+import 'package:nominatim_api/nominatim_api.dart';
+import 'package:open_meteo_api/open_meteo_api.dart';
 import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
+import 'package:weather_fit/data/repositories/location_repository.dart';
 import 'package:weather_fit/data/repositories/outfit_repository.dart';
 import 'package:weather_fit/entities/models/outfit/outfit_image.dart';
+import 'package:weather_fit/entities/models/search/saved_plan.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/search/ui/widgets/header.dart';
 import 'package:weather_fit/search/ui/widgets/planner_form.dart';
 import 'package:weather_fit/search/ui/widgets/planner_result.dart';
-import 'package:weather_fit/settings/bloc/settings_bloc.dart';
 import 'package:weather_repository/weather_repository.dart';
 
 class FutureOutfitPlannerSheet extends StatefulWidget {
@@ -35,166 +40,6 @@ class _FutureOutfitPlannerSheetState extends State<FutureOutfitPlannerSheet> {
   void initState() {
     super.initState();
     _cleanupPastPlans();
-  }
-
-  @override
-  void dispose() {
-    _locationController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _cleanupPastPlans() async {
-    await widget.localDataSource.removePastPlans();
-  }
-
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime now = DateTime.now();
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: _selectedDate ?? now.add(const Duration(days: 2)),
-      firstDate: now.add(const Duration(days: 1)),
-      lastDate: now.add(const Duration(days: 365 * 5)),
-    );
-    if (picked != null && picked != _selectedDate) {
-      setState(() {
-        _selectedDate = picked;
-      });
-    }
-  }
-
-  Future<void> _onPlanSelected(String cityName, DateTime date) async {
-    if (_isLoading) return;
-    setState(() {
-      _locationController.text = cityName;
-      _selectedDate = date;
-    });
-    // Automatically trigger search and skip confirmation for previously saved
-    // plans.
-    await _onGeneratePreview(skipConfirmation: true);
-  }
-
-  Future<void> _onGeneratePreview({bool skipConfirmation = false}) async {
-    if (_isLoading) return;
-
-    final String query = _locationController.text.trim();
-    if (query.isEmpty) return;
-    final DateTime? date = _selectedDate;
-    if (date == null) return;
-
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-      _resultOutfitImage = null;
-      _resultWeather = null;
-    });
-
-    try {
-      final WeatherRepository weatherRepository = context
-          .read<WeatherRepository>();
-
-      // 1. Resolve Location (independent flow, no GPS)
-      final Location location = await weatherRepository.searchLocation(
-        query: query,
-        locale: context.read<SettingsBloc>().state.locale,
-      );
-
-      if (mounted) {
-        if (skipConfirmation) {
-          await _fetchProjectionAndOutfit(location, date);
-        } else {
-          final bool? confirmed = await _showLocationConfirmationDialog(
-            location,
-          );
-          if (confirmed == true) {
-            await _fetchProjectionAndOutfit(location, date);
-          } else {
-            setState(() {
-              _isLoading = false;
-              _errorMessage = translate(
-                'search.location_not_found_clarification',
-              );
-            });
-          }
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-          _errorMessage = translate('search.location_not_found_clarification');
-        });
-      }
-    }
-  }
-
-  Future<void> _fetchProjectionAndOutfit(
-    Location location,
-    DateTime date,
-  ) async {
-    try {
-      final WeatherRepository weatherRepository = context
-          .read<WeatherRepository>();
-      final OutfitRepository outfitRepository = context
-          .read<OutfitRepository>();
-
-      // 2. Fetch Climate Projection
-      final WeatherDomain weatherDomain = await weatherRepository
-          .getClimateProjection(location: location, date: date);
-
-      // Convert Domain to App Weather model for the OutfitRepository
-      final Weather weather = Weather.fromDomain(weatherDomain);
-
-      // 3. Get Outfit Recommendation
-      final String recommendation = outfitRepository.getOutfitRecommendation(
-        weather,
-      );
-      final OutfitImage outfitImage = await outfitRepository.getOutfitImage(
-        weather,
-      );
-
-      if (mounted) {
-        setState(() {
-          _resultOutfitImage = outfitImage;
-          _resultRecommendation = recommendation;
-          _resultWeather = weatherDomain;
-          _isLoading = false;
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-          _errorMessage = translate('search.projection_fetch_failed');
-        });
-      }
-    }
-  }
-
-  Future<bool?> _showLocationConfirmationDialog(Location location) {
-    final List<String> parts = <String>[location.name];
-    if (location.province.isNotEmpty) parts.add(location.province);
-    if (location.country.isNotEmpty) parts.add(location.country);
-    final String displayLocation = parts.join(', ');
-
-    return showDialog<bool>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(translate('search.confirm_location_dialog_title')),
-          content: Text(displayLocation),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: Text(translate('no')),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: Text(translate('yes')),
-            ),
-          ],
-        );
-      },
-    );
   }
 
   @override
@@ -228,11 +73,7 @@ class _FutureOutfitPlannerSheetState extends State<FutureOutfitPlannerSheet> {
                 errorMessage: _errorMessage,
                 onSelectDate: () => _selectDate(context),
                 onGenerate: _onGeneratePreview,
-                onDateSelected: (DateTime date) {
-                  setState(() {
-                    _selectedDate = date;
-                  });
-                },
+                onDateSelected: _onDateChanged,
                 onPlanSelected: _onPlanSelected,
               )
             else
@@ -253,5 +94,259 @@ class _FutureOutfitPlannerSheetState extends State<FutureOutfitPlannerSheet> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _locationController.dispose();
+    super.dispose();
+  }
+
+  void _onDateChanged(DateTime date) {
+    setState(() {
+      _selectedDate = date;
+    });
+  }
+
+  bool _isNetworkError(Object e) {
+    final String errorString = e.toString();
+    return e is SocketException ||
+        errorString.contains('SocketException') ||
+        errorString.contains('Failed host lookup') ||
+        errorString.contains('HandshakeException') ||
+        errorString.contains('Connection refused') ||
+        errorString.contains('Connection closed');
+  }
+
+  String _mapExceptionToMessage({
+    required Object e,
+    required String defaultMessage,
+  }) {
+    if (_isNetworkError(e)) {
+      return translate('error.network_error');
+    }
+    return defaultMessage;
+  }
+
+  Future<void> _showLocationNotFoundDialog() {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: Text(translate('search.location_not_found_dialog_title')),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Text(
+                translate('search.location_not_found_suggestion_spell_check'),
+              ),
+              const SizedBox(height: 16),
+              Text(translate('search.location_not_found_suggestion_use_gps')),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: Navigator.of(dialogContext).pop,
+              child: Text(translate('cancel')),
+            ),
+            TextButton(
+              autofocus: true,
+              child: Text(translate('ok')),
+              onPressed: () => Navigator.of(dialogContext).pop(),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<bool?> _showLocationConfirmationDialog(Location location) {
+    // Build a list of non-empty location parts for a consistent UI.
+    final List<String> parts = <String>[location.name];
+    if (location.province.isNotEmpty) {
+      parts.add(location.province);
+    }
+    if (location.country.isNotEmpty) {
+      parts.add(location.country);
+    }
+    final String displayLocation = parts.join(', ');
+
+    return showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(translate('search.confirm_location_dialog_title')),
+          content: Text(displayLocation),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(translate('no')),
+            ),
+            TextButton(
+              autofocus: true,
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text(translate('yes')),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _displayWeather(WeatherDomain weatherDomain) async {
+    final Weather weather = Weather.fromDomain(weatherDomain);
+    final OutfitRepository outfitRepository = context.read<OutfitRepository>();
+
+    final String recommendation = outfitRepository.getOutfitRecommendation(
+      weather,
+    );
+    final OutfitImage outfitImage = await outfitRepository.getOutfitImage(
+      weather,
+    );
+
+    if (mounted) {
+      setState(() {
+        _resultOutfitImage = outfitImage;
+        _resultRecommendation = recommendation;
+        _resultWeather = weatherDomain;
+        _isLoading = false;
+        _errorMessage = null;
+      });
+    }
+  }
+
+  Future<void> _fetchProjectionAndOutfit({
+    required Location location,
+    required DateTime date,
+    WeatherDomain? savedWeather,
+  }) async {
+    try {
+      final WeatherRepository weatherRepository = context
+          .read<WeatherRepository>();
+
+      // Fetch Climate Projection for the resolved location.
+      final WeatherDomain weatherDomain = await weatherRepository
+          .getClimateProjection(location: location, date: date);
+
+      await _displayWeather(weatherDomain);
+    } catch (e) {
+      if (savedWeather != null && _isNetworkError(e)) {
+        await _displayWeather(savedWeather);
+      } else if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _errorMessage = _mapExceptionToMessage(
+            e: e,
+            defaultMessage: translate('search.projection_fetch_failed'),
+          );
+        });
+      }
+    }
+  }
+
+  Future<void> _onGeneratePreview({
+    bool skipConfirmation = false,
+    WeatherDomain? savedWeather,
+  }) async {
+    if (_isLoading) return;
+
+    final String query = _locationController.text.trim();
+    if (query.isEmpty) return;
+    final DateTime? date = _selectedDate;
+    if (date == null) return;
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+      _resultOutfitImage = null;
+      _resultWeather = null;
+    });
+
+    try {
+      final LocationRepository locationRepository = context
+          .read<LocationRepository>();
+
+      // Similar to SearchBloc, we use LocationRepository to resolve the query.
+      final Location location = await locationRepository.getLocation(query);
+
+      if (mounted) {
+        if (skipConfirmation) {
+          await _fetchProjectionAndOutfit(
+            location: location,
+            date: date,
+            savedWeather: savedWeather,
+          );
+        } else {
+          final bool? confirmed = await _showLocationConfirmationDialog(
+            location,
+          );
+          if (confirmed == true) {
+            await _fetchProjectionAndOutfit(location: location, date: date);
+          } else {
+            setState(() {
+              _isLoading = false;
+            });
+          }
+        }
+      }
+    } catch (e, stackTrace) {
+      debugPrint(
+        'FutureOutfitPlannerSheet: Error resolving location for query '
+        '"$query": $e',
+      );
+      debugPrint('Stack trace: $stackTrace');
+
+      if (savedWeather != null && _isNetworkError(e)) {
+        await _displayWeather(savedWeather);
+      } else if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+        if (e is LocationNotFoundFailure ||
+            e is NominatimLocationRequestFailure) {
+          _showLocationNotFoundDialog();
+        } else {
+          setState(() {
+            _errorMessage = _mapExceptionToMessage(
+              e: e,
+              defaultMessage: translate(
+                'search.location_not_found_clarification',
+              ),
+            );
+          });
+        }
+      }
+    }
+  }
+
+  Future<void> _onPlanSelected(SavedPlan plan) async {
+    if (_isLoading) return;
+    setState(() {
+      _locationController.text = plan.cityName;
+      _selectedDate = plan.date;
+    });
+    await _onGeneratePreview(
+      skipConfirmation: true,
+      savedWeather: plan.weather,
+    );
+  }
+
+  Future<void> _cleanupPastPlans() async {
+    await widget.localDataSource.removePastPlans();
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime now = DateTime.now();
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate ?? now.add(const Duration(days: 2)),
+      firstDate: now.add(const Duration(days: 1)),
+      lastDate: now.add(const Duration(days: 365 * 5)),
+    );
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        _selectedDate = picked;
+      });
+    }
   }
 }
