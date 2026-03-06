@@ -289,5 +289,19 @@
     "warm": "👕\nIt's warm. Shorts, t-shirts, and light dresses are great options.",
     "hot": "☀️\nIt's hot! Wear light, breathable clothing like tank tops and shorts.",
     "moderate": "🌤️\nThe weather is moderate. You can wear a variety of outfits."
+  },
+  "month_names": {
+    "january": "January",
+    "february": "February",
+    "march": "March",
+    "april": "April",
+    "may": "May",
+    "june": "June",
+    "july": "July",
+    "august": "August",
+    "september": "September",
+    "october": "October",
+    "november": "November",
+    "december": "December"
   }
 }

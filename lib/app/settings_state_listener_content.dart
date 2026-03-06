@@ -7,7 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:weather_fit/entities/enums/feedback_submission_type.dart';
 import 'package:weather_fit/extensions/build_context_extensions.dart';
-import 'package:weather_fit/res/constants.dart' as constants;
+import 'package:weather_fit/res/constants/constants.dart' as constants;
 import 'package:weather_fit/router/app_route.dart';
 import 'package:weather_fit/router/navigator.dart';
 import 'package:weather_fit/settings/bloc/settings_bloc.dart';

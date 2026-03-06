@@ -16,6 +16,7 @@ import 'package:weather_fit/entities/enums/weather_fetch_origin.dart';
 import 'package:weather_fit/entities/models/outfit/outfit_image.dart';
 import 'package:weather_fit/entities/models/temperature/temperature.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
+import 'package:weather_fit/extensions/date_time_extension.dart';
 import 'package:weather_fit/res/extensions/double_extension.dart';
 import 'package:weather_fit/services/home_widget_service.dart';
 import 'package:weather_repository/weather_repository.dart';
@@ -40,6 +41,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
            dailyForecast: const DailyForecastDomain(
              forecast: <ForecastItemDomain>[],
            ),
+           date: DateTime.now(),
          ),
        ) {
     on<FetchWeather>(_onFetchWeather);
@@ -48,6 +50,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     on<GetOutfitEvent>(_onOutfitRecommendationRequested);
     on<FetchDailyForecast>(_onFetchDailyForecast);
     on<UpdateWeatherOnMobileHomeScreenEvent>(_updateWeatherOnMobileHomeScreen);
+    on<CheckDateChangeOnResume>(_checkDateChangeOnResume);
   }
 
   final WeatherRepository _weatherRepository;
@@ -77,7 +80,11 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     final String savedLocale = _localDataSource.getLanguageIsoCode();
     if (eventLocation.isEmpty) {
       emit(
-        WeatherInitial(locale: savedLocale, dailyForecast: state.dailyForecast),
+        WeatherInitial(
+          locale: savedLocale,
+          dailyForecast: state.dailyForecast,
+          date: DateTime.now(),
+        ),
       );
     } else {
       emit(
@@ -85,6 +92,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           locale: savedLocale,
           weather: state.weather,
           dailyForecast: state.dailyForecast,
+          date: state.date,
         ),
       );
       try {
@@ -118,6 +126,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
             weather: updatedWeather,
             outfitRecommendation: outfitRecommendation,
             dailyForecast: dailyForecast,
+            date: state.date,
           ),
         );
 
@@ -145,6 +154,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
               outfitRecommendation: outfitRecommendation,
               outfitImage: outfitImage,
               dailyForecast: dailyForecast,
+              date: state.date,
             ),
           );
         }
@@ -159,6 +169,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
               message: translate('error.cors'),
               outfitRecommendation: stateOutfitRecommendation,
               dailyForecast: state.dailyForecast,
+              date: state.date,
             ),
           );
         } else {
@@ -169,6 +180,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
               message: _mapExceptionToMessage(exception),
               outfitRecommendation: stateOutfitRecommendation,
               dailyForecast: state.dailyForecast,
+              date: state.date,
             ),
           );
         }
@@ -184,6 +196,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     final String stateOutfitRecommendation = state.outfitRecommendation;
     final OutfitImage stateOutfitImage = state.outfitImage;
     final String savedLocale = _localDataSource.getLanguageIsoCode();
+    final DateTime now = DateTime.now();
     if (state is WeatherSuccess || state is WeatherFailure) {
       if (state is WeatherFailure) {
         debugPrint('Failed to get weather on refresh: $state');
@@ -193,6 +206,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           WeatherInitial(
             locale: savedLocale,
             dailyForecast: state.dailyForecast,
+            date: now,
           ),
         );
       } else {
@@ -203,6 +217,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
             outfitRecommendation: stateOutfitRecommendation,
             outfitImage: stateOutfitImage,
             dailyForecast: state.dailyForecast,
+            date: now,
           ),
         );
 
@@ -240,6 +255,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
               outfitRecommendation: updatedOutfitRecommendation,
               outfitImage: updatedOutfitImage,
               dailyForecast: dailyForecast,
+              date: now,
             ),
           );
           final WeatherState currentState = state;
@@ -264,6 +280,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
               outfitRecommendation: stateOutfitRecommendation,
               outfitImage: stateOutfitImage,
               dailyForecast: state.dailyForecast,
+              date: now,
             ),
           );
         }
@@ -276,6 +293,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           outfitRecommendation: stateOutfitRecommendation,
           outfitImage: stateOutfitImage,
           dailyForecast: state.dailyForecast,
+          date: state.date,
         ),
       );
     }
@@ -331,7 +349,11 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
 
     if (eventWeather.isEmpty) {
       emit(
-        WeatherInitial(locale: savedLocale, dailyForecast: state.dailyForecast),
+        WeatherInitial(
+          locale: savedLocale,
+          dailyForecast: state.dailyForecast,
+          date: state.date,
+        ),
       );
     } else {
       final Weather localizedWeather = eventWeather.copyWith(
@@ -343,6 +365,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           locale: savedLocale,
           weather: localizedWeather,
           dailyForecast: state.dailyForecast,
+          date: state.date,
         ),
       );
       try {
@@ -363,6 +386,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
             weather: updatedWeather,
             outfitRecommendation: outfitRecommendation,
             dailyForecast: state.dailyForecast,
+            date: state.date,
           ),
         );
 
@@ -396,6 +420,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
               outfitRecommendation: outfitRecommendation,
               outfitImage: outfitImage,
               dailyForecast: state.dailyForecast,
+              date: state.date,
             ),
           );
         }
@@ -412,6 +437,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
               message: translate('error.cors'),
               outfitRecommendation: stateOutfitRecommendation,
               dailyForecast: state.dailyForecast,
+              date: state.date,
             ),
           );
         } else {
@@ -422,6 +448,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
               message: _mapExceptionToMessage(e),
               outfitRecommendation: stateOutfitRecommendation,
               dailyForecast: state.dailyForecast,
+              date: state.date,
             ),
           );
         }
@@ -441,6 +468,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
         dailyForecast: state.dailyForecast,
         outfitRecommendation: state.outfitRecommendation,
         outfitImage: state.outfitImage,
+        date: state.date,
       ),
     );
     try {
@@ -455,6 +483,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
             locale: savedLocale,
             weather: state.weather,
             dailyForecast: dailyForecast,
+            date: state.date,
           ),
         );
       }
@@ -468,6 +497,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           outfitRecommendation: state.outfitRecommendation,
           outfitImage: state.outfitImage,
           dailyForecast: state.dailyForecast,
+          date: state.date,
         ),
       );
     }
@@ -527,5 +557,18 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
       return translate('error.getting_weather_bloc_generic');
     }
     return translate('error.something_went_wrong');
+  }
+
+  void _checkDateChangeOnResume(
+    CheckDateChangeOnResume event,
+    Emitter<WeatherState> emit,
+  ) {
+    final DateTime now = DateTime.now();
+    final DateTime lastDataDate = state.date;
+
+    // If the date has changed since the app was last active, reload entries
+    if (!lastDataDate.isSameDate(now)) {
+      add(RefreshWeather(event.origin));
+    }
   }
 }

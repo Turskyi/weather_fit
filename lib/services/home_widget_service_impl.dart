@@ -9,7 +9,7 @@ import 'package:weather_fit/data/repositories/outfit_repository.dart';
 import 'package:weather_fit/entities/enums/temperature_units.dart';
 import 'package:weather_fit/entities/models/temperature/temperature.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
-import 'package:weather_fit/res/constants.dart' as constants;
+import 'package:weather_fit/res/constants/constants.dart' as constants;
 import 'package:weather_fit/res/extensions/double_extension.dart';
 import 'package:weather_fit/res/home_widget_keys.dart';
 import 'package:weather_fit/services/home_widget_service.dart';

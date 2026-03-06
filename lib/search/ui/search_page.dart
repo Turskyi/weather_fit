@@ -11,7 +11,7 @@ import 'package:permission_handler/permission_handler.dart'
 import 'package:url_launcher/url_launcher.dart';
 import 'package:weather_fit/entities/enums/search_error_type.dart';
 import 'package:weather_fit/extensions/build_context_extensions.dart';
-import 'package:weather_fit/res/constants.dart' as constants;
+import 'package:weather_fit/res/constants/constants.dart' as constants;
 import 'package:weather_fit/router/app_route.dart';
 import 'package:weather_fit/search/bloc/search_bloc.dart';
 import 'package:weather_fit/search/ui/widgets/search_layout_default.dart';

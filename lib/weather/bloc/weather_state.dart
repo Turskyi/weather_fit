@@ -4,6 +4,7 @@ part of 'weather_bloc.dart';
 sealed class WeatherState extends Equatable {
   const WeatherState({
     required this.locale,
+    required this.date,
     this.outfitRecommendation = '',
     this.outfitImage = const OutfitImage.empty(),
     this.message = '',
@@ -20,6 +21,7 @@ sealed class WeatherState extends Equatable {
   final String message;
   final OutfitImage outfitImage;
   final String locale;
+  final DateTime date;
   final DailyForecastDomain? dailyForecast;
 
   @override
@@ -71,6 +73,7 @@ final class WeatherInitial extends WeatherState {
   const WeatherInitial({
     required super.locale,
     required super.dailyForecast,
+    required super.date,
     super.outfitRecommendation,
     super.weather,
     super.outfitImage,
@@ -90,6 +93,7 @@ final class WeatherInitial extends WeatherState {
     OutfitImage? outfitImage,
     DailyForecastDomain? dailyForecast,
     Language? language,
+    DateTime? date,
   }) {
     return WeatherInitial(
       locale: locale ?? this.locale,
@@ -97,6 +101,7 @@ final class WeatherInitial extends WeatherState {
       outfitRecommendation: outfitRecommendation ?? this.outfitRecommendation,
       outfitImage: outfitImage ?? this.outfitImage,
       dailyForecast: dailyForecast ?? this.dailyForecast,
+      date: date ?? this.date,
     );
   }
 }
@@ -106,6 +111,7 @@ class WeatherLoadingState extends WeatherState {
   const WeatherLoadingState({
     required super.locale,
     required super.weather,
+    required super.date,
     super.outfitRecommendation,
     super.outfitImage,
     super.dailyForecast,
@@ -122,12 +128,16 @@ class WeatherLoadingState extends WeatherState {
     Weather? weather,
     String? outfitRecommendation,
     DailyForecastDomain? dailyForecast,
-  }) => WeatherLoadingState(
-    locale: locale ?? this.locale,
-    weather: weather ?? this.weather,
-    outfitRecommendation: outfitRecommendation ?? this.outfitRecommendation,
-    dailyForecast: dailyForecast ?? this.dailyForecast,
-  );
+    DateTime? date,
+  }) {
+    return WeatherLoadingState(
+      locale: locale ?? this.locale,
+      weather: weather ?? this.weather,
+      outfitRecommendation: outfitRecommendation ?? this.outfitRecommendation,
+      dailyForecast: dailyForecast ?? this.dailyForecast,
+      date: date ?? this.date,
+    );
+  }
 
   @override
   List<Object?> get props => <Object?>[
@@ -144,6 +154,7 @@ class WeatherSuccess extends WeatherState {
   const WeatherSuccess({
     required super.locale,
     required super.dailyForecast,
+    required super.date,
     super.outfitImage,
     super.outfitRecommendation,
     super.weather,
@@ -164,14 +175,18 @@ class WeatherSuccess extends WeatherState {
     OutfitImage? outfitImage,
     String? message,
     DailyForecastDomain? dailyForecast,
-  }) => WeatherSuccess(
-    locale: locale ?? this.locale,
-    weather: weather ?? this.weather,
-    outfitRecommendation: outfitRecommendation ?? this.outfitRecommendation,
-    outfitImage: outfitImage ?? this.outfitImage,
-    message: message ?? this.message,
-    dailyForecast: dailyForecast ?? this.dailyForecast,
-  );
+    DateTime? date,
+  }) {
+    return WeatherSuccess(
+      locale: locale ?? this.locale,
+      weather: weather ?? this.weather,
+      outfitRecommendation: outfitRecommendation ?? this.outfitRecommendation,
+      outfitImage: outfitImage ?? this.outfitImage,
+      message: message ?? this.message,
+      dailyForecast: dailyForecast ?? this.dailyForecast,
+      date: date ?? this.date,
+    );
+  }
 
   @override
   List<Object?> get props => <Object?>[
@@ -189,6 +204,7 @@ final class LoadingOutfitState extends WeatherSuccess {
   const LoadingOutfitState({
     required super.locale,
     required super.dailyForecast,
+    required super.date,
     super.outfitRecommendation = '',
     super.outfitImage = const OutfitImage.empty(),
     super.weather,
@@ -202,6 +218,7 @@ final class LoadingOutfitState extends WeatherSuccess {
 class WeatherFailure extends WeatherState {
   const WeatherFailure({
     required super.locale,
+    required super.date,
     super.weather,
     super.outfitImage,
     super.outfitRecommendation,
@@ -236,6 +253,7 @@ class WeatherFailure extends WeatherState {
 class LocalWebCorsFailure extends WeatherFailure {
   const LocalWebCorsFailure({
     required super.locale,
+    required super.date,
     super.weather,
     super.outfitRecommendation,
     super.message,

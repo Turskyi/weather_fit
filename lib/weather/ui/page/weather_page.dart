@@ -17,13 +17,23 @@ class WeatherPage extends StatefulWidget {
   State<WeatherPage> createState() => _WeatherPageState();
 }
 
-class _WeatherPageState extends State<WeatherPage> {
+class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      context.read<WeatherBloc>().add(RefreshWeather(context.origin));
+    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.addPostFrameCallback((Duration _) {
+      return context.read<WeatherBloc>().add(RefreshWeather(context.origin));
     });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // Check if the date has changed while the app was in the background.
+      // Only reload if we've transitioned to a new day.
+      context.read<WeatherBloc>().add(CheckDateChangeOnResume(context.origin));
+    }
   }
 
   @override
@@ -45,6 +55,12 @@ class _WeatherPageState extends State<WeatherPage> {
         onReportPressed: _handleReportPressed,
       );
     }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   void _handleReportPressed() {

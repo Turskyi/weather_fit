@@ -157,6 +157,7 @@ void main() {
         weatherBloc,
         Stream<WeatherState>.fromIterable(<WeatherState>[
           WeatherInitial(
+            date: DateTime.now(),
             locale: 'en',
             weather: weatherWithNoFlag,
             dailyForecast: const DailyForecastDomain(
@@ -169,14 +170,21 @@ void main() {
               ],
             ),
           ),
-          WeatherLoadingState(locale: 'en', weather: weatherWithNoFlag),
+          WeatherLoadingState(
+            date: DateTime.now(),
+
+            locale: 'en',
+            weather: weatherWithNoFlag,
+          ),
           WeatherFailure(
+            date: DateTime.now(),
             message: errorMessage,
             locale: 'en',
             weather: weatherWithNoFlag,
           ),
         ]),
         initialState: WeatherInitial(
+          date: DateTime.now(),
           locale: 'en',
           weather: weatherWithNoFlag,
           dailyForecast: const DailyForecastDomain(
@@ -242,7 +250,8 @@ void main() {
         WidgetTester tester,
       ) async {
         when(() => weatherBloc.state).thenReturn(
-          const WeatherFailure(
+          WeatherFailure(
+            date: DateTime.now(),
             message: 'Error',
             locale: dummy_constants.dummyLocale,
           ),

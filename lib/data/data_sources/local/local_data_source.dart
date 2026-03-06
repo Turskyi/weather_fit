@@ -12,7 +12,7 @@ import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/entities/enums/temperature_units.dart';
 import 'package:weather_fit/entities/models/search/saved_plan.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
-import 'package:weather_fit/res/constants.dart' as constants;
+import 'package:weather_fit/res/constants/constants.dart' as constants;
 import 'package:weather_fit/res/enums/settings.dart';
 import 'package:weather_fit/res/extensions/double_extension.dart';
 import 'package:weather_repository/weather_repository.dart';

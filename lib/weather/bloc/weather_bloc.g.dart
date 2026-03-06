@@ -19,6 +19,7 @@ WeatherInitial _$WeatherInitialFromJson(Map<String, dynamic> json) =>
                 ? null
                 : DailyForecastDomain.fromJson(v as Map<String, dynamic>),
           ),
+          date: $checkedConvert('date', (v) => DateTime.parse(v as String)),
           outfitRecommendation: $checkedConvert(
             'outfit_recommendation',
             (v) => v as String? ?? '',
@@ -50,6 +51,7 @@ Map<String, dynamic> _$WeatherInitialToJson(WeatherInitial instance) =>
       'outfit_recommendation': instance.outfitRecommendation,
       'outfit_image': instance.outfitImage.toJson(),
       'locale': instance.locale,
+      'date': instance.date.toIso8601String(),
       'daily_forecast': instance.dailyForecast?.toJson(),
     };
 
@@ -65,6 +67,7 @@ WeatherLoadingState _$WeatherLoadingStateFromJson(Map<String, dynamic> json) =>
             (v) =>
                 v == null ? null : Weather.fromJson(v as Map<String, dynamic>),
           ),
+          date: $checkedConvert('date', (v) => DateTime.parse(v as String)),
           outfitRecommendation: $checkedConvert(
             'outfit_recommendation',
             (v) => v as String? ?? '',
@@ -98,6 +101,7 @@ Map<String, dynamic> _$WeatherLoadingStateToJson(
   'outfit_recommendation': instance.outfitRecommendation,
   'outfit_image': instance.outfitImage.toJson(),
   'locale': instance.locale,
+  'date': instance.date.toIso8601String(),
   'daily_forecast': instance.dailyForecast?.toJson(),
 };
 
@@ -114,6 +118,7 @@ WeatherSuccess _$WeatherSuccessFromJson(Map<String, dynamic> json) =>
                 ? null
                 : DailyForecastDomain.fromJson(v as Map<String, dynamic>),
           ),
+          date: $checkedConvert('date', (v) => DateTime.parse(v as String)),
           outfitImage: $checkedConvert(
             'outfit_image',
             (v) => v == null
@@ -147,6 +152,7 @@ Map<String, dynamic> _$WeatherSuccessToJson(WeatherSuccess instance) =>
       'message': instance.message,
       'outfit_image': instance.outfitImage.toJson(),
       'locale': instance.locale,
+      'date': instance.date.toIso8601String(),
       'daily_forecast': instance.dailyForecast?.toJson(),
     };
 
@@ -163,6 +169,7 @@ LoadingOutfitState _$LoadingOutfitStateFromJson(Map<String, dynamic> json) =>
                 ? null
                 : DailyForecastDomain.fromJson(v as Map<String, dynamic>),
           ),
+          date: $checkedConvert('date', (v) => DateTime.parse(v as String)),
           outfitRecommendation: $checkedConvert(
             'outfit_recommendation',
             (v) => v as String? ?? '',
@@ -194,6 +201,7 @@ Map<String, dynamic> _$LoadingOutfitStateToJson(LoadingOutfitState instance) =>
       'outfit_recommendation': instance.outfitRecommendation,
       'outfit_image': instance.outfitImage.toJson(),
       'locale': instance.locale,
+      'date': instance.date.toIso8601String(),
       'daily_forecast': instance.dailyForecast?.toJson(),
     };
 
@@ -204,6 +212,7 @@ WeatherFailure _$WeatherFailureFromJson(Map<String, dynamic> json) =>
       ($checkedConvert) {
         final val = WeatherFailure(
           locale: $checkedConvert('locale', (v) => v as String),
+          date: $checkedConvert('date', (v) => DateTime.parse(v as String)),
           weather: $checkedConvert(
             'weather',
             (v) =>
@@ -243,6 +252,7 @@ Map<String, dynamic> _$WeatherFailureToJson(WeatherFailure instance) =>
       'message': instance.message,
       'outfit_image': instance.outfitImage.toJson(),
       'locale': instance.locale,
+      'date': instance.date.toIso8601String(),
       'daily_forecast': instance.dailyForecast?.toJson(),
     };
 
@@ -253,6 +263,7 @@ LocalWebCorsFailure _$LocalWebCorsFailureFromJson(Map<String, dynamic> json) =>
       ($checkedConvert) {
         final val = LocalWebCorsFailure(
           locale: $checkedConvert('locale', (v) => v as String),
+          date: $checkedConvert('date', (v) => DateTime.parse(v as String)),
           weather: $checkedConvert(
             'weather',
             (v) =>
@@ -285,5 +296,6 @@ Map<String, dynamic> _$LocalWebCorsFailureToJson(
   'outfit_recommendation': instance.outfitRecommendation,
   'message': instance.message,
   'locale': instance.locale,
+  'date': instance.date.toIso8601String(),
   'daily_forecast': instance.dailyForecast?.toJson(),
 };

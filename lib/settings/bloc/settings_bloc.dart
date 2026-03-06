@@ -16,7 +16,7 @@ import 'package:weather_fit/entities/enums/feedback_submission_type.dart';
 import 'package:weather_fit/entities/enums/feedback_type.dart';
 import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/entities/models/exceptions/email_launch_exception.dart';
-import 'package:weather_fit/res/constants.dart' as constants;
+import 'package:weather_fit/res/constants/constants.dart' as constants;
 import 'package:weather_fit/services/update_service.dart';
 
 part 'settings_event.dart';

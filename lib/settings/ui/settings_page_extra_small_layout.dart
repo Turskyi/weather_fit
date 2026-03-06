@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:weather_fit/entities/enums/language.dart';
-import 'package:weather_fit/res/constants.dart' as constant;
+import 'package:weather_fit/res/constants/constants.dart' as constant;
 import 'package:weather_fit/res/widgets/leading_widget.dart';
 import 'package:weather_fit/settings/bloc/settings_bloc.dart';
 import 'package:weather_fit/settings/ui/blurred_fab_with_border.dart';

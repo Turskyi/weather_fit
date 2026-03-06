@@ -289,5 +289,19 @@
     "warm": "👕\nJest ciepło. Szorty, t-shirty i lekkie sukienki to świetne opcje.",
     "hot": "☀️\nJest gorąco! Noś lekką, przewiewną odzież, taką jak topy i szorty.",
     "moderate": "🌤️\nPogoda jest umiarkowana. Możesz nosić różnorodne stroje."
+  },
+  "month_names": {
+    "january": "Styczeń",
+    "february": "Luty",
+    "march": "Marzec",
+    "april": "Kwiecień",
+    "may": "Maj",
+    "june": "Czerwiec",
+    "july": "Lipiec",
+    "august": "Sierpień",
+    "september": "Wrzesień",
+    "october": "Październik",
+    "november": "Listopad",
+    "december": "Grudzień"
   }
 }

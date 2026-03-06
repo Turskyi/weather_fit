@@ -12,7 +12,7 @@ import 'package:weather_fit/data/repositories/outfit_repository.dart';
 import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/env/env.dart';
 import 'package:weather_fit/feedback/feedback_form.dart';
-import 'package:weather_fit/res/constants.dart' as constants;
+import 'package:weather_fit/res/constants/constants.dart' as constants;
 import 'package:weather_fit/res/resources.dart';
 import 'package:weather_fit/res/theme/cubit/theme_cubit.dart';
 import 'package:weather_fit/router/app_route.dart';

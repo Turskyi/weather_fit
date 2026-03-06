@@ -125,6 +125,7 @@ void main() {
         weatherBloc.state,
         WeatherInitial(
           locale: locale,
+          date: DateTime.now(),
           dailyForecast: const DailyForecastDomain(
             forecast: <ForecastItemDomain>[],
           ),
@@ -150,6 +151,7 @@ void main() {
             dailyForecast: const DailyForecastDomain(
               forecast: <ForecastItemDomain>[],
             ),
+            date: DateTime.now(),
           ),
           weatherBloc.state,
         );
@@ -180,10 +182,10 @@ void main() {
           'emits initial when location is empty',
           build: () => weatherBloc,
           seed: () {
-            return const WeatherSuccess(
+            return WeatherSuccess(
               weather: Weather.empty,
               locale: dummy_constants.dummyLocale,
-              dailyForecast: DailyForecastDomain(
+              dailyForecast: const DailyForecastDomain(
                 forecast: <ForecastItemDomain>[
                   ForecastItemDomain(
                     time: dummy_constants.dummyForecastTime,
@@ -192,6 +194,7 @@ void main() {
                   ),
                 ],
               ),
+              date: DateTime(2025),
             );
           },
           act: (WeatherBloc bloc) {
@@ -216,22 +219,25 @@ void main() {
         blocTest<WeatherBloc, WeatherState>(
           'emits updated units when status is not success',
           build: () => weatherBloc,
-          seed: () => WeatherLoadingState(
-            locale: dummy_constants.dummyLocale,
-            weather: Weather(
-              condition: WeatherCondition.rainy,
-              lastUpdatedDateTime: DateTime(2025),
-              location: dummy_constants.dummyLocation,
-              temperature: const Temperature(
-                value: dummy_constants.dummyWeatherTemperature,
+          seed: () {
+            return WeatherLoadingState(
+              locale: dummy_constants.dummyLocale,
+              weather: Weather(
+                condition: WeatherCondition.rainy,
+                lastUpdatedDateTime: DateTime(2025),
+                location: dummy_constants.dummyLocation,
+                temperature: const Temperature(
+                  value: dummy_constants.dummyWeatherTemperature,
+                ),
+                temperatureUnits: TemperatureUnits.celsius,
+                countryCode: dummy_constants.dummyCountryCode,
+                description: '',
+                code: 0,
+                locale: 'en',
               ),
-              temperatureUnits: TemperatureUnits.celsius,
-              countryCode: dummy_constants.dummyCountryCode,
-              description: '',
-              code: 0,
-              locale: 'en',
-            ),
-          ),
+              date: DateTime.now(),
+            );
+          },
           act: (WeatherBloc bloc) => bloc.add(const ToggleUnits()),
           expect: () => <WeatherState>[],
         );
@@ -264,15 +270,53 @@ void main() {
                 ),
               ],
             ),
+            date: DateTime.now(),
           ),
           act: (WeatherBloc bloc) => bloc.add(const ToggleUnits()),
-          expect: () => <WeatherState>[
-            WeatherSuccess(
+          expect: () {
+            return <WeatherState>[
+              WeatherSuccess(
+                locale: dummy_constants.dummyLocale,
+                weather: Weather(
+                  location: dummy_constants.dummyLocation,
+                  temperature: Temperature(
+                    value: dummy_constants.dummyWeatherTemperature.toCelsius(),
+                  ),
+                  lastUpdatedDateTime: DateTime(2020),
+                  condition: WeatherCondition.rainy,
+                  temperatureUnits: TemperatureUnits.celsius,
+                  countryCode: dummy_constants.dummyCountryCode,
+                  description: '',
+                  code: 0,
+                  locale: 'en',
+                ),
+                dailyForecast: const DailyForecastDomain(
+                  forecast: <ForecastItemDomain>[
+                    ForecastItemDomain(
+                      time: dummy_constants.dummyForecastTime,
+                      temperature: dummy_constants.dummyWeatherTemperature,
+                      weatherCode: dummy_constants.dummyWeatherCode,
+                    ),
+                  ],
+                ),
+                date: DateTime.now(),
+              ),
+            ];
+          },
+        );
+
+        blocTest<WeatherBloc, WeatherState>(
+          'emits updated units and temperature '
+          'when status is success (fahrenheit)',
+          build: () => weatherBloc,
+          seed: () {
+            return WeatherSuccess(
+              date: DateTime.now(),
               locale: dummy_constants.dummyLocale,
               weather: Weather(
                 location: dummy_constants.dummyLocation,
-                temperature: Temperature(
-                  value: dummy_constants.dummyWeatherTemperature.toCelsius(),
+                temperature: const Temperature(
+                  value: dummy_constants.dummyWeatherTemperature,
                 ),
                 lastUpdatedDateTime: DateTime(2020),
                 condition: WeatherCondition.rainy,
@@ -291,42 +335,12 @@ void main() {
                   ),
                 ],
               ),
-            ),
-          ],
-        );
-
-        blocTest<WeatherBloc, WeatherState>(
-          'emits updated units and temperature '
-          'when status is success (fahrenheit)',
-          build: () => weatherBloc,
-          seed: () => WeatherSuccess(
-            locale: dummy_constants.dummyLocale,
-            weather: Weather(
-              location: dummy_constants.dummyLocation,
-              temperature: const Temperature(
-                value: dummy_constants.dummyWeatherTemperature,
-              ),
-              lastUpdatedDateTime: DateTime(2020),
-              condition: WeatherCondition.rainy,
-              temperatureUnits: TemperatureUnits.celsius,
-              countryCode: dummy_constants.dummyCountryCode,
-              description: '',
-              code: 0,
-              locale: 'en',
-            ),
-            dailyForecast: const DailyForecastDomain(
-              forecast: <ForecastItemDomain>[
-                ForecastItemDomain(
-                  time: dummy_constants.dummyForecastTime,
-                  temperature: dummy_constants.dummyWeatherTemperature,
-                  weatherCode: dummy_constants.dummyWeatherCode,
-                ),
-              ],
-            ),
-          ),
+            );
+          },
           act: (WeatherBloc bloc) => bloc.add(const ToggleUnits()),
           expect: () => <WeatherState>[
             WeatherSuccess(
+              date: DateTime.now(),
               locale: dummy_constants.dummyLocale,
               weather: Weather(
                 location: dummy_constants.dummyLocation,

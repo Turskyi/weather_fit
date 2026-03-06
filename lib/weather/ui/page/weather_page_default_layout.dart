@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
-import 'package:weather_fit/res/constants.dart' as constants;
+import 'package:weather_fit/res/constants/constants.dart' as constants;
 import 'package:weather_fit/res/widgets/local_web_cors_error.dart';
 import 'package:weather_fit/res/widgets/store_badge.dart';
 import 'package:weather_fit/router/app_route.dart';
