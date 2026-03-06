@@ -66,6 +66,25 @@ sealed class WeatherState extends Equatable {
       this is! LoadingOutfitState && this is! WeatherLoadingState;
 
   bool get isInitial => this is WeatherInitial;
+
+  List<ForecastItemDomain> get forecast {
+    final List<ForecastItemDomain> forecastItems =
+        dailyForecast?.forecast ?? <ForecastItemDomain>[];
+
+    final DateTime now = DateTime.now();
+    const List<int> desiredHours = <int>[8, 13, 19];
+
+    final List<ForecastItemDomain> forecast = forecastItems
+        .where((ForecastItemDomain item) {
+          final DateTime? itemTime = DateTime.tryParse(item.time);
+          return itemTime != null &&
+              itemTime.isAfter(now) &&
+              desiredHours.contains(itemTime.hour);
+        })
+        .take(3)
+        .toList();
+    return forecast;
+  }
 }
 
 @JsonSerializable()

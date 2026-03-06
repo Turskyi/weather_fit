@@ -158,8 +158,11 @@ class _DailyForecastState extends State<DailyForecast> {
 
                       final List<ForecastItemDomain> forecast = forecastItems
                           .where((ForecastItemDomain item) {
-                            final DateTime itemTime = DateTime.parse(item.time);
-                            return itemTime.isAfter(now) &&
+                            final DateTime? itemTime = DateTime.tryParse(
+                              item.time,
+                            );
+                            return itemTime != null &&
+                                itemTime.isAfter(now) &&
                                 desiredHours.contains(itemTime.hour);
                           })
                           .take(3)

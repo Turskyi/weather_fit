@@ -143,7 +143,7 @@ class WeatherContentDefault extends StatelessWidget {
                         const SizedBox(height: 24),
                         BlocBuilder<WeatherBloc, WeatherState>(
                           builder: (BuildContext _, WeatherState state) {
-                            if (state.dailyForecast != null) {
+                            if (state.forecast.isNotEmpty) {
                               return DailyForecast(key: key);
                             } else {
                               return const SizedBox();
@@ -190,7 +190,7 @@ class WeatherContentDefault extends StatelessWidget {
 
                   BlocBuilder<WeatherBloc, WeatherState>(
                     builder: (BuildContext _, WeatherState state) {
-                      if (state.dailyForecast == null) {
+                      if (state.forecast.isEmpty) {
                         return const SizedBox();
                       } else {
                         return DailyForecast(key: key);
