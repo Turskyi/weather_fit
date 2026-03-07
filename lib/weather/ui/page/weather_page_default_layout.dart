@@ -189,11 +189,11 @@ class WeatherPageDefaultLayout extends StatelessWidget {
           : kIsWeb
           ? <Widget>[
               const StoreBadge(
-                url: constants.googlePlayUrl,
+                url: constants.kGooglePlayUrl,
                 assetPath: constants.playStoreBadgePath,
               ),
               const StoreBadge(
-                url: constants.appStoreUrl,
+                url: constants.kAppStoreUrl,
                 assetPath: constants.appStoreBadgeAssetPath,
                 height: constants.appStoreBadgeHeight,
                 width: constants.appStoreBadgeWidth,
@@ -280,11 +280,11 @@ class WeatherPageDefaultLayout extends StatelessWidget {
         ),
       ),
       const StoreBadge(
-        url: constants.googlePlayUrl,
+        url: constants.kGooglePlayUrl,
         assetPath: constants.playStoreBadgePath,
       ),
       const StoreBadge(
-        url: constants.appStoreUrl,
+        url: constants.kAppStoreUrl,
         assetPath: constants.appStoreBadgeAssetPath,
         height: constants.appStoreBadgeHeight,
         width: constants.appStoreBadgeWidth,

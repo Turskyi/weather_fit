@@ -8,9 +8,9 @@ const String supportEmail = 'support@$domain';
 const String imagePath = 'assets/images/';
 const String outfitImagePath = '${imagePath}outfits/';
 const String appName = 'WeatherFit';
-const String googlePlayUrl =
+const String kGooglePlayUrl =
     'https://play.google.com/store/apps/details?id=com.turskyi.weather_fit';
-const String appStoreUrl =
+const String kAppStoreUrl =
     'https://apps.apple.com/ca/app/weatherfit/id6743688355';
 const String itunesLookupUrl = 'https://itunes.apple.com/lookup?bundleId=';
 const String developerName = 'Dmytro Turskyi';
