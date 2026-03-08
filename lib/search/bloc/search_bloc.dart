@@ -31,11 +31,11 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
          SearchInitial(
            quickCitiesSuggestions: <QuickCitySuggestion>[
              QuickCitySuggestion(
-               name: translate('search.quick_city_toronto'),
-               flag: '🇨🇦',
-             ),
-             QuickCitySuggestion(
-               name: translate('search.quick_city_north_york'),
+               name: translate(
+                 localDataSource.getSavedLanguage().isUkrainian
+                     ? 'search.quick_city_north_york'
+                     : 'search.quick_city_toronto',
+               ),
                flag: '🇨🇦',
              ),
              QuickCitySuggestion(

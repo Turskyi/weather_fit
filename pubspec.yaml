@@ -35,7 +35,7 @@ dependencies:
   flutter_email_sender: ^8.0.0
   flutter_localizations:
     sdk: flutter
-  flutter_svg: ^2.2.3
+  flutter_svg: ^2.2.4
   flutter_translate:
     git:
       url: https://github.com/Javernaver/flutter_translate.git
