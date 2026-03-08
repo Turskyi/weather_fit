@@ -246,7 +246,7 @@ class _PrivacyPolicyAndroidPageState extends State<PrivacyPolicyAndroidPage> {
               style: TextStyle(fontSize: bodySize),
             ),
             const EmailText(constants.supportEmail),
-            const SizedBox(height: 10),
+            const SizedBox(height: 20),
           ],
         ),
       ),
