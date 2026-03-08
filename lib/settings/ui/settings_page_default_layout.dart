@@ -110,9 +110,7 @@ class SettingsPageDefaultLayout extends StatelessWidget {
                                 );
                               }).toList(),
                               selected: <Language>{settingsState.language},
-                              onSelectionChanged: (Set<Language> newSelection) {
-                                onLanguageChanged(newSelection.first);
-                              },
+                              onSelectionChanged: _onLanguageSelected,
                             ),
                           ],
                         ),
@@ -266,5 +264,12 @@ class SettingsPageDefaultLayout extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  void _onLanguageSelected(Set<Language> newSelection) {
+    final Language? language = newSelection.firstOrNull;
+    if (language != null) {
+      onLanguageChanged(language);
+    }
   }
 }
