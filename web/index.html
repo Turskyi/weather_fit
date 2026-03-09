@@ -2,20 +2,22 @@
 <html lang="en">
 
 <head>
-      <!--
-          If you are serving your web app in a path other than the root, change the
-          href value below to reflect the base path you are serving from.
 
-          The path provided below has to start and end with a slash "/" in order for
-          it to work correctly.
-
-          For more details:
-          * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-          This is a placeholder for base href that will be replaced by the value of
-          the `--base-href` argument provided to `flutter build`.
-        -->
       <base href="$FLUTTER_BASE_HREF">
+
+      <meta charset="UTF-8">
+
+      <!-- Google tag (gtag.js) -->
+      <script async
+            src="https://www.googletagmanager.com/gtag/js?id=G-NSHW9QP276"></script>
+      <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag() { dataLayer.push(arguments); }
+            gtag('js', new Date());
+
+            gtag('config', 'G-NSHW9QP276');
+      </script>
+
       <link href="https://weather-fit.com/" rel="canonical">
       <meta content="weather outfit planner, what to wear weather, outfit recommendation weather, weather clothing advice, weather outfit app, WeatherFit"
             name="keywords">
@@ -82,7 +84,6 @@
       }
       </script>
 
-      <meta charset="UTF-8">
       <meta content="IE=Edge" http-equiv="X-UA-Compatible">
       <meta content="Dmytro Turskyi" name="author">
       <meta content="WeatherFit suggests what to wear based on the weather and helps you plan outfits for future trips. Get simple clothing recommendations for any forecast."
