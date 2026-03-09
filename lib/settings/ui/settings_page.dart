@@ -25,7 +25,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     return context.isExtraSmallScreen
         ? SettingsPageExtraSmallLayout(
-            rebuildSettingsWhen: _isLanguageChanged,
+            rebuildSettingsWhen: _isLanguageOrUpdateFrequencyChanged,
             onLanguageChanged: _changeLanguage,
             rebuildUnitsWhen: _isUnitsChanged,
             onUnitsChanged: _changeUnits,
@@ -37,7 +37,7 @@ class _SettingsPageState extends State<SettingsPage> {
             onSearchPressed: _handleLocationSearchAndFetchWeather,
           )
         : SettingsPageDefaultLayout(
-            rebuildSettingsWhen: _isLanguageChanged,
+            rebuildSettingsWhen: _isLanguageOrUpdateFrequencyChanged,
             onLanguageChanged: _changeLanguage,
             rebuildUnitsWhen: _isUnitsChanged,
             onUnitsChanged: _changeUnits,
@@ -88,8 +88,12 @@ class _SettingsPageState extends State<SettingsPage> {
         current.weather.temperatureUnits;
   }
 
-  bool _isLanguageChanged(SettingsState previous, SettingsState current) {
-    return previous.language != current.language;
+  bool _isLanguageOrUpdateFrequencyChanged(
+    SettingsState previous,
+    SettingsState current,
+  ) {
+    return previous.language != current.language ||
+        previous.widgetUpdateFrequency != current.widgetUpdateFrequency;
   }
 
   void _changeLanguage(Language language) {

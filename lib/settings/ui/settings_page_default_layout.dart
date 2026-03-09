@@ -147,6 +147,148 @@ class SettingsPageDefaultLayout extends StatelessWidget {
                   },
                 ),
                 if (!kIsWeb &&
+                    (defaultTargetPlatform == TargetPlatform.android ||
+                        defaultTargetPlatform ==
+                            TargetPlatform.iOS)) ...<Widget>[
+                  const SizedBox(height: 20),
+                  // Home Widget Updates Card.
+                  BlocBuilder<SettingsBloc, SettingsState>(
+                    buildWhen: rebuildSettingsWhen,
+                    builder: (BuildContext context, SettingsState state) {
+                      final bool isAndroid =
+                          defaultTargetPlatform == TargetPlatform.android;
+
+                      final Map<int, String> options = isAndroid
+                          ? <int, String>{
+                              15: translate('settings.frequency_15m'),
+                              30: translate('settings.frequency_30m'),
+                              60: translate('settings.frequency_1h'),
+                              constant.kAndroidDefaultMinutesFrequency:
+                                  translate('settings.frequency_2h'),
+                              360: translate('settings.frequency_6h'),
+                              720: translate('settings.frequency_12h'),
+                              1440: translate('settings.frequency_24h'),
+                            }
+                          : <int, String>{
+                              60: translate('settings.frequency_1h'),
+                              constant.kIosDefaultMinutesFrequency: translate(
+                                'settings.frequency_3h',
+                              ),
+                              360: translate('settings.frequency_6h'),
+                              720: translate('settings.frequency_12h'),
+                              1440: translate('settings.frequency_24h'),
+                            };
+
+                      return Card(
+                        elevation: 2.0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        Text(
+                                          translate(
+                                            'settings.widget_updates_title',
+                                          ),
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          translate(
+                                            'settings.widget_updates_subtitle',
+                                            args: <String, Object?>{
+                                              'appName': constant.kAppName,
+                                            },
+                                          ),
+                                          style: const TextStyle(fontSize: 12),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.info_outline),
+                                    onPressed: () {
+                                      _showWidgetInfoDialog(context);
+                                    },
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 12),
+                              LayoutBuilder(
+                                builder:
+                                    (
+                                      BuildContext context,
+                                      BoxConstraints constraints,
+                                    ) {
+                                      // Use Dropdown if space is limited,
+                                      // otherwise SegmentedButton.
+                                      if (constraints.maxWidth < 400) {
+                                        return DropdownButton<int>(
+                                          value: state.widgetUpdateFrequency,
+                                          isExpanded: true,
+                                          items: options.entries.map((
+                                            MapEntry<int, String> entry,
+                                          ) {
+                                            return DropdownMenuItem<int>(
+                                              value: entry.key,
+                                              child: Text(entry.value),
+                                            );
+                                          }).toList(),
+                                          onChanged: (int? value) {
+                                            _onWidgetUpdateFrequencyChanged(
+                                              value: value,
+                                              context: context,
+                                            );
+                                          },
+                                        );
+                                      }
+                                      return SegmentedButton<int>(
+                                        segments: options.entries.map((
+                                          MapEntry<int, String> entry,
+                                        ) {
+                                          return ButtonSegment<int>(
+                                            value: entry.key,
+                                            label: Text(
+                                              entry.value,
+                                              style: const TextStyle(
+                                                fontSize: 10,
+                                              ),
+                                            ),
+                                          );
+                                        }).toList(),
+                                        selected: <int>{
+                                          state.widgetUpdateFrequency,
+                                        },
+                                        onSelectionChanged: (Set<int> value) {
+                                          context.read<SettingsBloc>().add(
+                                            ChangeWidgetUpdateFrequencyEvent(
+                                              value.first,
+                                            ),
+                                          );
+                                        },
+                                      );
+                                    },
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+                if (!kIsWeb &&
                     (defaultTargetPlatform ==
                         TargetPlatform.android)) ...<Widget>[
                   const SizedBox(height: 20),
@@ -266,10 +408,47 @@ class SettingsPageDefaultLayout extends StatelessWidget {
     );
   }
 
+  void _onWidgetUpdateFrequencyChanged({
+    required BuildContext context,
+    required int? value,
+  }) {
+    if (value != null) {
+      context.read<SettingsBloc>().add(ChangeWidgetUpdateFrequencyEvent(value));
+    }
+  }
+
   void _onLanguageSelected(Set<Language> newSelection) {
     final Language? language = newSelection.firstOrNull;
     if (language != null) {
       onLanguageChanged(language);
     }
+  }
+
+  Future<void> _showWidgetInfoDialog(BuildContext context) {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        final bool isAndroid = defaultTargetPlatform == TargetPlatform.android;
+
+        return AlertDialog(
+          title: Text(
+            isAndroid
+                ? translate('settings.widget_info_title_android')
+                : translate('settings.widget_info_title_ios'),
+          ),
+          content: Text(
+            isAndroid
+                ? translate('settings.widget_info_content_android')
+                : translate('settings.widget_info_content_ios'),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: Navigator.of(context).pop,
+              child: Text(translate('settings.ok')),
+            ),
+          ],
+        );
+      },
+    );
   }
 }

@@ -361,6 +361,17 @@ class LocalDataSource {
     return _preferences.setStringList(Settings.savedPlans.key, jsonList);
   }
 
+  Future<bool> saveWidgetUpdateFrequency(int minutes) {
+    return _preferences.setInt(Settings.widgetUpdateFrequency.key, minutes);
+  }
+
+  int getWidgetUpdateFrequency() {
+    return _preferences.getInt(Settings.widgetUpdateFrequency.key) ??
+        (defaultTargetPlatform == TargetPlatform.iOS
+            ? constants.kIosDefaultMinutesFrequency
+            : constants.kAndroidDefaultMinutesFrequency);
+  }
+
   String _translateError(String key, String locale) {
     final Map<String, Map<String, String>> localizedErrors =
         <String, Map<String, String>>{

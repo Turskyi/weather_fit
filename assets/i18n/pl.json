@@ -134,7 +134,22 @@
     "feedback_subtitle": "Daj nam znać, co myślisz i jakie masz sugestie. Możesz także zgłaszać wszelkie problemy z treścią aplikacji.",
     "support_subtitle": "Odwiedź naszą stronę wsparcia, aby uzyskać pomoc i odpowiedzi na najczęściej zadawane pytania.",
     "pin_widget": "Przypnij widżet",
-    "pin_widget_subtitle": "Dodaj widżet do ekranu głównego, aby szybko sprawdzać pogodę."
+    "pin_widget_subtitle": "Dodaj widżet do ekranu głównego, aby szybko sprawdzać pogodę.",
+    "frequency_15m": "15 min",
+    "frequency_30m": "30 min",
+    "frequency_1h": "1 godz.",
+    "frequency_2h": "2 godz.",
+    "frequency_3h": "3 godz.",
+    "frequency_6h": "6 godz.",
+    "frequency_12h": "12 godz.",
+    "frequency_24h": "24 godz.",
+    "widget_updates_title": "Aktualizacje widżetu",
+    "widget_updates_subtitle": "Określ, jak często widżet {appName} ma odświeżać dane pogodowe.",
+    "widget_info_title_android": "Aktualizacje widżetu na Androidzie",
+    "widget_info_title_ios": "Aktualizacje widżetu na iOS",
+    "widget_info_content_android": "WeatherFit może regularnie aktualizować widżet w tle. Wybrany interwał jest zazwyczaj respektowany przez system.",
+    "widget_info_content_ios": "System iOS kontroluje uruchamianie zadań w tle. Nawet jeśli wybrano krótszy interwał, system może aktualizować widżet znacznie rzadziej w zależności od baterii, aktywności urządzenia i zasad systemowych.\n\nWskazówki dotyczące lepszych aktualizacji:\n• Pozostaw WeatherFit na liście ostatnich aplikacji\n• Włącz „Odświeżanie w tle” w ustawieniach systemu\n• Otwieraj aplikację od czasu do czasu",
+    "ok": "OK"
   },
   "search": {
     "label": "Szukaj",

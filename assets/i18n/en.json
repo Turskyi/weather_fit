@@ -134,7 +134,22 @@
     "feedback_subtitle": "Let us know your thoughts and suggestions. You can also report any issues with the app’s content.",
     "support_subtitle": "Visit our support page for help and frequently asked questions.",
     "pin_widget": "Pin Widget",
-    "pin_widget_subtitle": "Add a widget to your home screen to see the weather at a glance."
+    "pin_widget_subtitle": "Add a widget to your home screen to see the weather at a glance.",
+    "frequency_15m": "15m",
+    "frequency_30m": "30m",
+    "frequency_1h": "1h",
+    "frequency_2h": "2h",
+    "frequency_3h": "3h",
+    "frequency_6h": "6h",
+    "frequency_12h": "12h",
+    "frequency_24h": "24h",
+    "widget_updates_title": "Home Widget Updates",
+    "widget_updates_subtitle": "Control how often the {appName} widget refreshes its weather data.",
+    "widget_info_title_android": "Widget updates on Android",
+    "widget_info_title_ios": "Widget updates on iOS",
+    "widget_info_content_android": "WeatherFit can update the widget regularly in the background. The selected interval is usually respected by the system.",
+    "widget_info_content_ios": "iOS controls when background tasks run. Even if a shorter interval is selected, the system may update the widget much less frequently depending on battery, device activity, and system policies.\n\nTips for better updates:\n• Keep WeatherFit in the recent apps list\n• Enable \"Background App Refresh\" in system settings\n• Open the app occasionally",
+    "ok": "OK"
   },
   "search": {
     "label": "Search",

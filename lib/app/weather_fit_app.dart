@@ -132,7 +132,7 @@ class WeatherFitApp extends StatelessWidget {
                 child: MaterialApp(
                   navigatorKey: navigatorKey,
                   debugShowCheckedModeBanner: false,
-                  title: constants.appName,
+                  title: constants.kAppName,
                   localizationsDelegates: <LocalizationsDelegate<Object>>[
                     GlobalMaterialLocalizations.delegate,
                     GlobalWidgetsLocalizations.delegate,

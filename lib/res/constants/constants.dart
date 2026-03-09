@@ -7,7 +7,7 @@ const String domain = 'weather-fit.com';
 const String supportEmail = 'support@$domain';
 const String imagePath = 'assets/images/';
 const String outfitImagePath = '${imagePath}outfits/';
-const String appName = 'WeatherFit';
+const String kAppName = 'WeatherFit';
 const String kGooglePlayUrl =
     'https://play.google.com/store/apps/details?id=com.turskyi.weather_fit';
 const String kAppStoreUrl =
@@ -41,7 +41,7 @@ const double blurSigma = 8;
 
 const String doNotReplySenderName = 'Do Not Reply';
 const String feedbackEmailSender =
-    '$doNotReplySenderName $appName <no-reply@$resendEmailDomain>';
+    '$doNotReplySenderName $kAppName <no-reply@$resendEmailDomain>';
 const String feedbackScreenshotFileName = 'feedback.png';
 
 const String remoteOutfitBaseUrl =
@@ -54,3 +54,8 @@ const double kWideLayoutBreakpoint = 1000.0;
 const String kMacOSLocationServicesSettingsUrl =
     'x-apple.systempreferences:com.apple.preference.security?'
     'Privacy_LocationServices';
+
+const int kIosDefaultMinutesFrequency = 180;
+const int kAndroidDefaultMinutesFrequency = 120;
+const String kBackgroundUniqueName = 'weatherfit_background_update';
+const String kBackgroundTaskName = 'updateWidgetTask';

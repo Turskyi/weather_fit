@@ -20,6 +20,7 @@ import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/localization/localization_delegate_getter.dart'
     as locale;
+import 'package:weather_fit/res/constants/constants.dart' as constants;
 import 'package:weather_fit/services/home_widget_service.dart';
 import 'package:weather_fit/services/home_widget_service_impl.dart';
 import 'package:weather_fit/use_cases/initialize_app_language_use_case.dart';
@@ -29,11 +30,6 @@ import 'package:workmanager/workmanager.dart';
 
 Future<Dependencies> injectDependencies() async {
   await _initializeAllDateFormatting();
-  // Make sure we run on supported platforms:
-  // https://pub.dev/packages/workmanager
-  if (!kIsWeb && !Platform.isMacOS && (Platform.isAndroid || Platform.isIOS)) {
-    _setupBackgroundWidgetUpdates();
-  }
 
   Bloc.observer = const WeatherBlocObserver();
 
@@ -45,6 +41,13 @@ Future<Dependencies> injectDependencies() async {
 
   final SharedPreferences preferences = await SharedPreferences.getInstance();
   final LocalDataSource localDataSource = LocalDataSource(preferences);
+
+  // Make sure we run on supported platforms:
+  // https://pub.dev/packages/workmanager
+  if (!kIsWeb && !Platform.isMacOS && (Platform.isAndroid || Platform.isIOS)) {
+    _setupBackgroundWidgetUpdates(localDataSource);
+  }
+
   final RemoteDataSource remoteDataSource = RemoteDataSource(Dio());
   final OutfitRepository outfitRepository = OutfitRepository(
     localDataSource,
@@ -130,8 +133,7 @@ Future<void> _initializeWebHydratedStorage() async {
 /// and device state
 ///
 /// **What we're doing correctly:**
-/// ✅ Registering task with 2-hour frequency (workmanager minimum on iOS is
-/// 15 min)
+/// ✅ Registering task with configurable frequency
 /// ✅ Using NetworkType.connected constraint to avoid draining battery
 /// ✅ Handling errors gracefully with try-catch and debug logging
 /// ✅ Using @pragma('vm:entry-point') for callback dispatcher
@@ -140,8 +142,7 @@ Future<void> _initializeWebHydratedStorage() async {
 /// **Expected behavior on iOS:**
 /// - Widget may update ~1-2 times per day when iOS decides to execute
 /// background fetch
-/// - Updates are NOT tied to the 120-minute frequency we request; that's just
-/// a hint
+/// - Updates are NOT tied to the frequency we request; that's just a hint
 /// - Device state, battery, and user behavior are primary factors in iOS
 /// scheduling
 /// - This is why widget updates on iOS appear irregular and unpredictable
@@ -151,19 +152,22 @@ Future<void> _initializeWebHydratedStorage() async {
 /// - https://developer.apple.com/documentation/backgroundtasks
 /// - Apple's BGTaskScheduler APIs have hard execution time limits
 ///
-Future<void> _setupBackgroundWidgetUpdates() async {
+Future<void> _setupBackgroundWidgetUpdates(
+  LocalDataSource localDataSource,
+) async {
   try {
     await Workmanager().initialize(_callbackDispatcher);
+    final int frequencyMinutes = localDataSource.getWidgetUpdateFrequency();
     try {
       await Workmanager().registerPeriodicTask(
-        'weatherfit_background_update',
-        'updateWidgetTask',
-        // Request 2-hour frequency, but iOS will schedule based on its own
-        // heuristics.
+        constants.kBackgroundUniqueName,
+        constants.kBackgroundTaskName,
+        // Request frequency, but iOS will schedule based on its own heuristics.
         // On iOS, actual execution may be much less frequent (~1x daily).
         // This is an OS-level limitation, not a configuration issue.
-        frequency: const Duration(minutes: 120),
+        frequency: Duration(minutes: frequencyMinutes),
         constraints: Constraints(networkType: NetworkType.connected),
+        existingWorkPolicy: ExistingPeriodicWorkPolicy.keep,
       );
     } catch (e) {
       debugPrint(
