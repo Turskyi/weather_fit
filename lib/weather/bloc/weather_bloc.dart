@@ -51,6 +51,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     on<FetchDailyForecast>(_onFetchDailyForecast);
     on<UpdateWeatherOnMobileHomeScreenEvent>(_updateWeatherOnMobileHomeScreen);
     on<CheckDateChangeOnResume>(_checkDateChangeOnResume);
+    on<ToggleFavouriteEvent>(_onToggleFavourite);
   }
 
   final WeatherRepository _weatherRepository;
@@ -78,12 +79,16 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
   ) async {
     final Location eventLocation = event.location;
     final String savedLocale = _localDataSource.getLanguageIsoCode();
+    final bool isFavourite = _localDataSource.isFavouriteLocation(
+      eventLocation,
+    );
     if (eventLocation.isEmpty) {
       emit(
         WeatherInitial(
           locale: savedLocale,
           dailyForecast: state.dailyForecast,
           date: DateTime.now(),
+          isFavourite: isFavourite,
         ),
       );
     } else {
@@ -93,6 +98,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           weather: state.weather,
           dailyForecast: state.dailyForecast,
           date: state.date,
+          isFavourite: isFavourite,
         ),
       );
       try {
@@ -127,6 +133,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
             outfitRecommendation: outfitRecommendation,
             dailyForecast: dailyForecast,
             date: state.date,
+            isFavourite: isFavourite,
           ),
         );
 
@@ -155,6 +162,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
               outfitImage: outfitImage,
               dailyForecast: dailyForecast,
               date: state.date,
+              isFavourite: isFavourite,
             ),
           );
         }
@@ -170,6 +178,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
               outfitRecommendation: stateOutfitRecommendation,
               dailyForecast: state.dailyForecast,
               date: state.date,
+              isFavourite: isFavourite,
             ),
           );
         } else {
@@ -181,6 +190,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
               outfitRecommendation: stateOutfitRecommendation,
               dailyForecast: state.dailyForecast,
               date: state.date,
+              isFavourite: isFavourite,
             ),
           );
         }
@@ -196,6 +206,9 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     final String stateOutfitRecommendation = state.outfitRecommendation;
     final OutfitImage stateOutfitImage = state.outfitImage;
     final String savedLocale = _localDataSource.getLanguageIsoCode();
+    final bool isFavourite = _localDataSource.isFavouriteLocation(
+      stateWeather.location,
+    );
     final DateTime now = DateTime.now();
     if (state is WeatherSuccess || state is WeatherFailure) {
       if (state is WeatherFailure) {
@@ -207,6 +220,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
             locale: savedLocale,
             dailyForecast: state.dailyForecast,
             date: now,
+            isFavourite: isFavourite,
           ),
         );
       } else {
@@ -218,6 +232,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
             outfitImage: stateOutfitImage,
             dailyForecast: state.dailyForecast,
             date: now,
+            isFavourite: isFavourite,
           ),
         );
 
@@ -256,6 +271,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
               outfitImage: updatedOutfitImage,
               dailyForecast: dailyForecast,
               date: now,
+              isFavourite: isFavourite,
             ),
           );
           final WeatherState currentState = state;
@@ -281,6 +297,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
               outfitImage: stateOutfitImage,
               dailyForecast: state.dailyForecast,
               date: now,
+              isFavourite: isFavourite,
             ),
           );
         }
@@ -294,6 +311,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           outfitImage: stateOutfitImage,
           dailyForecast: state.dailyForecast,
           date: state.date,
+          isFavourite: isFavourite,
         ),
       );
     }
@@ -346,6 +364,9 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     final Location eventLocation = eventWeather.location;
 
     final String savedLocale = _localDataSource.getLanguageIsoCode();
+    final bool isFavourite = _localDataSource.isFavouriteLocation(
+      eventLocation,
+    );
 
     if (eventWeather.isEmpty) {
       emit(
@@ -353,6 +374,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           locale: savedLocale,
           dailyForecast: state.dailyForecast,
           date: state.date,
+          isFavourite: isFavourite,
         ),
       );
     } else {
@@ -366,6 +388,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           weather: localizedWeather,
           dailyForecast: state.dailyForecast,
           date: state.date,
+          isFavourite: isFavourite,
         ),
       );
       try {
@@ -387,6 +410,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
             outfitRecommendation: outfitRecommendation,
             dailyForecast: state.dailyForecast,
             date: state.date,
+            isFavourite: isFavourite,
           ),
         );
 
@@ -421,6 +445,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
               outfitImage: outfitImage,
               dailyForecast: state.dailyForecast,
               date: state.date,
+              isFavourite: isFavourite,
             ),
           );
         }
@@ -438,6 +463,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
               outfitRecommendation: stateOutfitRecommendation,
               dailyForecast: state.dailyForecast,
               date: state.date,
+              isFavourite: isFavourite,
             ),
           );
         } else {
@@ -449,6 +475,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
               outfitRecommendation: stateOutfitRecommendation,
               dailyForecast: state.dailyForecast,
               date: state.date,
+              isFavourite: isFavourite,
             ),
           );
         }
@@ -461,6 +488,9 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     Emitter<WeatherState> emit,
   ) async {
     final String savedLocale = _localDataSource.getLanguageIsoCode();
+    final bool isFavourite = _localDataSource.isFavouriteLocation(
+      event.location,
+    );
     emit(
       WeatherLoadingState(
         locale: savedLocale,
@@ -469,6 +499,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
         outfitRecommendation: state.outfitRecommendation,
         outfitImage: state.outfitImage,
         date: state.date,
+        isFavourite: isFavourite,
       ),
     );
     try {
@@ -484,6 +515,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
             weather: state.weather,
             dailyForecast: dailyForecast,
             date: state.date,
+            isFavourite: isFavourite,
           ),
         );
       }
@@ -498,6 +530,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           outfitImage: state.outfitImage,
           dailyForecast: state.dailyForecast,
           date: state.date,
+          isFavourite: isFavourite,
         ),
       );
     }
@@ -569,6 +602,34 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     // If the date has changed since the app was last active, reload entries
     if (!lastDataDate.isSameDate(now)) {
       add(RefreshWeather(event.origin));
+    }
+  }
+
+  FutureOr<void> _onToggleFavourite(
+    ToggleFavouriteEvent event,
+    Emitter<WeatherState> emit,
+  ) async {
+    final Location location = event.location;
+    final bool currentlyFavourite = _localDataSource.isFavouriteLocation(
+      location,
+    );
+    if (currentlyFavourite) {
+      await _localDataSource.removeFavouriteLocation(location);
+    } else {
+      await _localDataSource.saveFavouriteLocation(location);
+    }
+
+    final WeatherState currentState = state;
+    if (currentState is WeatherSuccess) {
+      emit(currentState.copyWith(isFavourite: !currentlyFavourite));
+    } else if (currentState is WeatherInitial) {
+      emit(currentState.copyWith(isFavourite: !currentlyFavourite));
+    } else if (currentState is WeatherFailure) {
+      emit(currentState.copyWith(isFavourite: !currentlyFavourite));
+    } else if (currentState is LocalWebCorsFailure) {
+      emit(currentState.copyWith(isFavourite: !currentlyFavourite));
+    } else {
+      emit(currentState);
     }
   }
 }

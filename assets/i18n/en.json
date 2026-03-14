@@ -64,6 +64,8 @@
   "screen_size": "Screen size",
   "state": "State",
   "report_issue": "Report issue",
+  "location_saved": "Location saved to favourites",
+  "location_removed": "Removed from favourites.",
   "feedback": {
     "title": "Feedback",
     "app_feedback": "App Feedback",

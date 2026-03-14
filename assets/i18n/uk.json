@@ -65,6 +65,8 @@
   "screen_size": "Розміри екрану",
   "state": "Стан",
   "report_issue": "Повідомити про проблему",
+  "location_saved": "Місце збережено у вибране",
+  "location_removed": "Вилучено з вибраного.",
   "feedback": {
     "title": "Відгук",
     "app_feedback": "Відгук про додаток",

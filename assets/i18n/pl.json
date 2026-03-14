@@ -64,6 +64,8 @@
   "screen_size": "Rozmiar ekranu",
   "state": "Status",
   "report_issue": "Zgłoś problem",
+  "location_saved": "Lokalizacja zapisana w ulubionych",
+  "location_removed": "Usunięto z ulubionych.",
   "feedback": {
     "title": "Opinia",
     "app_feedback": "Opinia o aplikacji",

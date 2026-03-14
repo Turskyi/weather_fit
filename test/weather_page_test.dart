@@ -35,15 +35,19 @@ import 'helpers/mocks/mock_blocs.dart';
 import 'helpers/mocks/mock_repositories.dart';
 import 'helpers/mocks/mock_services.dart';
 
+class MockLocalDataSource extends Mock implements LocalDataSource {}
+
 void main() {
   initHydratedStorage();
   late LocalizationDelegate localizationDelegate;
+  late MockLocalDataSource mockLocalDataSource;
+
   setUpAll(() async {
     registerFallbackValue(
       const RefreshWeather(WeatherFetchOrigin.defaultDevice),
     );
     registerFallbackValue(const SearchLocation(''));
-    registerFallbackValue(repository.Location.empty);
+    registerFallbackValue(const repository.Location.empty());
 
     SharedPreferences.setMockInitialValues(<String, Object>{});
     final SharedPreferences preferences = await SharedPreferences.getInstance();
@@ -53,6 +57,7 @@ void main() {
     final Language savedLanguage = localDataSource.getSavedLanguage();
     localizationDelegate = await getLocalizationDelegate(savedLanguage);
   });
+
   late repository.WeatherRepository weatherRepository;
   late OutfitRepository outfitRepository;
   late HomeWidgetService mockHomeWidgetService;
@@ -62,12 +67,24 @@ void main() {
     mockHomeWidgetService = MockHomeWidgetService();
     weatherRepository = MockWeatherRepository();
     outfitRepository = MockOutfitRepository();
+    mockLocalDataSource = MockLocalDataSource();
 
     settingsBloc = MockSettingsBloc();
 
     when(
       () => settingsBloc.state,
     ).thenReturn(const SettingsInitial(language: Language.en));
+
+    when(
+      () => mockLocalDataSource.getLastSavedLocation(),
+    ).thenReturn(const repository.Location.empty());
+    when(
+      () => mockLocalDataSource.getFavouriteLocations(),
+    ).thenReturn(<repository.Location>[]);
+    when(
+      () => mockLocalDataSource.isFavouriteLocation(any()),
+    ).thenReturn(false);
+    when(() => mockLocalDataSource.getLanguageIsoCode()).thenReturn('en');
   });
 
   group('WeatherPage', () {
@@ -82,6 +99,9 @@ void main() {
               value: weatherRepository,
             ),
             RepositoryProvider<OutfitRepository>.value(value: outfitRepository),
+            RepositoryProvider<LocalDataSource>.value(
+              value: LocalDataSource(preferences),
+            ),
           ],
           child: MultiBlocProvider(
             providers: <SingleChildWidget>[
@@ -202,6 +222,9 @@ void main() {
               value: weatherRepository,
             ),
             RepositoryProvider<OutfitRepository>.value(value: outfitRepository),
+            RepositoryProvider<LocalDataSource>.value(
+              value: mockLocalDataSource,
+            ),
           ],
           child: MultiBlocProvider(
             providers: <SingleChildWidget>[
@@ -257,8 +280,15 @@ void main() {
           ),
         );
         await tester.pumpWidget(
-          RepositoryProvider<repository.WeatherRepository>.value(
-            value: weatherRepository,
+          MultiRepositoryProvider(
+            providers: <SingleChildWidget>[
+              RepositoryProvider<repository.WeatherRepository>.value(
+                value: weatherRepository,
+              ),
+              RepositoryProvider<LocalDataSource>.value(
+                value: mockLocalDataSource,
+              ),
+            ],
             child: BlocProvider<WeatherBloc>.value(
               value: weatherBloc,
               child: LocalizedApp(
@@ -269,6 +299,51 @@ void main() {
           ),
         );
         expect(find.byType(WeatherError), findsOneWidget);
+      });
+    });
+
+    group('WeatherPage Duplicate Logic', () {
+      testWidgets('Swipe list always contains at least one empty location', (
+        WidgetTester tester,
+      ) async {
+        await tester.pumpWidget(
+          MultiRepositoryProvider(
+            providers: <SingleChildWidget>[
+              RepositoryProvider<repository.WeatherRepository>.value(
+                value: weatherRepository,
+              ),
+              RepositoryProvider<OutfitRepository>.value(
+                value: outfitRepository,
+              ),
+              RepositoryProvider<LocalDataSource>.value(
+                value: mockLocalDataSource,
+              ),
+            ],
+            child: MultiBlocProvider(
+              providers: <SingleChildWidget>[
+                BlocProvider<WeatherBloc>(
+                  create: (BuildContext context) => WeatherBloc(
+                    weatherRepository: weatherRepository,
+                    outfitRepository: outfitRepository,
+                    localDataSource: mockLocalDataSource,
+                    homeWidgetService: mockHomeWidgetService,
+                  ),
+                ),
+                BlocProvider<SettingsBloc>.value(value: settingsBloc),
+              ],
+              child: prepareWidgetForTesting(
+                LocalizedApp(
+                  localizationDelegate,
+                  const MaterialApp(home: WeatherPage()),
+                ),
+                localizationDelegate,
+              ),
+            ),
+          ),
+        );
+
+        await tester.pumpAndSettle();
+        expect(find.byType(PageView), findsOneWidget);
       });
     });
   });

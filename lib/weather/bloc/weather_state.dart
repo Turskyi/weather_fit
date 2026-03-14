@@ -9,6 +9,7 @@ sealed class WeatherState extends Equatable {
     this.outfitImage = const OutfitImage.empty(),
     this.message = '',
     this.dailyForecast,
+    this.isFavourite = false,
     Weather? weather,
   }) : weather = weather ?? Weather.empty;
 
@@ -23,6 +24,7 @@ sealed class WeatherState extends Equatable {
   final String locale;
   final DateTime date;
   final DailyForecastDomain? dailyForecast;
+  final bool isFavourite;
 
   @override
   List<Object?> get props => <Object?>[
@@ -33,6 +35,7 @@ sealed class WeatherState extends Equatable {
     locale,
     isCelsius,
     dailyForecast,
+    isFavourite,
   ];
 
   Map<String, Object?> toJson() {
@@ -41,6 +44,7 @@ sealed class WeatherState extends Equatable {
       'outfit_recommendation': outfitRecommendation,
       'outfit_image': outfitImage.toJson(),
       'message': message,
+      'is_favourite': isFavourite,
     };
   }
 
@@ -96,6 +100,7 @@ final class WeatherInitial extends WeatherState {
     super.outfitRecommendation,
     super.weather,
     super.outfitImage,
+    super.isFavourite,
   });
 
   factory WeatherInitial.fromJson(Map<String, Object?> json) {
@@ -113,6 +118,7 @@ final class WeatherInitial extends WeatherState {
     DailyForecastDomain? dailyForecast,
     Language? language,
     DateTime? date,
+    bool? isFavourite,
   }) {
     return WeatherInitial(
       locale: locale ?? this.locale,
@@ -121,6 +127,7 @@ final class WeatherInitial extends WeatherState {
       outfitImage: outfitImage ?? this.outfitImage,
       dailyForecast: dailyForecast ?? this.dailyForecast,
       date: date ?? this.date,
+      isFavourite: isFavourite ?? this.isFavourite,
     );
   }
 }
@@ -134,6 +141,7 @@ class WeatherLoadingState extends WeatherState {
     super.outfitRecommendation,
     super.outfitImage,
     super.dailyForecast,
+    super.isFavourite,
   });
 
   factory WeatherLoadingState.fromJson(Map<String, Object?> json) =>
@@ -148,6 +156,7 @@ class WeatherLoadingState extends WeatherState {
     String? outfitRecommendation,
     DailyForecastDomain? dailyForecast,
     DateTime? date,
+    bool? isFavourite,
   }) {
     return WeatherLoadingState(
       locale: locale ?? this.locale,
@@ -155,6 +164,7 @@ class WeatherLoadingState extends WeatherState {
       outfitRecommendation: outfitRecommendation ?? this.outfitRecommendation,
       dailyForecast: dailyForecast ?? this.dailyForecast,
       date: date ?? this.date,
+      isFavourite: isFavourite ?? this.isFavourite,
     );
   }
 
@@ -165,6 +175,7 @@ class WeatherLoadingState extends WeatherState {
     outfitRecommendation,
     outfitImage,
     dailyForecast,
+    isFavourite,
   ];
 }
 
@@ -178,6 +189,7 @@ class WeatherSuccess extends WeatherState {
     super.outfitRecommendation,
     super.weather,
     super.message,
+    super.isFavourite,
   });
 
   factory WeatherSuccess.fromJson(Map<String, Object?> json) {
@@ -195,6 +207,7 @@ class WeatherSuccess extends WeatherState {
     String? message,
     DailyForecastDomain? dailyForecast,
     DateTime? date,
+    bool? isFavourite,
   }) {
     return WeatherSuccess(
       locale: locale ?? this.locale,
@@ -204,6 +217,7 @@ class WeatherSuccess extends WeatherState {
       message: message ?? this.message,
       dailyForecast: dailyForecast ?? this.dailyForecast,
       date: date ?? this.date,
+      isFavourite: isFavourite ?? this.isFavourite,
     );
   }
 
@@ -215,6 +229,7 @@ class WeatherSuccess extends WeatherState {
     outfitImage,
     message,
     dailyForecast,
+    isFavourite,
   ];
 }
 
@@ -227,6 +242,7 @@ final class LoadingOutfitState extends WeatherSuccess {
     super.outfitRecommendation = '',
     super.outfitImage = const OutfitImage.empty(),
     super.weather,
+    super.isFavourite,
   });
 
   factory LoadingOutfitState.fromJson(Map<String, Object?> json) =>
@@ -243,6 +259,7 @@ class WeatherFailure extends WeatherState {
     super.outfitRecommendation,
     super.message,
     super.dailyForecast,
+    super.isFavourite,
   });
 
   factory WeatherFailure.fromJson(Map<String, Object?> json) {
@@ -257,6 +274,28 @@ class WeatherFailure extends WeatherState {
     return '${toJson()}';
   }
 
+  WeatherFailure copyWith({
+    String? locale,
+    DateTime? date,
+    Weather? weather,
+    OutfitImage? outfitImage,
+    String? outfitRecommendation,
+    String? message,
+    DailyForecastDomain? dailyForecast,
+    bool? isFavourite,
+  }) {
+    return WeatherFailure(
+      locale: locale ?? this.locale,
+      date: date ?? this.date,
+      weather: weather ?? this.weather,
+      outfitImage: outfitImage ?? this.outfitImage,
+      outfitRecommendation: outfitRecommendation ?? this.outfitRecommendation,
+      message: message ?? this.message,
+      dailyForecast: dailyForecast ?? this.dailyForecast,
+      isFavourite: isFavourite ?? this.isFavourite,
+    );
+  }
+
   @override
   List<Object?> get props => <Object?>[
     locale,
@@ -265,6 +304,7 @@ class WeatherFailure extends WeatherState {
     outfitImage,
     message,
     dailyForecast,
+    isFavourite,
   ];
 }
 
@@ -277,6 +317,7 @@ class LocalWebCorsFailure extends WeatherFailure {
     super.outfitRecommendation,
     super.message,
     super.dailyForecast,
+    super.isFavourite,
   });
 
   factory LocalWebCorsFailure.fromJson(Map<String, Object?> json) {
@@ -287,5 +328,11 @@ class LocalWebCorsFailure extends WeatherFailure {
   Map<String, Object?> toJson() => _$LocalWebCorsFailureToJson(this);
 
   @override
-  List<Object?> get props => <Object?>[locale, weather, message, dailyForecast];
+  List<Object?> get props => <Object?>[
+    locale,
+    weather,
+    message,
+    dailyForecast,
+    isFavourite,
+  ];
 }

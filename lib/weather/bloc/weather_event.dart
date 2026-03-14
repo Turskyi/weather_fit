@@ -64,3 +64,12 @@ final class CheckDateChangeOnResume extends WeatherEvent {
 
   final WeatherFetchOrigin origin;
 }
+
+final class ToggleFavouriteEvent extends WeatherEvent {
+  const ToggleFavouriteEvent(this.location);
+
+  final Location location;
+
+  @override
+  List<Object> get props => <Object>[location];
+}

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_translate/flutter_translate.dart';
+import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/res/constants/constants.dart' as constants;
 import 'package:weather_fit/settings/bloc/settings_bloc.dart';
@@ -84,6 +85,37 @@ class WeatherContentDefault extends StatelessWidget {
                           ),
                         ),
                       ),
+                    ),
+                    const SizedBox(width: 4),
+                    BlocBuilder<WeatherBloc, WeatherState>(
+                      builder: (BuildContext context, WeatherState state) {
+                        final LocalDataSource localDataSource = context
+                            .read<LocalDataSource>();
+                        final bool isFavourite = localDataSource
+                            .isFavouriteLocation(weather.location);
+                        return IconButton(
+                          icon: Icon(
+                            isFavourite ? Icons.star : Icons.star_border,
+                            color: isFavourite ? Colors.amber : null,
+                          ),
+                          onPressed: () {
+                            context.read<WeatherBloc>().add(
+                              ToggleFavouriteEvent(weather.location),
+                            );
+                            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  isFavourite
+                                      ? translate('location_removed')
+                                      : translate('location_saved'),
+                                ),
+                                duration: const Duration(seconds: 2),
+                              ),
+                            );
+                          },
+                        );
+                      },
                     ),
                   ],
                 ),

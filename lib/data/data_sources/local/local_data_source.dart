@@ -293,6 +293,49 @@ class LocalDataSource {
     }
   }
 
+  List<Location> getFavouriteLocations() {
+    final List<String> jsonList =
+        _preferences.getStringList(Settings.favourites.key) ?? <String>[];
+    return jsonList.map((String json) {
+      return Location.fromJson(jsonDecode(json) as Map<String, Object?>);
+    }).toList();
+  }
+
+  Future<bool> saveFavouriteLocation(Location location) {
+    final List<Location> favourites = getFavouriteLocations();
+    final bool isAlreadyFavourite = favourites.any(
+      (Location l) =>
+          l.latitude == location.latitude && l.longitude == location.longitude,
+    );
+    if (isAlreadyFavourite) return Future<bool>.value(true);
+    favourites.add(location);
+    return _saveFavouritesList(favourites);
+  }
+
+  Future<bool> removeFavouriteLocation(Location location) {
+    final List<Location> favourites = getFavouriteLocations();
+    favourites.removeWhere(
+      (Location l) =>
+          l.latitude == location.latitude && l.longitude == location.longitude,
+    );
+    return _saveFavouritesList(favourites);
+  }
+
+  bool isFavouriteLocation(Location location) {
+    final List<Location> favourites = getFavouriteLocations();
+    return favourites.any(
+      (Location l) =>
+          l.latitude == location.latitude && l.longitude == location.longitude,
+    );
+  }
+
+  Future<bool> _saveFavouritesList(List<Location> favourites) {
+    final List<String> jsonList = favourites
+        .map((Location l) => jsonEncode(l.toJson()))
+        .toList();
+    return _preferences.setStringList(Settings.favourites.key, jsonList);
+  }
+
   Future<Directory> getAppDirectory() async {
     if (kIsWeb) {
       throw UnsupportedError('Directory access is not supported on Web.');
