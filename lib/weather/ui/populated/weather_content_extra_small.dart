@@ -9,6 +9,7 @@ import 'package:weather_fit/res/constants/constants.dart' as constants;
 import 'package:weather_fit/settings/bloc/settings_bloc.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 import 'package:weather_fit/weather/ui/widgets/weather_icon.dart';
+import 'package:weather_fit/weather/ui/widgets/weather_shimmer.dart';
 
 class WeatherContentExtraSmall extends StatelessWidget {
   const WeatherContentExtraSmall({
@@ -84,7 +85,9 @@ class WeatherContentExtraSmall extends StatelessWidget {
                   ),
                 ),
               ],
-            ),
+            )
+          else
+            const OutfitShimmer(),
           const SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,

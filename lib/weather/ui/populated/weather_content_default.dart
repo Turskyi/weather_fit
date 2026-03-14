@@ -9,6 +9,7 @@ import 'package:weather_fit/settings/bloc/settings_bloc.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 import 'package:weather_fit/weather/ui/populated/daily_forecast.dart';
 import 'package:weather_fit/weather/ui/widgets/weather_icon.dart';
+import 'package:weather_fit/weather/ui/widgets/weather_shimmer.dart';
 
 class WeatherContentDefault extends StatelessWidget {
   const WeatherContentDefault({
@@ -53,7 +54,9 @@ class WeatherContentDefault extends StatelessWidget {
               children: <Widget>[
                 const SizedBox(height: 4),
                 if (weather.wasUpdated)
-                  WeatherIcon(condition: weather.condition),
+                  WeatherIcon(condition: weather.condition)
+                else
+                  const WeatherIconShimmer(),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
@@ -129,7 +132,9 @@ class WeatherContentDefault extends StatelessWidget {
                         ),
                       );
                     },
-                  ),
+                  )
+                else
+                  const TemperatureShimmer(),
                 if (weather.neverUpdated)
                   BlocBuilder<SettingsBloc, SettingsState>(
                     builder: (BuildContext _, SettingsState state) {
@@ -178,7 +183,7 @@ class WeatherContentDefault extends StatelessWidget {
                             if (state.forecast.isNotEmpty) {
                               return DailyForecast(key: key);
                             } else {
-                              return const SizedBox();
+                              return const DailyForecastShimmer();
                             }
                           },
                         ),
@@ -217,13 +222,13 @@ class WeatherContentDefault extends StatelessWidget {
                 children: <Widget>[
                   mainWeatherInfo,
                   const SizedBox(height: 24),
-                  if (weather.wasUpdated) child,
+                  if (weather.wasUpdated) child else const OutfitShimmer(),
                   const SizedBox(height: 24),
 
                   BlocBuilder<WeatherBloc, WeatherState>(
                     builder: (BuildContext _, WeatherState state) {
                       if (state.forecast.isEmpty) {
-                        return const SizedBox();
+                        return const DailyForecastShimmer();
                       } else {
                         return DailyForecast(key: key);
                       }

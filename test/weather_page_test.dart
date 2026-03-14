@@ -88,6 +88,9 @@ void main() {
       () => mockLocalDataSource.isFavouriteLocation(any()),
     ).thenReturn(false);
     when(() => mockLocalDataSource.getLanguageIsoCode()).thenReturn('en');
+    when(
+      () => mockLocalDataSource.getCachedWeatherBundle(any()),
+    ).thenReturn(null);
   });
 
   group('WeatherPage', () {
@@ -144,7 +147,9 @@ void main() {
         ),
       );
 
-      await tester.pumpAndSettle();
+      // Use pump() with duration instead of pumpAndSettle() to avoid timeout
+      // from infinite shimmer animations.
+      await tester.pump(const Duration(milliseconds: 500));
       expect(find.byType(AppBar), findsOneWidget);
     });
 
@@ -237,8 +242,8 @@ void main() {
       );
 
       await tester.pump();
-      // Ensure the SnackBar animation completes fully.
-      await tester.pumpAndSettle();
+      // Ensure the SnackBar animation triggers and completes entrance.
+      await tester.pump(const Duration(seconds: 1));
 
       final Finder tryAgainFinder = find.text('Try again');
       expect(find.text(errorMessage), findsWidgets);
@@ -249,7 +254,8 @@ void main() {
       await tester.tapAt(tester.getCenter(tryAgainFinder));
 
       // Allow the scheduled timer from _refresh's Future.delayed to execute.
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
 
       verify(
         () => weatherBloc.add(any(that: isA<RefreshWeather>())),
@@ -336,7 +342,7 @@ void main() {
           ),
         );
 
-        await tester.pumpAndSettle();
+        await tester.pump(const Duration(milliseconds: 500));
         expect(find.byType(PageView), findsOneWidget);
       });
     });
