@@ -79,6 +79,9 @@ void main() {
       () => mockLocalDataSource.getLastSavedLocation(),
     ).thenReturn(const repository.Location.empty());
     when(
+      () => mockLocalDataSource.getLastSearchedLocation(),
+    ).thenReturn(const repository.Location.empty());
+    when(
       () => mockLocalDataSource.getFavouriteLocations(),
     ).thenReturn(<repository.Location>[]);
     when(
@@ -89,9 +92,6 @@ void main() {
 
   group('WeatherPage', () {
     testWidgets('renders AppBar', (WidgetTester tester) async {
-      final SharedPreferences preferences =
-          await SharedPreferences.getInstance();
-
       await tester.pumpWidget(
         MultiRepositoryProvider(
           providers: <SingleChildWidget>[
@@ -100,37 +100,31 @@ void main() {
             ),
             RepositoryProvider<OutfitRepository>.value(value: outfitRepository),
             RepositoryProvider<LocalDataSource>.value(
-              value: LocalDataSource(preferences),
+              value: mockLocalDataSource,
             ),
           ],
           child: MultiBlocProvider(
             providers: <SingleChildWidget>[
               BlocProvider<WeatherBloc>(
                 create: (BuildContext _) {
-                  final LocalDataSource localDataSource = LocalDataSource(
-                    preferences,
-                  );
                   return WeatherBloc(
                     weatherRepository: weatherRepository,
                     outfitRepository: outfitRepository,
-                    localDataSource: localDataSource,
+                    localDataSource: mockLocalDataSource,
                     homeWidgetService: mockHomeWidgetService,
                   );
                 },
               ),
               BlocProvider<SearchBloc>(
                 create: (BuildContext _) {
-                  final LocalDataSource localDataSource = LocalDataSource(
-                    preferences,
-                  );
                   return SearchBloc(
                     weatherRepository: weatherRepository,
                     locationRepository: LocationRepository(
                       NominatimApiClient(),
                       OpenMeteoApiClient(),
-                      localDataSource,
+                      mockLocalDataSource,
                     ),
-                    localDataSource: localDataSource,
+                    localDataSource: mockLocalDataSource,
                   );
                 },
               ),

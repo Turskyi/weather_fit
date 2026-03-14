@@ -43,17 +43,33 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
 
   List<Location> _getSwipeList(LocalDataSource localDataSource) {
     final Location activeLocation = localDataSource.getLastSavedLocation();
+    final Location lastSearched = localDataSource.getLastSearchedLocation();
     final List<Location> favourites = localDataSource.getFavouriteLocations();
 
     final List<Location> newList = <Location>[];
+
+    // 1. Active location FIRST.
     if (activeLocation.isNotEmpty) {
       newList.add(activeLocation);
     }
 
+    // 2. Last searched if not already active and not a favorite.
+    if (lastSearched.isNotEmpty) {
+      final bool isAlreadyInList = newList.any(
+        (Location l) => _isSameLocation(l, lastSearched),
+      );
+      final bool isFavourite = favourites.any(
+        (Location l) => _isSameLocation(l, lastSearched),
+      );
+      if (!isAlreadyInList && !isFavourite) {
+        newList.add(lastSearched);
+      }
+    }
+
+    // 3. Favourites.
     for (final Location fav in favourites) {
       final bool alreadyExists = newList.any(
-        (Location l) =>
-            l.latitude == fav.latitude && l.longitude == fav.longitude,
+        (Location l) => _isSameLocation(l, fav),
       );
       if (!alreadyExists) {
         newList.add(fav);
@@ -66,6 +82,10 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
     return newList;
   }
 
+  bool _isSameLocation(Location l1, Location l2) {
+    return l1.latitude == l2.latitude && l1.longitude == l2.longitude;
+  }
+
   void _updateLocations({bool resetToFirst = false}) {
     final List<Location> newList = _getSwipeList(
       context.read<LocalDataSource>(),
@@ -74,10 +94,8 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
     final bool setChanged =
         newList.length != _locations.length ||
         !newList.every(
-          (Location nl) => _locations.any(
-            (Location l) =>
-                l.latitude == nl.latitude && l.longitude == nl.longitude,
-          ),
+          (Location nl) =>
+              _locations.any((Location l) => _isSameLocation(l, nl)),
         );
 
     if (setChanged || resetToFirst) {
@@ -198,13 +216,18 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
     );
 
     if (mounted && weather is Weather) {
-      context.read<WeatherBloc>().add(
-        FetchDailyForecast(location: weather.location),
-      );
+      final LocalDataSource localDataSource = context.read<LocalDataSource>();
+      await localDataSource.saveLastSearchedLocation(weather.location);
+      await localDataSource.saveLocation(weather.location);
+      if (mounted) {
+        context.read<WeatherBloc>().add(
+          FetchDailyForecast(location: weather.location),
+        );
+        context.read<WeatherBloc>().add(
+          GetOutfitEvent(weather: weather, origin: context.origin),
+        );
+      }
 
-      context.read<WeatherBloc>().add(
-        GetOutfitEvent(weather: weather, origin: context.origin),
-      );
       _updateLocations(resetToFirst: true);
     }
   }

@@ -293,6 +293,29 @@ class LocalDataSource {
     }
   }
 
+  Future<bool> saveLastSearchedLocation(Location location) {
+    final String json = jsonEncode(location.toJson());
+    return _preferences.setString(Settings.lastSearchedLocation.key, json);
+  }
+
+  Location getLastSearchedLocation() {
+    final String jsonString =
+        _preferences.getString(Settings.lastSearchedLocation.key) ?? '';
+    if (jsonString.isEmpty) {
+      return const Location.empty();
+    } else {
+      try {
+        final Object? decoded = jsonDecode(jsonString);
+        if (decoded is Map<String, Object?>) {
+          return Location.fromJson(decoded);
+        }
+      } catch (e) {
+        debugPrint('Error parsing last searched location: $e');
+      }
+      return const Location.empty();
+    }
+  }
+
   List<Location> getFavouriteLocations() {
     final List<String> jsonList =
         _preferences.getStringList(Settings.favourites.key) ?? <String>[];
