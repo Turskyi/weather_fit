@@ -98,7 +98,8 @@ class Location extends Equatable {
       longitude == 0.0 &&
       countryCode.isEmpty &&
       country.isEmpty &&
-      province.isEmpty;
+      province.isEmpty &&
+      locale.isEmpty;
 
   bool get isNotEmpty => !isEmpty;
 
@@ -108,15 +109,21 @@ class Location extends Equatable {
     final Map<String, String> latLabels = <String, String>{
       'en': 'Lat',
       'uk': 'Шир',
+      'pl': 'szer',
     };
 
     final Map<String, String> lonLabels = <String, String>{
       'en': 'Lon',
       'uk': 'Дов',
+      'pl': 'dług',
     };
 
-    final String lang = (locationLocale == Language.uk.isoLanguageCode)
-        ? Language.uk.isoLanguageCode
+    final String lang =
+        <String>[
+          Language.uk.isoLanguageCode,
+          Language.pl.isoLanguageCode,
+        ].contains(locationLocale)
+        ? locationLocale
         : Language.en.isoLanguageCode;
 
     return name.isEmpty
