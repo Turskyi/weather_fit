@@ -20,6 +20,7 @@ class WeatherPageExtraSmallLayout extends StatelessWidget {
     required this.onRefresh,
     required this.onSearchPressed,
     required this.onReportPressed,
+    this.weatherStateListener,
     this.isEmbedded = false,
     this.location,
     this.bodyOverride,
@@ -29,6 +30,9 @@ class WeatherPageExtraSmallLayout extends StatelessWidget {
   /// The callback that is called when the settings button is tapped or
   /// otherwise activated.
   final VoidCallback onSettingsPressed;
+
+  /// Optional listener for responding to [WeatherState] changes.
+  final BlocWidgetListener<WeatherState>? weatherStateListener;
 
   /// A function that's called when the user has dragged the refresh indicator
   /// far enough to demonstrate that they want the app to refresh. The returned
@@ -50,71 +54,11 @@ class WeatherPageExtraSmallLayout extends StatelessWidget {
     final ThemeData theme = Theme.of(context);
     final ColorScheme colorScheme = theme.colorScheme;
 
-    if (bodyOverride != null) {
-      return Scaffold(
-        extendBodyBehindAppBar: true,
-        appBar: AppBar(
-          toolbarHeight: cupertino
-              .kCupertinoButtonMinSize[cupertino.CupertinoButtonSize.medium],
-          centerTitle: true,
-          title: IconButton(
-            icon: DecoratedBox(
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surface.withValues(alpha: 0.4),
-                borderRadius: BorderRadius.circular(12.0),
-              ),
-              child: Icon(
-                Icons.settings,
-                color: colorScheme.onSurface,
-                size: cupertino.kCupertinoButtonDefaultIconSize,
-              ),
-            ),
-            onPressed: onSettingsPressed,
-          ),
-        ),
-        body: bodyOverride,
-        floatingActionButton: (location == null || location!.isEmpty)
-            ? FloatingActionButton(
-                mini: true,
-                onPressed: onSearchPressed,
-                child: Icon(
-                  Icons.search,
-                  semanticLabel: translate('search.label'),
-                ),
-              )
-            : null,
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      );
-    }
-
-    final Widget body = BlocConsumer<WeatherBloc, WeatherState>(
-      listener: (BuildContext context, WeatherState state) {
-        if ((state is WeatherFailure || state is LocalWebCorsFailure) &&
-            state.weather.isNotEmpty) {
-          ScaffoldMessenger.of(context)
-            ..hideCurrentSnackBar()
-            ..showSnackBar(
-              SnackBar(
-                duration: const Duration(seconds: 2),
-                content: Row(
-                  children: <Widget>[
-                    Expanded(child: SelectableText(state.message)),
-                    TextButton(
-                      onPressed: () =>
-                          ScaffoldMessenger.of(context).hideCurrentSnackBar(),
-                      child: Text(translate('ok')),
-                    ),
-                  ],
-                ),
-                action: SnackBarAction(
-                  label: translate('try_again'),
-                  onPressed: onRefresh,
-                ),
-              ),
-            );
-        }
-      },
+    final Widget content = BlocConsumer<WeatherBloc, WeatherState>(
+      listener: _onWeatherStateChanged,
       builder: (BuildContext context, WeatherState state) {
+        if (bodyOverride != null) return bodyOverride!;
+
         if (location != null &&
             location!.isNotEmpty &&
             (state.location.latitude != location!.latitude ||
@@ -122,7 +66,7 @@ class WeatherPageExtraSmallLayout extends StatelessWidget {
           return WeatherPopulated(
             weather: Weather.empty.copyWith(location: location),
             onRefresh: onRefresh,
-            child: const WeatherLoadingWidget(),
+            child: const WeatherLoadingWidget(isShimmer: true),
           );
         }
 
@@ -137,7 +81,7 @@ class WeatherPageExtraSmallLayout extends StatelessWidget {
               return WeatherPopulated(
                 weather: stateWeather,
                 onRefresh: onRefresh,
-                child: const WeatherLoadingWidget(),
+                child: const WeatherLoadingWidget(isShimmer: true),
               );
             }
           case WeatherSuccess():
@@ -146,7 +90,6 @@ class WeatherPageExtraSmallLayout extends StatelessWidget {
             }
             Widget outfitImageWidget = const SizedBox();
             final String stateOutfitRecommendation = state.outfitRecommendation;
-            final ColorScheme colorScheme = Theme.of(context).colorScheme;
             if (stateOutfitRecommendation.isNotEmpty) {
               outfitImageWidget = OutfitWidget(
                 outfitImage: state.outfitImage,
@@ -241,7 +184,7 @@ class WeatherPageExtraSmallLayout extends StatelessWidget {
       },
     );
 
-    if (isEmbedded) return body;
+    if (isEmbedded) return content;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -264,7 +207,7 @@ class WeatherPageExtraSmallLayout extends StatelessWidget {
           onPressed: onSettingsPressed,
         ),
       ),
-      body: Center(child: body),
+      body: Center(child: content),
       floatingActionButton: (location == null || location!.isEmpty)
           ? FloatingActionButton(
               mini: true,
@@ -277,5 +220,34 @@ class WeatherPageExtraSmallLayout extends StatelessWidget {
           : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
+  }
+
+  void _onWeatherStateChanged(BuildContext context, WeatherState state) {
+    if (!isEmbedded &&
+        (state is WeatherFailure || state is LocalWebCorsFailure) &&
+        state.weather.isNotEmpty) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            duration: const Duration(seconds: 2),
+            content: Row(
+              children: <Widget>[
+                Expanded(child: SelectableText(state.message)),
+                TextButton(
+                  onPressed: () =>
+                      ScaffoldMessenger.of(context).hideCurrentSnackBar(),
+                  child: Text(translate('ok')),
+                ),
+              ],
+            ),
+            action: SnackBarAction(
+              label: translate('try_again'),
+              onPressed: onRefresh,
+            ),
+          ),
+        );
+    }
+    weatherStateListener?.call(context, state);
   }
 }

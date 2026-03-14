@@ -10,6 +10,7 @@ import 'package:path_provider/path_provider.dart' as path;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/entities/enums/temperature_units.dart';
+import 'package:weather_fit/entities/models/outfit/outfit_image.dart';
 import 'package:weather_fit/entities/models/search/saved_plan.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/res/constants/constants.dart' as constants;
@@ -357,6 +358,37 @@ class LocalDataSource {
         .map((Location l) => jsonEncode(l.toJson()))
         .toList();
     return _preferences.setStringList(Settings.favourites.key, jsonList);
+  }
+
+  Future<bool> cacheWeatherBundle({
+    required Location location,
+    required Weather weather,
+    required DailyForecastDomain dailyForecast,
+    required String outfitRecommendation,
+    required OutfitImage outfitImage,
+  }) {
+    final String key =
+        'weather_bundle_${location.latitude}_${location.longitude}';
+    final Map<String, Object?> data = <String, Object?>{
+      'weather': weather.toJson(),
+      'dailyForecast': dailyForecast.toJson(),
+      'outfitRecommendation': outfitRecommendation,
+      'outfitImage': outfitImage.toJson(),
+    };
+    return _preferences.setString(key, jsonEncode(data));
+  }
+
+  Map<String, dynamic>? getCachedWeatherBundle(Location location) {
+    final String key =
+        'weather_bundle_${location.latitude}_${location.longitude}';
+    final String? jsonString = _preferences.getString(key);
+    if (jsonString == null) return null;
+    try {
+      return jsonDecode(jsonString) as Map<String, dynamic>;
+    } catch (e) {
+      debugPrint('Error parsing cached weather bundle: $e');
+      return null;
+    }
   }
 
   Future<Directory> getAppDirectory() async {

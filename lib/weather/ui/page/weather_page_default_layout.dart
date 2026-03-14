@@ -22,6 +22,7 @@ class WeatherPageDefaultLayout extends StatelessWidget {
     required this.onRefresh,
     required this.onSearchPressed,
     required this.onReportPressed,
+    this.weatherStateListener,
     this.isEmbedded = false,
     this.location,
     this.bodyOverride,
@@ -31,6 +32,9 @@ class WeatherPageDefaultLayout extends StatelessWidget {
   /// The callback that is called when the settings button is tapped or
   /// otherwise activated.
   final VoidCallback onSettingsPressed;
+
+  /// Optional listener for responding to [WeatherState] changes.
+  final BlocWidgetListener<WeatherState>? weatherStateListener;
 
   /// A function that's called when the user has dragged the refresh indicator
   /// far enough to demonstrate that they want the app to refresh. The returned
@@ -63,7 +67,7 @@ class WeatherPageDefaultLayout extends StatelessWidget {
           return WeatherPopulated(
             weather: Weather.empty.copyWith(location: location),
             onRefresh: onRefresh,
-            child: const WeatherLoadingWidget(),
+            child: const WeatherLoadingWidget(isShimmer: true),
           );
         }
 
@@ -78,7 +82,7 @@ class WeatherPageDefaultLayout extends StatelessWidget {
               return WeatherPopulated(
                 weather: stateWeather,
                 onRefresh: onRefresh,
-                child: const WeatherLoadingWidget(),
+                child: const WeatherLoadingWidget(isShimmer: true),
               );
             }
           case WeatherSuccess():

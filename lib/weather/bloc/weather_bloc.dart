@@ -82,6 +82,41 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     final bool isFavourite = _localDataSource.isFavouriteLocation(
       eventLocation,
     );
+
+    // 1. Check for cached data to emit a "Stale" state immediately.
+    final Map<String, dynamic>? cachedData = _localDataSource
+        .getCachedWeatherBundle(eventLocation);
+
+    if (cachedData != null) {
+      try {
+        final Weather cachedWeather = Weather.fromJson(
+          cachedData['weather'] as Map<String, dynamic>,
+        );
+        final DailyForecastDomain cachedForecast = DailyForecastDomain.fromJson(
+          cachedData['dailyForecast'] as Map<String, dynamic>,
+        );
+        final OutfitImage cachedOutfitImage = OutfitImage.fromJson(
+          cachedData['outfitImage'] as Map<String, dynamic>,
+        );
+        final String cachedRecommendation =
+            cachedData['outfitRecommendation'] as String;
+
+        emit(
+          WeatherSuccess(
+            locale: savedLocale,
+            weather: cachedWeather,
+            dailyForecast: cachedForecast,
+            outfitRecommendation: cachedRecommendation,
+            outfitImage: cachedOutfitImage,
+            date: state.date,
+            isFavourite: isFavourite,
+          ),
+        );
+      } catch (e) {
+        debugPrint('Error loading cached weather bundle: $e');
+      }
+    }
+
     if (eventLocation.isEmpty) {
       emit(
         WeatherInitial(
@@ -92,15 +127,20 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
         ),
       );
     } else {
-      emit(
-        WeatherLoadingState(
-          locale: savedLocale,
-          weather: state.weather,
-          dailyForecast: state.dailyForecast,
-          date: state.date,
-          isFavourite: isFavourite,
-        ),
-      );
+      // If we don't have cache, or even if we do, we show a localized loader
+      // (or just revalidate in background).
+      if (cachedData == null) {
+        emit(
+          WeatherLoadingState(
+            locale: savedLocale,
+            weather: state.weather,
+            dailyForecast: state.dailyForecast,
+            date: state.date,
+            isFavourite: isFavourite,
+          ),
+        );
+      }
+
       try {
         final DailyForecastDomain dailyForecast = await _weatherRepository
             .getDailyForecast(eventLocation);
@@ -126,62 +166,39 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           updatedWeather,
         );
 
+        final OutfitImage outfitImage = await _outfitRepository.getOutfitImage(
+          weather,
+        );
+
+        // 2. Persist the new "Weather Bundle" for future swipes.
+        await _localDataSource.cacheWeatherBundle(
+          location: eventLocation,
+          weather: updatedWeather,
+          dailyForecast: dailyForecast,
+          outfitRecommendation: outfitRecommendation,
+          outfitImage: outfitImage,
+        );
+
         emit(
-          LoadingOutfitState(
+          WeatherSuccess(
             locale: savedLocale,
             weather: updatedWeather,
             outfitRecommendation: outfitRecommendation,
+            outfitImage: outfitImage,
             dailyForecast: dailyForecast,
             date: state.date,
             isFavourite: isFavourite,
           ),
         );
 
-        final WeatherState currentState = state;
-        if (currentState is WeatherSuccess) {
-          final OutfitImage outfitImage = await _outfitRepository
-              .getOutfitImage(weather);
-
-          emit(currentState.copyWith(outfitImage: outfitImage));
-
-          final WeatherFetchOrigin eventOrigin = event.origin;
-          // Only add the event if it's NOT web AND NOT macOS.
-          // For context, see issue:
-          // https://github.com/ABausG/home_widget/issues/137.
-          if (!kIsWeb && !Platform.isMacOS && eventOrigin.isNotWearable) {
-            add(UpdateWeatherOnMobileHomeScreenEvent(eventOrigin));
-          }
-        } else {
-          final OutfitImage outfitImage = await _outfitRepository
-              .getOutfitImage(weather);
-          emit(
-            WeatherSuccess(
-              locale: savedLocale,
-              weather: updatedWeather,
-              outfitRecommendation: outfitRecommendation,
-              outfitImage: outfitImage,
-              dailyForecast: dailyForecast,
-              date: state.date,
-              isFavourite: isFavourite,
-            ),
-          );
+        final WeatherFetchOrigin eventOrigin = event.origin;
+        if (!kIsWeb && !Platform.isMacOS && eventOrigin.isNotWearable) {
+          add(UpdateWeatherOnMobileHomeScreenEvent(eventOrigin));
         }
       } on Exception catch (exception) {
         debugPrint('WeatherBloc _onFetchWeather Exception: $exception.');
-        final String stateOutfitRecommendation = state.outfitRecommendation;
-        if (exception is http.ClientException && kDebugMode && kIsWeb) {
-          emit(
-            LocalWebCorsFailure(
-              locale: savedLocale,
-              weather: state.weather,
-              message: translate('error.cors'),
-              outfitRecommendation: stateOutfitRecommendation,
-              dailyForecast: state.dailyForecast,
-              date: state.date,
-              isFavourite: isFavourite,
-            ),
-          );
-        } else {
+        if (cachedData == null) {
+          final String stateOutfitRecommendation = state.outfitRecommendation;
           emit(
             WeatherFailure(
               locale: savedLocale,
@@ -260,13 +277,24 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           final OutfitImage updatedOutfitImage = await _outfitRepository
               .getOutfitImage(weather);
 
+          final Weather updatedWeatherWithUnits = weather.copyWith(
+            temperature: Temperature(value: temperatureValue),
+            temperatureUnits: units,
+          );
+
+          // Update cache on refresh too.
+          await _localDataSource.cacheWeatherBundle(
+            location: stateLocation,
+            weather: updatedWeatherWithUnits,
+            dailyForecast: dailyForecast,
+            outfitRecommendation: updatedOutfitRecommendation,
+            outfitImage: updatedOutfitImage,
+          );
+
           emit(
-            LoadingOutfitState(
+            WeatherSuccess(
               locale: savedLocale,
-              weather: weather.copyWith(
-                temperature: Temperature(value: temperatureValue),
-                temperatureUnits: units,
-              ),
+              weather: updatedWeatherWithUnits,
               outfitRecommendation: updatedOutfitRecommendation,
               outfitImage: updatedOutfitImage,
               dailyForecast: dailyForecast,
@@ -274,17 +302,10 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
               isFavourite: isFavourite,
             ),
           );
-          final WeatherState currentState = state;
-          if (currentState is WeatherSuccess) {
-            emit(currentState.copyWith(outfitImage: updatedOutfitImage));
 
-            final WeatherFetchOrigin eventOrigin = event.origin;
-            // Only add the event if it's NOT web AND NOT macOS.
-            // For context, see issue:
-            // https://github.com/ABausG/home_widget/issues/137.
-            if (!kIsWeb && !Platform.isMacOS && eventOrigin.isNotWearable) {
-              add(UpdateWeatherOnMobileHomeScreenEvent(eventOrigin));
-            }
+          final WeatherFetchOrigin eventOrigin = event.origin;
+          if (!kIsWeb && !Platform.isMacOS && eventOrigin.isNotWearable) {
+            add(UpdateWeatherOnMobileHomeScreenEvent(eventOrigin));
           }
         } on Exception catch (e) {
           debugPrint('Failed to get weather: $e');
