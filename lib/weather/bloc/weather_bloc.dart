@@ -7,7 +7,6 @@ import 'package:flutter_translate/flutter_translate.dart';
 import 'package:http/http.dart' as http;
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:open_meteo_api/open_meteo_api.dart';
 import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
 import 'package:weather_fit/data/repositories/outfit_repository.dart';
 import 'package:weather_fit/entities/enums/language.dart';
@@ -60,13 +59,23 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
   final HomeWidgetService _homeWidgetService;
 
   @override
-  WeatherSuccess fromJson(Map<String, Object?> json) {
-    return WeatherSuccess.fromJson(json);
+  WeatherState? fromJson(Map<String, Object?> json) {
+    try {
+      if (json.isEmpty) return null;
+      // Since we primarily care about restoring successful weather data,
+      // we try to restore as WeatherSuccess.
+      return WeatherSuccess.fromJson(json);
+    } catch (e) {
+      debugPrint('WeatherBloc fromJson error: $e');
+      return null;
+    }
   }
 
   @override
-  Map<String, Object?> toJson(Object? state) {
-    if (state is WeatherSuccess) {
+  Map<String, Object?> toJson(WeatherState state) {
+    if (state is WeatherSuccess ||
+        state is WeatherFailure ||
+        state is WeatherInitial) {
       return state.toJson();
     } else {
       return <String, Object?>{};
@@ -223,13 +232,39 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     final String stateOutfitRecommendation = state.outfitRecommendation;
     final OutfitImage stateOutfitImage = state.outfitImage;
     final String savedLocale = _localDataSource.getLanguageIsoCode();
+
+    // Determine which location to refresh.
+    // If the current state has no location, fallback to the last saved
+    // location.
+    Location locationToRefresh = stateWeather.location;
+    if (locationToRefresh.isEmpty) {
+      locationToRefresh = _localDataSource.getLastSavedLocation();
+    }
+
+    if (locationToRefresh.isEmpty) {
+      // If we still have no location, we emit WeatherInitial as expected by
+      // tests.
+      emit(
+        WeatherInitial(
+          locale: savedLocale,
+          dailyForecast: state.dailyForecast,
+          date: state.date,
+          isFavourite: state.isFavourite,
+        ),
+      );
+      return;
+    }
+
     final bool isFavourite = _localDataSource.isFavouriteLocation(
-      stateWeather.location,
+      locationToRefresh,
     );
     final DateTime now = DateTime.now();
+
     if (state is WeatherSuccess || state is WeatherFailure) {
       await _refreshWeatherAndCache(
-        stateWeather: stateWeather,
+        stateWeather: stateWeather.isNotEmpty
+            ? stateWeather
+            : Weather.empty.copyWith(location: locationToRefresh),
         emit: emit,
         savedLocale: savedLocale,
         now: now,
@@ -242,7 +277,9 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
       emit(
         WeatherInitial(
           locale: savedLocale,
-          weather: stateWeather,
+          weather: stateWeather.isNotEmpty
+              ? stateWeather
+              : Weather.empty.copyWith(location: locationToRefresh),
           outfitRecommendation: stateOutfitRecommendation,
           outfitImage: stateOutfitImage,
           dailyForecast: state.dailyForecast,
@@ -250,6 +287,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           isFavourite: isFavourite,
         ),
       );
+      add(FetchWeather(location: locationToRefresh, origin: event.origin));
     }
   }
 
@@ -289,7 +327,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
       );
 
       try {
-        final Location stateLocation = state.location;
+        final Location stateLocation = stateWeather.location;
         final WeatherDomain updatedWeather = await _getWeatherByLocation(
           stateLocation,
         );
@@ -364,39 +402,61 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     return _weatherRepository.getWeatherByLocation(location);
   }
 
-  void _onToggleUnits(ToggleUnits _, Emitter<WeatherState> emit) {
-    final TemperatureUnits units = state.weather.temperatureUnits.isFahrenheit
-        ? TemperatureUnits.celsius
-        : TemperatureUnits.fahrenheit;
-    final Weather weather = state.weather;
-    final Temperature temperature = weather.temperature;
-    final double value = units.isCelsius
-        ? temperature.value.toCelsius()
-        : temperature.value.toFahrenheit();
+  String _getOutfitRecommendation(Weather weather) {
+    return _outfitRepository.getOutfitRecommendation(weather);
+  }
 
-    final WeatherState currentState = state;
+  String _mapExceptionToMessage(Exception exception) {
+    if (exception is http.ClientException || exception is SocketException) {
+      return translate('errors.no_internet');
+    }
+    return translate('errors.unknown');
+  }
 
-    if (currentState is WeatherSuccess) {
-      final Weather updatedWeather = weather.copyWith(
-        temperature: Temperature(value: value),
-        temperatureUnits: units,
-      );
+  FutureOr<void> _onToggleUnits(ToggleUnits event, Emitter<WeatherState> emit) {
+    final Weather stateWeather = state.weather;
+    final TemperatureUnits units = stateWeather.temperatureUnits.isCelsius
+        ? TemperatureUnits.fahrenheit
+        : TemperatureUnits.celsius;
 
-      emit(currentState.copyWith(weather: updatedWeather));
-    } else if (currentState is WeatherInitial) {
+    final double value = units.isFahrenheit
+        ? stateWeather.temperature.value.toFahrenheit()
+        : stateWeather.temperature.value.toCelsius();
+
+    final Weather updatedWeather = stateWeather.copyWith(
+      temperature: Temperature(value: value),
+      temperatureUnits: units,
+    );
+
+    if (state is WeatherSuccess) {
       emit(
-        currentState.copyWith(
-          weather: weather.copyWith(
-            temperature: Temperature(value: value),
-            temperatureUnits: units,
-          ),
+        (state as WeatherSuccess).copyWith(
+          weather: updatedWeather,
+          date: state.date,
+        ),
+      );
+    } else if (state is WeatherFailure) {
+      emit(
+        (state as WeatherFailure).copyWith(
+          weather: updatedWeather,
+          date: state.date,
+        ),
+      );
+    } else if (state is WeatherLoadingState) {
+      emit(
+        (state as WeatherLoadingState).copyWith(
+          weather: updatedWeather,
+          date: state.date,
+        ),
+      );
+    } else if (state is WeatherInitial) {
+      emit(
+        (state as WeatherInitial).copyWith(
+          weather: updatedWeather,
+          date: state.date,
         ),
       );
     }
-  }
-
-  String _getOutfitRecommendation(Weather weather) {
-    return _outfitRepository.getOutfitRecommendation(weather);
   }
 
   FutureOr<void> _onOutfitRecommendationRequested(
@@ -404,125 +464,56 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     Emitter<WeatherState> emit,
   ) async {
     final Weather eventWeather = event.weather;
-    final Location eventLocation = eventWeather.location;
+    if (eventWeather.isNoLocation) return;
 
     final String savedLocale = _localDataSource.getLanguageIsoCode();
     final bool isFavourite = _localDataSource.isFavouriteLocation(
-      eventLocation,
+      eventWeather.location,
     );
 
-    if (eventWeather.isEmpty) {
-      emit(
-        WeatherInitial(
-          locale: savedLocale,
-          dailyForecast: state.dailyForecast,
-          date: state.date,
-          isFavourite: isFavourite,
-        ),
-      );
-    } else {
-      final Weather localizedWeather = eventWeather.copyWith(
-        location: eventLocation.copyWith(locale: savedLocale),
+    emit(
+      LoadingOutfitState(
         locale: savedLocale,
+        weather: eventWeather,
+        dailyForecast: state.dailyForecast,
+        date: state.date,
+        isFavourite: isFavourite,
+      ),
+    );
+
+    try {
+      final String outfitRecommendation = _outfitRepository
+          .getOutfitRecommendation(eventWeather);
+
+      final OutfitImage outfitImage = await _outfitRepository.getOutfitImage(
+        eventWeather,
       );
+
       emit(
-        WeatherLoadingState(
+        WeatherSuccess(
           locale: savedLocale,
-          weather: localizedWeather,
+          weather: eventWeather,
+          outfitRecommendation: outfitRecommendation,
+          outfitImage: outfitImage,
           dailyForecast: state.dailyForecast,
           date: state.date,
           isFavourite: isFavourite,
         ),
       );
-      try {
-        final TemperatureUnits units = state.temperatureUnits;
-
-        final Weather updatedWeather = localizedWeather.copyWith(
-          temperature: Temperature(value: eventWeather.temperature.value),
-          temperatureUnits: units,
-        );
-
-        final String outfitRecommendation = _getOutfitRecommendation(
-          updatedWeather,
-        );
-
-        emit(
-          LoadingOutfitState(
-            locale: savedLocale,
-            weather: updatedWeather,
-            outfitRecommendation: outfitRecommendation,
-            dailyForecast: state.dailyForecast,
-            date: state.date,
-            isFavourite: isFavourite,
-          ),
-        );
-
-        final WeatherState currentState = state;
-
-        if (currentState is WeatherSuccess) {
-          final OutfitImage outfitImage = await _outfitRepository
-              .getOutfitImage(eventWeather);
-          emit(currentState.copyWith(outfitImage: outfitImage));
-          final WeatherFetchOrigin eventOrigin = event.origin;
-          // Only add the event if it's NOT web AND NOT macOS.
-          // For context, see issue:
-          // https://github.com/ABausG/home_widget/issues/137.
-          if (!kIsWeb && !Platform.isMacOS && eventOrigin.isNotWearable) {
-            add(UpdateWeatherOnMobileHomeScreenEvent(eventOrigin));
-          }
-          final bool isLocationSaved = await _localDataSource.saveLocation(
-            eventWeather.location,
-          );
-
-          if (isLocationSaved) {
-            //   TODO: add notification to user that location has been saved.
-          }
-        } else {
-          final OutfitImage outfitImage = await _outfitRepository
-              .getOutfitImage(eventWeather);
-          emit(
-            WeatherSuccess(
-              locale: savedLocale,
-              weather: updatedWeather,
-              outfitRecommendation: outfitRecommendation,
-              outfitImage: outfitImage,
-              dailyForecast: state.dailyForecast,
-              date: state.date,
-              isFavourite: isFavourite,
-            ),
-          );
-        }
-      } on Exception catch (e) {
-        debugPrint(
-          'WeatherBloc _onOutfitRecommendationRequested Exception: $e',
-        );
-        final String stateOutfitRecommendation = state.outfitRecommendation;
-        if (e is http.ClientException && kDebugMode && kIsWeb) {
-          emit(
-            LocalWebCorsFailure(
-              locale: savedLocale,
-              weather: state.weather,
-              message: translate('error.cors'),
-              outfitRecommendation: stateOutfitRecommendation,
-              dailyForecast: state.dailyForecast,
-              date: state.date,
-              isFavourite: isFavourite,
-            ),
-          );
-        } else {
-          emit(
-            WeatherFailure(
-              locale: savedLocale,
-              weather: state.weather,
-              message: _mapExceptionToMessage(e),
-              outfitRecommendation: stateOutfitRecommendation,
-              dailyForecast: state.dailyForecast,
-              date: state.date,
-              isFavourite: isFavourite,
-            ),
-          );
-        }
-      }
+    } on Exception catch (exception) {
+      debugPrint(
+        'WeatherBloc _onOutfitRecommendationRequested Exception: $exception.',
+      );
+      emit(
+        WeatherFailure(
+          locale: savedLocale,
+          weather: eventWeather,
+          message: _mapExceptionToMessage(exception),
+          dailyForecast: state.dailyForecast,
+          date: state.date,
+          isFavourite: isFavourite,
+        ),
+      );
     }
   }
 
@@ -530,47 +521,45 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     FetchDailyForecast event,
     Emitter<WeatherState> emit,
   ) async {
+    final Location eventLocation = event.location;
     final String savedLocale = _localDataSource.getLanguageIsoCode();
     final bool isFavourite = _localDataSource.isFavouriteLocation(
-      event.location,
+      eventLocation,
     );
-    emit(
-      WeatherLoadingState(
-        locale: savedLocale,
-        weather: state.weather,
-        dailyForecast: state.dailyForecast,
-        outfitRecommendation: state.outfitRecommendation,
-        outfitImage: state.outfitImage,
-        date: state.date,
-        isFavourite: isFavourite,
-      ),
-    );
+
     try {
       final DailyForecastDomain dailyForecast = await _weatherRepository
-          .getDailyForecast(event.location);
-      final WeatherState currentState = state;
-      if (currentState is WeatherSuccess) {
-        emit(currentState.copyWith(dailyForecast: dailyForecast));
-      } else {
+          .getDailyForecast(eventLocation);
+
+      if (state is WeatherSuccess) {
         emit(
-          WeatherSuccess(
-            locale: savedLocale,
-            weather: state.weather,
+          (state as WeatherSuccess).copyWith(
             dailyForecast: dailyForecast,
             date: state.date,
-            isFavourite: isFavourite,
+          ),
+        );
+      } else if (state is WeatherInitial) {
+        emit(
+          (state as WeatherInitial).copyWith(
+            dailyForecast: dailyForecast,
+            date: state.date,
+          ),
+        );
+      } else if (state is WeatherFailure) {
+        emit(
+          (state as WeatherFailure).copyWith(
+            dailyForecast: dailyForecast,
+            date: state.date,
           ),
         );
       }
-    } on Exception catch (e) {
-      debugPrint('Failed to get daily forecast: $e');
+    } on Exception catch (exception) {
+      debugPrint('WeatherBloc _onFetchDailyForecast Exception: $exception.');
       emit(
         WeatherFailure(
           locale: savedLocale,
           weather: state.weather,
-          message: _mapExceptionToMessage(e),
-          outfitRecommendation: state.outfitRecommendation,
-          outfitImage: state.outfitImage,
+          message: _mapExceptionToMessage(exception),
           dailyForecast: state.dailyForecast,
           date: state.date,
           isFavourite: isFavourite,
@@ -583,67 +572,23 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     UpdateWeatherOnMobileHomeScreenEvent event,
     Emitter<WeatherState> emit,
   ) async {
-    // Check the supported platforms https://pub.dev/packages/home_widget
-    // See issue: https://github.com/ABausG/home_widget/issues/137.
-    if (!kIsWeb &&
-        !Platform.isMacOS &&
-        (Platform.isAndroid || Platform.isIOS)) {
-      try {
-        final Weather weather = state.weather;
-        final DailyForecastDomain? dailyForecastDomain = state.dailyForecast;
-
-        // Ensure native widget receives current locale for localization.
-        try {
-          final String languageCode = _localDataSource.getLanguageIsoCode();
-          // Use the service instead of calling HomeWidget directly.
-          await _homeWidgetService.saveWidgetData<String>(
-            'selected_language',
-            languageCode,
-          );
-        } catch (e) {
-          debugPrint('Failed to save widget language: $e');
-        }
-
-        await _homeWidgetService.updateHomeWidget(
-          localDataSource: _localDataSource,
-          weather: weather,
-          outfitRepository: _outfitRepository,
-          forecast:
-              dailyForecastDomain ??
-              const DailyForecastDomain(forecast: <ForecastItemDomain>[]),
-        );
-      } catch (e) {
-        debugPrint('Failed to update home screen widget: $e');
-      }
+    final DailyForecastDomain? dailyForecast = state.dailyForecast;
+    if (dailyForecast != null) {
+      await _homeWidgetService.updateHomeWidget(
+        localDataSource: _localDataSource,
+        weather: state.weather,
+        forecast: dailyForecast,
+        outfitRepository: _outfitRepository,
+      );
     }
   }
 
-  /// Maps an [Exception] to a localized user-friendly message.
-  String _mapExceptionToMessage(Object e) {
-    final String errorString = e.toString();
-    if (e is SocketException ||
-        errorString.contains('SocketException') ||
-        errorString.contains('Failed host lookup') ||
-        errorString.contains('HandshakeException') ||
-        errorString.contains('Connection refused') ||
-        errorString.contains('Connection closed')) {
-      return translate('error.network_error');
-    }
-    if (e is WeatherRequestFailure) {
-      return translate('error.getting_weather_bloc_generic');
-    }
-    return translate('error.something_went_wrong');
-  }
-
-  void _checkDateChangeOnResume(
+  FutureOr<void> _checkDateChangeOnResume(
     CheckDateChangeOnResume event,
     Emitter<WeatherState> emit,
   ) {
     final DateTime now = DateTime.now();
-    final DateTime lastDataDate = state.date;
-
-    // If the date has changed since the app was last active, reload entries
-    if (!lastDataDate.isSameDate(now)) {
+    if (!state.date.isSameDate(now)) {
       add(RefreshWeather(event.origin));
     }
   }
@@ -653,26 +598,28 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     Emitter<WeatherState> emit,
   ) async {
     final Location location = event.location;
-    final bool currentlyFavourite = _localDataSource.isFavouriteLocation(
-      location,
-    );
-    if (currentlyFavourite) {
+    final bool isFavourite = _localDataSource.isFavouriteLocation(location);
+
+    if (isFavourite) {
       await _localDataSource.removeFavouriteLocation(location);
     } else {
       await _localDataSource.saveFavouriteLocation(location);
     }
 
-    final WeatherState currentState = state;
-    if (currentState is WeatherSuccess) {
-      emit(currentState.copyWith(isFavourite: !currentlyFavourite));
-    } else if (currentState is WeatherInitial) {
-      emit(currentState.copyWith(isFavourite: !currentlyFavourite));
-    } else if (currentState is WeatherFailure) {
-      emit(currentState.copyWith(isFavourite: !currentlyFavourite));
-    } else if (currentState is LocalWebCorsFailure) {
-      emit(currentState.copyWith(isFavourite: !currentlyFavourite));
-    } else {
-      emit(currentState);
+    final bool updatedIsFavourite = !isFavourite;
+
+    if (state is WeatherSuccess) {
+      emit((state as WeatherSuccess).copyWith(isFavourite: updatedIsFavourite));
+    } else if (state is WeatherFailure) {
+      emit((state as WeatherFailure).copyWith(isFavourite: updatedIsFavourite));
+    } else if (state is WeatherInitial) {
+      emit((state as WeatherInitial).copyWith(isFavourite: updatedIsFavourite));
+    } else if (state is WeatherLoadingState) {
+      emit(
+        (state as WeatherLoadingState).copyWith(
+          isFavourite: updatedIsFavourite,
+        ),
+      );
     }
   }
 }

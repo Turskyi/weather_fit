@@ -33,7 +33,7 @@ sealed class WeatherState extends Equatable {
     outfitImage,
     message,
     locale,
-    isCelsius,
+    date,
     dailyForecast,
     isFavourite,
   ];
@@ -45,6 +45,9 @@ sealed class WeatherState extends Equatable {
       'outfit_image': outfitImage.toJson(),
       'message': message,
       'is_favourite': isFavourite,
+      'locale': locale,
+      'date': date.toIso8601String(),
+      'dailyForecast': dailyForecast?.toJson(),
     };
   }
 
@@ -176,6 +179,7 @@ class WeatherLoadingState extends WeatherState {
     outfitImage,
     dailyForecast,
     isFavourite,
+    date,
   ];
 }
 
@@ -230,6 +234,7 @@ class WeatherSuccess extends WeatherState {
     message,
     dailyForecast,
     isFavourite,
+    date,
   ];
 }
 
@@ -305,6 +310,7 @@ class WeatherFailure extends WeatherState {
     message,
     dailyForecast,
     isFavourite,
+    date,
   ];
 }
 
@@ -334,5 +340,6 @@ class LocalWebCorsFailure extends WeatherFailure {
     message,
     dailyForecast,
     isFavourite,
+    date,
   ];
 }
