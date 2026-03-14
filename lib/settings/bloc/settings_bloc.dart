@@ -58,21 +58,29 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     LoadSettingsEvent event,
     Emitter<SettingsState> emit,
   ) async {
-    final PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    emit(
-      SettingsInitial(
-        language: state.language,
-        appVersion: '${packageInfo.version} (${packageInfo.buildNumber})',
-        widgetUpdateFrequency: _localDataSource.getWidgetUpdateFrequency(),
-      ),
-    );
+    try {
+      final PackageInfo packageInfo = await PackageInfo.fromPlatform();
+      emit(
+        SettingsInitial(
+          language: state.language,
+          appVersion: '${packageInfo.version} (${packageInfo.buildNumber})',
+          widgetUpdateFrequency: _localDataSource.getWidgetUpdateFrequency(),
+        ),
+      );
+    } catch (e, stackTrace) {
+      debugPrint('SettingsErrorEvent:$e\nStackTrace: $stackTrace');
+    }
   }
 
   FutureOr<void> _onCheckForUpdate(
     CheckForUpdateEvent event,
     Emitter<SettingsState> emit,
   ) async {
-    await _updateService.checkForUpdate();
+    try {
+      await _updateService.checkForUpdate();
+    } catch (e) {
+      debugPrint('Error checking for updates: $e');
+    }
   }
 
   FutureOr<void> _handleError(

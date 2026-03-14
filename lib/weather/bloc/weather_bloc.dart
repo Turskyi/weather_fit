@@ -228,101 +228,16 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     );
     final DateTime now = DateTime.now();
     if (state is WeatherSuccess || state is WeatherFailure) {
-      if (state is WeatherFailure) {
-        debugPrint('Failed to get weather on refresh: $state');
-      }
-      if (stateWeather.isNoLocation) {
-        emit(
-          WeatherInitial(
-            locale: savedLocale,
-            dailyForecast: state.dailyForecast,
-            date: now,
-            isFavourite: isFavourite,
-          ),
-        );
-      } else {
-        emit(
-          WeatherLoadingState(
-            locale: savedLocale,
-            weather: stateWeather,
-            outfitRecommendation: stateOutfitRecommendation,
-            outfitImage: stateOutfitImage,
-            dailyForecast: state.dailyForecast,
-            date: now,
-            isFavourite: isFavourite,
-          ),
-        );
-
-        try {
-          final Location stateLocation = state.location;
-          final WeatherDomain updatedWeather = await _getWeatherByLocation(
-            stateLocation,
-          );
-
-          final Weather weather = Weather.fromRepository(updatedWeather);
-
-          final DailyForecastDomain dailyForecast = await _weatherRepository
-              .getDailyForecast(stateLocation);
-
-          final TemperatureUnits units = stateWeather.temperatureUnits;
-
-          final double temperatureValue = units.isFahrenheit
-              ? weather.temperature.value.toFahrenheit()
-              : weather.temperature.value;
-
-          final String updatedOutfitRecommendation = _getOutfitRecommendation(
-            weather,
-          );
-
-          final OutfitImage updatedOutfitImage = await _outfitRepository
-              .getOutfitImage(weather);
-
-          final Weather updatedWeatherWithUnits = weather.copyWith(
-            temperature: Temperature(value: temperatureValue),
-            temperatureUnits: units,
-          );
-
-          // Update cache on refresh too.
-          await _localDataSource.cacheWeatherBundle(
-            location: stateLocation,
-            weather: updatedWeatherWithUnits,
-            dailyForecast: dailyForecast,
-            outfitRecommendation: updatedOutfitRecommendation,
-            outfitImage: updatedOutfitImage,
-          );
-
-          emit(
-            WeatherSuccess(
-              locale: savedLocale,
-              weather: updatedWeatherWithUnits,
-              outfitRecommendation: updatedOutfitRecommendation,
-              outfitImage: updatedOutfitImage,
-              dailyForecast: dailyForecast,
-              date: now,
-              isFavourite: isFavourite,
-            ),
-          );
-
-          final WeatherFetchOrigin eventOrigin = event.origin;
-          if (!kIsWeb && !Platform.isMacOS && eventOrigin.isNotWearable) {
-            add(UpdateWeatherOnMobileHomeScreenEvent(eventOrigin));
-          }
-        } on Exception catch (e) {
-          debugPrint('Failed to get weather: $e');
-          emit(
-            WeatherFailure(
-              locale: savedLocale,
-              weather: stateWeather,
-              message: _mapExceptionToMessage(e),
-              outfitRecommendation: stateOutfitRecommendation,
-              outfitImage: stateOutfitImage,
-              dailyForecast: state.dailyForecast,
-              date: now,
-              isFavourite: isFavourite,
-            ),
-          );
-        }
-      }
+      await _refreshWeatherAndCache(
+        stateWeather: stateWeather,
+        emit: emit,
+        savedLocale: savedLocale,
+        now: now,
+        isFavourite: isFavourite,
+        stateOutfitRecommendation: stateOutfitRecommendation,
+        stateOutfitImage: stateOutfitImage,
+        event: event,
+      );
     } else {
       emit(
         WeatherInitial(
@@ -335,6 +250,113 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           isFavourite: isFavourite,
         ),
       );
+    }
+  }
+
+  Future<void> _refreshWeatherAndCache({
+    required Weather stateWeather,
+    required Emitter<WeatherState> emit,
+    required String savedLocale,
+    required DateTime now,
+    required bool isFavourite,
+    required String stateOutfitRecommendation,
+    required OutfitImage stateOutfitImage,
+    required RefreshWeather event,
+  }) async {
+    if (state is WeatherFailure) {
+      debugPrint('Failed to get weather on refresh: $state');
+    }
+    if (stateWeather.isNoLocation) {
+      emit(
+        WeatherInitial(
+          locale: savedLocale,
+          dailyForecast: state.dailyForecast,
+          date: now,
+          isFavourite: isFavourite,
+        ),
+      );
+    } else {
+      emit(
+        WeatherLoadingState(
+          locale: savedLocale,
+          weather: stateWeather,
+          outfitRecommendation: stateOutfitRecommendation,
+          outfitImage: stateOutfitImage,
+          dailyForecast: state.dailyForecast,
+          date: now,
+          isFavourite: isFavourite,
+        ),
+      );
+
+      try {
+        final Location stateLocation = state.location;
+        final WeatherDomain updatedWeather = await _getWeatherByLocation(
+          stateLocation,
+        );
+
+        final Weather weather = Weather.fromRepository(updatedWeather);
+
+        final DailyForecastDomain dailyForecast = await _weatherRepository
+            .getDailyForecast(stateLocation);
+
+        final TemperatureUnits units = stateWeather.temperatureUnits;
+
+        final double temperatureValue = units.isFahrenheit
+            ? weather.temperature.value.toFahrenheit()
+            : weather.temperature.value;
+
+        final String updatedOutfitRecommendation = _getOutfitRecommendation(
+          weather,
+        );
+
+        final OutfitImage updatedOutfitImage = await _outfitRepository
+            .getOutfitImage(weather);
+
+        final Weather updatedWeatherWithUnits = weather.copyWith(
+          temperature: Temperature(value: temperatureValue),
+          temperatureUnits: units,
+        );
+
+        // Update cache on refresh too.
+        await _localDataSource.cacheWeatherBundle(
+          location: stateLocation,
+          weather: updatedWeatherWithUnits,
+          dailyForecast: dailyForecast,
+          outfitRecommendation: updatedOutfitRecommendation,
+          outfitImage: updatedOutfitImage,
+        );
+
+        emit(
+          WeatherSuccess(
+            locale: savedLocale,
+            weather: updatedWeatherWithUnits,
+            outfitRecommendation: updatedOutfitRecommendation,
+            outfitImage: updatedOutfitImage,
+            dailyForecast: dailyForecast,
+            date: now,
+            isFavourite: isFavourite,
+          ),
+        );
+
+        final WeatherFetchOrigin eventOrigin = event.origin;
+        if (!kIsWeb && !Platform.isMacOS && eventOrigin.isNotWearable) {
+          add(UpdateWeatherOnMobileHomeScreenEvent(eventOrigin));
+        }
+      } on Exception catch (e) {
+        debugPrint('Failed to get weather: $e');
+        emit(
+          WeatherFailure(
+            locale: savedLocale,
+            weather: stateWeather,
+            message: _mapExceptionToMessage(e),
+            outfitRecommendation: stateOutfitRecommendation,
+            outfitImage: stateOutfitImage,
+            dailyForecast: state.dailyForecast,
+            date: now,
+            isFavourite: isFavourite,
+          ),
+        );
+      }
     }
   }
 
