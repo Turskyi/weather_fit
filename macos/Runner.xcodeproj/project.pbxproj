@@ -30,7 +30,6 @@
 		4B711F9F164AB2ECDD522669 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A58CA9269DC180B3ACA2BFA6 /* Pods_Runner.framework */; };
 		66879C672DF5E8290037A706 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66A5237B2DF5E3A900195319 /* WidgetKit.framework */; };
 		66879C682DF5E8290037A706 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66A5237D2DF5E3AA00195319 /* SwiftUI.framework */; };
-		66879C742DF5E82A0037A706 /* WeatherWidgetsExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 66879C662DF5E8290037A706 /* WeatherWidgetsExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		735BA3BED77EFEDBC27C0A77 /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D717B31C49A1F0B5123A1748 /* Pods_RunnerTests.framework */; };
 /* End PBXBuildFile section */
 
@@ -48,13 +47,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 33CC111A2044C6BA0003C045;
 			remoteInfo = FLX;
-		};
-		66879C722DF5E82A0037A706 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 33CC10E52044A3C60003C045 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 66879C652DF5E8290037A706;
-			remoteInfo = WeatherWidgetsExtension;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -75,7 +67,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				66879C742DF5E82A0037A706 /* WeatherWidgetsExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -308,7 +299,6 @@
 			);
 			dependencies = (
 				33CC11202044C79F0003C045 /* PBXTargetDependency */,
-				66879C732DF5E82A0037A706 /* PBXTargetDependency */,
 			);
 			name = Runner;
 			productName = Runner;
@@ -554,11 +544,6 @@
 			isa = PBXTargetDependency;
 			target = 33CC111A2044C6BA0003C045 /* Flutter Assemble */;
 			targetProxy = 33CC111F2044C79F0003C045 /* PBXContainerItemProxy */;
-		};
-		66879C732DF5E82A0037A706 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 66879C652DF5E8290037A706 /* WeatherWidgetsExtension */;
-			targetProxy = 66879C722DF5E82A0037A706 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
