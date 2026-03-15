@@ -4,6 +4,7 @@ import 'package:flutter_translate/flutter_translate.dart';
 import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/extensions/build_context_extensions.dart';
+import 'package:weather_fit/res/constants/constants.dart' as constants;
 import 'package:weather_fit/res/theme/cubit/theme_cubit.dart';
 import 'package:weather_fit/router/app_route.dart';
 import 'package:weather_fit/settings/bloc/settings_bloc.dart';
@@ -22,16 +23,15 @@ class WeatherPage extends StatefulWidget {
 class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
   late PageController _pageController;
   List<Location> _locations = <Location>[];
+  int _currentPageIndex = 0;
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController();
     WidgetsBinding.instance.addObserver(this);
-    // Initialize locations list immediately so PageView has items on first
+    // Initialize locations list immediately so `PageView` has items on first
     // build.
-    // We use context.read here; this is safe in `initState` as long as
-    // providers are ancestors.
     _locations = _getSwipeList(context.read<LocalDataSource>());
 
     WidgetsBinding.instance.addPostFrameCallback((Duration _) {
@@ -120,10 +120,15 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     final bool isExtraSmall = context.isExtraSmallScreen;
+    final bool isWide = context.screenWidth > constants.kWideLayoutBreakpoint;
+
     final Widget pageView = PageView.builder(
       controller: _pageController,
       itemCount: _locations.length,
       onPageChanged: (int index) {
+        setState(() {
+          _currentPageIndex = index;
+        });
         final Location location = _locations[index];
         if (location.isNotEmpty) {
           context.read<LocalDataSource>().saveLocation(location);
@@ -156,6 +161,50 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
       },
     );
 
+    final Widget body = isWide
+        ? Stack(
+            children: <Widget>[
+              pageView,
+              if (_currentPageIndex > 0)
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.arrow_back_ios,
+                        color: Colors.white54,
+                        size: 48,
+                      ),
+                      onPressed: () => _pageController.previousPage(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                      ),
+                    ),
+                  ),
+                ),
+              if (_currentPageIndex < _locations.length - 1)
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.arrow_forward_ios,
+                        color: Colors.white54,
+                        size: 48,
+                      ),
+                      onPressed: () => _pageController.nextPage(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          )
+        : pageView;
+
     return BlocListener<WeatherBloc, WeatherState>(
       listener: (BuildContext context, WeatherState state) {
         _weatherBlocStateListener(context, state);
@@ -169,14 +218,14 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
               onRefresh: _refresh,
               onSearchPressed: _handleLocationSearchAndFetchWeather,
               onReportPressed: _handleReportPressed,
-              bodyOverride: pageView,
+              bodyOverride: body,
             )
           : WeatherPageDefaultLayout(
               onSettingsPressed: _navigateToSettingsAndRefreshOutfit,
               onRefresh: _refresh,
               onSearchPressed: _handleLocationSearchAndFetchWeather,
               onReportPressed: _handleReportPressed,
-              bodyOverride: pageView,
+              bodyOverride: body,
             ),
     );
   }
