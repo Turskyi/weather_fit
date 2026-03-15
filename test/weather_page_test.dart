@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +26,8 @@ import 'package:weather_fit/services/home_widget_service.dart';
 import 'package:weather_fit/settings/bloc/settings_bloc.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 import 'package:weather_fit/weather/ui/page/weather_page.dart';
+import 'package:weather_fit/weather/ui/populated/daily_forecast.dart';
+import 'package:weather_fit/weather/ui/widgets/weather_shimmer.dart';
 import 'package:weather_fit/weather/weather.dart';
 import 'package:weather_repository/weather_repository.dart' as repository;
 import 'package:weather_repository/weather_repository.dart';
@@ -37,7 +41,60 @@ import 'helpers/mocks/mock_services.dart';
 
 class MockLocalDataSource extends Mock implements LocalDataSource {}
 
+class MockHttpClient extends Mock implements HttpClient {}
+
+class MockHttpClientRequest extends Mock implements HttpClientRequest {}
+
+class MockHttpClientResponse extends Mock implements HttpClientResponse {}
+
+class MockHttpHeaders extends Mock implements HttpHeaders {}
+
+class TestHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return _createMockImageHttpClient();
+  }
+}
+
+HttpClient _createMockImageHttpClient() {
+  final MockHttpClient client = MockHttpClient();
+  final MockHttpClientRequest request = MockHttpClientRequest();
+  final MockHttpClientResponse response = MockHttpClientResponse();
+  final MockHttpHeaders headers = MockHttpHeaders();
+
+  when(() => client.getUrl(any())).thenAnswer((_) async => request);
+  when(() => request.headers).thenReturn(headers);
+  when(() => request.close()).thenAnswer((_) async => response);
+  when(() => response.statusCode).thenReturn(HttpStatus.ok);
+  when(() => response.contentLength).thenReturn(_transparentSvg.length);
+  when(
+    () => response.compressionState,
+  ).thenReturn(HttpClientResponseCompressionState.notCompressed);
+  when(
+    () => response.listen(
+      any(),
+      cancelOnError: any(named: 'cancelOnError'),
+      onDone: any(named: 'onDone'),
+      onError: any(named: 'onError'),
+    ),
+  ).thenAnswer((Invocation invocation) {
+    final void Function(List<int>) onData =
+        invocation.positionalArguments[0] as void Function(List<int>);
+    final void Function()? onDone =
+        invocation.namedArguments[#onDone] as void Function()?;
+    return Stream<List<int>>.fromIterable(<List<int>>[
+      _transparentSvg,
+    ]).listen(onData, onDone: onDone);
+  });
+  return client;
+}
+
+final List<int> _transparentSvg = utf8.encode(
+  '<svg viewBox="0 0 1 1" xmlns="http://www.w3.org/2000/svg"></svg>',
+);
+
 void main() {
+  HttpOverrides.global = TestHttpOverrides();
   initHydratedStorage();
   late LocalizationDelegate localizationDelegate;
   late MockLocalDataSource mockLocalDataSource;
@@ -91,6 +148,12 @@ void main() {
     when(
       () => mockLocalDataSource.getCachedWeatherBundle(any()),
     ).thenReturn(null);
+    when(
+      () => mockLocalDataSource.saveLocation(any()),
+    ).thenAnswer((_) async => true);
+    when(
+      () => mockLocalDataSource.saveLastSearchedLocation(any()),
+    ).thenAnswer((_) async => true);
   });
 
   group('WeatherPage', () {
@@ -147,8 +210,6 @@ void main() {
         ),
       );
 
-      // Use pump() with duration instead of pumpAndSettle() to avoid timeout
-      // from infinite shimmer animations.
       await tester.pump(const Duration(milliseconds: 500));
       expect(find.byType(AppBar), findsOneWidget);
     });
@@ -156,8 +217,6 @@ void main() {
     testWidgets('shows snackbar with try again when WeatherFailure occurs', (
       WidgetTester tester,
     ) async {
-      // Set a larger surface size to ensure the SnackBar is on-screen and
-      // hittable.
       tester.view.physicalSize = const Size(800, 3000);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() {
@@ -191,7 +250,6 @@ void main() {
           ),
           WeatherLoadingState(
             date: DateTime.now(),
-
             locale: 'en',
             weather: weatherWithNoFlag,
           ),
@@ -242,18 +300,14 @@ void main() {
       );
 
       await tester.pump();
-      // Ensure the SnackBar animation triggers and completes entrance.
       await tester.pump(const Duration(seconds: 1));
 
       final Finder tryAgainFinder = find.text('Try again');
       expect(find.text(errorMessage), findsWidgets);
       expect(tryAgainFinder, findsOneWidget);
 
-      // Using tapAt with centered coordinates to avoid hit-test warning while
-      // still triggering the button callback.
       await tester.tapAt(tester.getCenter(tryAgainFinder));
 
-      // Allow the scheduled timer from _refresh's Future.delayed to execute.
       await tester.pump();
       await tester.pump(const Duration(seconds: 1));
 
@@ -277,6 +331,7 @@ void main() {
             date: DateTime.now(),
             message: 'Error',
             locale: dummy_constants.dummyLocale,
+            weather: Weather.empty,
           ),
         );
         await tester.pumpWidget(
@@ -289,15 +344,22 @@ void main() {
                 value: mockLocalDataSource,
               ),
             ],
-            child: BlocProvider<WeatherBloc>.value(
-              value: weatherBloc,
-              child: LocalizedApp(
+            child: MultiBlocProvider(
+              providers: <SingleChildWidget>[
+                BlocProvider<WeatherBloc>.value(value: weatherBloc),
+                BlocProvider<SettingsBloc>.value(value: settingsBloc),
+              ],
+              child: prepareWidgetForTesting(
+                LocalizedApp(
+                  localizationDelegate,
+                  const MaterialApp(home: WeatherPage()),
+                ),
                 localizationDelegate,
-                const MaterialApp(home: WeatherPage()),
               ),
             ),
           ),
         );
+        await tester.pump(const Duration(milliseconds: 500));
         expect(find.byType(WeatherError), findsOneWidget);
       });
     });
@@ -344,6 +406,112 @@ void main() {
 
         await tester.pump(const Duration(milliseconds: 500));
         expect(find.byType(PageView), findsOneWidget);
+      });
+    });
+
+    group('UI Stability', () {
+      testWidgets('Content does not jump when swiping between locations', (
+        WidgetTester tester,
+      ) async {
+        tester.view.physicalSize = const Size(800, 3000);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(() {
+          tester.view.resetPhysicalSize();
+          tester.view.resetDevicePixelRatio();
+        });
+
+        final repository.Location loc1 = dummy_constants.dummyLocation.copyWith(
+          countryCode: '',
+        );
+        final repository.Location loc2 = dummy_constants.dummyLocation.copyWith(
+          latitude: 40.0,
+          longitude: 40.0,
+          name: 'Second City',
+          countryCode: '',
+        );
+
+        when(() => mockLocalDataSource.getLastSavedLocation()).thenReturn(loc1);
+        when(
+          () => mockLocalDataSource.getLastSearchedLocation(),
+        ).thenReturn(loc1);
+        when(
+          () => mockLocalDataSource.getFavouriteLocations(),
+        ).thenReturn(<repository.Location>[loc2]);
+        when(
+          () => mockLocalDataSource.getCachedWeatherBundle(any()),
+        ).thenReturn(null);
+
+        final WeatherBloc weatherBloc = MockWeatherBloc();
+
+        final DateTime futureDate = DateTime.now().add(const Duration(days: 1));
+        final String futureTimeString =
+            '${futureDate.year}-${futureDate.month.toString().padLeft(2, '0')}'
+            '-${futureDate.day.toString().padLeft(2, '0')}T08:00';
+
+        final WeatherSuccess successState = WeatherSuccess(
+          locale: 'en',
+          date: DateTime.now(),
+          outfitRecommendation: 'Test recommendation',
+          weather: dummy_constants.dummyWeather.copyWith(
+            location: loc1,
+            countryCode: '',
+          ),
+          dailyForecast: DailyForecastDomain(
+            forecast: <ForecastItemDomain>[
+              ForecastItemDomain(
+                time: futureTimeString,
+                temperature: 10,
+                weatherCode: 0,
+              ),
+            ],
+          ),
+        );
+
+        when(() => weatherBloc.state).thenReturn(successState);
+        when(
+          () => weatherBloc.stream,
+        ).thenAnswer((_) => const Stream<WeatherState>.empty());
+
+        await tester.pumpWidget(
+          MultiRepositoryProvider(
+            providers: <SingleChildWidget>[
+              RepositoryProvider<repository.WeatherRepository>.value(
+                value: weatherRepository,
+              ),
+              RepositoryProvider<LocalDataSource>.value(
+                value: mockLocalDataSource,
+              ),
+            ],
+            child: MultiBlocProvider(
+              providers: <SingleChildWidget>[
+                BlocProvider<WeatherBloc>.value(value: weatherBloc),
+                BlocProvider<SettingsBloc>.value(value: settingsBloc),
+              ],
+              child: prepareWidgetForTesting(
+                LocalizedApp(
+                  localizationDelegate,
+                  const MaterialApp(home: WeatherPage()),
+                ),
+                localizationDelegate,
+              ),
+            ),
+          ),
+        );
+
+        await tester.pump(const Duration(milliseconds: 500));
+
+        final Finder forecastFinder = find.byType(DailyForecast);
+        expect(forecastFinder, findsOneWidget);
+        final double initialY = tester.getTopLeft(forecastFinder).dy;
+
+        await tester.drag(find.byType(PageView), const Offset(-400, 0));
+        await tester.pump();
+
+        final Finder shimmerFinder = find.byType(DailyForecastShimmer);
+        expect(shimmerFinder, findsWidgets);
+
+        final double shimmerY = tester.getTopLeft(shimmerFinder.first).dy;
+        expect(shimmerY, closeTo(initialY, 2.0));
       });
     });
   });

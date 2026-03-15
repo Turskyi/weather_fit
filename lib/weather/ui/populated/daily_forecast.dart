@@ -133,6 +133,7 @@ class _DailyForecastState extends State<DailyForecast> {
             filter: ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
             child: Container(
               width: double.infinity,
+              height: 132,
               padding: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
                 color: colors.surface.withValues(alpha: 0.3),
@@ -140,6 +141,7 @@ class _DailyForecastState extends State<DailyForecast> {
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   BlocBuilder<WeatherBloc, WeatherState>(
                     builder: (BuildContext context, WeatherState state) {

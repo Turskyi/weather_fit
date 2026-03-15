@@ -3,21 +3,39 @@ import 'package:shimmer/shimmer.dart';
 import 'package:weather_fit/extensions/build_context_extensions.dart';
 
 class WeatherShimmer extends StatelessWidget {
-  const WeatherShimmer({super.key});
+  const WeatherShimmer({this.locationName, super.key});
+
+  final String? locationName;
 
   @override
   Widget build(BuildContext context) {
-    return const SingleChildScrollView(
+    final ThemeData theme = Theme.of(context);
+    return SingleChildScrollView(
       child: Column(
         children: <Widget>[
-          SizedBox(height: 40),
-          LocationNameShimmer(),
-          SizedBox(height: 20),
-          TemperatureShimmer(),
-          SizedBox(height: 40),
-          OutfitShimmer(),
-          SizedBox(height: 24),
-          DailyForecastShimmer(),
+          const SizedBox(height: 40),
+          if (locationName != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Text(
+                locationName!,
+                style: theme.textTheme.displayMedium?.copyWith(
+                  fontWeight: FontWeight.w200,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            )
+          else
+            const LocationNameShimmer(),
+          const SizedBox(height: 20),
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 8.0),
+            child: TemperatureShimmer(),
+          ),
+          const SizedBox(height: 40),
+          const OutfitShimmer(),
+          const SizedBox(height: 24),
+          const DailyForecastShimmer(),
         ],
       ),
     );
@@ -34,7 +52,7 @@ class LocationNameShimmer extends StatelessWidget {
       baseColor: colorScheme.surfaceContainerHighest,
       highlightColor: colorScheme.surface.withValues(alpha: 0.5),
       child: Container(
-        height: 40,
+        height: 56, // Matched to displayMedium height
         width: 200,
         decoration: BoxDecoration(
           color: Colors.white,
@@ -55,9 +73,8 @@ class TemperatureShimmer extends StatelessWidget {
       baseColor: colorScheme.surfaceContainerHighest,
       highlightColor: colorScheme.surface.withValues(alpha: 0.5),
       child: Container(
-        height: 60,
+        height: 48, // Adjusted to better match displaySmall height
         width: 100,
-        margin: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(8),
@@ -78,9 +95,9 @@ class OutfitShimmer extends StatelessWidget {
 
     double height = 400;
     if (isExtraSmall) {
-      height = 300;
+      height = 236; // Matches _getOutfitImageSize
     } else if (isNarrow) {
-      height = 460;
+      height = 520; // Matches _getOutfitImageSize
     }
 
     return Shimmer.fromColors(
@@ -88,7 +105,7 @@ class OutfitShimmer extends StatelessWidget {
       highlightColor: colorScheme.surface.withValues(alpha: 0.5),
       child: Container(
         height: height,
-        width: isExtraSmall ? 250 : 400,
+        width: isExtraSmall ? 180 : 400, // Matches _getOutfitImageSize
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
@@ -108,7 +125,7 @@ class DailyForecastShimmer extends StatelessWidget {
       baseColor: colorScheme.surfaceContainerHighest,
       highlightColor: colorScheme.surface.withValues(alpha: 0.5),
       child: Container(
-        height: 100,
+        height: 122, // Approximate height of DailyForecast
         width: double.infinity,
         constraints: const BoxConstraints(maxWidth: 400),
         decoration: BoxDecoration(
@@ -130,8 +147,8 @@ class WeatherIconShimmer extends StatelessWidget {
       baseColor: colorScheme.surfaceContainerHighest,
       highlightColor: colorScheme.surface.withValues(alpha: 0.5),
       child: Container(
-        height: 64,
-        width: 64,
+        height: 75, // Matches WeatherIcon._iconSize
+        width: 75,
         decoration: const BoxDecoration(
           color: Colors.white,
           shape: BoxShape.circle,
