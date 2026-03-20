@@ -1,10 +1,10 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:home_widget/home_widget.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:nominatim_api/nominatim_api.dart';
@@ -28,6 +28,9 @@ import 'package:weather_fit/weather_bloc_observer.dart';
 import 'package:weather_repository/weather_repository.dart';
 import 'package:workmanager/workmanager.dart';
 
+Timer? _macOSWidgetUpdateTimer;
+bool _isMacOSWidgetUpdateInProgress = false;
+
 Future<Dependencies> injectDependencies() async {
   await _initializeAllDateFormatting();
 
@@ -44,8 +47,10 @@ Future<Dependencies> injectDependencies() async {
 
   // Make sure we run on supported platforms:
   // https://pub.dev/packages/workmanager
-  if (!kIsWeb && !Platform.isMacOS && (Platform.isAndroid || Platform.isIOS)) {
+  if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
     _setupBackgroundWidgetUpdates(localDataSource);
+  } else if (!kIsWeb && Platform.isMacOS) {
+    _setupMacOSForegroundWidgetUpdates(localDataSource);
   }
 
   final RemoteDataSource remoteDataSource = RemoteDataSource(Dio());
@@ -211,75 +216,108 @@ Future<void> _setupBackgroundWidgetUpdates(
   }
 }
 
+void _setupMacOSForegroundWidgetUpdates(LocalDataSource localDataSource) {
+  _macOSWidgetUpdateTimer?.cancel();
+
+  final int frequencyMinutes = localDataSource.getWidgetUpdateFrequency();
+  final Duration updateInterval = Duration(
+    minutes: frequencyMinutes > 0 ? frequencyMinutes : 15,
+  );
+
+  Future<void>(() async {
+    if (_isMacOSWidgetUpdateInProgress) {
+      return;
+    }
+    _isMacOSWidgetUpdateInProgress = true;
+    try {
+      await _performWidgetUpdateTick();
+    } finally {
+      _isMacOSWidgetUpdateInProgress = false;
+    }
+  });
+
+  _macOSWidgetUpdateTimer = Timer.periodic(updateInterval, (Timer _) async {
+    if (_isMacOSWidgetUpdateInProgress) {
+      return;
+    }
+    _isMacOSWidgetUpdateInProgress = true;
+    try {
+      await _performWidgetUpdateTick();
+    } finally {
+      _isMacOSWidgetUpdateInProgress = false;
+    }
+  });
+}
+
 /// Used for Background Updates using [Workmanager] Plugin.
 @pragma('vm:entry-point')
 void _callbackDispatcher() {
   try {
     Workmanager().executeTask((String _, Map<String, Object?>? _) async {
-      try {
-        WidgetsFlutterBinding.ensureInitialized();
-
-        await _initializeAllDateFormatting();
-
-        final SharedPreferences preferences =
-            await SharedPreferences.getInstance();
-
-        final LocalDataSource localDataSource = LocalDataSource(preferences);
-        final RemoteDataSource remoteDataSource = RemoteDataSource(Dio());
-
-        // Save currently selected language to widget data so native widgets
-        // (Android/iOS) can use it to localize strings.
-        try {
-          final String languageCode = localDataSource.getLanguageIsoCode();
-          await HomeWidget.saveWidgetData<String>(
-            'selected_language',
-            languageCode,
-          );
-        } catch (e) {
-          debugPrint('Failed to save widget language: $e');
-        }
-
-        final Location lastSavedLocation = localDataSource
-            .getLastSavedLocation();
-
-        if (lastSavedLocation.isNotEmpty) {
-          // Get latest weather.
-          final WeatherRepository weatherRepository = WeatherRepository();
-
-          final WeatherDomain domainWeather = await weatherRepository
-              .getWeatherByLocation(lastSavedLocation);
-
-          final DailyForecastDomain dailyForecast = await weatherRepository
-              .getDailyForecast(lastSavedLocation);
-
-          final OutfitRepository outfitRepository = OutfitRepository(
-            localDataSource,
-            remoteDataSource,
-          );
-
-          final HomeWidgetService homeWidgetService =
-              const HomeWidgetServiceImpl();
-
-          final Weather weather = Weather.fromRepository(domainWeather);
-
-          await homeWidgetService.updateHomeWidget(
-            localDataSource: localDataSource,
-            weather: weather,
-            outfitRepository: outfitRepository,
-            forecast: dailyForecast,
-          );
-
-          return true;
-        } else {
-          return false;
-        }
-      } catch (e) {
-        debugPrint('Background widget update failed: $e');
-        return false;
-      }
+      return _performWidgetUpdateTick();
     });
   } catch (e) {
     debugPrint('Error while WorkManager.executeTask: $e');
+  }
+}
+
+Future<bool> _performWidgetUpdateTick() async {
+  try {
+    WidgetsFlutterBinding.ensureInitialized();
+
+    await _initializeAllDateFormatting();
+
+    final SharedPreferences preferences = await SharedPreferences.getInstance();
+
+    final LocalDataSource localDataSource = LocalDataSource(preferences);
+    final RemoteDataSource remoteDataSource = RemoteDataSource(Dio());
+
+    final HomeWidgetService homeWidgetService = const HomeWidgetServiceImpl();
+
+    // Save currently selected language to widget data so native widgets
+    // (Android/iOS/macOS) can use it to localize strings.
+    try {
+      final String languageCode = localDataSource.getLanguageIsoCode();
+      await homeWidgetService.saveWidgetData<String>(
+        'selected_language',
+        languageCode,
+      );
+    } catch (e) {
+      debugPrint('Failed to save widget language: $e');
+    }
+
+    final Location lastSavedLocation = localDataSource.getLastSavedLocation();
+
+    if (lastSavedLocation.isEmpty) {
+      return false;
+    }
+
+    final WeatherRepository weatherRepository = WeatherRepository();
+
+    final WeatherDomain domainWeather = await weatherRepository
+        .getWeatherByLocation(lastSavedLocation);
+
+    final DailyForecastDomain dailyForecast = await weatherRepository
+        .getDailyForecast(lastSavedLocation);
+
+    final OutfitRepository outfitRepository = OutfitRepository(
+      localDataSource,
+      remoteDataSource,
+    );
+
+    final Weather weather = Weather.fromRepository(domainWeather);
+
+    await homeWidgetService.updateHomeWidget(
+      localDataSource: localDataSource,
+      weather: weather,
+      outfitRepository: outfitRepository,
+      forecast: dailyForecast,
+    );
+
+    return true;
+  } catch (e) {
+    debugPrint('Background widget update failed: $e');
+    return false;
   }
 }
 
