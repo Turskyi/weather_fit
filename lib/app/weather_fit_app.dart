@@ -12,13 +12,14 @@ import 'package:weather_fit/data/repositories/outfit_repository.dart';
 import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/env/env.dart';
 import 'package:weather_fit/feedback/feedback_form.dart';
-import 'package:weather_fit/res/constants.dart' as constants;
+import 'package:weather_fit/res/constants/constants.dart' as constants;
 import 'package:weather_fit/res/resources.dart';
 import 'package:weather_fit/res/theme/cubit/theme_cubit.dart';
 import 'package:weather_fit/router/app_route.dart';
 import 'package:weather_fit/router/navigator.dart';
 import 'package:weather_fit/search/bloc/search_bloc.dart';
 import 'package:weather_fit/services/home_widget_service.dart';
+import 'package:weather_fit/services/home_widget_service_impl.dart';
 import 'package:weather_fit/services/update_service.dart';
 import 'package:weather_fit/settings/bloc/settings_bloc.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
@@ -65,10 +66,10 @@ class WeatherFitApp extends StatelessWidget {
           BlocProvider<WeatherBloc>(
             create: (BuildContext context) {
               return WeatherBloc(
-                weatherRepository,
-                outfitRepository,
-                localDataSource,
-                context.read<HomeWidgetService>(),
+                weatherRepository: weatherRepository,
+                outfitRepository: outfitRepository,
+                localDataSource: localDataSource,
+                homeWidgetService: context.read<HomeWidgetService>(),
               );
             },
           ),
@@ -131,7 +132,7 @@ class WeatherFitApp extends StatelessWidget {
                 child: MaterialApp(
                   navigatorKey: navigatorKey,
                   debugShowCheckedModeBanner: false,
-                  title: constants.appName,
+                  title: constants.kAppName,
                   localizationsDelegates: <LocalizationsDelegate<Object>>[
                     GlobalMaterialLocalizations.delegate,
                     GlobalWidgetsLocalizations.delegate,

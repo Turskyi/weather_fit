@@ -58,3 +58,18 @@ final class FetchDailyForecast extends WeatherEvent {
   @override
   List<Object> get props => <Object>[location];
 }
+
+final class CheckDateChangeOnResume extends WeatherEvent {
+  const CheckDateChangeOnResume(this.origin);
+
+  final WeatherFetchOrigin origin;
+}
+
+final class ToggleFavouriteEvent extends WeatherEvent {
+  const ToggleFavouriteEvent(this.location);
+
+  final Location location;
+
+  @override
+  List<Object> get props => <Object>[location];
+}

@@ -13,6 +13,13 @@ WeatherInitial _$WeatherInitialFromJson(Map<String, dynamic> json) =>
       ($checkedConvert) {
         final val = WeatherInitial(
           locale: $checkedConvert('locale', (v) => v as String),
+          dailyForecast: $checkedConvert(
+            'daily_forecast',
+            (v) => v == null
+                ? null
+                : DailyForecastDomain.fromJson(v as Map<String, dynamic>),
+          ),
+          date: $checkedConvert('date', (v) => DateTime.parse(v as String)),
           outfitRecommendation: $checkedConvert(
             'outfit_recommendation',
             (v) => v as String? ?? '',
@@ -28,19 +35,18 @@ WeatherInitial _$WeatherInitialFromJson(Map<String, dynamic> json) =>
                 ? const OutfitImage.empty()
                 : OutfitImage.fromJson(v as Map<String, dynamic>),
           ),
-          dailyForecast: $checkedConvert(
-            'daily_forecast',
-            (v) => v == null
-                ? null
-                : DailyForecastDomain.fromJson(v as Map<String, dynamic>),
+          isFavourite: $checkedConvert(
+            'is_favourite',
+            (v) => v as bool? ?? false,
           ),
         );
         return val;
       },
       fieldKeyMap: const {
+        'dailyForecast': 'daily_forecast',
         'outfitRecommendation': 'outfit_recommendation',
         'outfitImage': 'outfit_image',
-        'dailyForecast': 'daily_forecast',
+        'isFavourite': 'is_favourite',
       },
     );
 
@@ -50,7 +56,9 @@ Map<String, dynamic> _$WeatherInitialToJson(WeatherInitial instance) =>
       'outfit_recommendation': instance.outfitRecommendation,
       'outfit_image': instance.outfitImage.toJson(),
       'locale': instance.locale,
+      'date': instance.date.toIso8601String(),
       'daily_forecast': instance.dailyForecast?.toJson(),
+      'is_favourite': instance.isFavourite,
     };
 
 WeatherLoadingState _$WeatherLoadingStateFromJson(Map<String, dynamic> json) =>
@@ -65,6 +73,7 @@ WeatherLoadingState _$WeatherLoadingStateFromJson(Map<String, dynamic> json) =>
             (v) =>
                 v == null ? null : Weather.fromJson(v as Map<String, dynamic>),
           ),
+          date: $checkedConvert('date', (v) => DateTime.parse(v as String)),
           outfitRecommendation: $checkedConvert(
             'outfit_recommendation',
             (v) => v as String? ?? '',
@@ -81,6 +90,10 @@ WeatherLoadingState _$WeatherLoadingStateFromJson(Map<String, dynamic> json) =>
                 ? null
                 : DailyForecastDomain.fromJson(v as Map<String, dynamic>),
           ),
+          isFavourite: $checkedConvert(
+            'is_favourite',
+            (v) => v as bool? ?? false,
+          ),
         );
         return val;
       },
@@ -88,6 +101,7 @@ WeatherLoadingState _$WeatherLoadingStateFromJson(Map<String, dynamic> json) =>
         'outfitRecommendation': 'outfit_recommendation',
         'outfitImage': 'outfit_image',
         'dailyForecast': 'daily_forecast',
+        'isFavourite': 'is_favourite',
       },
     );
 
@@ -98,7 +112,9 @@ Map<String, dynamic> _$WeatherLoadingStateToJson(
   'outfit_recommendation': instance.outfitRecommendation,
   'outfit_image': instance.outfitImage.toJson(),
   'locale': instance.locale,
+  'date': instance.date.toIso8601String(),
   'daily_forecast': instance.dailyForecast?.toJson(),
+  'is_favourite': instance.isFavourite,
 };
 
 WeatherSuccess _$WeatherSuccessFromJson(Map<String, dynamic> json) =>
@@ -114,6 +130,7 @@ WeatherSuccess _$WeatherSuccessFromJson(Map<String, dynamic> json) =>
                 ? null
                 : DailyForecastDomain.fromJson(v as Map<String, dynamic>),
           ),
+          date: $checkedConvert('date', (v) => DateTime.parse(v as String)),
           outfitImage: $checkedConvert(
             'outfit_image',
             (v) => v == null
@@ -130,6 +147,10 @@ WeatherSuccess _$WeatherSuccessFromJson(Map<String, dynamic> json) =>
                 v == null ? null : Weather.fromJson(v as Map<String, dynamic>),
           ),
           message: $checkedConvert('message', (v) => v as String? ?? ''),
+          isFavourite: $checkedConvert(
+            'is_favourite',
+            (v) => v as bool? ?? false,
+          ),
         );
         return val;
       },
@@ -137,6 +158,7 @@ WeatherSuccess _$WeatherSuccessFromJson(Map<String, dynamic> json) =>
         'dailyForecast': 'daily_forecast',
         'outfitImage': 'outfit_image',
         'outfitRecommendation': 'outfit_recommendation',
+        'isFavourite': 'is_favourite',
       },
     );
 
@@ -147,7 +169,9 @@ Map<String, dynamic> _$WeatherSuccessToJson(WeatherSuccess instance) =>
       'message': instance.message,
       'outfit_image': instance.outfitImage.toJson(),
       'locale': instance.locale,
+      'date': instance.date.toIso8601String(),
       'daily_forecast': instance.dailyForecast?.toJson(),
+      'is_favourite': instance.isFavourite,
     };
 
 LoadingOutfitState _$LoadingOutfitStateFromJson(Map<String, dynamic> json) =>
@@ -163,6 +187,7 @@ LoadingOutfitState _$LoadingOutfitStateFromJson(Map<String, dynamic> json) =>
                 ? null
                 : DailyForecastDomain.fromJson(v as Map<String, dynamic>),
           ),
+          date: $checkedConvert('date', (v) => DateTime.parse(v as String)),
           outfitRecommendation: $checkedConvert(
             'outfit_recommendation',
             (v) => v as String? ?? '',
@@ -178,6 +203,10 @@ LoadingOutfitState _$LoadingOutfitStateFromJson(Map<String, dynamic> json) =>
             (v) =>
                 v == null ? null : Weather.fromJson(v as Map<String, dynamic>),
           ),
+          isFavourite: $checkedConvert(
+            'is_favourite',
+            (v) => v as bool? ?? false,
+          ),
         );
         return val;
       },
@@ -185,6 +214,7 @@ LoadingOutfitState _$LoadingOutfitStateFromJson(Map<String, dynamic> json) =>
         'dailyForecast': 'daily_forecast',
         'outfitRecommendation': 'outfit_recommendation',
         'outfitImage': 'outfit_image',
+        'isFavourite': 'is_favourite',
       },
     );
 
@@ -194,7 +224,9 @@ Map<String, dynamic> _$LoadingOutfitStateToJson(LoadingOutfitState instance) =>
       'outfit_recommendation': instance.outfitRecommendation,
       'outfit_image': instance.outfitImage.toJson(),
       'locale': instance.locale,
+      'date': instance.date.toIso8601String(),
       'daily_forecast': instance.dailyForecast?.toJson(),
+      'is_favourite': instance.isFavourite,
     };
 
 WeatherFailure _$WeatherFailureFromJson(Map<String, dynamic> json) =>
@@ -204,6 +236,7 @@ WeatherFailure _$WeatherFailureFromJson(Map<String, dynamic> json) =>
       ($checkedConvert) {
         final val = WeatherFailure(
           locale: $checkedConvert('locale', (v) => v as String),
+          date: $checkedConvert('date', (v) => DateTime.parse(v as String)),
           weather: $checkedConvert(
             'weather',
             (v) =>
@@ -226,6 +259,10 @@ WeatherFailure _$WeatherFailureFromJson(Map<String, dynamic> json) =>
                 ? null
                 : DailyForecastDomain.fromJson(v as Map<String, dynamic>),
           ),
+          isFavourite: $checkedConvert(
+            'is_favourite',
+            (v) => v as bool? ?? false,
+          ),
         );
         return val;
       },
@@ -233,6 +270,7 @@ WeatherFailure _$WeatherFailureFromJson(Map<String, dynamic> json) =>
         'outfitImage': 'outfit_image',
         'outfitRecommendation': 'outfit_recommendation',
         'dailyForecast': 'daily_forecast',
+        'isFavourite': 'is_favourite',
       },
     );
 
@@ -243,7 +281,9 @@ Map<String, dynamic> _$WeatherFailureToJson(WeatherFailure instance) =>
       'message': instance.message,
       'outfit_image': instance.outfitImage.toJson(),
       'locale': instance.locale,
+      'date': instance.date.toIso8601String(),
       'daily_forecast': instance.dailyForecast?.toJson(),
+      'is_favourite': instance.isFavourite,
     };
 
 LocalWebCorsFailure _$LocalWebCorsFailureFromJson(Map<String, dynamic> json) =>
@@ -253,6 +293,7 @@ LocalWebCorsFailure _$LocalWebCorsFailureFromJson(Map<String, dynamic> json) =>
       ($checkedConvert) {
         final val = LocalWebCorsFailure(
           locale: $checkedConvert('locale', (v) => v as String),
+          date: $checkedConvert('date', (v) => DateTime.parse(v as String)),
           weather: $checkedConvert(
             'weather',
             (v) =>
@@ -269,12 +310,17 @@ LocalWebCorsFailure _$LocalWebCorsFailureFromJson(Map<String, dynamic> json) =>
                 ? null
                 : DailyForecastDomain.fromJson(v as Map<String, dynamic>),
           ),
+          isFavourite: $checkedConvert(
+            'is_favourite',
+            (v) => v as bool? ?? false,
+          ),
         );
         return val;
       },
       fieldKeyMap: const {
         'outfitRecommendation': 'outfit_recommendation',
         'dailyForecast': 'daily_forecast',
+        'isFavourite': 'is_favourite',
       },
     );
 
@@ -285,5 +331,7 @@ Map<String, dynamic> _$LocalWebCorsFailureToJson(
   'outfit_recommendation': instance.outfitRecommendation,
   'message': instance.message,
   'locale': instance.locale,
+  'date': instance.date.toIso8601String(),
   'daily_forecast': instance.dailyForecast?.toJson(),
+  'is_favourite': instance.isFavourite,
 };

@@ -2,20 +2,25 @@
 <html lang="en">
 
 <head>
-      <!--
-          If you are serving your web app in a path other than the root, change the
-          href value below to reflect the base path you are serving from.
 
-          The path provided below has to start and end with a slash "/" in order for
-          it to work correctly.
-
-          For more details:
-          * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-          This is a placeholder for base href that will be replaced by the value of
-          the `--base-href` argument provided to `flutter build`.
-        -->
       <base href="$FLUTTER_BASE_HREF">
+
+      <meta charset="UTF-8">
+
+      <!-- Google tag (gtag.js) -->
+      <script async
+            src="https://www.googletagmanager.com/gtag/js?id=G-NSHW9QP276"></script>
+      <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag() { dataLayer.push(arguments); }
+            gtag('js', new Date());
+
+            gtag('config', 'G-NSHW9QP276');
+      </script>
+
+      <link href="https://weather-fit.com/" rel="canonical">
+      <meta content="weather outfit planner, what to wear weather, outfit recommendation weather, weather clothing advice, weather outfit app, WeatherFit"
+            name="keywords">
 
       <meta content="https://weather-fit.com/weather_fit-feature_graphic.png"
             property="og:image">
@@ -25,20 +30,64 @@
       <!-- Image type of the feature graphic -->
       <meta content="image/png" property="og:image:type">
       <meta content="summary_large_image" name="twitter:card">
+      <meta content="WeatherFit – Outfit Recommendations Based on Weather"
+            property="og:title">
+      <meta content="Get outfit suggestions based on the weather or plan what to wear for future trips with the WeatherFit outfit planner."
+            property="og:description">
       <meta content="WeatherFit" name="twitter:title">
-      <meta content="WeatherFit:
-    Your personal stylist for any weather.
-    Get outfit recommendations based on current conditions & your style.
-    Dress smart, stay comfortable. 🌤️👕👖👞" name="twitter:description">
+      <meta content="WeatherFit helps you decide what to wear based on the weather. Get outfit recommendations for today or plan outfits for upcoming trips with the outfit planner. 🌤️👕👖👞"
+            name="twitter:description">
       <meta content="https://weather-fit.com/weather_fit-feature_graphic.png"
             name="twitter:image">
 
-      <meta charset="UTF-8">
+      <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "MobileApplication",
+        "name": "WeatherFit",
+        "operatingSystem": "Android, iOS, Web",
+        "applicationCategory": "WeatherApplication",
+        "applicationSubCategory": "Outfit Recommendation",
+        "description": "WeatherFit helps you decide what to wear based on the weather. Get outfit recommendations for today or plan outfits for upcoming trips with the outfit planner.",
+        "url": "https://weather-fit.com",
+        "image": "https://weather-fit.com/weather_fit-feature_graphic.png",
+        "author": {
+          "@type": "Person",
+          "name": "Dmytro Turskyi"
+        },
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "sameAs": [
+          "https://play.google.com/store/apps/details?id=com.turskyi.weather_fit",
+          "https://apps.apple.com/ca/app/weatherfit/id6743688355"
+        ],
+        "downloadUrl": [
+          "https://play.google.com/store/apps/details?id=com.turskyi.weather_fit",
+          "https://apps.apple.com/ca/app/weatherfit/id6743688355"
+        ]
+      }
+      </script>
+      <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "WeatherFit",
+        "url": "https://weather-fit.com",
+        "logo": "https://weather-fit.com/weather_fit-feature_graphic.png",
+        "sameAs": [
+          "https://play.google.com/store/apps/details?id=com.turskyi.weather_fit",
+          "https://apps.apple.com/ca/app/weatherfit/id6743688355"
+        ]
+      }
+      </script>
+
       <meta content="IE=Edge" http-equiv="X-UA-Compatible">
       <meta content="Dmytro Turskyi" name="author">
-      <meta content="WeatherFit: Your personal stylist for any weather.
-          Get outfit recommendations for today or plan ahead for upcoming trips.
-          Dress smart, stay comfortable. 🌤️👕👖👞" name="description">
+      <meta content="WeatherFit suggests what to wear based on the weather and helps you plan outfits for future trips. Get simple clothing recommendations for any forecast."
+            name="description">
       <!-- iOS meta tags & icons -->
       <meta content="yes" name="apple-mobile-web-app-capable">
       <meta content="black" name="apple-mobile-web-app-status-bar-style">
@@ -49,7 +98,8 @@
       <!-- Favicon -->
       <link href="favicon.jpeg" rel="icon" type="image/jpeg" />
 
-      <title>WeatherFit</title>
+      <title>WeatherFit – What to Wear Today & Outfit Planner for Future Weather
+      </title>
       <link href="manifest.json" rel="manifest">
 
       <!-- This script adds the flutter initialization JS code -->
@@ -58,6 +108,32 @@
 </head>
 
 <body>
+      <noscript>
+            <h1>WeatherFit – Outfit recommendations based on weather</h1>
+            <p>
+                  WeatherFit helps you decide what to wear based on the weather.
+                  Get outfit recommendations for today or plan what to wear for
+                  future trips with the outfit planner.
+            </p>
+      </noscript>
+      <div style="display:none">
+            <h2>Weather Outfit Planner</h2>
+            <p>
+                  WeatherFit is a weather outfit planner that helps you decide
+                  what to wear today
+                  and plan outfits for future weather conditions. Enter any city
+                  to see clothing
+                  recommendations based on temperature and forecast.
+            </p>
+            <p>
+                  The app provides:
+            </p>
+            <ul>
+                  <li>Weather-based outfit recommendations</li>
+                  <li>Clothing suggestions for rain, cold, and heat</li>
+                  <li>Future outfit planning for trips</li>
+            </ul>
+      </div>
       <!--suppress HtmlUnknownTarget -->
       <script async src="flutter_bootstrap.js"></script>
 </body>

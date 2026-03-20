@@ -44,3 +44,9 @@ class ChangeLanguageEvent extends SettingsEvent {
 
   final Language language;
 }
+
+class ChangeWidgetUpdateFrequencyEvent extends SettingsEvent {
+  const ChangeWidgetUpdateFrequencyEvent(this.minutes);
+
+  final int minutes;
+}

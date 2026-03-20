@@ -29,6 +29,7 @@ class _WeatherContentState extends State<WeatherContent> {
     final Weather weather = widget.weather;
     return context.isExtraSmallScreen
         ? WeatherContentExtraSmall(
+            weather: weather,
             onRefresh: widget.onRefresh,
             listenSettingsStateWhen: _shouldRebuildOnLanguageChange,
             settingsStateListener: _settingsStateListener,

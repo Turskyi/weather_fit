@@ -16,15 +16,21 @@ import 'package:weather_fit/entities/enums/feedback_submission_type.dart';
 import 'package:weather_fit/entities/enums/feedback_type.dart';
 import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/entities/models/exceptions/email_launch_exception.dart';
-import 'package:weather_fit/res/constants.dart' as constants;
+import 'package:weather_fit/res/constants/constants.dart' as constants;
 import 'package:weather_fit/services/update_service.dart';
+import 'package:workmanager/workmanager.dart';
 
 part 'settings_event.dart';
 part 'settings_state.dart';
 
 class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   SettingsBloc(this._localDataSource, this._updateService)
-    : super(SettingsInitial(language: _localDataSource.getSavedLanguage())) {
+    : super(
+        SettingsInitial(
+          language: _localDataSource.getSavedLanguage(),
+          widgetUpdateFrequency: _localDataSource.getWidgetUpdateFrequency(),
+        ),
+      ) {
     on<LoadSettingsEvent>(_onLoadSettings);
 
     on<CheckForUpdateEvent>(_onCheckForUpdate);
@@ -39,6 +45,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
 
     on<ChangeLanguageEvent>(_changeLanguage);
 
+    on<ChangeWidgetUpdateFrequencyEvent>(_onChangeWidgetUpdateFrequency);
+
     add(const LoadSettingsEvent());
     add(const CheckForUpdateEvent());
   }
@@ -50,20 +58,29 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     LoadSettingsEvent event,
     Emitter<SettingsState> emit,
   ) async {
-    final PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    emit(
-      SettingsInitial(
-        language: state.language,
-        appVersion: '${packageInfo.version} (${packageInfo.buildNumber})',
-      ),
-    );
+    try {
+      final PackageInfo packageInfo = await PackageInfo.fromPlatform();
+      emit(
+        SettingsInitial(
+          language: state.language,
+          appVersion: '${packageInfo.version} (${packageInfo.buildNumber})',
+          widgetUpdateFrequency: _localDataSource.getWidgetUpdateFrequency(),
+        ),
+      );
+    } catch (e, stackTrace) {
+      debugPrint('SettingsErrorEvent:$e\nStackTrace: $stackTrace');
+    }
   }
 
   FutureOr<void> _onCheckForUpdate(
     CheckForUpdateEvent event,
     Emitter<SettingsState> emit,
   ) async {
-    await _updateService.checkForUpdate();
+    try {
+      await _updateService.checkForUpdate();
+    } catch (e) {
+      debugPrint('Error checking for updates: $e');
+    }
   }
 
   FutureOr<void> _handleError(
@@ -75,6 +92,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         errorMessage: event.error,
         language: state.language,
         appVersion: state.appVersion,
+        widgetUpdateFrequency: state.widgetUpdateFrequency,
       ),
     );
   }
@@ -88,6 +106,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         LoadingSettingsState(
           language: state.language,
           appVersion: state.appVersion,
+          widgetUpdateFrequency: state.widgetUpdateFrequency,
         ),
       );
       final UserFeedback feedback = event.feedback;
@@ -190,6 +209,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
                 errorMessage: errorMessage,
                 language: state.language,
                 appVersion: state.appVersion,
+                widgetUpdateFrequency: state.widgetUpdateFrequency,
               ),
             );
           }
@@ -215,7 +235,11 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         }
 
         emit(
-          FeedbackSent(language: state.language, appVersion: state.appVersion),
+          FeedbackSent(
+            language: state.language,
+            appVersion: state.appVersion,
+            widgetUpdateFrequency: state.widgetUpdateFrequency,
+          ),
         );
       } catch (e, stackTrace) {
         debugPrint('SettingsErrorEvent:$e\nStackTrace: $stackTrace');
@@ -224,6 +248,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
             errorMessage: translate('error.unexpected_error'),
             language: state.language,
             appVersion: state.appVersion,
+            widgetUpdateFrequency: state.widgetUpdateFrequency,
           ),
         );
       }
@@ -247,6 +272,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         language: state.language,
         errorMessage: errorMessage,
         appVersion: state.appVersion,
+        widgetUpdateFrequency: state.widgetUpdateFrequency,
       ),
     );
   }
@@ -264,7 +290,11 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     Emitter<SettingsState> emit,
   ) {
     emit(
-      SettingsInitial(language: state.language, appVersion: state.appVersion),
+      SettingsInitial(
+        language: state.language,
+        appVersion: state.appVersion,
+        widgetUpdateFrequency: state.widgetUpdateFrequency,
+      ),
     );
   }
 
@@ -284,11 +314,43 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         if (state is SettingsInitial) {
           emit(state.copyWith(language: language));
         } else {
-          SettingsInitial(language: language, appVersion: state.appVersion);
+          SettingsInitial(
+            language: language,
+            appVersion: state.appVersion,
+            widgetUpdateFrequency: state.widgetUpdateFrequency,
+          );
         }
       } else {
         //TODO: no sure what to do.
       }
+    }
+  }
+
+  FutureOr<void> _onChangeWidgetUpdateFrequency(
+    ChangeWidgetUpdateFrequencyEvent event,
+    Emitter<SettingsState> emit,
+  ) async {
+    final int minutes = event.minutes;
+    final bool isSaved = await _localDataSource.saveWidgetUpdateFrequency(
+      minutes,
+    );
+    if (isSaved) {
+      if (!kIsWeb &&
+          !Platform.isMacOS &&
+          (Platform.isAndroid || Platform.isIOS)) {
+        try {
+          await Workmanager().registerPeriodicTask(
+            constants.kBackgroundUniqueName,
+            constants.kBackgroundTaskName,
+            frequency: Duration(minutes: minutes),
+            constraints: Constraints(networkType: NetworkType.connected),
+            existingWorkPolicy: ExistingPeriodicWorkPolicy.replace,
+          );
+        } catch (e) {
+          debugPrint('Failed to re-register Workmanager task: $e');
+        }
+      }
+      emit(state.copyWith(widgetUpdateFrequency: minutes));
     }
   }
 }

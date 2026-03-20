@@ -31,11 +31,11 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
          SearchInitial(
            quickCitiesSuggestions: <QuickCitySuggestion>[
              QuickCitySuggestion(
-               name: translate('search.quick_city_toronto'),
-               flag: '🇨🇦',
-             ),
-             QuickCitySuggestion(
-               name: translate('search.quick_city_north_york'),
+               name: translate(
+                 localDataSource.getSavedLanguage().isUkrainian
+                     ? 'search.quick_city_north_york'
+                     : 'search.quick_city_toronto',
+               ),
                flag: '🇨🇦',
              ),
              QuickCitySuggestion(
@@ -95,9 +95,12 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         ),
       );
     } catch (e, stackTrace) {
-      final String debugErrorMessage =
-          '[_onRetrySearchByCurrentLocation] Error getting weather: $e';
-      debugPrint('error: $debugErrorMessage\n$stackTrace');
+      debugPrint(
+        '[_onRetrySearchByCurrentLocation] '
+        'Error type: ${e.runtimeType}\n'
+        'Error: $e\n'
+        'Stack trace: $stackTrace',
+      );
 
       String userFriendlyErrorMessage = translate(
         'error.getting_weather_retry_request_permission',
@@ -157,10 +160,12 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         ),
       );
     } catch (e, stackTrace) {
-      // 1. Log the detailed error with function name for debugging.
-      final String debugErrorMessage =
-          '[_searchByLocation] Error getting weather: $e';
-      debugPrint('$debugErrorMessage\n$stackTrace');
+      debugPrint(
+        '[_searchByLocation] '
+        'Error type: ${e.runtimeType}\n'
+        'Error: $e\n'
+        'Stack trace: $stackTrace',
+      );
 
       // 2. Determine the user-facing error message.
       final String userFriendlyErrorMessage = translate(
@@ -193,10 +198,12 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         ),
       );
     } catch (e, stackTrace) {
-      // 1. Log the detailed error with function name for debugging.
-      final String debugErrorMessage =
-          '[_confirmLocation] Error getting weather: $e';
-      debugPrint('$debugErrorMessage\n$stackTrace');
+      debugPrint(
+        '[_confirmLocation] '
+        'Error type: ${e.runtimeType}\n'
+        'Error: $e\n'
+        'Stack trace: $stackTrace',
+      );
 
       // 2. Determine the user-facing error message.
       final String userFriendlyErrorMessage = translate(
@@ -244,15 +251,18 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         ),
       );
     } catch (e, stackTrace) {
-      // 1. Log the detailed error with function name for debugging
-      final String debugErrorMessage =
-          '[_onRequestLocationPermission] Error getting weather: $e';
-      debugPrint('error: $debugErrorMessage\n$stackTrace');
+      debugPrint(
+        '[_onRequestLocationPermission] '
+        'Error type: ${e.runtimeType}\n'
+        'Error: $e\n'
+        'Stack trace: $stackTrace',
+      );
 
       // 2. Determine the user-facing error message.
       String userFriendlyErrorMessage = translate(
         'error.getting_weather_request_permission',
       );
+
       SearchErrorType searchErrorType = SearchErrorType.unknown;
 
       if (e is LocationServiceDisabledException) {
@@ -301,8 +311,6 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     final String eventQuery = event.query.trim();
 
     if (eventQuery.isEmpty) {
-      //TODO: For some reason the query is empty. This should not have
-      // happened. Maybe inform user that he has to type something "
       emit(SearchInitial(quickCitiesSuggestions: _quickCitiesSuggestions));
     } else {
       try {
@@ -372,7 +380,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         }
         debugPrint(
           '[_searchLocation] '
-          'Error: ${e.runtimeType}\n'
+          'Error type: ${e.runtimeType}\n'
           'errorType: $errorType\n'
           'query: $eventQuery\n'
           'detailedMessage: $detailedMessage\n'
@@ -395,10 +403,12 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         }
       }
     } catch (e, stackTrace) {
-      final String debugErrorMessage =
-          '[_requestLocationPermission] '
-          'Location service check or request failed: $e';
-      debugPrint('$debugErrorMessage\n$stackTrace');
+      debugPrint(
+        '[_requestLocationPermission] Location service check failed\n'
+        'Error type: ${e.runtimeType}\n'
+        'Error: $e\n'
+        'Stack trace: $stackTrace',
+      );
       if (e is LocationServiceDisabledException ||
           e.toString().contains('LOCATION_SERVICES_DISABLED')) {
         throw const LocationServiceDisabledException();
@@ -441,53 +451,112 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
   Future<Position> _getCurrentPosition() async {
     try {
       // Try to get a fresh position with a 10-second timeout.
-      return await Geolocator.getCurrentPosition(
+      final Position position = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
           accuracy: LocationAccuracy.low,
           timeLimit: Duration(seconds: 10),
         ),
       );
-    } catch (e) {
+      return position;
+    } catch (e, stackTrace) {
       debugPrint(
-        'Geolocator.getCurrentPosition failed: $e. '
+        'Geolocator.getCurrentPosition failed\n'
+        'Error type: ${e.runtimeType}\n'
+        'Error: $e\n'
+        'Stack trace: $stackTrace\n'
         'Attempting to get last known position.',
       );
+      if (e is PermissionDeniedException) {
+        debugPrint(
+          '[_getCurrentPosition] Unexpectedly encountered a permission-related '
+          'issue despite status being granted. Triggering fallback '
+          'verification via _ensureLocationPermission().',
+        );
+        await _ensureLocationPermission();
+      }
+
       // Fallback to the last known position if getting a fresh one fails.
+      final Position lastKnownPosition = await _getLastKnownPosition();
+      return lastKnownPosition;
+    }
+  }
+
+  /// Fallback to the last known position if getting a fresh one fails.
+  Future<Position> _getLastKnownPosition() async {
+    // Fallback to the last known position if getting a fresh one fails.
+    try {
       final Position? lastKnownPosition =
           await Geolocator.getLastKnownPosition();
       if (lastKnownPosition != null) {
         return lastKnownPosition;
       } else {
-        debugPrint(
-          'Geolocator.getLastKnownPosition() also returned null. '
-          'Error: $e',
-        );
-        final geo.Location location = geo.Location();
-        try {
-          final geo.LocationData locationData = await location.getLocation();
-          final double? latitude = locationData.latitude;
-          final double? longitude = locationData.longitude;
-          if (latitude == null || longitude == null) {
-            rethrow;
-          } else {
-            return Position(
-              latitude: latitude,
-              longitude: longitude,
-              timestamp: DateTime.now(),
-              accuracy: locationData.accuracy ?? 0.0,
-              altitude: locationData.altitude ?? 0.0,
-              heading: locationData.heading ?? 0.0,
-              speed: locationData.speed ?? 0.0,
-              speedAccuracy: locationData.speedAccuracy ?? 0.0,
-              altitudeAccuracy: locationData.verticalAccuracy ?? 0.0,
-              headingAccuracy: locationData.headingAccuracy ?? 0.0,
-            );
-          }
-        } catch (e) {
-          debugPrint('Error: $e');
-          rethrow;
-        }
+        debugPrint('Geolocator.getLastKnownPosition() returned null.');
+        final Position position = await _getFallbackLocation();
+        return position;
       }
+    } catch (e, stackTrace) {
+      debugPrint(
+        'Geolocator.getLastKnownPosition() failed\n'
+        'Error type: ${e.runtimeType}\n'
+        'Error: $e\n'
+        'Stack trace: $stackTrace',
+      );
+      final Position position = await _getFallbackLocation();
+      return position;
+    }
+  }
+
+  Future<Position> _getFallbackLocation() async {
+    final geo.Location location = geo.Location();
+    try {
+      await _ensureLocationPermission();
+
+      final geo.LocationData locationData = await location.getLocation();
+      final double? latitude = locationData.latitude;
+      final double? longitude = locationData.longitude;
+
+      if (latitude == null || longitude == null) {
+        throw Exception(translate('error.location_unavailable'));
+      } else {
+        return Position(
+          latitude: latitude,
+          longitude: longitude,
+          timestamp: DateTime.now(),
+          accuracy: locationData.accuracy ?? 0.0,
+          altitude: locationData.altitude ?? 0.0,
+          heading: locationData.heading ?? 0.0,
+          speed: locationData.speed ?? 0.0,
+          speedAccuracy: locationData.speedAccuracy ?? 0.0,
+          altitudeAccuracy: locationData.verticalAccuracy ?? 0.0,
+          headingAccuracy: locationData.headingAccuracy ?? 0.0,
+        );
+      }
+    } catch (e, stackTrace) {
+      debugPrint(
+        'Error in _getFallbackLocation\n'
+        'Error type: ${e.runtimeType}\n'
+        'Error: $e\n'
+        'Stack trace: $stackTrace',
+      );
+      rethrow;
+    }
+  }
+
+  Future<void> _ensureLocationPermission() async {
+    final geo.Location location = geo.Location();
+    geo.PermissionStatus permissionStatus = await location.hasPermission();
+    if (permissionStatus == geo.PermissionStatus.denied) {
+      permissionStatus = await location.requestPermission();
+    } else if (permissionStatus != geo.PermissionStatus.granted &&
+        permissionStatus != geo.PermissionStatus.grantedLimited) {
+      if (permissionStatus == geo.PermissionStatus.deniedForever) {
+        throw Exception(
+          translate(
+            'error.location_permission_permanently_denied_cannot_request',
+          ),
+        );
+      }
+      throw Exception(translate('error.location_permission_denied'));
     }
   }
 }

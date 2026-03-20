@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:weather_fit/res/constants/constants.dart' as constants;
 import 'package:weather_fit/router/app_route.dart';
 import 'package:weather_fit/weather/ui/page/weather_page.dart';
-
-import '../constants.dart' as constants;
 
 class LeadingWidget extends StatelessWidget {
   const LeadingWidget({super.key});

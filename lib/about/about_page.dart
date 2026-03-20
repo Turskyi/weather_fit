@@ -5,7 +5,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:weather_fit/res/constants.dart' as constants;
+import 'package:weather_fit/res/constants/constants.dart' as constants;
 import 'package:weather_fit/res/widgets/leading_widget.dart';
 import 'package:weather_fit/res/widgets/store_badge.dart';
 import 'package:weather_fit/router/app_route.dart';
@@ -22,11 +22,11 @@ class AboutPage extends StatelessWidget {
   String get _locationSupportKey {
     if (kIsWeb) {
       return 'about.feature_location_support_web';
-    }
-    if (Platform.isMacOS) {
+    } else if (Platform.isMacOS) {
       return 'about.feature_location_support_macos';
+    } else {
+      return 'about.feature_location_support_default';
     }
-    return 'about.feature_location_support_default';
   }
 
   @override
@@ -190,11 +190,11 @@ class AboutPage extends StatelessWidget {
       persistentFooterButtons: kIsWeb
           ? <Widget>[
               const StoreBadge(
-                url: constants.googlePlayUrl,
+                url: constants.kGooglePlayUrl,
                 assetPath: constants.playStoreBadgePath,
               ),
               const StoreBadge(
-                url: constants.appStoreUrl,
+                url: constants.kAppStoreUrl,
                 assetPath: constants.appStoreBadgeAssetPath,
                 height: constants.appStoreBadgeHeight,
                 width: constants.appStoreBadgeWidth,

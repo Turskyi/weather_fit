@@ -1,6 +1,6 @@
 import 'package:weather_fit/entities/enums/feedback_rating.dart';
 import 'package:weather_fit/entities/enums/feedback_type.dart';
-import 'package:weather_fit/res/constants.dart' as constants;
+import 'package:weather_fit/res/constants/constants.dart' as constants;
 
 /// A data type holding user feedback consisting of a feedback type, free from
 /// feedback text, and a sentiment rating.

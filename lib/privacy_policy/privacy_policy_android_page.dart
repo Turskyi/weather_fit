@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:weather_fit/privacy_policy/email_text.dart';
-import 'package:weather_fit/res/constants.dart' as constants;
+import 'package:weather_fit/res/constants/constants.dart' as constants;
 import 'package:weather_fit/res/widgets/leading_widget.dart';
 import 'package:weather_fit/settings/bloc/settings_bloc.dart';
 import 'package:weather_fit/utils/date_util.dart';
@@ -246,7 +246,7 @@ class _PrivacyPolicyAndroidPageState extends State<PrivacyPolicyAndroidPage> {
               style: TextStyle(fontSize: bodySize),
             ),
             const EmailText(constants.supportEmail),
-            const SizedBox(height: 10),
+            const SizedBox(height: 20),
           ],
         ),
       ),

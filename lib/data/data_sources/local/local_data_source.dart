@@ -1,17 +1,19 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:path_provider/path_provider.dart' as path;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/entities/enums/temperature_units.dart';
+import 'package:weather_fit/entities/models/outfit/outfit_image.dart';
 import 'package:weather_fit/entities/models/search/saved_plan.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
-import 'package:weather_fit/res/constants.dart' as constants;
+import 'package:weather_fit/res/constants/constants.dart' as constants;
 import 'package:weather_fit/res/enums/settings.dart';
 import 'package:weather_fit/res/extensions/double_extension.dart';
 import 'package:weather_repository/weather_repository.dart';
@@ -153,14 +155,13 @@ class LocalDataSource {
   }
 
   Future<String> downloadAndSaveImage(String assetPath) async {
-    // Check if the platform is web OR macOS.
-    // See issue: https://github.com/ABausG/home_widget/issues/137.
-    if (!kIsWeb && !Platform.isMacOS) {
+    // Check if the platform is web.
+    if (!kIsWeb) {
       try {
         // Load asset data as ByteData.
         final ByteData byteData = await rootBundle.load(assetPath);
 
-        // Get the application documents directory.
+        // Get the application documents directory (or shared container).
         final Directory directory = await getAppDirectory();
         final String filePath = '${directory.path}/outfit_image.png';
         // Write the bytes to the file.
@@ -293,22 +294,124 @@ class LocalDataSource {
     }
   }
 
+  Future<bool> saveLastSearchedLocation(Location location) {
+    final String json = jsonEncode(location.toJson());
+    return _preferences.setString(Settings.lastSearchedLocation.key, json);
+  }
+
+  Location getLastSearchedLocation() {
+    final String jsonString =
+        _preferences.getString(Settings.lastSearchedLocation.key) ?? '';
+    if (jsonString.isEmpty) {
+      return const Location.empty();
+    } else {
+      try {
+        final Object? decoded = jsonDecode(jsonString);
+        if (decoded is Map<String, Object?>) {
+          return Location.fromJson(decoded);
+        }
+      } catch (e) {
+        debugPrint('Error parsing last searched location: $e');
+      }
+      return const Location.empty();
+    }
+  }
+
+  List<Location> getFavouriteLocations() {
+    final List<String> jsonList =
+        _preferences.getStringList(Settings.favourites.key) ?? <String>[];
+    return jsonList.map((String json) {
+      return Location.fromJson(jsonDecode(json) as Map<String, Object?>);
+    }).toList();
+  }
+
+  Future<bool> saveFavouriteLocation(Location location) {
+    final List<Location> favourites = getFavouriteLocations();
+    final bool isAlreadyFavourite = favourites.any(
+      (Location l) =>
+          l.latitude == location.latitude && l.longitude == location.longitude,
+    );
+    if (isAlreadyFavourite) return Future<bool>.value(true);
+    favourites.add(location);
+    return _saveFavouritesList(favourites);
+  }
+
+  Future<bool> removeFavouriteLocation(Location location) {
+    final List<Location> favourites = getFavouriteLocations();
+    favourites.removeWhere(
+      (Location l) =>
+          l.latitude == location.latitude && l.longitude == location.longitude,
+    );
+    return _saveFavouritesList(favourites);
+  }
+
+  bool isFavouriteLocation(Location location) {
+    final List<Location> favourites = getFavouriteLocations();
+    return favourites.any(
+      (Location l) =>
+          l.latitude == location.latitude && l.longitude == location.longitude,
+    );
+  }
+
+  Future<bool> _saveFavouritesList(List<Location> favourites) {
+    final List<String> jsonList = favourites
+        .map((Location l) => jsonEncode(l.toJson()))
+        .toList();
+    return _preferences.setStringList(Settings.favourites.key, jsonList);
+  }
+
+  Future<bool> cacheWeatherBundle({
+    required Location location,
+    required Weather weather,
+    required DailyForecastDomain dailyForecast,
+    required String outfitRecommendation,
+    required OutfitImage outfitImage,
+  }) {
+    final String key =
+        'weather_bundle_${location.latitude}_${location.longitude}';
+    final Map<String, Object?> data = <String, Object?>{
+      'weather': weather.toJson(),
+      'dailyForecast': dailyForecast.toJson(),
+      'outfitRecommendation': outfitRecommendation,
+      'outfitImage': outfitImage.toJson(),
+    };
+    return _preferences.setString(key, jsonEncode(data));
+  }
+
+  Map<String, dynamic>? getCachedWeatherBundle(Location location) {
+    final String key =
+        'weather_bundle_${location.latitude}_${location.longitude}';
+    final String? jsonString = _preferences.getString(key);
+    if (jsonString == null) return null;
+    try {
+      return jsonDecode(jsonString) as Map<String, dynamic>;
+    } catch (e) {
+      debugPrint('Error parsing cached weather bundle: $e');
+      return null;
+    }
+  }
+
   Future<Directory> getAppDirectory() async {
     if (kIsWeb) {
-      return Directory('');
-    } else if (Platform.isIOS) {
+      throw UnsupportedError('Directory access is not supported on Web.');
+    } else if (Platform.isIOS || Platform.isMacOS) {
       try {
         final String? sharedPath = await _channel.invokeMethod<String>(
           'getSharedContainerPath',
         );
-        if (sharedPath != null) {
+
+        if (sharedPath != null && sharedPath.isNotEmpty) {
           return Directory(sharedPath);
+        } else {
+          debugPrint(
+            'Using app documents directory instead of shared container.',
+          );
         }
       } catch (e) {
         debugPrint('Error getting shared container path: $e');
       }
     }
-    return getApplicationDocumentsDirectory();
+    return path.getApplicationDocumentsDirectory();
   }
 
   Future<bool> fileExists(String filePath) async {
@@ -354,6 +457,17 @@ class LocalDataSource {
         .map((SavedPlan p) => jsonEncode(p.toJson()))
         .toList();
     return _preferences.setStringList(Settings.savedPlans.key, jsonList);
+  }
+
+  Future<bool> saveWidgetUpdateFrequency(int minutes) {
+    return _preferences.setInt(Settings.widgetUpdateFrequency.key, minutes);
+  }
+
+  int getWidgetUpdateFrequency() {
+    return _preferences.getInt(Settings.widgetUpdateFrequency.key) ??
+        (defaultTargetPlatform == TargetPlatform.iOS
+            ? constants.kIosDefaultMinutesFrequency
+            : constants.kAndroidDefaultMinutesFrequency);
   }
 
   String _translateError(String key, String locale) {

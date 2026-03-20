@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_translate/flutter_translate.dart';
+import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
-import 'package:weather_fit/res/constants.dart' as constants;
+import 'package:weather_fit/res/constants/constants.dart' as constants;
 import 'package:weather_fit/settings/bloc/settings_bloc.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 import 'package:weather_fit/weather/ui/populated/daily_forecast.dart';
+import 'package:weather_fit/weather/ui/widgets/text_shimmer.dart';
 import 'package:weather_fit/weather/ui/widgets/weather_icon.dart';
+import 'package:weather_fit/weather/ui/widgets/weather_shimmer.dart';
 
 class WeatherContentDefault extends StatelessWidget {
   const WeatherContentDefault({
@@ -35,13 +38,7 @@ class WeatherContentDefault extends StatelessWidget {
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
       clipBehavior: Clip.none,
-      padding: const EdgeInsets.only(
-        // This top padding is tricky, it might look off on one of the
-        // platforms, before changing check Android physical device.
-        top: 36,
-        left: 16,
-        right: 16,
-      ),
+      padding: const EdgeInsets.only(top: 36, left: 16, right: 16),
       child: Center(
         child: LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
@@ -52,7 +49,9 @@ class WeatherContentDefault extends StatelessWidget {
               children: <Widget>[
                 const SizedBox(height: 4),
                 if (weather.wasUpdated)
-                  WeatherIcon(condition: weather.condition),
+                  WeatherIcon(condition: weather.condition)
+                else
+                  const WeatherIconShimmer(),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
@@ -73,57 +72,106 @@ class WeatherContentDefault extends StatelessWidget {
                     const SizedBox(width: 8),
                     Flexible(
                       child: FittedBox(
-                        child: BlocListener<SettingsBloc, SettingsState>(
-                          listenWhen: listenSettingsStateWhen,
-                          listener: settingsStateListener,
-                          child: Text(
-                            weather.locationName,
-                            style: cityTextStyle?.copyWith(
-                              fontWeight: FontWeight.w200,
+                        child: SizedBox(
+                          height: 56,
+                          child: Center(
+                            child: BlocListener<SettingsBloc, SettingsState>(
+                              listenWhen: listenSettingsStateWhen,
+                              listener: settingsStateListener,
+                              child: Text(
+                                weather.locationName,
+                                style: cityTextStyle?.copyWith(
+                                  fontWeight: FontWeight.w200,
+                                ),
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
+                    const SizedBox(width: 4),
+                    BlocBuilder<WeatherBloc, WeatherState>(
+                      builder: (BuildContext context, WeatherState state) {
+                        final LocalDataSource localDataSource = context
+                            .read<LocalDataSource>();
+                        final bool isFavourite = localDataSource
+                            .isFavouriteLocation(weather.location);
+                        return IconButton(
+                          icon: Icon(
+                            isFavourite ? Icons.star : Icons.star_border,
+                            color: isFavourite ? Colors.amber : null,
+                          ),
+                          onPressed: () {
+                            context.read<WeatherBloc>().add(
+                              ToggleFavouriteEvent(weather.location),
+                            );
+                            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  isFavourite
+                                      ? translate('location_removed')
+                                      : translate('location_saved'),
+                                ),
+                                duration: const Duration(seconds: 2),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
                   ],
                 ),
-                if (weather.wasUpdated)
-                  BlocBuilder<WeatherBloc, WeatherState>(
-                    builder: (BuildContext _, WeatherState state) {
-                      return Text(
-                        weather.formattedTemperature,
-                        style: textTheme.displaySmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      );
-                    },
+                SizedBox(
+                  height: 56,
+                  child: Center(
+                    child: weather.wasUpdated
+                        ? BlocBuilder<WeatherBloc, WeatherState>(
+                            builder: (BuildContext _, WeatherState state) {
+                              return Text(
+                                weather.formattedTemperature,
+                                style: textTheme.displaySmall?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              );
+                            },
+                          )
+                        : const TemperatureShimmer(),
                   ),
-                if (weather.neverUpdated)
-                  BlocBuilder<SettingsBloc, SettingsState>(
-                    builder: (BuildContext _, SettingsState state) {
-                      return Text(
-                        weather.getFormattedLastUpdatedDateTime(state.locale),
-                      );
-                    },
-                  )
-                else
-                  BlocBuilder<SettingsBloc, SettingsState>(
-                    builder: (BuildContext _, SettingsState state) {
-                      final String lastUpdatedDateTime = weather
-                          .getFormattedLastUpdatedDateTime(state.locale);
-                      return Text(
-                        '${translate('last_updated_on_label')}\n'
-                        '$lastUpdatedDateTime',
-                        textAlign: TextAlign.center,
-                      );
-                    },
+                ),
+                SizedBox(
+                  height: 40,
+                  child: Center(
+                    child: BlocBuilder<SettingsBloc, SettingsState>(
+                      builder: (BuildContext _, SettingsState state) {
+                        final String lastUpdatedDateTime = weather
+                            .getFormattedLastUpdatedDateTime(state.locale);
+                        if (weather.neverUpdated) {
+                          return Text(lastUpdatedDateTime);
+                        } else {
+                          return Text(
+                            '${translate('last_updated_on_label')}\n'
+                            '$lastUpdatedDateTime',
+                            textAlign: TextAlign.center,
+                          );
+                        }
+                      },
+                    ),
                   ),
+                ),
                 Padding(
                   padding: const EdgeInsets.only(top: 8.0),
-                  child: Text(
-                    weather.translatedWeatherDescription,
-                    style: textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurface,
+                  child: SizedBox(
+                    height: 24,
+                    child: Center(
+                      child: weather.wasUpdated
+                          ? Text(
+                              weather.translatedWeatherDescription,
+                              style: textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.onSurface,
+                              ),
+                            )
+                          : const TextShimmer(width: 100, height: 12),
                     ),
                   ),
                 ),
@@ -143,10 +191,15 @@ class WeatherContentDefault extends StatelessWidget {
                         const SizedBox(height: 24),
                         BlocBuilder<WeatherBloc, WeatherState>(
                           builder: (BuildContext _, WeatherState state) {
-                            if (state.dailyForecast != null) {
-                              return DailyForecast(key: key);
+                            final bool isLocationMatch =
+                                weather.location.latitude ==
+                                    state.location.latitude &&
+                                weather.location.longitude ==
+                                    state.location.longitude;
+                            if (isLocationMatch && state.forecast.isNotEmpty) {
+                              return const DailyForecast();
                             } else {
-                              return const SizedBox();
+                              return const DailyForecastShimmer();
                             }
                           },
                         ),
@@ -185,15 +238,20 @@ class WeatherContentDefault extends StatelessWidget {
                 children: <Widget>[
                   mainWeatherInfo,
                   const SizedBox(height: 24),
-                  if (weather.wasUpdated) child,
+                  if (weather.wasUpdated) child else const OutfitShimmer(),
                   const SizedBox(height: 24),
 
                   BlocBuilder<WeatherBloc, WeatherState>(
                     builder: (BuildContext _, WeatherState state) {
-                      if (state.dailyForecast == null) {
-                        return const SizedBox();
+                      final bool isLocationMatch =
+                          weather.location.latitude ==
+                              state.location.latitude &&
+                          weather.location.longitude ==
+                              state.location.longitude;
+                      if (isLocationMatch && state.forecast.isNotEmpty) {
+                        return const DailyForecast();
                       } else {
-                        return DailyForecast(key: key);
+                        return const DailyForecastShimmer();
                       }
                     },
                   ),
