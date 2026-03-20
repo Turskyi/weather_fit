@@ -296,9 +296,3 @@ Future<void> _initializeAllDateFormatting() async {
     }
   }
 }
-
-/// Called when Doing Background Work initiated from Widget
-@pragma('vm:entry-point')
-Future<void> _interactiveCallback(Uri? data) async {
-  //TODO: add implementation.
-}
