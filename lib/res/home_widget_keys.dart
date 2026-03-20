@@ -6,7 +6,11 @@ enum HomeWidgetKey {
   textRecommendation,
   forecastData,
   imageWeather,
-  weatherCode;
+  weatherCode,
+  locationLatitude,
+  locationLongitude,
+  temperatureUnit,
+  widgetUpdateFrequency;
 
   String get stringValue {
     switch (this) {
@@ -26,6 +30,14 @@ enum HomeWidgetKey {
         return 'weatherfit_text_recommendation';
       case HomeWidgetKey.textEmoji:
         return 'weatherfit_text_emoji';
+      case HomeWidgetKey.locationLatitude:
+        return 'weatherfit_location_latitude';
+      case HomeWidgetKey.locationLongitude:
+        return 'weatherfit_location_longitude';
+      case HomeWidgetKey.temperatureUnit:
+        return 'weatherfit_temperature_unit';
+      case HomeWidgetKey.widgetUpdateFrequency:
+        return 'weatherfit_widget_update_frequency';
     }
   }
 }

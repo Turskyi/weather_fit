@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -28,9 +27,6 @@ import 'package:weather_fit/weather_bloc_observer.dart';
 import 'package:weather_repository/weather_repository.dart';
 import 'package:workmanager/workmanager.dart';
 
-Timer? _macOSWidgetUpdateTimer;
-bool _isMacOSWidgetUpdateInProgress = false;
-
 Future<Dependencies> injectDependencies() async {
   await _initializeAllDateFormatting();
 
@@ -49,8 +45,6 @@ Future<Dependencies> injectDependencies() async {
   // https://pub.dev/packages/workmanager
   if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
     _setupBackgroundWidgetUpdates(localDataSource);
-  } else if (!kIsWeb && Platform.isMacOS) {
-    _setupMacOSForegroundWidgetUpdates(localDataSource);
   }
 
   final RemoteDataSource remoteDataSource = RemoteDataSource(Dio());
@@ -214,39 +208,6 @@ Future<void> _setupBackgroundWidgetUpdates(
   } catch (e) {
     debugPrint('Background widget update failed in Workmanager.initialize: $e');
   }
-}
-
-void _setupMacOSForegroundWidgetUpdates(LocalDataSource localDataSource) {
-  _macOSWidgetUpdateTimer?.cancel();
-
-  final int frequencyMinutes = localDataSource.getWidgetUpdateFrequency();
-  final Duration updateInterval = Duration(
-    minutes: frequencyMinutes > 0 ? frequencyMinutes : 15,
-  );
-
-  Future<void>(() async {
-    if (_isMacOSWidgetUpdateInProgress) {
-      return;
-    }
-    _isMacOSWidgetUpdateInProgress = true;
-    try {
-      await _performWidgetUpdateTick();
-    } finally {
-      _isMacOSWidgetUpdateInProgress = false;
-    }
-  });
-
-  _macOSWidgetUpdateTimer = Timer.periodic(updateInterval, (Timer _) async {
-    if (_isMacOSWidgetUpdateInProgress) {
-      return;
-    }
-    _isMacOSWidgetUpdateInProgress = true;
-    try {
-      await _performWidgetUpdateTick();
-    } finally {
-      _isMacOSWidgetUpdateInProgress = false;
-    }
-  });
 }
 
 /// Used for Background Updates using [Workmanager] Plugin.

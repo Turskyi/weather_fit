@@ -122,6 +122,26 @@ class HomeWidgetServiceImpl implements HomeWidgetService {
       weather.locationName,
     );
 
+    await saveWidgetData<double>(
+      HomeWidgetKey.locationLatitude.stringValue,
+      weather.location.latitude,
+    );
+
+    await saveWidgetData<double>(
+      HomeWidgetKey.locationLongitude.stringValue,
+      weather.location.longitude,
+    );
+
+    await saveWidgetData<String>(
+      HomeWidgetKey.temperatureUnit.stringValue,
+      weather.temperatureUnits.name,
+    );
+
+    await saveWidgetData<int>(
+      HomeWidgetKey.widgetUpdateFrequency.stringValue,
+      localDataSource.getWidgetUpdateFrequency(),
+    );
+
     await saveWidgetData<String>(
       HomeWidgetKey.textTemperature.stringValue,
       weather.formattedTemperature,

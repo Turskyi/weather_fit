@@ -51,6 +51,33 @@ struct SimpleEntry: TimelineEntry {
     let weatherData: WeatherData
 }
 
+struct OpenMeteoResponse: Decodable {
+    let current: CurrentWeather
+    let hourly: HourlyForecast
+}
+
+struct CurrentWeather: Decodable {
+    let temperature2m: Double
+    let weatherCode: Int
+
+    enum CodingKeys: String, CodingKey {
+        case temperature2m = "temperature_2m"
+        case weatherCode = "weather_code"
+    }
+}
+
+struct HourlyForecast: Decodable {
+    let time: [String]
+    let temperature2m: [Double]
+    let weatherCode: [Int]
+
+    enum CodingKeys: String, CodingKey {
+        case time
+        case temperature2m = "temperature_2m"
+        case weatherCode = "weather_code"
+    }
+}
+
 // --- Timeline Provider ---
 /// The `TimelineProvider` is the engine of the widget.
 /// It is responsible for:
@@ -62,6 +89,10 @@ struct SimpleEntry: TimelineEntry {
 /// from the shared `UserDefaults` (populated by the Flutter app).
 struct Provider: TimelineProvider {
     let appGroupIdentifier = "group.dmytrowidget"
+    private let latitudeKey = "weatherfit_location_latitude"
+    private let longitudeKey = "weatherfit_location_longitude"
+    private let temperatureUnitKey = "weatherfit_temperature_unit"
+    private let updateFrequencyKey = "weatherfit_widget_update_frequency"
 
     func getWeatherData() -> WeatherData? {
         guard let sharedDefaults = UserDefaults(suiteName: appGroupIdentifier)
@@ -131,11 +162,13 @@ struct Provider: TimelineProvider {
         in context: Context,
         completion: @escaping (SimpleEntry) -> Void
     ) {
-        let entry = SimpleEntry(
-            date: Date(),
-            weatherData: getWeatherData() ?? .placeholder
-        )
-        completion(entry)
+        refreshWeatherDataFromNetworkIfPossible { weatherData in
+            let entry = SimpleEntry(
+                date: Date(),
+                weatherData: weatherData ?? self.getWeatherData() ?? .placeholder
+            )
+            completion(entry)
+        }
     }
 
     func getTimeline(
@@ -143,17 +176,200 @@ struct Provider: TimelineProvider {
         completion: @escaping (Timeline<Entry>) -> Void
     ) {
         let currentDate = Date()
-        let entry = SimpleEntry(
-            date: currentDate,
-            weatherData: getWeatherData() ?? .placeholder
+        refreshWeatherDataFromNetworkIfPossible { weatherData in
+            let entry = SimpleEntry(
+                date: currentDate,
+                weatherData: weatherData ?? self.getWeatherData() ?? .placeholder
+            )
+            let nextUpdate = Calendar.current.date(
+                byAdding: .minute,
+                value: refreshIntervalMinutes(),
+                to: currentDate
+            )!
+            let timeline = Timeline(entries: [entry], policy: .after(nextUpdate))
+            completion(timeline)
+        }
+    }
+
+    private func refreshWeatherDataFromNetworkIfPossible(
+        completion: @escaping (WeatherData?) -> Void
+    ) {
+        guard let sharedDefaults = UserDefaults(suiteName: appGroupIdentifier)
+        else {
+            completion(nil)
+            return
+        }
+
+        guard
+            let latitude = sharedDefaults.object(forKey: latitudeKey) as? Double,
+            let longitude = sharedDefaults.object(forKey: longitudeKey) as? Double
+        else {
+            completion(nil)
+            return
+        }
+
+        var components = URLComponents(string: "https://api.open-meteo.com/v1/forecast")
+        components?.queryItems = [
+            URLQueryItem(name: "latitude", value: String(latitude)),
+            URLQueryItem(name: "longitude", value: String(longitude)),
+            URLQueryItem(name: "current", value: "temperature_2m,weather_code"),
+            URLQueryItem(name: "hourly", value: "temperature_2m,weather_code"),
+            URLQueryItem(name: "forecast_days", value: "2"),
+            URLQueryItem(name: "timezone", value: "auto"),
+        ]
+
+        guard let url = components?.url else {
+            completion(nil)
+            return
+        }
+
+        let task = URLSession.shared.dataTask(with: url) { data, _, error in
+            if let error = error {
+                print("Widget network fetch failed: \(error)")
+                completion(nil)
+                return
+            }
+
+            guard let data = data else {
+                completion(nil)
+                return
+            }
+
+            do {
+                let response = try JSONDecoder().decode(OpenMeteoResponse.self, from: data)
+
+                let temperatureUnit =
+                    sharedDefaults.string(forKey: self.temperatureUnitKey) ?? "celsius"
+                let isFahrenheit = temperatureUnit == "fahrenheit"
+
+                let formattedTemperature = self.formatTemperature(
+                    celsiusValue: response.current.temperature2m,
+                    isFahrenheit: isFahrenheit
+                )
+
+                let forecast = self.buildWidgetForecast(
+                    from: response.hourly,
+                    isFahrenheit: isFahrenheit
+                )
+
+                let locale = sharedDefaults.string(forKey: "selected_language")
+                let updatedData = WeatherData(
+                    emoji: WeatherHelper.getWeatherEmoji(for: response.current.weatherCode),
+                    location: sharedDefaults.string(forKey: "text_location"),
+                    temperature: formattedTemperature,
+                    recommendation: sharedDefaults.string(forKey: "weatherfit_text_recommendation"),
+                    lastUpdated: self.lastUpdatedText(),
+                    locale: locale,
+                    imagePath: sharedDefaults.string(forKey: "image_weather"),
+                    forecast: forecast
+                )
+
+                sharedDefaults.set(updatedData.emoji, forKey: "weatherfit_text_emoji")
+                sharedDefaults.set(updatedData.temperature, forKey: "text_temperature")
+                sharedDefaults.set(updatedData.lastUpdated, forKey: "weatherfit_text_last_updated")
+                if let forecastJson = self.encodeForecast(forecast) {
+                    sharedDefaults.set(forecastJson, forKey: "forecast_data")
+                }
+
+                completion(updatedData)
+            } catch {
+                print("Widget response decode failed: \(error)")
+                completion(nil)
+            }
+        }
+
+        task.resume()
+    }
+
+    private func buildWidgetForecast(
+        from hourly: HourlyForecast,
+        isFahrenheit: Bool
+    ) -> [ForecastItem] {
+        let count = min(
+            hourly.time.count,
+            min(hourly.temperature2m.count, hourly.weatherCode.count)
         )
-        let nextUpdate = Calendar.current.date(
-            byAdding: .minute,
-            value: 15,
-            to: currentDate
-        )!
-        let timeline = Timeline(entries: [entry], policy: .after(nextUpdate))
-        completion(timeline)
+        guard count > 0 else { return [] }
+
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm"
+
+        let now = Date()
+        var futureItems: [ForecastItem] = []
+
+        for index in 0..<count {
+            let timeString = hourly.time[index]
+            guard let date = formatter.date(from: timeString), date > now else {
+                continue
+            }
+
+            let celsius = hourly.temperature2m[index]
+            let temperature = isFahrenheit ? (celsius * 9 / 5) + 32 : celsius
+            let weatherCode = hourly.weatherCode[index]
+
+            futureItems.append(
+                ForecastItem(
+                    time: timeString,
+                    temperature: temperature,
+                    weatherCode: weatherCode
+                )
+            )
+        }
+
+        let morning = futureItems.first { item in
+            guard let date = formatter.date(from: item.time) else { return false }
+            let hour = Calendar.current.component(.hour, from: date)
+            return (8...11).contains(hour)
+        }
+
+        let lunch = futureItems.first { item in
+            guard let date = formatter.date(from: item.time) else { return false }
+            let hour = Calendar.current.component(.hour, from: date)
+            return (12...15).contains(hour)
+        }
+
+        let evening = futureItems.first { item in
+            guard let date = formatter.date(from: item.time) else { return false }
+            let hour = Calendar.current.component(.hour, from: date)
+            return (17...20).contains(hour)
+        }
+
+        let result = [morning, lunch, evening].compactMap { $0 }
+        return result.sorted { $0.time < $1.time }
+    }
+
+    private func formatTemperature(celsiusValue: Double, isFahrenheit: Bool) -> String {
+        let value = isFahrenheit ? ((celsiusValue * 9 / 5) + 32) : celsiusValue
+        let rounded = Int(value.rounded())
+        return "\(rounded)°\(isFahrenheit ? "F" : "C")"
+    }
+
+    private func lastUpdatedText() -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        return formatter.string(from: Date())
+    }
+
+    private func encodeForecast(_ forecast: [ForecastItem]) -> String? {
+        do {
+            let data = try JSONEncoder().encode(["forecast": forecast])
+            return String(data: data, encoding: .utf8)
+        } catch {
+            print("Failed to encode widget forecast: \(error)")
+            return nil
+        }
+    }
+
+    private func refreshIntervalMinutes() -> Int {
+        guard
+            let sharedDefaults = UserDefaults(suiteName: appGroupIdentifier),
+            let minutes = sharedDefaults.object(forKey: updateFrequencyKey) as? Int,
+            minutes > 0
+        else {
+            return 15
+        }
+        return max(15, minutes)
     }
 }
 
