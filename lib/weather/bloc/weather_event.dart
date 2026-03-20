@@ -31,8 +31,8 @@ final class ToggleUnits extends WeatherEvent {
   const ToggleUnits();
 }
 
-final class UpdateWeatherOnMobileHomeScreenEvent extends WeatherEvent {
-  const UpdateWeatherOnMobileHomeScreenEvent(this.origin);
+final class UpdateWeatherOnHomeWidgetEvent extends WeatherEvent {
+  const UpdateWeatherOnHomeWidgetEvent(this.origin);
 
   final WeatherFetchOrigin origin;
 

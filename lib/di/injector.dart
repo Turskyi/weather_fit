@@ -79,17 +79,48 @@ Future<Dependencies> injectDependencies() async {
 }
 
 Future<void> _setupMobileHydratedStorage() async {
+  // We cannot specify `Directory` type here, otherwise it will not work on
+  // Web.
+  final dynamic temporaryDirectory = await getTemporaryDirectory();
+  final String storagePath = temporaryDirectory.path;
+
   try {
-    // We cannot specify `Directory` type here, otherwise it will not work on
-    // Web.
-    final dynamic temporaryDirectory = await getTemporaryDirectory();
     final HydratedStorage hydratedStorage = await HydratedStorage.build(
-      storageDirectory: HydratedStorageDirectory(temporaryDirectory.path),
+      storageDirectory: HydratedStorageDirectory(storagePath),
     );
     HydratedBloc.storage = hydratedStorage;
+    return;
   } catch (e, s) {
     debugPrint('Failed to initialize hydrated storage: $e.\nStackTrace: $s');
   }
+
+  // If the lock file got stuck from a previous process, clear it and retry.
+  try {
+    final File lockFile = File('$storagePath/hydrated_box.lock');
+    if (await lockFile.exists()) {
+      await lockFile.delete();
+    }
+
+    final HydratedStorage hydratedStorage = await HydratedStorage.build(
+      storageDirectory: HydratedStorageDirectory(storagePath),
+    );
+    HydratedBloc.storage = hydratedStorage;
+    return;
+  } catch (e, s) {
+    debugPrint(
+      'Retry after clearing hydrated storage lock failed: $e.\nStackTrace: $s',
+    );
+  }
+
+  // Final fallback: use an isolated temporary folder so the app can still boot.
+  final String fallbackStoragePath =
+      '$storagePath/hydrated_fallback_${DateTime.now().millisecondsSinceEpoch}';
+  await Directory(fallbackStoragePath).create(recursive: true);
+
+  final HydratedStorage fallbackStorage = await HydratedStorage.build(
+    storageDirectory: HydratedStorageDirectory(fallbackStoragePath),
+  );
+  HydratedBloc.storage = fallbackStorage;
 }
 
 Future<void> _initializeWebHydratedStorage() async {

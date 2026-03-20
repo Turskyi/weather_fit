@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
 import 'package:weather_fit/data/repositories/outfit_repository.dart';
@@ -18,22 +19,41 @@ import 'package:weather_repository/weather_repository.dart';
 class HomeWidgetServiceImpl implements HomeWidgetService {
   const HomeWidgetServiceImpl();
 
+  static const MethodChannel _widgetChannel = MethodChannel(
+    'com.weatherfit.home_widget',
+  );
+  static const String _appGroupIdArgKey = 'appGroupId';
+
   @override
   Future<void> setAppGroupId(String appGroupId) {
-    if (kIsWeb || Platform.isMacOS) {
+    if (kIsWeb) {
       return Future<void>.value();
-    } else {
-      return HomeWidget.setAppGroupId(appGroupId);
     }
+    if (Platform.isMacOS) {
+      return _widgetChannel.invokeMethod<void>(
+        'setAppGroupId',
+        <String, String>{_appGroupIdArgKey: appGroupId},
+      );
+    }
+    return HomeWidget.setAppGroupId(appGroupId);
   }
 
   @override
   Future<bool?> saveWidgetData<T>(String id, T? data) {
-    if (kIsWeb || Platform.isMacOS) {
+    if (kIsWeb) {
       return Future<bool>.value(false);
-    } else {
-      return HomeWidget.saveWidgetData<T>(id, data);
     }
+    if (Platform.isMacOS) {
+      return _widgetChannel.invokeMethod<bool>(
+        'saveWidgetData',
+        <String, Object?>{
+          'key': id,
+          'value': data,
+          _appGroupIdArgKey: constants.kAppleAppGroupId,
+        },
+      );
+    }
+    return HomeWidget.saveWidgetData<T>(id, data);
   }
 
   @override
@@ -43,16 +63,18 @@ class HomeWidgetServiceImpl implements HomeWidgetService {
     String? iOSName,
     String? qualifiedAndroidName,
   }) {
-    if (kIsWeb || Platform.isMacOS) {
+    if (kIsWeb) {
       return Future<bool>.value(false);
-    } else {
-      return HomeWidget.updateWidget(
-        name: name,
-        iOSName: iOSName,
-        androidName: androidName,
-        qualifiedAndroidName: qualifiedAndroidName,
-      );
     }
+    if (Platform.isMacOS) {
+      return _widgetChannel.invokeMethod<bool>('updateWidget');
+    }
+    return HomeWidget.updateWidget(
+      name: name,
+      iOSName: iOSName,
+      androidName: androidName,
+      qualifiedAndroidName: qualifiedAndroidName,
+    );
   }
 
   @override
@@ -147,15 +169,16 @@ class HomeWidgetServiceImpl implements HomeWidgetService {
     String? androidName,
     String? qualifiedAndroidName,
   }) {
+    // macOS widgets in Notification Center don't have a "pin" mechanism.
+    // The user must add the widget manually from Notification Center settings.
     if (kIsWeb || Platform.isMacOS) {
       return Future<void>.value();
-    } else {
-      return HomeWidget.requestPinWidget(
-        name: name,
-        androidName: androidName,
-        qualifiedAndroidName: qualifiedAndroidName,
-      );
     }
+    return HomeWidget.requestPinWidget(
+      name: name,
+      androidName: androidName,
+      qualifiedAndroidName: qualifiedAndroidName,
+    );
   }
 
   /// Filters the full forecast list to a few essential time points for the
