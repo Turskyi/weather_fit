@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -38,7 +41,11 @@ class WeatherContentDefault extends StatelessWidget {
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
       clipBehavior: Clip.none,
-      padding: const EdgeInsets.only(top: 36, left: 16, right: 16),
+      padding: EdgeInsets.only(
+        top: (kIsWeb || Platform.isAndroid) ? 36 : 40,
+        left: 16,
+        right: 16,
+      ),
       child: Center(
         child: LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {

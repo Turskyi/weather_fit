@@ -59,8 +59,8 @@ final class FetchDailyForecast extends WeatherEvent {
   List<Object> get props => <Object>[location];
 }
 
-final class CheckDateChangeOnResume extends WeatherEvent {
-  const CheckDateChangeOnResume(this.origin);
+final class CheckHourChangeOnResume extends WeatherEvent {
+  const CheckHourChangeOnResume(this.origin);
 
   final WeatherFetchOrigin origin;
 }

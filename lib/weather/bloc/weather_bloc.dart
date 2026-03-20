@@ -49,7 +49,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     on<GetOutfitEvent>(_onOutfitRecommendationRequested);
     on<FetchDailyForecast>(_onFetchDailyForecast);
     on<UpdateWeatherOnMobileHomeScreenEvent>(_updateWeatherOnMobileHomeScreen);
-    on<CheckDateChangeOnResume>(_checkDateChangeOnResume);
+    on<CheckHourChangeOnResume>(_checkHourChangeOnResume);
     on<ToggleFavouriteEvent>(_onToggleFavourite);
   }
 
@@ -583,12 +583,12 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     }
   }
 
-  FutureOr<void> _checkDateChangeOnResume(
-    CheckDateChangeOnResume event,
+  FutureOr<void> _checkHourChangeOnResume(
+    CheckHourChangeOnResume event,
     Emitter<WeatherState> emit,
   ) {
     final DateTime now = DateTime.now();
-    if (!state.date.isSameDate(now)) {
+    if (!state.date.isSameHour(now)) {
       add(RefreshWeather(event.origin));
     }
   }

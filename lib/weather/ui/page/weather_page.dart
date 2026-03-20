@@ -111,9 +111,9 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      // Check if the date has changed while the app was in the background.
-      // Only reload if we've transitioned to a new day.
-      context.read<WeatherBloc>().add(CheckDateChangeOnResume(context.origin));
+      // Check if the hour has changed while the app was in the background.
+      // Only reload if we've transitioned to a new hour.
+      context.read<WeatherBloc>().add(CheckHourChangeOnResume(context.origin));
     }
   }
 
