@@ -10,6 +10,7 @@ import 'package:weather_fit/res/widgets/background.dart';
 import 'package:weather_fit/res/widgets/leading_widget.dart';
 import 'package:weather_fit/search/bloc/search_bloc.dart';
 import 'package:weather_fit/search/ui/widgets/future_outfit_planner_sheet.dart';
+import 'package:weather_fit/search/ui/widgets/search_buttons.dart';
 import 'package:weather_fit/search/ui/widgets/search_input.dart';
 import 'package:weather_fit/widgets/keyboard_visibility_builder.dart';
 
@@ -124,38 +125,18 @@ class _SearchLayoutDefaultState extends State<SearchLayoutDefault> {
                         BlocConsumer<SearchBloc, SearchState>(
                           listener: widget.searchStateListener,
                           builder: (BuildContext _, SearchState state) {
-                            final double progressIndicatorSize = 20.0;
                             return ValueListenableBuilder<TextEditingValue>(
                               valueListenable: widget.textEditingController,
-                              child: state is SearchLoading
-                                  ? SizedBox(
-                                      height: progressIndicatorSize,
-                                      width: progressIndicatorSize,
-                                      child: const CircularProgressIndicator(),
-                                    )
-                                  : Text(
-                                      translate('submit'),
-                                      semanticsLabel: translate('submit'),
-                                    ),
                               builder:
                                   (
                                     BuildContext context,
                                     TextEditingValue value,
-                                    Widget? textSubmit,
+                                    Widget? _,
                                   ) {
-                                    final String query = value.text;
-                                    return ElevatedButton(
-                                      key: const Key(
-                                        'searchPage_search_iconButton',
-                                      ),
-                                      onPressed:
-                                          state is! SearchLoading &&
-                                              query.trim().isNotEmpty
-                                          ? () {
-                                              _onSearchSubmitted(query);
-                                            }
-                                          : null,
-                                      child: textSubmit,
+                                    return SearchButtons(
+                                      query: value.text,
+                                      isLoading: state is SearchLoading,
+                                      onSearchSubmitted: _onSearchSubmitted,
                                     );
                                   },
                             );
@@ -163,20 +144,7 @@ class _SearchLayoutDefaultState extends State<SearchLayoutDefault> {
                         ),
                         const SizedBox(height: 8),
                         TextButton.icon(
-                          onPressed: () {
-                            final LocalDataSource localDataSource = context
-                                .read<LocalDataSource>();
-                            showModalBottomSheet(
-                              context: context,
-                              isScrollControlled: true,
-                              useSafeArea: true,
-                              builder: (BuildContext _) {
-                                return FutureOutfitPlannerSheet(
-                                  localDataSource: localDataSource,
-                                );
-                              },
-                            );
-                          },
+                          onPressed: _showFutureOutfitPlanner,
                           icon: const Icon(Icons.auto_awesome),
                           label: Text(translate('search.plan_future_outfit')),
                         ),
@@ -198,6 +166,18 @@ class _SearchLayoutDefaultState extends State<SearchLayoutDefault> {
     _searchFieldFocus.removeListener(_onFocusChanged);
     _searchFieldFocus.dispose();
     super.dispose();
+  }
+
+  void _showFutureOutfitPlanner() {
+    final LocalDataSource localDataSource = context.read<LocalDataSource>();
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (BuildContext _) {
+        return FutureOutfitPlannerSheet(localDataSource: localDataSource);
+      },
+    );
   }
 
   void _onFocusChanged() {
