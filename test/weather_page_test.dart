@@ -214,7 +214,7 @@ void main() {
       expect(find.byType(AppBar), findsOneWidget);
     });
 
-    testWidgets('shows snackbar with try again when WeatherFailure occurs', (
+    testWidgets('shows snack-bar with try again when WeatherFailure occurs', (
       WidgetTester tester,
     ) async {
       tester.view.physicalSize = const Size(800, 3000);

@@ -314,14 +314,26 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         if (state is SettingsInitial) {
           emit(state.copyWith(language: language));
         } else {
-          SettingsInitial(
-            language: language,
-            appVersion: state.appVersion,
-            widgetUpdateFrequency: state.widgetUpdateFrequency,
+          emit(
+            SettingsInitial(
+              language: language,
+              appVersion: state.appVersion,
+              widgetUpdateFrequency: state.widgetUpdateFrequency,
+            ),
           );
         }
       } else {
-        //TODO: no sure what to do.
+        debugPrint(
+          'Failed to save language preference: ${language.isoLanguageCode}',
+        );
+        emit(
+          SettingsError(
+            errorMessage: translate('error.unexpected_error'),
+            language: state.language,
+            appVersion: state.appVersion,
+            widgetUpdateFrequency: state.widgetUpdateFrequency,
+          ),
+        );
       }
     }
   }
