@@ -1,5 +1,5 @@
-import SwiftUI
 import AppKit
+import SwiftUI
 import WidgetKit
 
 // Typealias UIImage to NSImage for cross-platform compatibility in the loader logic
@@ -51,6 +51,33 @@ struct SimpleEntry: TimelineEntry {
     let weatherData: WeatherData
 }
 
+struct OpenMeteoResponse: Decodable {
+    let current: CurrentWeather
+    let hourly: HourlyForecast
+}
+
+struct CurrentWeather: Decodable {
+    let temperature2m: Double
+    let weatherCode: Int
+
+    enum CodingKeys: String, CodingKey {
+        case temperature2m = "temperature_2m"
+        case weatherCode = "weather_code"
+    }
+}
+
+struct HourlyForecast: Decodable {
+    let time: [String]
+    let temperature2m: [Double]
+    let weatherCode: [Int]
+
+    enum CodingKeys: String, CodingKey {
+        case time
+        case temperature2m = "temperature_2m"
+        case weatherCode = "weather_code"
+    }
+}
+
 // --- Timeline Provider ---
 /// The `TimelineProvider` is the engine of the widget.
 /// It is responsible for:
@@ -62,14 +89,18 @@ struct SimpleEntry: TimelineEntry {
 /// from the shared `UserDefaults` (populated by the Flutter app).
 struct Provider: TimelineProvider {
     let appGroupIdentifier = "group.dmytrowidget"
-    
+    private let latitudeKey = "weatherfit_location_latitude"
+    private let longitudeKey = "weatherfit_location_longitude"
+    private let temperatureUnitKey = "weatherfit_temperature_unit"
+    private let updateFrequencyKey = "weatherfit_widget_update_frequency"
+
     func getWeatherData() -> WeatherData? {
         guard let sharedDefaults = UserDefaults(suiteName: appGroupIdentifier)
         else {
             print("Could not load shared defaults.")
             return nil
         }
-        
+
         let keys: [String: String] = [
             "location": "text_location",
             "temperature": "text_temperature",
@@ -79,7 +110,7 @@ struct Provider: TimelineProvider {
             "recommendation": "weatherfit_text_recommendation",
             "lastUpdated": "weatherfit_text_last_updated",
         ]
-        
+
         let emoji = sharedDefaults.string(forKey: keys["emoji"]!)
         let location = sharedDefaults.string(forKey: keys["location"]!)
         let temperature = sharedDefaults.string(forKey: keys["temperature"]!)
@@ -91,10 +122,10 @@ struct Provider: TimelineProvider {
         let forecastDataString = sharedDefaults.string(
             forKey: keys["forecastData"]!
         )
-        
+
         var forecast: [ForecastItem]?
         if let forecastDataString = forecastDataString,
-           let data = forecastDataString.data(using: .utf8)
+            let data = forecastDataString.data(using: .utf8)
         {
             do {
                 let decoder = JSONDecoder()
@@ -108,9 +139,9 @@ struct Provider: TimelineProvider {
                 print("WIDGET FORECAST DECODING FAILED: \(error)")
             }
         }
-        
+
         let locale = sharedDefaults.string(forKey: "selected_language")
-        
+
         return WeatherData(
             emoji: emoji,
             location: location,
@@ -122,38 +153,223 @@ struct Provider: TimelineProvider {
             forecast: forecast
         )
     }
-    
+
     func placeholder(in context: Context) -> SimpleEntry {
         SimpleEntry(date: Date(), weatherData: .placeholder)
     }
-    
+
     func getSnapshot(
         in context: Context,
         completion: @escaping (SimpleEntry) -> Void
     ) {
-        let entry = SimpleEntry(
-            date: Date(),
-            weatherData: getWeatherData() ?? .placeholder
-        )
-        completion(entry)
+        refreshWeatherDataFromNetworkIfPossible { weatherData in
+            let entry = SimpleEntry(
+                date: Date(),
+                weatherData: weatherData ?? self.getWeatherData() ?? .placeholder
+            )
+            completion(entry)
+        }
     }
-    
+
     func getTimeline(
         in context: Context,
         completion: @escaping (Timeline<Entry>) -> Void
     ) {
         let currentDate = Date()
-        let entry = SimpleEntry(
-            date: currentDate,
-            weatherData: getWeatherData() ?? .placeholder
+        refreshWeatherDataFromNetworkIfPossible { weatherData in
+            let entry = SimpleEntry(
+                date: currentDate,
+                weatherData: weatherData ?? self.getWeatherData() ?? .placeholder
+            )
+            let nextUpdate = Calendar.current.date(
+                byAdding: .minute,
+                value: refreshIntervalMinutes(),
+                to: currentDate
+            )!
+            let timeline = Timeline(entries: [entry], policy: .after(nextUpdate))
+            completion(timeline)
+        }
+    }
+
+    private func refreshWeatherDataFromNetworkIfPossible(
+        completion: @escaping (WeatherData?) -> Void
+    ) {
+        guard let sharedDefaults = UserDefaults(suiteName: appGroupIdentifier)
+        else {
+            completion(nil)
+            return
+        }
+
+        guard
+            let latitude = sharedDefaults.object(forKey: latitudeKey) as? Double,
+            let longitude = sharedDefaults.object(forKey: longitudeKey) as? Double
+        else {
+            completion(nil)
+            return
+        }
+
+        var components = URLComponents(string: "https://api.open-meteo.com/v1/forecast")
+        components?.queryItems = [
+            URLQueryItem(name: "latitude", value: String(latitude)),
+            URLQueryItem(name: "longitude", value: String(longitude)),
+            URLQueryItem(name: "current", value: "temperature_2m,weather_code"),
+            URLQueryItem(name: "hourly", value: "temperature_2m,weather_code"),
+            URLQueryItem(name: "forecast_days", value: "2"),
+            URLQueryItem(name: "timezone", value: "auto"),
+        ]
+
+        guard let url = components?.url else {
+            completion(nil)
+            return
+        }
+
+        let task = URLSession.shared.dataTask(with: url) { data, _, error in
+            if let error = error {
+                print("Widget network fetch failed: \(error)")
+                completion(nil)
+                return
+            }
+
+            guard let data = data else {
+                completion(nil)
+                return
+            }
+
+            do {
+                let response = try JSONDecoder().decode(OpenMeteoResponse.self, from: data)
+
+                let temperatureUnit =
+                    sharedDefaults.string(forKey: self.temperatureUnitKey) ?? "celsius"
+                let isFahrenheit = temperatureUnit == "fahrenheit"
+
+                let formattedTemperature = self.formatTemperature(
+                    celsiusValue: response.current.temperature2m,
+                    isFahrenheit: isFahrenheit
+                )
+
+                let forecast = self.buildWidgetForecast(
+                    from: response.hourly,
+                    isFahrenheit: isFahrenheit
+                )
+
+                let locale = sharedDefaults.string(forKey: "selected_language")
+                let updatedData = WeatherData(
+                    emoji: WeatherHelper.getWeatherEmoji(for: response.current.weatherCode),
+                    location: sharedDefaults.string(forKey: "text_location"),
+                    temperature: formattedTemperature,
+                    recommendation: sharedDefaults.string(forKey: "weatherfit_text_recommendation"),
+                    lastUpdated: self.lastUpdatedText(),
+                    locale: locale,
+                    imagePath: sharedDefaults.string(forKey: "image_weather"),
+                    forecast: forecast
+                )
+
+                sharedDefaults.set(updatedData.emoji, forKey: "weatherfit_text_emoji")
+                sharedDefaults.set(updatedData.temperature, forKey: "text_temperature")
+                sharedDefaults.set(updatedData.lastUpdated, forKey: "weatherfit_text_last_updated")
+                if let forecastJson = self.encodeForecast(forecast) {
+                    sharedDefaults.set(forecastJson, forKey: "forecast_data")
+                }
+
+                completion(updatedData)
+            } catch {
+                print("Widget response decode failed: \(error)")
+                completion(nil)
+            }
+        }
+
+        task.resume()
+    }
+
+    private func buildWidgetForecast(
+        from hourly: HourlyForecast,
+        isFahrenheit: Bool
+    ) -> [ForecastItem] {
+        let count = min(
+            hourly.time.count,
+            min(hourly.temperature2m.count, hourly.weatherCode.count)
         )
-        let nextUpdate = Calendar.current.date(
-            byAdding: .minute,
-            value: 15,
-            to: currentDate
-        )!
-        let timeline = Timeline(entries: [entry], policy: .after(nextUpdate))
-        completion(timeline)
+        guard count > 0 else { return [] }
+
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm"
+
+        let now = Date()
+        var futureItems: [ForecastItem] = []
+
+        for index in 0..<count {
+            let timeString = hourly.time[index]
+            guard let date = formatter.date(from: timeString), date > now else {
+                continue
+            }
+
+            let celsius = hourly.temperature2m[index]
+            let temperature = isFahrenheit ? (celsius * 9 / 5) + 32 : celsius
+            let weatherCode = hourly.weatherCode[index]
+
+            futureItems.append(
+                ForecastItem(
+                    time: timeString,
+                    temperature: temperature,
+                    weatherCode: weatherCode
+                )
+            )
+        }
+
+        let morning = futureItems.first { item in
+            guard let date = formatter.date(from: item.time) else { return false }
+            let hour = Calendar.current.component(.hour, from: date)
+            return (8...11).contains(hour)
+        }
+
+        let lunch = futureItems.first { item in
+            guard let date = formatter.date(from: item.time) else { return false }
+            let hour = Calendar.current.component(.hour, from: date)
+            return (12...15).contains(hour)
+        }
+
+        let evening = futureItems.first { item in
+            guard let date = formatter.date(from: item.time) else { return false }
+            let hour = Calendar.current.component(.hour, from: date)
+            return (17...20).contains(hour)
+        }
+
+        let result = [morning, lunch, evening].compactMap { $0 }
+        return result.sorted { $0.time < $1.time }
+    }
+
+    private func formatTemperature(celsiusValue: Double, isFahrenheit: Bool) -> String {
+        let value = isFahrenheit ? ((celsiusValue * 9 / 5) + 32) : celsiusValue
+        let rounded = Int(value.rounded())
+        return "\(rounded)°\(isFahrenheit ? "F" : "C")"
+    }
+
+    private func lastUpdatedText() -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        return formatter.string(from: Date())
+    }
+
+    private func encodeForecast(_ forecast: [ForecastItem]) -> String? {
+        do {
+            let data = try JSONEncoder().encode(["forecast": forecast])
+            return String(data: data, encoding: .utf8)
+        } catch {
+            print("Failed to encode widget forecast: \(error)")
+            return nil
+        }
+    }
+
+    private func refreshIntervalMinutes() -> Int {
+        guard
+            let sharedDefaults = UserDefaults(suiteName: appGroupIdentifier),
+            let minutes = sharedDefaults.object(forKey: updateFrequencyKey) as? Int,
+            minutes > 0
+        else {
+            return 15
+        }
+        return max(15, minutes)
     }
 }
 
@@ -162,7 +378,7 @@ struct Provider: TimelineProvider {
 struct ForecastItemView: View {
     let item: ForecastItem
     let locale: String?
-    
+
     var body: some View {
         VStack(spacing: 2) {
             Text(DateHelper.getDay(from: item.time, locale: locale ?? "en"))
@@ -183,12 +399,12 @@ struct ForecastItemView: View {
 struct WeatherWidgetsEntryView: View {
     var entry: Provider.Entry
     @Environment(\.widgetFamily) var family
-    
+
     var body: some View {
         // Horizontal layout for wide widgets (Medium)
         // macOS systemLarge is vertical to match iOS Large alignment
         let isWide = family == .systemMedium
-        
+
         Group {
             if isWide {
                 HStack(alignment: .top, spacing: 12) {
@@ -198,7 +414,7 @@ struct WeatherWidgetsEntryView: View {
                         recommendationSection
                     }
                     .frame(maxWidth: .infinity)
-                    
+
                     // Right Column: Header and Forecast
                     VStack(alignment: .leading, spacing: 12) {
                         headerSection
@@ -210,12 +426,12 @@ struct WeatherWidgetsEntryView: View {
                 // Vertical layout for Small and Large widgets
                 VStack(spacing: 8) {
                     headerSection
-                    
+
                     imageSection
                         .frame(maxHeight: .infinity)
-                    
+
                     recommendationSection
-                    
+
                     if family != .systemSmall {
                         forecastSection
                     }
@@ -224,7 +440,7 @@ struct WeatherWidgetsEntryView: View {
         }
         .widgetURL(URL(string: "weatherfit://open")!)
     }
-    
+
     /// The Outfit Image section with rounded corners
     private var imageSection: some View {
         Group {
@@ -244,7 +460,7 @@ struct WeatherWidgetsEntryView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
-    
+
     /// Recommendation text
     private var recommendationSection: some View {
         Group {
@@ -260,7 +476,7 @@ struct WeatherWidgetsEntryView: View {
             }
         }
     }
-    
+
     /// Header components: [location, temperature], [emoji, last updated]
     private var headerSection: some View {
         HStack(alignment: .center) {
@@ -270,9 +486,9 @@ struct WeatherWidgetsEntryView: View {
                 Text(entry.weatherData.temperature ?? "--°")
                     .font(.system(size: 16, weight: .bold))
             }
-            
+
             Spacer()
-            
+
             VStack(alignment: .trailing, spacing: 0) {
                 Text(entry.weatherData.emoji ?? "☀️")
                     .font(.system(size: 18))
@@ -287,7 +503,7 @@ struct WeatherWidgetsEntryView: View {
         .cornerRadius(10)
         .foregroundColor(.white)
     }
-    
+
     /// Forecast components (three parts)
     private var forecastSection: some View {
         Group {
@@ -312,7 +528,7 @@ struct WeatherWidgetsEntryView: View {
 // --- Widget Definition ---
 struct WeatherWidgets: Widget {
     let kind: String = "WeatherWidgets"
-    
+
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: Provider()) { entry in
             WeatherWidgetsEntryView(entry: entry)
@@ -321,7 +537,9 @@ struct WeatherWidgets: Widget {
                         for: entry.weatherData.forecast?.first?.weatherCode ?? 0
                     )
                 }
+                .clipShape(ContainerRelativeShape())
         }
+        .contentMarginsDisabled()
         .configurationDisplayName("WeatherFit")
         .description("Check the weather and outfit recommendation.")
     }
@@ -335,24 +553,25 @@ struct WidgetImageLoader {
         forecast: [ForecastItem]?
     ) -> UIImage? {
         if let imagePath = imagePath,
-           let image = UIImage(contentsOfFile: imagePath) {
+            let image = UIImage(contentsOfFile: imagePath)
+        {
             return image
         }
-        
+
         if let forecast = forecast, !forecast.isEmpty {
             let weatherCode = forecast.first?.weatherCode ?? 0
             let temperature = Int(forecast.first?.temperature.rounded() ?? 0)
             let conditionName = getConditionName(from: weatherCode)
             let roundedTemp = roundTemperatureToBucket(temperature)
             let fallbackImageName = "\(conditionName)_\(roundedTemp).png"
-            
+
             if let image = UIImage(named: fallbackImageName) {
                 return image
             }
         }
         return nil
     }
-    
+
     private static func getConditionName(from weatherCode: Int) -> String {
         switch weatherCode {
         case 0: return "clear"
@@ -362,7 +581,7 @@ struct WidgetImageLoader {
         default: return "clear"
         }
     }
-    
+
     private static func roundTemperatureToBucket(_ temperature: Int) -> Int {
         let remainder = temperature % 10
         if remainder >= 5 {
@@ -382,16 +601,16 @@ struct DateHelper {
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm"
         return formatter.date(from: string)
     }
-    
+
     static func getDay(from dateString: String, locale: String = "en") -> String {
         guard let date = parseDateTime(from: dateString) else {
             return ""
         }
-        
+
         let isUk = locale.lowercased().hasPrefix("uk")
         let isPl = locale.lowercased().hasPrefix("pl")
         let isDe = locale.lowercased().hasPrefix("de")
-        
+
         if Calendar.current.isDateInToday(date) {
             if isUk { return "Сьогодні" }
             if isPl { return "Dzisiaj" }
@@ -408,17 +627,17 @@ struct DateHelper {
         dayFormatter.dateFormat = "EEE"
         return dayFormatter.string(from: date)
     }
-    
+
     static func getTimeOfDay(from dateString: String, locale: String) -> String {
         guard let date = parseDateTime(from: dateString) else {
             return ""
         }
         let hour = Calendar.current.component(.hour, from: date)
-        
+
         let isUk = locale.lowercased().hasPrefix("uk")
         let isPl = locale.lowercased().hasPrefix("pl")
         let isDe = locale.lowercased().hasPrefix("de")
-        
+
         switch hour {
         case 5...11:
             if isUk { return "Ранок" }
@@ -459,7 +678,7 @@ struct WeatherHelper {
         default: return "🤔"
         }
     }
-    
+
     static func getGradient(for code: Int) -> some View {
         let gradient: Gradient
         switch code {

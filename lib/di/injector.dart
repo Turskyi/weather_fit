@@ -4,7 +4,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:home_widget/home_widget.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:nominatim_api/nominatim_api.dart';
@@ -44,7 +43,7 @@ Future<Dependencies> injectDependencies() async {
 
   // Make sure we run on supported platforms:
   // https://pub.dev/packages/workmanager
-  if (!kIsWeb && !Platform.isMacOS && (Platform.isAndroid || Platform.isIOS)) {
+  if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
     _setupBackgroundWidgetUpdates(localDataSource);
   }
 
@@ -79,17 +78,48 @@ Future<Dependencies> injectDependencies() async {
 }
 
 Future<void> _setupMobileHydratedStorage() async {
+  // We cannot specify `Directory` type here, otherwise it will not work on
+  // Web.
+  final dynamic temporaryDirectory = await getTemporaryDirectory();
+  final String storagePath = temporaryDirectory.path;
+
   try {
-    // We cannot specify `Directory` type here, otherwise it will not work on
-    // Web.
-    final dynamic temporaryDirectory = await getTemporaryDirectory();
     final HydratedStorage hydratedStorage = await HydratedStorage.build(
-      storageDirectory: HydratedStorageDirectory(temporaryDirectory.path),
+      storageDirectory: HydratedStorageDirectory(storagePath),
     );
     HydratedBloc.storage = hydratedStorage;
+    return;
   } catch (e, s) {
     debugPrint('Failed to initialize hydrated storage: $e.\nStackTrace: $s');
   }
+
+  // If the lock file got stuck from a previous process, clear it and retry.
+  try {
+    final File lockFile = File('$storagePath/hydrated_box.lock');
+    if (await lockFile.exists()) {
+      await lockFile.delete();
+    }
+
+    final HydratedStorage hydratedStorage = await HydratedStorage.build(
+      storageDirectory: HydratedStorageDirectory(storagePath),
+    );
+    HydratedBloc.storage = hydratedStorage;
+    return;
+  } catch (e, s) {
+    debugPrint(
+      'Retry after clearing hydrated storage lock failed: $e.\nStackTrace: $s',
+    );
+  }
+
+  // Final fallback: use an isolated temporary folder so the app can still boot.
+  final String fallbackStoragePath =
+      '$storagePath/hydrated_fallback_${DateTime.now().millisecondsSinceEpoch}';
+  await Directory(fallbackStoragePath).create(recursive: true);
+
+  final HydratedStorage fallbackStorage = await HydratedStorage.build(
+    storageDirectory: HydratedStorageDirectory(fallbackStoragePath),
+  );
+  HydratedBloc.storage = fallbackStorage;
 }
 
 Future<void> _initializeWebHydratedStorage() async {
@@ -185,70 +215,70 @@ Future<void> _setupBackgroundWidgetUpdates(
 void _callbackDispatcher() {
   try {
     Workmanager().executeTask((String _, Map<String, Object?>? _) async {
-      try {
-        WidgetsFlutterBinding.ensureInitialized();
-
-        await _initializeAllDateFormatting();
-
-        final SharedPreferences preferences =
-            await SharedPreferences.getInstance();
-
-        final LocalDataSource localDataSource = LocalDataSource(preferences);
-        final RemoteDataSource remoteDataSource = RemoteDataSource(Dio());
-
-        // Save currently selected language to widget data so native widgets
-        // (Android/iOS) can use it to localize strings.
-        try {
-          final String languageCode = localDataSource.getLanguageIsoCode();
-          await HomeWidget.saveWidgetData<String>(
-            'selected_language',
-            languageCode,
-          );
-        } catch (e) {
-          debugPrint('Failed to save widget language: $e');
-        }
-
-        final Location lastSavedLocation = localDataSource
-            .getLastSavedLocation();
-
-        if (lastSavedLocation.isNotEmpty) {
-          // Get latest weather.
-          final WeatherRepository weatherRepository = WeatherRepository();
-
-          final WeatherDomain domainWeather = await weatherRepository
-              .getWeatherByLocation(lastSavedLocation);
-
-          final DailyForecastDomain dailyForecast = await weatherRepository
-              .getDailyForecast(lastSavedLocation);
-
-          final OutfitRepository outfitRepository = OutfitRepository(
-            localDataSource,
-            remoteDataSource,
-          );
-
-          final HomeWidgetService homeWidgetService =
-              const HomeWidgetServiceImpl();
-
-          final Weather weather = Weather.fromRepository(domainWeather);
-
-          await homeWidgetService.updateHomeWidget(
-            localDataSource: localDataSource,
-            weather: weather,
-            outfitRepository: outfitRepository,
-            forecast: dailyForecast,
-          );
-
-          return true;
-        } else {
-          return false;
-        }
-      } catch (e) {
-        debugPrint('Background widget update failed: $e');
-        return false;
-      }
+      return _performWidgetUpdateTick();
     });
   } catch (e) {
     debugPrint('Error while WorkManager.executeTask: $e');
+  }
+}
+
+Future<bool> _performWidgetUpdateTick() async {
+  try {
+    WidgetsFlutterBinding.ensureInitialized();
+
+    await _initializeAllDateFormatting();
+
+    final SharedPreferences preferences = await SharedPreferences.getInstance();
+
+    final LocalDataSource localDataSource = LocalDataSource(preferences);
+    final RemoteDataSource remoteDataSource = RemoteDataSource(Dio());
+
+    final HomeWidgetService homeWidgetService = const HomeWidgetServiceImpl();
+
+    // Save currently selected language to widget data so native widgets
+    // (Android/iOS/macOS) can use it to localize strings.
+    try {
+      final String languageCode = localDataSource.getLanguageIsoCode();
+      await homeWidgetService.saveWidgetData<String>(
+        'selected_language',
+        languageCode,
+      );
+    } catch (e) {
+      debugPrint('Failed to save widget language: $e');
+    }
+
+    final Location lastSavedLocation = localDataSource.getLastSavedLocation();
+
+    if (lastSavedLocation.isEmpty) {
+      return false;
+    }
+
+    final WeatherRepository weatherRepository = WeatherRepository();
+
+    final WeatherDomain domainWeather = await weatherRepository
+        .getWeatherByLocation(lastSavedLocation);
+
+    final DailyForecastDomain dailyForecast = await weatherRepository
+        .getDailyForecast(lastSavedLocation);
+
+    final OutfitRepository outfitRepository = OutfitRepository(
+      localDataSource,
+      remoteDataSource,
+    );
+
+    final Weather weather = Weather.fromRepository(domainWeather);
+
+    await homeWidgetService.updateHomeWidget(
+      localDataSource: localDataSource,
+      weather: weather,
+      outfitRepository: outfitRepository,
+      forecast: dailyForecast,
+    );
+
+    return true;
+  } catch (e) {
+    debugPrint('Background widget update failed: $e');
+    return false;
   }
 }
 
@@ -264,10 +294,4 @@ Future<void> _initializeAllDateFormatting() async {
       );
     }
   }
-}
-
-/// Called when Doing Background Work initiated from Widget
-@pragma('vm:entry-point')
-Future<void> _interactiveCallback(Uri? data) async {
-  //TODO: add implementation.
 }

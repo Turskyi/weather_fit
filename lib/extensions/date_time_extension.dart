@@ -2,8 +2,11 @@ import 'package:flutter_translate/flutter_translate.dart';
 import 'package:weather_fit/res/constants/date_constants.dart' as constants;
 
 extension DateTimeExtension on DateTime {
-  bool isSameDate(DateTime other) {
-    return year == other.year && month == other.month && day == other.day;
+  bool isSameHour(DateTime other) {
+    return year == other.year &&
+        month == other.month &&
+        day == other.day &&
+        hour == other.hour;
   }
 
   bool get isOlderThanMinimumAge => isBefore(constants.kMinAllowedBirthDate);

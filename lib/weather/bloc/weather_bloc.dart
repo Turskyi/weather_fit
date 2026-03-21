@@ -48,15 +48,38 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     on<ToggleUnits>(_onToggleUnits);
     on<GetOutfitEvent>(_onOutfitRecommendationRequested);
     on<FetchDailyForecast>(_onFetchDailyForecast);
-    on<UpdateWeatherOnMobileHomeScreenEvent>(_updateWeatherOnMobileHomeScreen);
-    on<CheckDateChangeOnResume>(_checkDateChangeOnResume);
+    on<UpdateWeatherOnHomeWidgetEvent>(_updateWeatherOnHomeWidget);
+    on<CheckHourChangeOnResume>(_checkHourChangeOnResume);
     on<ToggleFavouriteEvent>(_onToggleFavourite);
+
+    _scheduleInitialHomeWidgetSync();
   }
 
   final WeatherRepository _weatherRepository;
   final OutfitRepository _outfitRepository;
   final LocalDataSource _localDataSource;
   final HomeWidgetService _homeWidgetService;
+
+  void _scheduleInitialHomeWidgetSync() {
+    if (kIsWeb) {
+      return;
+    }
+
+    final DailyForecastDomain? dailyForecast = state.dailyForecast;
+    if (dailyForecast == null || dailyForecast.forecast.isEmpty) {
+      return;
+    }
+
+    if (state.weather.isEmpty) {
+      return;
+    }
+
+    Future<void>.microtask(() {
+      add(
+        const UpdateWeatherOnHomeWidgetEvent(WeatherFetchOrigin.defaultDevice),
+      );
+    });
+  }
 
   @override
   WeatherState? fromJson(Map<String, Object?> json) {
@@ -201,8 +224,8 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
         );
 
         final WeatherFetchOrigin eventOrigin = event.origin;
-        if (!kIsWeb && !Platform.isMacOS && eventOrigin.isNotWearable) {
-          add(UpdateWeatherOnMobileHomeScreenEvent(eventOrigin));
+        if (!kIsWeb && eventOrigin.isNotWearable) {
+          add(UpdateWeatherOnHomeWidgetEvent(eventOrigin));
         }
       } on Exception catch (exception) {
         debugPrint('WeatherBloc _onFetchWeather Exception: $exception.');
@@ -377,8 +400,8 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
         );
 
         final WeatherFetchOrigin eventOrigin = event.origin;
-        if (!kIsWeb && !Platform.isMacOS && eventOrigin.isNotWearable) {
-          add(UpdateWeatherOnMobileHomeScreenEvent(eventOrigin));
+        if (!kIsWeb && eventOrigin.isNotWearable) {
+          add(UpdateWeatherOnHomeWidgetEvent(eventOrigin));
         }
       } on Exception catch (e) {
         debugPrint('Failed to get weather: $e');
@@ -568,8 +591,8 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     }
   }
 
-  FutureOr<void> _updateWeatherOnMobileHomeScreen(
-    UpdateWeatherOnMobileHomeScreenEvent event,
+  FutureOr<void> _updateWeatherOnHomeWidget(
+    UpdateWeatherOnHomeWidgetEvent event,
     Emitter<WeatherState> emit,
   ) async {
     final DailyForecastDomain? dailyForecast = state.dailyForecast;
@@ -583,12 +606,12 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     }
   }
 
-  FutureOr<void> _checkDateChangeOnResume(
-    CheckDateChangeOnResume event,
+  FutureOr<void> _checkHourChangeOnResume(
+    CheckHourChangeOnResume event,
     Emitter<WeatherState> emit,
   ) {
     final DateTime now = DateTime.now();
-    if (!state.date.isSameDate(now)) {
+    if (!state.date.isSameHour(now)) {
       add(RefreshWeather(event.origin));
     }
   }

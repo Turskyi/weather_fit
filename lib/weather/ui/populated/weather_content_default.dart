@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -38,7 +41,11 @@ class WeatherContentDefault extends StatelessWidget {
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
       clipBehavior: Clip.none,
-      padding: const EdgeInsets.only(top: 36, left: 16, right: 16),
+      padding: EdgeInsets.only(
+        top: (kIsWeb || Platform.isAndroid) ? 36 : 40,
+        left: 16,
+        right: 16,
+      ),
       child: Center(
         child: LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
@@ -191,11 +198,8 @@ class WeatherContentDefault extends StatelessWidget {
                         const SizedBox(height: 24),
                         BlocBuilder<WeatherBloc, WeatherState>(
                           builder: (BuildContext _, WeatherState state) {
-                            final bool isLocationMatch =
-                                weather.location.latitude ==
-                                    state.location.latitude &&
-                                weather.location.longitude ==
-                                    state.location.longitude;
+                            final bool isLocationMatch = weather.location
+                                .isSamePlaceAs(state.location);
                             if (isLocationMatch && state.forecast.isNotEmpty) {
                               return const DailyForecast();
                             } else {
@@ -243,11 +247,8 @@ class WeatherContentDefault extends StatelessWidget {
 
                   BlocBuilder<WeatherBloc, WeatherState>(
                     builder: (BuildContext _, WeatherState state) {
-                      final bool isLocationMatch =
-                          weather.location.latitude ==
-                              state.location.latitude &&
-                          weather.location.longitude ==
-                              state.location.longitude;
+                      final bool isLocationMatch = weather.location
+                          .isSamePlaceAs(state.location);
                       if (isLocationMatch && state.forecast.isNotEmpty) {
                         return const DailyForecast();
                       } else {

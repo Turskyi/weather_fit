@@ -8,7 +8,6 @@ import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:resend/resend.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
 import 'package:weather_fit/entities/enums/feedback_rating.dart';
@@ -17,6 +16,7 @@ import 'package:weather_fit/entities/enums/feedback_type.dart';
 import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/entities/models/exceptions/email_launch_exception.dart';
 import 'package:weather_fit/res/constants/constants.dart' as constants;
+import 'package:weather_fit/services/feedback_service.dart';
 import 'package:weather_fit/services/update_service.dart';
 import 'package:workmanager/workmanager.dart';
 
@@ -24,8 +24,11 @@ part 'settings_event.dart';
 part 'settings_state.dart';
 
 class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
-  SettingsBloc(this._localDataSource, this._updateService)
-    : super(
+  SettingsBloc(
+    this._localDataSource,
+    this._updateService,
+    this._feedbackService,
+  ) : super(
         SettingsInitial(
           language: _localDataSource.getSavedLanguage(),
           widgetUpdateFrequency: _localDataSource.getWidgetUpdateFrequency(),
@@ -53,6 +56,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
 
   final LocalDataSource _localDataSource;
   final UpdateService _updateService;
+  final FeedbackService _feedbackService;
 
   FutureOr<void> _onLoadSettings(
     LoadSettingsEvent event,
@@ -167,11 +171,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
           );
 
         if (event.submissionType.isAutomatic) {
-          // TODO: move this thing to "data".
-          final Resend resend = Resend.instance;
-          await resend.sendEmail(
-            from: constants.feedbackEmailSender,
-            to: <String>[constants.supportEmail],
+          await _feedbackService.sendAutomaticFeedback(
             subject:
                 '${translate('feedback.app_feedback')}: ${packageInfo.appName}',
             text: feedbackBody.toString(),
@@ -314,14 +314,26 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         if (state is SettingsInitial) {
           emit(state.copyWith(language: language));
         } else {
-          SettingsInitial(
-            language: language,
-            appVersion: state.appVersion,
-            widgetUpdateFrequency: state.widgetUpdateFrequency,
+          emit(
+            SettingsInitial(
+              language: language,
+              appVersion: state.appVersion,
+              widgetUpdateFrequency: state.widgetUpdateFrequency,
+            ),
           );
         }
       } else {
-        //TODO: no sure what to do.
+        debugPrint(
+          'Failed to save language preference: ${language.isoLanguageCode}',
+        );
+        emit(
+          SettingsError(
+            errorMessage: translate('error.unexpected_error'),
+            language: state.language,
+            appVersion: state.appVersion,
+            widgetUpdateFrequency: state.widgetUpdateFrequency,
+          ),
+        );
       }
     }
   }

@@ -26,6 +26,7 @@ import 'package:weather_fit/services/home_widget_service.dart';
 import 'package:weather_fit/settings/bloc/settings_bloc.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 import 'package:weather_fit/weather/ui/page/weather_page.dart';
+import 'package:weather_fit/weather/ui/page/weather_page_default_layout.dart';
 import 'package:weather_fit/weather/ui/populated/daily_forecast.dart';
 import 'package:weather_fit/weather/ui/widgets/weather_shimmer.dart';
 import 'package:weather_fit/weather/weather.dart';
@@ -118,8 +119,8 @@ void main() {
   late repository.WeatherRepository weatherRepository;
   late OutfitRepository outfitRepository;
   late HomeWidgetService mockHomeWidgetService;
-
   late SettingsBloc settingsBloc;
+
   setUp(() {
     mockHomeWidgetService = MockHomeWidgetService();
     weatherRepository = MockWeatherRepository();
@@ -214,7 +215,7 @@ void main() {
       expect(find.byType(AppBar), findsOneWidget);
     });
 
-    testWidgets('shows snackbar with try again when WeatherFailure occurs', (
+    testWidgets('shows snack-bar with try again when WeatherFailure occurs', (
       WidgetTester tester,
     ) async {
       tester.view.physicalSize = const Size(800, 3000);
@@ -322,6 +323,88 @@ void main() {
       setUp(() {
         weatherBloc = MockWeatherBloc();
       });
+
+      testWidgets(
+        'default populated layout shows forecast instead of shimmer for '
+        'near-identical location coordinates',
+        (WidgetTester tester) async {
+          final repository.Location selectedLocation = dummy_constants
+              .dummyLocation
+              .copyWith(latitude: 50.4501, longitude: 30.5234, countryCode: '');
+          final repository.Location stateLocation = selectedLocation.copyWith(
+            latitude: 50.45015,
+            longitude: 30.52345,
+          );
+          final DateTime futureDate = DateTime.now().add(
+            const Duration(days: 1),
+          );
+          final String futureTimeString =
+              '${futureDate.year}-'
+              '${futureDate.month.toString().padLeft(2, '0')}'
+              '-${futureDate.day.toString().padLeft(2, '0')}T08:00';
+
+          final WeatherSuccess successState = WeatherSuccess(
+            date: DateTime.now(),
+            locale: dummy_constants.dummyLocale,
+            weather: dummy_constants.dummyWeather.copyWith(
+              location: stateLocation,
+              countryCode: '',
+            ),
+            outfitRecommendation: 'Wear a jacket',
+            dailyForecast: DailyForecastDomain(
+              forecast: <ForecastItemDomain>[
+                ForecastItemDomain(
+                  time: futureTimeString,
+                  temperature: 10,
+                  weatherCode: 0,
+                ),
+              ],
+            ),
+          );
+
+          when(() => weatherBloc.state).thenReturn(successState);
+          when(
+            () => weatherBloc.stream,
+          ).thenAnswer((_) => const Stream<WeatherState>.empty());
+
+          await tester.pumpWidget(
+            MultiRepositoryProvider(
+              providers: <SingleChildWidget>[
+                RepositoryProvider<LocalDataSource>.value(
+                  value: mockLocalDataSource,
+                ),
+              ],
+              child: MultiBlocProvider(
+                providers: <SingleChildWidget>[
+                  BlocProvider<WeatherBloc>.value(value: weatherBloc),
+                  BlocProvider<SettingsBloc>.value(value: settingsBloc),
+                ],
+                child: prepareWidgetForTesting(
+                  LocalizedApp(
+                    localizationDelegate,
+                    MaterialApp(
+                      home: WeatherPageDefaultLayout(
+                        onSettingsPressed: () {},
+                        onRefresh: () async {},
+                        onSearchPressed: () {},
+                        onReportPressed: () {},
+                        isEmbedded: true,
+                        location: selectedLocation,
+                      ),
+                    ),
+                  ),
+                  localizationDelegate,
+                ),
+              ),
+            ),
+          );
+
+          await tester.pump();
+
+          expect(find.byType(DailyForecast), findsOneWidget);
+          expect(find.byType(DailyForecastShimmer), findsNothing);
+        },
+      );
 
       testWidgets('renders WeatherError for WeatherStatus.failure', (
         WidgetTester tester,

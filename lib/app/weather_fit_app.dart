@@ -18,6 +18,7 @@ import 'package:weather_fit/res/theme/cubit/theme_cubit.dart';
 import 'package:weather_fit/router/app_route.dart';
 import 'package:weather_fit/router/navigator.dart';
 import 'package:weather_fit/search/bloc/search_bloc.dart';
+import 'package:weather_fit/services/feedback_service.dart';
 import 'package:weather_fit/services/home_widget_service.dart';
 import 'package:weather_fit/services/home_widget_service_impl.dart';
 import 'package:weather_fit/services/update_service.dart';
@@ -55,6 +56,9 @@ class WeatherFitApp extends StatelessWidget {
         RepositoryProvider<HomeWidgetService>(
           create: (BuildContext _) => const HomeWidgetServiceImpl(),
         ),
+        RepositoryProvider<FeedbackService>(
+          create: (BuildContext _) => const FeedbackServiceImpl(),
+        ),
         RepositoryProvider<UpdateService>(
           create: (BuildContext _) => const UpdateServiceImpl(),
         ),
@@ -78,6 +82,7 @@ class WeatherFitApp extends StatelessWidget {
               return SettingsBloc(
                 localDataSource,
                 context.read<UpdateService>(),
+                context.read<FeedbackService>(),
               );
             },
           ),

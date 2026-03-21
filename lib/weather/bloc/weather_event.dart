@@ -31,8 +31,8 @@ final class ToggleUnits extends WeatherEvent {
   const ToggleUnits();
 }
 
-final class UpdateWeatherOnMobileHomeScreenEvent extends WeatherEvent {
-  const UpdateWeatherOnMobileHomeScreenEvent(this.origin);
+final class UpdateWeatherOnHomeWidgetEvent extends WeatherEvent {
+  const UpdateWeatherOnHomeWidgetEvent(this.origin);
 
   final WeatherFetchOrigin origin;
 
@@ -59,8 +59,8 @@ final class FetchDailyForecast extends WeatherEvent {
   List<Object> get props => <Object>[location];
 }
 
-final class CheckDateChangeOnResume extends WeatherEvent {
-  const CheckDateChangeOnResume(this.origin);
+final class CheckHourChangeOnResume extends WeatherEvent {
+  const CheckHourChangeOnResume(this.origin);
 
   final WeatherFetchOrigin origin;
 }

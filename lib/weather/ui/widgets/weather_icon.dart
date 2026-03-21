@@ -12,15 +12,9 @@ class WeatherIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double size = context.isExtraSmallScreen ? 32 : _iconSize;
-    return SizedBox(
-      height: size,
-      width: size,
-      child: Center(
-        child: Text(
-          condition.toEmoji,
-          style: TextStyle(fontSize: size, height: 1.0),
-        ),
-      ),
+    return Text(
+      condition.toEmoji,
+      style: TextStyle(fontSize: size, height: 1.0),
     );
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -5,6 +7,7 @@ import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
 import 'package:weather_fit/entities/enums/temperature_units.dart';
 import 'package:weather_fit/entities/models/temperature/temperature.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
+import 'package:weather_fit/res/enums/settings.dart';
 import 'package:weather_repository/weather_repository.dart';
 
 import 'constants/dummy_constants.dart' as dummy_constants;
@@ -262,6 +265,29 @@ void main() {
               'Failed for temperature ${entry.key}: expected ${entry.value}',
         );
       }
+    });
+  });
+
+  group('favorite locations', () {
+    test('matches favorite entries when coordinates only differ slightly', () {
+      const Location storedLocation = Location(
+        latitude: 50.4501,
+        longitude: 30.5234,
+        locale: 'uk',
+        name: 'Kyiv',
+      );
+      const Location queriedLocation = Location(
+        latitude: 50.45015,
+        longitude: 30.52345,
+        locale: 'uk',
+        name: 'Kyiv',
+      );
+
+      when(
+        () => mockSharedPreferences.getStringList(Settings.favourites.key),
+      ).thenReturn(<String>[jsonEncode(storedLocation.toJson())]);
+
+      expect(localDataSource.isFavouriteLocation(queriedLocation), isTrue);
     });
   });
 }

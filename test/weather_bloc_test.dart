@@ -25,12 +25,16 @@ void main() {
   late WeatherBloc weatherBloc;
   late WeatherRepository mockWeatherRepository;
   late OutfitRepository mockOutfitRepository;
+  late LocalDataSource localDataSource;
 
   setUpAll(() {
     SharedPreferences.setMockInitialValues(<String, Object>{});
     registerFallbackValue(Uri.parse('http://example.com'));
     registerFallbackValue(dummy_constants.dummyLocation);
     registerFallbackValue(Weather.empty);
+    registerFallbackValue(
+      const DailyForecastDomain(forecast: <ForecastItemDomain>[]),
+    );
   });
 
   setUp(() async {
@@ -52,7 +56,16 @@ void main() {
     ).thenAnswer((_) async => true);
 
     final SharedPreferences preferences = await SharedPreferences.getInstance();
-    final LocalDataSource localDataSource = LocalDataSource(preferences);
+    localDataSource = LocalDataSource(preferences);
+    when(
+      () => mockHomeWidgetService.updateHomeWidget(
+        localDataSource: localDataSource,
+        weather: any(named: 'weather'),
+        forecast: any(named: 'forecast'),
+        outfitRepository: mockOutfitRepository,
+      ),
+    ).thenAnswer((_) async {});
+
     weatherBloc = WeatherBloc(
       weatherRepository: mockWeatherRepository,
       outfitRepository: mockOutfitRepository,
@@ -102,7 +115,16 @@ void main() {
 
       final SharedPreferences preferences =
           await SharedPreferences.getInstance();
-      final LocalDataSource localDataSource = LocalDataSource(preferences);
+      localDataSource = LocalDataSource(preferences);
+      when(
+        () => mockHomeWidgetService.updateHomeWidget(
+          localDataSource: localDataSource,
+          weather: any(named: 'weather'),
+          forecast: any(named: 'forecast'),
+          outfitRepository: mockOutfitRepository,
+        ),
+      ).thenAnswer((_) async {});
+
       weatherBloc = WeatherBloc(
         weatherRepository: mockWeatherRepository,
         outfitRepository: mockOutfitRepository,
@@ -272,7 +294,7 @@ void main() {
 
         blocTest<WeatherBloc, WeatherState>(
           'emits updated units and temperature '
-          'when status is success (fahrenheit)',
+          'when status is success (Fahrenheit)',
           build: () => weatherBloc,
           seed: () {
             return WeatherSuccess(
@@ -316,6 +338,95 @@ void main() {
                   dummy_constants.dummyWeatherTemperature.toFahrenheit(),
                 ),
           ],
+        );
+      });
+
+      group('home widget update', () {
+        blocTest<WeatherBloc, WeatherState>(
+          'invokes HomeWidgetService when update event is dispatched and '
+          'forecast exists',
+          build: () => weatherBloc,
+          seed: () => WeatherSuccess(
+            locale: dummy_constants.dummyLocale,
+            weather: Weather(
+              location: dummy_constants.dummyLocation,
+              temperature: const Temperature(
+                value: dummy_constants.dummyWeatherTemperature,
+              ),
+              lastUpdatedDateTime: DateTime(2025),
+              condition: WeatherCondition.clear,
+              temperatureUnits: TemperatureUnits.celsius,
+              countryCode: dummy_constants.dummyCountryCode,
+              description: dummy_constants.dummyWeatherDescription,
+              code: dummy_constants.dummyWeatherCode,
+              locale: dummy_constants.dummyLocale,
+            ),
+            dailyForecast: const DailyForecastDomain(
+              forecast: <ForecastItemDomain>[
+                ForecastItemDomain(
+                  time: dummy_constants.dummyForecastTime,
+                  temperature: dummy_constants.dummyWeatherTemperature,
+                  weatherCode: dummy_constants.dummyWeatherCode,
+                ),
+              ],
+            ),
+            date: DateTime(2025),
+          ),
+          act: (WeatherBloc bloc) => bloc.add(
+            const UpdateWeatherOnHomeWidgetEvent(
+              WeatherFetchOrigin.defaultDevice,
+            ),
+          ),
+          expect: () => <WeatherState>[],
+          verify: (_) {
+            verify(
+              () => mockHomeWidgetService.updateHomeWidget(
+                localDataSource: localDataSource,
+                weather: any(named: 'weather'),
+                forecast: any(named: 'forecast'),
+                outfitRepository: mockOutfitRepository,
+              ),
+            ).called(1);
+          },
+        );
+
+        blocTest<WeatherBloc, WeatherState>(
+          'does not invoke HomeWidgetService when forecast is missing',
+          build: () => weatherBloc,
+          seed: () => WeatherInitial(
+            locale: dummy_constants.dummyLocale,
+            weather: Weather(
+              location: dummy_constants.dummyLocation,
+              temperature: const Temperature(
+                value: dummy_constants.dummyWeatherTemperature,
+              ),
+              lastUpdatedDateTime: DateTime(2025),
+              condition: WeatherCondition.clear,
+              temperatureUnits: TemperatureUnits.celsius,
+              countryCode: dummy_constants.dummyCountryCode,
+              description: dummy_constants.dummyWeatherDescription,
+              code: dummy_constants.dummyWeatherCode,
+              locale: dummy_constants.dummyLocale,
+            ),
+            dailyForecast: null,
+            date: DateTime(2025),
+          ),
+          act: (WeatherBloc bloc) => bloc.add(
+            const UpdateWeatherOnHomeWidgetEvent(
+              WeatherFetchOrigin.defaultDevice,
+            ),
+          ),
+          expect: () => <WeatherState>[],
+          verify: (_) {
+            verifyNever(
+              () => mockHomeWidgetService.updateHomeWidget(
+                localDataSource: localDataSource,
+                weather: any(named: 'weather'),
+                forecast: any(named: 'forecast'),
+                outfitRepository: mockOutfitRepository,
+              ),
+            );
+          },
         );
       });
     });

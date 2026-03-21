@@ -328,8 +328,7 @@ class LocalDataSource {
   Future<bool> saveFavouriteLocation(Location location) {
     final List<Location> favourites = getFavouriteLocations();
     final bool isAlreadyFavourite = favourites.any(
-      (Location l) =>
-          l.latitude == location.latitude && l.longitude == location.longitude,
+      (Location l) => l.isSamePlaceAs(location),
     );
     if (isAlreadyFavourite) return Future<bool>.value(true);
     favourites.add(location);
@@ -338,19 +337,13 @@ class LocalDataSource {
 
   Future<bool> removeFavouriteLocation(Location location) {
     final List<Location> favourites = getFavouriteLocations();
-    favourites.removeWhere(
-      (Location l) =>
-          l.latitude == location.latitude && l.longitude == location.longitude,
-    );
+    favourites.removeWhere((Location l) => l.isSamePlaceAs(location));
     return _saveFavouritesList(favourites);
   }
 
   bool isFavouriteLocation(Location location) {
     final List<Location> favourites = getFavouriteLocations();
-    return favourites.any(
-      (Location l) =>
-          l.latitude == location.latitude && l.longitude == location.longitude,
-    );
+    return favourites.any((Location l) => l.isSamePlaceAs(location));
   }
 
   Future<bool> _saveFavouritesList(List<Location> favourites) {
@@ -394,7 +387,7 @@ class LocalDataSource {
   Future<Directory> getAppDirectory() async {
     if (kIsWeb) {
       throw UnsupportedError('Directory access is not supported on Web.');
-    } else if (Platform.isIOS || Platform.isMacOS) {
+    } else if (Platform.isIOS) {
       try {
         final String? sharedPath = await _channel.invokeMethod<String>(
           'getSharedContainerPath',

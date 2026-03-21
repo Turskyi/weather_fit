@@ -36,7 +36,7 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
 
     WidgetsBinding.instance.addPostFrameCallback((Duration _) {
       if (mounted) {
-        context.read<WeatherBloc>().add(RefreshWeather(context.origin));
+        _fetchWeatherForCurrentPageLocation();
       }
     });
   }
@@ -83,7 +83,7 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
   }
 
   bool _isSameLocation(Location l1, Location l2) {
-    return l1.latitude == l2.latitude && l1.longitude == l2.longitude;
+    return l1.isSamePlaceAs(l2);
   }
 
   void _updateLocations({bool resetToFirst = false}) {
@@ -111,9 +111,9 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      // Check if the date has changed while the app was in the background.
-      // Only reload if we've transitioned to a new day.
-      context.read<WeatherBloc>().add(CheckDateChangeOnResume(context.origin));
+      // Check if the hour has changed while the app was in the background.
+      // Only reload if we've transitioned to a new hour.
+      context.read<WeatherBloc>().add(CheckHourChangeOnResume(context.origin));
     }
   }
 
@@ -284,9 +284,28 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
   Future<void> _refresh() {
     return Future<void>.delayed(Duration.zero, () {
       if (mounted) {
-        context.read<WeatherBloc>().add(RefreshWeather(context.origin));
+        _fetchWeatherForCurrentPageLocation();
       }
     });
+  }
+
+  void _fetchWeatherForCurrentPageLocation() {
+    if (_locations.isEmpty) {
+      context.read<WeatherBloc>().add(RefreshWeather(context.origin));
+      return;
+    }
+
+    final int safeIndex = _currentPageIndex.clamp(0, _locations.length - 1);
+    final Location currentLocation = _locations[safeIndex];
+
+    if (currentLocation.isNotEmpty) {
+      context.read<LocalDataSource>().saveLocation(currentLocation);
+      context.read<WeatherBloc>().add(
+        FetchWeather(location: currentLocation, origin: context.origin),
+      );
+    } else {
+      context.read<WeatherBloc>().add(RefreshWeather(context.origin));
+    }
   }
 
   void _weatherBlocStateListener(BuildContext context, WeatherState state) {

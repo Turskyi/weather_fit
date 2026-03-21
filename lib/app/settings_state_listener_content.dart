@@ -166,17 +166,35 @@ class _SettingsStateListenerContentState
         },
       );
     } else {
-      // TODO: not sure what to do here.
+      debugPrint(
+        'WARNING: navigatorKey.currentContext is null. '
+        'Falling back to a temporary sending message.',
+      );
+      _showTemporaryMessage(translate('feedback.sending_short'));
     }
   }
 
-  /// Captures a screenshot of the widget wrapped with
-  /// `_watchFeedbackScreenshotKey`.
-  Future<Uint8List> _captureWidgetScreenshot() async {
-    // FIXME: There is an issue with screenshot
-    //  https://github.com/flutter/flutter/issues/22308.
-    // Even though there is a workaround we still cannot send this screenshot
-    // via resend, so I will return empty Uint8List for now.
+  /// Returns an empty [Uint8List] as a screenshot placeholder for the
+  /// automatic feedback path (extra-small / smart-watch screens).
+  ///
+  /// **Why an empty array is the correct return value:**
+  ///
+  /// This method is only called from [_sendFeedbackImmediately], which submits
+  /// feedback via Resend. Resend does not support file attachments, so a real
+  /// screenshot could never be included in the outgoing email regardless of
+  /// what this method returns.
+  ///
+  /// For reference, the manual [BetterFeedback] flow on Android and iOS *does*
+  /// attach a screenshot — `BetterFeedback` captures it internally and
+  /// `FlutterEmailSender` writes the bytes to a temp file and attaches it.
+  /// On Web and macOS the manual path also discards screenshots because
+  /// `mailto:` URIs cannot carry attachments.
+  ///
+  /// Additionally, the Flutter rendering limitation described in
+  /// https://github.com/flutter/flutter/issues/22308 would make reliable
+  /// off-screen capture difficult on some platforms, but the Resend constraint
+  /// alone makes implementing actual capture unnecessary.
+  Future<Uint8List> _captureWidgetScreenshot() {
     return Future<Uint8List>.value(Uint8List(0));
   }
 

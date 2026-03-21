@@ -3,8 +3,10 @@ const String iOSWidgetName = 'WeatherWidgets';
 const String androidWidgetName = 'WeatherWidget';
 const String developerDomain = 'turskyi.com';
 const String developerUrl = 'https://$developerDomain';
-const String domain = 'weather-fit.com';
-const String supportEmail = 'support@$domain';
+const String kDomain = 'weather-fit.com';
+
+const String kResendEmailDomain = kDomain;
+const String supportEmail = 'support@$kDomain';
 const String imagePath = 'assets/images/';
 const String outfitImagePath = '${imagePath}outfits/';
 const String kAppName = 'WeatherFit';
@@ -33,15 +35,12 @@ const String ratingProperty = 'rating';
 const String screenSizeProperty = 'screenSize';
 const String searchError = 'searchError';
 
-// Expires Mar 13, 2026.
-const String resendEmailDomain = 'kima.website';
-
 /// Blur intensity constant.
 const double blurSigma = 8;
 
 const String doNotReplySenderName = 'Do Not Reply';
 const String feedbackEmailSender =
-    '$doNotReplySenderName $kAppName <no-reply@$resendEmailDomain>';
+    '$doNotReplySenderName $kAppName <no-reply@$kResendEmailDomain>';
 const String feedbackScreenshotFileName = 'feedback.png';
 
 const String remoteOutfitBaseUrl =
