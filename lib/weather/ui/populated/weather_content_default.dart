@@ -198,11 +198,8 @@ class WeatherContentDefault extends StatelessWidget {
                         const SizedBox(height: 24),
                         BlocBuilder<WeatherBloc, WeatherState>(
                           builder: (BuildContext _, WeatherState state) {
-                            final bool isLocationMatch =
-                                weather.location.latitude ==
-                                    state.location.latitude &&
-                                weather.location.longitude ==
-                                    state.location.longitude;
+                            final bool isLocationMatch = weather.location
+                                .isSamePlaceAs(state.location);
                             if (isLocationMatch && state.forecast.isNotEmpty) {
                               return const DailyForecast();
                             } else {
@@ -250,11 +247,8 @@ class WeatherContentDefault extends StatelessWidget {
 
                   BlocBuilder<WeatherBloc, WeatherState>(
                     builder: (BuildContext _, WeatherState state) {
-                      final bool isLocationMatch =
-                          weather.location.latitude ==
-                              state.location.latitude &&
-                          weather.location.longitude ==
-                              state.location.longitude;
+                      final bool isLocationMatch = weather.location
+                          .isSamePlaceAs(state.location);
                       if (isLocationMatch && state.forecast.isNotEmpty) {
                         return const DailyForecast();
                       } else {

@@ -56,6 +56,8 @@ class Location extends Equatable {
   final String province;
   final String locale;
 
+  static const double _coordinateTolerance = 0.0001;
+
   Map<String, Object?> toJson() {
     return <String, Object?>{
       'id': id,
@@ -130,6 +132,18 @@ class Location extends Equatable {
         ? '${latLabels[lang]}: ${latitude.toStringAsFixed(2)}, '
               '${lonLabels[lang]}: ${longitude.toStringAsFixed(2)}'
         : name;
+  }
+
+  bool isSamePlaceAs(
+    Location other, {
+    double tolerance = _coordinateTolerance,
+  }) {
+    if (isEmpty || other.isEmpty) {
+      return isEmpty && other.isEmpty;
+    }
+
+    return (latitude - other.latitude).abs() <= tolerance &&
+        (longitude - other.longitude).abs() <= tolerance;
   }
 
   @override

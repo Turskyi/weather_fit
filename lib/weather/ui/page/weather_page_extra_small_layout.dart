@@ -61,8 +61,7 @@ class WeatherPageExtraSmallLayout extends StatelessWidget {
 
         if (location != null &&
             location!.isNotEmpty &&
-            (state.location.latitude != location!.latitude ||
-                state.location.longitude != location!.longitude)) {
+            !state.location.isSamePlaceAs(location!)) {
           return WeatherPopulated(
             weather: Weather.empty.copyWith(location: location),
             onRefresh: onRefresh,
