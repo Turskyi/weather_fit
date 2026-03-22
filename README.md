@@ -132,25 +132,34 @@ This project uses two Android flavors:
 - `phone` — default mobile build.
 - `wear` — Wear OS targeted build.
 
-### Debug run configuration (important)
+### Debug run configuration
 
-After introducing Android flavors, run/debug must use a flavor-specific
-configuration. If you run without flavor, Android Studio may launch a generic
-`debug` variant and your latest flavor-specific code changes can appear missing.
+The build is configured to make debugging seamless:
 
-Android Studio:
-
-- Create separate Flutter run configurations for `phone` and `wear`.
-- Set **Build flavor** to `phone` or `wear` (only the flavor name, without
-  `--flavor`).
-- Keep Dart entry-point as `lib/main.dart`.
+- **Default "main" run configuration works**: The build system is configured to
+  only build the `phone` flavor for debug builds. This means you can run the
+  standard debug configuration in Android Studio or use `flutter run` without
+  specifying a flavor. No setup required!
+- **For Wear OS testing**: Explicitly specify the `wear` flavor.
 
 CLI examples:
 
 ```bash
-flutter run --flavor phone -t lib/main.dart
-flutter run --flavor wear -t lib/main.dart
+# Test phone (default, no flavor needed for debug builds)
+flutter run
+
+# Or explicitly specify phone
+flutter run --flavor phone
+
+# Test Wear OS (use --flavor wear for release builds too)
+flutter build appbundle --release --flavor wear -t lib/main.dart
 ```
+
+Android Studio:
+
+- **Phone debugging**: Just press Debug with the default "main" configuration.
+- **Wear OS debugging**: Create a new Flutter run configuration and set
+  **Build flavor** to `wear`.
 
 Manifest overlays:
 
