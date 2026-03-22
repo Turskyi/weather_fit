@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:http/http.dart' as http;
 import 'package:hydrated_bloc/hydrated_bloc.dart';
@@ -15,6 +16,7 @@ import 'package:weather_fit/entities/enums/weather_fetch_origin.dart';
 import 'package:weather_fit/entities/models/outfit/outfit_image.dart';
 import 'package:weather_fit/entities/models/temperature/temperature.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
+import 'package:weather_fit/extensions/build_context_extensions.dart';
 import 'package:weather_fit/extensions/date_time_extension.dart';
 import 'package:weather_fit/res/extensions/double_extension.dart';
 import 'package:weather_fit/services/home_widget_service.dart';
@@ -61,7 +63,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
   final HomeWidgetService _homeWidgetService;
 
   void _scheduleInitialHomeWidgetSync() {
-    if (kIsWeb) {
+    if (kIsWeb || isWearDevice) {
       return;
     }
 
@@ -597,12 +599,16 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
   ) async {
     final DailyForecastDomain? dailyForecast = state.dailyForecast;
     if (dailyForecast != null) {
-      await _homeWidgetService.updateHomeWidget(
-        localDataSource: _localDataSource,
-        weather: state.weather,
-        forecast: dailyForecast,
-        outfitRepository: _outfitRepository,
-      );
+      try {
+        await _homeWidgetService.updateHomeWidget(
+          localDataSource: _localDataSource,
+          weather: state.weather,
+          forecast: dailyForecast,
+          outfitRepository: _outfitRepository,
+        );
+      } on PlatformException catch (e) {
+        debugPrint('Home widget update skipped: $e');
+      }
     }
   }
 

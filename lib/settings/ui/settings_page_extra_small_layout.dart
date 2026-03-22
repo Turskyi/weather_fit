@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
@@ -44,8 +43,10 @@ class SettingsPageExtraSmallLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
-      backgroundColor: Colors.transparent,
+      backgroundColor: Colors.black,
       appBar: AppBar(
+        backgroundColor: Colors.black,
+        surfaceTintColor: Colors.transparent,
         title: const Padding(
           padding: EdgeInsets.only(top: 8.0, bottom: 8.0),
           child: LeadingWidget(),
@@ -105,28 +106,6 @@ class SettingsPageExtraSmallLayout extends StatelessWidget {
                 );
               },
             ),
-            if (!kIsWeb &&
-                (defaultTargetPlatform == TargetPlatform.android)) ...<Widget>[
-              const SizedBox(height: 16),
-              Card(
-                elevation: 2.0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-                child: ListTile(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  title: Text(
-                    translate('settings.pin_widget'),
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  subtitle: Text(translate('settings.pin_widget_subtitle')),
-                  trailing: const Icon(Icons.push_pin_outlined),
-                  onTap: onPinWidgetTap,
-                ),
-              ),
-            ],
           ],
         ),
       ),

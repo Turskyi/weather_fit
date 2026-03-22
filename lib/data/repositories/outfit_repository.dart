@@ -7,6 +7,7 @@ import 'package:weather_fit/entities/enums/outfit_image_source.dart';
 import 'package:weather_fit/entities/enums/temperature_units.dart';
 import 'package:weather_fit/entities/models/outfit/outfit_image.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
+import 'package:weather_fit/extensions/build_context_extensions.dart';
 import 'package:weather_fit/res/constants/constants.dart' as constants;
 import 'package:weather_fit/res/extensions/double_extension.dart';
 import 'package:weather_repository/weather_repository.dart';
@@ -36,9 +37,9 @@ class OutfitRepository {
             .toList(),
         source: OutfitImageSource.network,
       );
-    } else if (roundedTemp % 10 == 0) {
-      // 1. If the temperature ends with 0, return the asset image paths
-      // immediately.
+    } else if (isWearDevice || roundedTemp % 10 == 0) {
+      // On Wear OS, network fetch is unreliable; always use bundled assets.
+      // Also use assets when the temperature ends with 0.
       return OutfitImage(
         paths: getOutfitImageAssetPaths(weather),
         source: OutfitImageSource.asset,

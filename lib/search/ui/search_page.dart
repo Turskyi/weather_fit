@@ -458,7 +458,7 @@ class _SearchPageState extends State<SearchPage> {
         await launchUrl(url);
       }
     } else {
-      permission_handler.openAppSettings();
+      await _openDeviceLocationSettings();
     }
     if (mounted) {
       return ScaffoldMessenger.of(context).hideCurrentSnackBar();
@@ -511,6 +511,71 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   Future<void> _handleLocationServiceDisabledError(SearchError state) {
+    if (context.isExtraSmallScreen) {
+      return showDialog<void>(
+        context: context,
+        builder: (BuildContext dialogContext) {
+          return Dialog.fullscreen(
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 20, 16, 12),
+                child: Column(
+                  children: <Widget>[
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            Text(
+                              translate(
+                                'error.location_services_disabled_title',
+                              ),
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.titleSmall,
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              translate(
+                                'error.location_services_disabled_content',
+                              ),
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              translate('error.gps_unavailable_watch'),
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        autofocus: true,
+                        onPressed: _handleOpenLocationSettingsAndPop,
+                        child: Text(translate('settings.title')),
+                      ),
+                    ),
+                    SizedBox(
+                      width: double.infinity,
+                      child: TextButton(
+                        onPressed: Navigator.of(dialogContext).pop,
+                        child: Text(translate('cancel')),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      );
+    }
+
     return showDialog<void>(
       context: context,
       builder: (BuildContext dialogContext) {
@@ -533,9 +598,18 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  Future<void> _handleOpenLocationSettingsAndPop() {
+  Future<void> _handleOpenLocationSettingsAndPop() async {
     Navigator.of(context).pop();
-    return geolocator.Geolocator.openLocationSettings();
+    await _openDeviceLocationSettings();
+  }
+
+  Future<void> _openDeviceLocationSettings() async {
+    final bool openedByGeolocator =
+        await geolocator.Geolocator.openLocationSettings();
+
+    if (!openedByGeolocator) {
+      await permission_handler.openAppSettings();
+    }
   }
 
   void _popAndSearch() {

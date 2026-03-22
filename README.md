@@ -67,32 +67,32 @@ follow these steps:
 - Fork this repository and clone it to your local machine.
 - Create a new branch for your feature or bug-fix.
 - Set up the necessary configuration and secret files (these are not versioned):
-    - Create a `.env` file in the root directory:
-      ```env
-      RESEND_API_KEY="re_123abc"
-      ```
-      (Get a free token from [resend.com](https://resend.com))
-    - Create `android/key.properties` with the following content:
-      ```properties
-      # dev debug environment variables
-      SIGNING_KEY_DEBUG_PATH=../keystore/weather_fit_debug.keystore
-      SIGNING_KEY_DEBUG_PASSWORD=...
-      SIGNING_KEY_DEBUG_KEY=weather_fit_debug
-      SIGNING_KEY_DEBUG_KEY_PASSWORD=...
-      # production release environment variables
-      SIGNING_KEY_RELEASE_PATH=../keystore/weather_fit_release.keystore
-      SIGNING_KEY_RELEASE_PASSWORD=...
-      SIGNING_KEY_RELEASE_KEY=weather_fit_release
-      SIGNING_KEY_RELEASE_KEY_PASSWORD=...
-      # suppress inspection "UnusedProperty"
-      FIREBASE_ANDROID_APP_ID=1:...
-      # suppress inspection "UnusedProperty"
-      FIREBASE_TOKEN=1//...
-      ```
-    - Place the following files in their respective locations:
-        - `android/keystore/weather_fit_debug.keystore`
-        - `android/keystore/weather_fit_release.keystore`
-        - `android/app/google-services.json`
+  - Create a `.env` file in the root directory:
+    ```env
+    RESEND_API_KEY="re_123abc"
+    ```
+    (Get a free token from [resend.com](https://resend.com))
+  - Create `android/key.properties` with the following content:
+    ```properties
+    # dev debug environment variables
+    SIGNING_KEY_DEBUG_PATH=../keystore/weather_fit_debug.keystore
+    SIGNING_KEY_DEBUG_PASSWORD=...
+    SIGNING_KEY_DEBUG_KEY=weather_fit_debug
+    SIGNING_KEY_DEBUG_KEY_PASSWORD=...
+    # production release environment variables
+    SIGNING_KEY_RELEASE_PATH=../keystore/weather_fit_release.keystore
+    SIGNING_KEY_RELEASE_PASSWORD=...
+    SIGNING_KEY_RELEASE_KEY=weather_fit_release
+    SIGNING_KEY_RELEASE_KEY_PASSWORD=...
+    # suppress inspection "UnusedProperty"
+    FIREBASE_ANDROID_APP_ID=1:...
+    # suppress inspection "UnusedProperty"
+    FIREBASE_TOKEN=1//...
+    ```
+  - Place the following files in their respective locations:
+    - `android/keystore/weather_fit_debug.keystore`
+    - `android/keystore/weather_fit_release.keystore`
+    - `android/app/google-services.json`
 - Generate the necessary files by running:
   ```bash
   dart run build_runner build --delete-conflicting-outputs
@@ -113,8 +113,8 @@ features, or give feedback.
 To install **WeatherFit**, you need to have Flutter SDK and Android Studio
 installed on your machine. You can follow
 [the official documentation](https://docs.flutter.dev/get-started/install) to
-set up your development environment. To run a **WeatherFit** on your device or 
-emulator, you need to clone this repository and open it in Android Studio. 
+set up your development environment. To run a **WeatherFit** on your device or
+emulator, you need to clone this repository and open it in Android Studio.
 Then, you can use the run button or the command line to launch the app.
 For more information, see the Flutter documentation.
 
@@ -124,6 +124,102 @@ For more information, see the Flutter documentation.
 dart run build_runner clean
 dart run build_runner build --delete-conflicting-outputs
 ```
+
+## Android flavors (phone and Wear OS)
+
+This project uses two Android flavors:
+
+- `phone` — default mobile build.
+- `wear` — Wear OS targeted build.
+
+### Debug run configuration (important)
+
+After introducing Android flavors, run/debug must use a flavor-specific
+configuration. If you run without flavor, Android Studio may launch a generic
+`debug` variant and your latest flavor-specific code changes can appear missing.
+
+Android Studio:
+
+- Create separate Flutter run configurations for `phone` and `wear`.
+- Set **Build flavor** to `phone` or `wear` (only the flavor name, without
+  `--flavor`).
+- Keep Dart entry-point as `lib/main.dart`.
+
+CLI examples:
+
+```bash
+flutter run --flavor phone -t lib/main.dart
+flutter run --flavor wear -t lib/main.dart
+```
+
+Manifest overlays:
+
+- `android/app/src/main/AndroidManifest.xml` (shared)
+- `android/app/src/phone/AndroidManifest.xml` (phone-only additions)
+- `android/app/src/wear/AndroidManifest.xml` (Wear-only additions, including
+  `android.hardware.type.watch`)
+
+### Build phone release
+
+```bash
+flutter build appbundle --release --flavor phone -t lib/main.dart
+```
+
+Output:
+
+- `build/app/outputs/bundle/phoneRelease/app-phone-release.aab`
+
+### Build Wear OS release
+
+```bash
+flutter build appbundle --release --flavor wear -t lib/main.dart
+```
+
+Output:
+
+- `build/app/outputs/bundle/wearRelease/app-wear-release.aab`
+
+## Upload Wear build to Play Console
+
+1. Open your app in Google Play Console.
+2. Go to **Test & release** → choose a track (Internal/Closed/Production).
+3. In the release page header, switch the form-factor dropdown from
+   **Phones** to **Wear OS**.
+
+- This dropdown is easy to miss.
+- Example track URL where this switch appears:
+  `https://play.google.com/console/u/0/developers/8790223297246728168/app/4975841565581446594/tracks/4697313077494146074?tab=releases`
+
+4. Create a new release and upload
+   `build/app/outputs/bundle/wearRelease/app-wear-release.aab`.
+5. Verify the release is recognized as **Wear OS** in App Bundle Explorer
+   (supported form factors/devices).
+6. Save, review, and roll out.
+
+Tip: keep phone and wear releases as separate flavor artifacts. Do not manually
+toggle manifest lines before each build.
+
+### Release order and versioning rule
+
+Google Play requires unique Android `versionCode` values across phone and Wear
+artifacts (same package name).
+
+Recommended workflow for this project:
+
+1. Build and publish the **Wear OS** flavor manually from a release branch:
+
+```bash
+flutter build appbundle --release --flavor wear -t lib/main.dart
+```
+
+2. After the Wear OS release is published in Play Console, increment app
+   version (`version:` in `pubspec.yaml`) to produce the next Android
+   `versionCode`.
+3. Merge/push to `master` so CI/CD builds and publishes the **phone** flavor
+   with the incremented version number.
+
+This prevents Play Console conflicts where one form factor blocks publishing
+for the other because of duplicate `versionCode`.
 
 ## Test Coverage
 

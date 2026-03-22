@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:in_app_update/in_app_update.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:weather_fit/extensions/build_context_extensions.dart';
 import 'package:weather_fit/res/constants/constants.dart' as constants;
 import 'package:weather_fit/res/extensions/http_response_extension.dart';
 
@@ -30,6 +31,8 @@ class UpdateServiceImpl implements UpdateService {
   }
 
   Future<void> _checkAndroidUpdate() async {
+    // Play Core in-app updates are not available on Wear OS.
+    if (isWearDevice) return;
     try {
       final AppUpdateInfo info = await InAppUpdate.checkForUpdate();
       if (info.updateAvailability == UpdateAvailability.updateAvailable) {

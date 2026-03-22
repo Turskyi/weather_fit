@@ -53,6 +53,16 @@ android {
         }
     }
 
+    flavorDimensions += "device"
+    productFlavors {
+        phone {
+            dimension "device"
+        }
+        wear {
+            dimension "device"
+        }
+    }
+
     signingConfigs {
         production {
             // FCI_BUILD_ID is exported by Codemagic.

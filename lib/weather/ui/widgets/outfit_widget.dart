@@ -143,7 +143,7 @@ class OutfitWidget extends StatelessWidget {
 
   Size _getOutfitImageSize(BuildContext context) {
     if (context.isExtraSmallScreen) {
-      return const Size(180, 236);
+      return const Size(148, 194);
     } else if (context.isNarrowScreen) {
       return const Size(400, 520);
     } else {

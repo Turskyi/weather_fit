@@ -1,8 +1,11 @@
 name: Upload Android build to App Tester.
 
+env:
+  ANDROID_FLAVOR: phone
+
 on:
   workflow_run:
-    workflows: [ "Code Quality and Tests" ]
+    workflows: ['Code Quality and Tests']
     types:
       - completed
 
@@ -72,17 +75,17 @@ jobs:
           dart run build_runner build --delete-conflicting-outputs
         shell: bash
 
-      - run: flutter build apk --release
+      - run: flutter build apk --release --flavor $ANDROID_FLAVOR
 
       - name: Upload APK
         uses: actions/upload-artifact@master
         with:
           name: apk-build
-          path: build/app/outputs/apk/release
+          path: build/app/outputs/flutter-apk/app-${{ env.ANDROID_FLAVOR }}-release.apk
 
   beta_apk:
     name: Upload Android Beta version to Firebase App Distribution
-    needs: [ build_apk ]
+    needs: [build_apk]
     runs-on: ubuntu-latest
 
     steps:
@@ -105,5 +108,5 @@ jobs:
         with:
           appId: ${{secrets.FIREBASE_ANDROID_APP_ID}}
           groups: testers
-          file: app-release.apk
+          file: app-${{ env.ANDROID_FLAVOR }}-release.apk
           serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_WEATHER_FIT_AI }}

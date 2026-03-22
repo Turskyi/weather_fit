@@ -1,4 +1,5 @@
 import 'package:bloc_test/bloc_test.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -167,6 +168,61 @@ void main() {
     });
 
     group('fetchWeather', () {
+      group('updateWeatherOnHomeWidget', () {
+        blocTest<WeatherBloc, WeatherState>(
+          'does not emit errors when home widget update throws '
+          'PlatformException',
+          build: () => weatherBloc,
+          setUp: () {
+            when(
+              () => mockHomeWidgetService.updateHomeWidget(
+                localDataSource: localDataSource,
+                weather: any(named: 'weather'),
+                forecast: any(named: 'forecast'),
+                outfitRepository: mockOutfitRepository,
+              ),
+            ).thenThrow(
+              PlatformException(
+                code: 'error',
+                message: 'Widget API not available',
+              ),
+            );
+          },
+          seed: () => WeatherSuccess(
+            locale: dummy_constants.dummyLocale,
+            weather: Weather.empty,
+            dailyForecast: const DailyForecastDomain(
+              forecast: <ForecastItemDomain>[
+                ForecastItemDomain(
+                  time: '2030-01-01T13:00:00',
+                  temperature: 20,
+                  weatherCode: 1,
+                ),
+              ],
+            ),
+            date: DateTime(2025),
+          ),
+          act: (WeatherBloc bloc) {
+            bloc.add(
+              const UpdateWeatherOnHomeWidgetEvent(
+                WeatherFetchOrigin.defaultDevice,
+              ),
+            );
+          },
+          expect: () => <WeatherState>[],
+          verify: (_) {
+            verify(
+              () => mockHomeWidgetService.updateHomeWidget(
+                localDataSource: localDataSource,
+                weather: any(named: 'weather'),
+                forecast: any(named: 'forecast'),
+                outfitRepository: mockOutfitRepository,
+              ),
+            ).called(1);
+          },
+        );
+      });
+
       group('refreshWeather', () {
         blocTest<WeatherBloc, WeatherState>(
           'emits initial when status is not success',
