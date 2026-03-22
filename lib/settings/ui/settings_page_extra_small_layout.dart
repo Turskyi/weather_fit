@@ -135,19 +135,22 @@ class _SettingSegmentedToggle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    const Color watchForegroundColor = Color(0xFFF2F2F2);
 
     return Column(
       children: <Widget>[
         Text(
           label,
-          style: Theme.of(context).textTheme.bodyMedium,
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: watchForegroundColor),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 4),
         Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
-            color: colorScheme.surfaceContainerHighest,
+            color: Colors.white12,
           ),
           padding: const EdgeInsets.all(4),
           child: Row(
@@ -170,7 +173,7 @@ class _SettingSegmentedToggle extends StatelessWidget {
                       style: TextStyle(
                         color: isSelected
                             ? colorScheme.onPrimary
-                            : colorScheme.onSurface,
+                            : watchForegroundColor,
                         fontWeight: FontWeight.bold,
                       ),
                     ),

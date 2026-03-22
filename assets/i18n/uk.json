@@ -157,6 +157,7 @@
   "search": {
     "label": "Пошук",
     "city_or_country": "Місто або країна",
+    "enter_location": "Введіть локацію",
     "enter_city_or_country": "Введіть місто або країну",
     "page_semantics_label": "Сторінка пошуку міста або країни",
     "page_app_bar_title": "Пошук міста або країни",

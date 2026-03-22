@@ -122,6 +122,7 @@ const Map<String, Object?> _enTestTranslations = <String, Object?>{
   },
   'search': <String, String>{
     'city_or_country': 'City or country',
+    'enter_location': 'Enter location',
     'enter_city_or_country': 'Enter city or country',
     'page_semantics_label': 'City or country search page',
     'page_app_bar_title': 'City or country search',

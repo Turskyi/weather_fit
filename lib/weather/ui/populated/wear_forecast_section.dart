@@ -10,12 +10,13 @@ import 'package:weather_repository/weather_repository.dart';
 class WearForecastSection extends StatelessWidget {
   const WearForecastSection({super.key});
 
+  static const Color _watchForecastForeground = Color(0xFFF2F2F2);
+  static const Color _watchForecastCardBackground = Colors.black;
+
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    final Color watchForegroundColor = _resolveWatchForeground(
-      theme.colorScheme,
-    );
+    const Color watchForegroundColor = _watchForecastForeground;
 
     return BlocBuilder<WeatherBloc, WeatherState>(
       builder: (BuildContext context, WeatherState state) {
@@ -27,7 +28,7 @@ class WearForecastSection extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: theme.colorScheme.surface.withValues(alpha: 0.92),
+            color: _watchForecastCardBackground,
             borderRadius: BorderRadius.circular(18),
           ),
           child: Column(
@@ -52,10 +53,7 @@ class WearForecastSection extends StatelessWidget {
                     isCelsius: state.isCelsius,
                   ),
                   if (index < forecast.length - 1)
-                    Divider(
-                      height: 12,
-                      color: theme.colorScheme.outlineVariant,
-                    ),
+                    const Divider(height: 12, color: Colors.white24),
                 ],
             ],
           ),
@@ -100,9 +98,8 @@ class _WearForecastRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    final Color watchForegroundColor = _resolveWatchForeground(
-      theme.colorScheme,
-    );
+    const Color watchForegroundColor =
+        WearForecastSection._watchForecastForeground;
     final DateTime itemDate = DateTime.parse(item.time);
     final double displayTemperature = isCelsius
         ? item.temperature
@@ -178,19 +175,4 @@ class _WearForecastRow extends StatelessWidget {
     }
     return translate('weather.time_of_day.evening');
   }
-}
-
-Color _resolveWatchForeground(ColorScheme colorScheme) {
-  final List<Color> candidates = <Color>[
-    colorScheme.onSurface,
-    colorScheme.onInverseSurface,
-    colorScheme.inverseSurface,
-    colorScheme.onPrimary,
-  ];
-
-  return candidates.reduce((Color current, Color next) {
-    return next.computeLuminance() > current.computeLuminance()
-        ? next
-        : current;
-  });
 }

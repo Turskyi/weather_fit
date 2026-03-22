@@ -88,9 +88,7 @@ class SearchPageExtraSmallLayout extends StatelessWidget {
                                 fillColor: Theme.of(
                                   context,
                                 ).colorScheme.surface.withValues(alpha: 0.92),
-                                hintText: translate(
-                                  'search.enter_city_or_country',
-                                ),
+                                hintText: translate('search.enter_location'),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(18),
                                 ),

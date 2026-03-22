@@ -156,6 +156,7 @@
   "search": {
     "label": "Szukaj",
     "city_or_country": "Miasto lub kraj",
+    "enter_location": "Wpisz lokalizację",
     "enter_city_or_country": "Wpisz miasto lub kraj",
     "page_semantics_label": "Strona wyszukiwania miasta lub kraju",
     "page_app_bar_title": "Wyszukiwanie miasta lub kraju",
