@@ -41,9 +41,9 @@ class WeatherContentExtraSmall extends StatelessWidget {
       colorScheme.onPrimary,
     ];
     final Color watchForegroundColor = watchTextCandidates.reduce((
-        Color current,
-        Color next,
-        ) {
+      Color current,
+      Color next,
+    ) {
       return next.computeLuminance() > current.computeLuminance()
           ? next
           : current;
