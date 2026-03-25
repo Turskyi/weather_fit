@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:intl/intl.dart';
+import 'package:weather_fit/extensions/build_context_extensions.dart';
 import 'package:weather_fit/res/extensions/double_extension.dart';
 import 'package:weather_fit/res/extensions/weather_code_extension.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
@@ -10,13 +11,12 @@ import 'package:weather_repository/weather_repository.dart';
 class WearForecastSection extends StatelessWidget {
   const WearForecastSection({super.key});
 
-  static const Color _watchForecastForeground = Color(0xFFF2F2F2);
   static const Color _watchForecastCardBackground = Colors.black;
 
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    const Color watchForegroundColor = _watchForecastForeground;
+    final Color watchForegroundColor = context.watchForegroundColor;
 
     return BlocBuilder<WeatherBloc, WeatherState>(
       builder: (BuildContext context, WeatherState state) {
@@ -98,8 +98,7 @@ class _WearForecastRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    const Color watchForegroundColor =
-        WearForecastSection._watchForecastForeground;
+    final Color watchForegroundColor = context.watchForegroundColor;
     final DateTime itemDate = DateTime.parse(item.time);
     final double displayTemperature = isCelsius
         ? item.temperature

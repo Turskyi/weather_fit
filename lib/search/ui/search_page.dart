@@ -33,9 +33,7 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery.sizeOf(context).width;
-    // 192.0 is the size of Kate's Pixel Watch 2.
-    final bool isExtraSmallScreen = screenWidth <= 200.0;
+    final bool isExtraSmallScreen = context.isExtraSmallScreen;
     return Semantics(
       label: translate('search.page_semantics_label'),
       child: isExtraSmallScreen
@@ -331,7 +329,9 @@ class _SearchPageState extends State<SearchPage> {
               (BuildContext context, Animation<double> _, Animation<double> _) {
                 return Center(
                   child: Container(
-                    constraints: const BoxConstraints(maxWidth: 200),
+                    constraints: const BoxConstraints(
+                      maxWidth: constants.kWearCompactLayoutSize,
+                    ),
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       color: Theme.of(context).colorScheme.surface,

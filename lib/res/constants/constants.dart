@@ -50,6 +50,11 @@ const String remoteOutfitBaseUrl =
 /// Web/Desktop.
 const double kWideLayoutBreakpoint = 1000.0;
 
+/// Shared logical-pixel size threshold for Wear compact layouts.
+/// XL Watch emulator shortest side is 240dp, so Wear-specific layouts should
+/// still activate at this size.
+const double kWearCompactLayoutSize = 240.0;
+
 const String kMacOSLocationServicesSettingsUrl =
     'x-apple.systempreferences:com.apple.preference.security?'
     'Privacy_LocationServices';

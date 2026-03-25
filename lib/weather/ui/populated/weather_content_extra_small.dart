@@ -33,21 +33,7 @@ class WeatherContentExtraSmall extends StatelessWidget {
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final TextTheme textTheme = theme.textTheme;
-    final ColorScheme colorScheme = theme.colorScheme;
-    final List<Color> watchTextCandidates = <Color>[
-      colorScheme.onSurface,
-      colorScheme.onInverseSurface,
-      colorScheme.inverseSurface,
-      colorScheme.onPrimary,
-    ];
-    final Color watchForegroundColor = watchTextCandidates.reduce((
-      Color current,
-      Color next,
-    ) {
-      return next.computeLuminance() > current.computeLuminance()
-          ? next
-          : current;
-    });
+    final Color watchForegroundColor = context.watchForegroundColor;
     final TextStyle? cityTextStyle = textTheme.bodySmall?.copyWith(
       color: watchForegroundColor,
     );

@@ -8,6 +8,7 @@ import 'package:weather_fit/di/dependencies.dart';
 import 'package:weather_fit/di/injector.dart' as di;
 import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/router/routes.dart' as router;
+import 'package:weather_fit/services/device_type_service.dart';
 import 'package:weather_repository/weather_repository.dart';
 
 /// The [main] is the ultimate detail — the lowest-level policy.
@@ -25,6 +26,8 @@ void main() async {
   // We need to call `WidgetsFlutterBinding.ensureInitialized` before any
   // `await` operation, otherwise app may stuck on black/white screen.
   WidgetsFlutterBinding.ensureInitialized();
+
+  await initializeDeviceType();
 
   final Dependencies dependencies = await di.injectDependencies();
 
