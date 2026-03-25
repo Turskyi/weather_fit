@@ -10,8 +10,12 @@ const String supportEmail = 'support@$kDomain';
 const String imagePath = 'assets/images/';
 const String outfitImagePath = '${imagePath}outfits/';
 const String kAppName = 'WeatherFit';
+const String kAndroidPackageName = 'com.turskyi.weather_fit';
+const String kDeviceMethodChannel = '$kAndroidPackageName/device';
+const String kSharedContainerMethodChannel =
+    '$kAndroidPackageName/shared_container';
 const String kGooglePlayUrl =
-    'https://play.google.com/store/apps/details?id=com.turskyi.weather_fit';
+    'https://play.google.com/store/apps/details?id=$kAndroidPackageName';
 const String kAppStoreUrl =
     'https://apps.apple.com/ca/app/weatherfit/id6743688355';
 const String itunesLookupUrl = 'https://itunes.apple.com/lookup?bundleId=';

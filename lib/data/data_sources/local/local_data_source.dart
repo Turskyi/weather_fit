@@ -24,7 +24,7 @@ class LocalDataSource {
   final SharedPreferences _preferences;
 
   static const MethodChannel _channel = MethodChannel(
-    'com.turskyi.weather_fit/shared_container',
+    constants.kSharedContainerMethodChannel,
   );
 
   String getOutfitImageAssetPath(Weather weather) {

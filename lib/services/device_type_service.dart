@@ -1,8 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:weather_fit/res/constants/constants.dart' as constants;
 
 const MethodChannel _deviceChannel = MethodChannel(
-  'com.turskyi.weather_fit/device',
+  constants.kDeviceMethodChannel,
 );
 
 bool _isWearDevice = false;
