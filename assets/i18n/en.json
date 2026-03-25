@@ -126,6 +126,10 @@
     "location_services_disabled_title": "Location Services Disabled",
     "location_services_disabled_content": "Location services are disabled on your device. Please enable them in the system settings to use your current location."
   },
+  "errors": {
+    "no_internet": "No internet connection. Please check your connection and try again.",
+    "unknown": "An unknown error occurred. Please try again."
+  },
   "settings": {
     "title": "Settings",
     "language": "Language",

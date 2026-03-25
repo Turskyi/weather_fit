@@ -126,6 +126,10 @@
     "location_services_disabled_title": "Usługi lokalizacji są wyłączone",
     "location_services_disabled_content": "Usługi lokalizacji są wyłączone на Twoim urządzeniu. Włącz je w ustawieniach systemowych, aby korzystać z aktualnej lokalizacji."
   },
+  "errors": {
+    "no_internet": "Brak połączenia z internetem. Sprawdź połączenie i spróbuj ponownie.",
+    "unknown": "Wystąpił nieznany błąd. Spróbuj ponownie."
+  },
   "settings": {
     "title": "Ustawienia",
     "language": "Język",
