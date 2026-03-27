@@ -68,8 +68,14 @@ the agent will append it to this file.
 
 - Remove unused imports immediately when refactoring.
 - Use one class per file and name the file after that class.
-- Do not create markdown summary files after making changes.
+- Do not create Markdown summary files after making changes.
+
+## Validation Before Completion
+
+- Before saying a task is complete, always run `flutter analyze .`.
+- Address all analyzer problems introduced by the task before reporting
+  completion.
 
 ---
 
-_Last updated by agent on 2026-03-26._
+_Last updated by agent on 2026-03-27._

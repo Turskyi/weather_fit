@@ -6,11 +6,15 @@ sealed class SettingsState {
     required this.language,
     this.appVersion,
     this.widgetUpdateFrequency = 120,
+    this.dayStartHour = WeatherCondition.defaultDayStartHour,
+    this.nightStartHour = WeatherCondition.defaultNightStartHour,
   });
 
   final Language language;
   final String? appVersion;
   final int widgetUpdateFrequency;
+  final int dayStartHour;
+  final int nightStartHour;
 
   bool get isEnglish => language == Language.en;
 
@@ -24,6 +28,8 @@ sealed class SettingsState {
     Language? language,
     String? appVersion,
     int? widgetUpdateFrequency,
+    int? dayStartHour,
+    int? nightStartHour,
   });
 }
 
@@ -32,6 +38,8 @@ final class SettingsInitial extends SettingsState {
     required super.language,
     super.appVersion,
     super.widgetUpdateFrequency,
+    super.dayStartHour,
+    super.nightStartHour,
   });
 
   @override
@@ -39,12 +47,16 @@ final class SettingsInitial extends SettingsState {
     Language? language,
     String? appVersion,
     int? widgetUpdateFrequency,
+    int? dayStartHour,
+    int? nightStartHour,
   }) {
     return SettingsInitial(
       language: language ?? this.language,
       appVersion: appVersion ?? this.appVersion,
       widgetUpdateFrequency:
           widgetUpdateFrequency ?? this.widgetUpdateFrequency,
+      dayStartHour: dayStartHour ?? this.dayStartHour,
+      nightStartHour: nightStartHour ?? this.nightStartHour,
     );
   }
 
@@ -54,6 +66,8 @@ final class SettingsInitial extends SettingsState {
         '  language: $language,'
         '  appVersion: $appVersion,'
         '  widgetUpdateFrequency: $widgetUpdateFrequency,'
+        '  dayStartHour: $dayStartHour,'
+        '  nightStartHour: $nightStartHour,'
         '}';
   }
 }
@@ -64,6 +78,8 @@ final class FeedbackState extends SettingsState {
     required super.language,
     super.appVersion,
     super.widgetUpdateFrequency,
+    super.dayStartHour,
+    super.nightStartHour,
   });
 
   final String errorMessage;
@@ -75,6 +91,8 @@ final class FeedbackState extends SettingsState {
         '  language: $language,'
         '  appVersion: $appVersion,'
         '  widgetUpdateFrequency: $widgetUpdateFrequency,'
+        '  dayStartHour: $dayStartHour,'
+        '  nightStartHour: $nightStartHour,'
         ')';
   }
 
@@ -84,6 +102,8 @@ final class FeedbackState extends SettingsState {
     Language? language,
     String? appVersion,
     int? widgetUpdateFrequency,
+    int? dayStartHour,
+    int? nightStartHour,
   }) {
     return FeedbackState(
       errorMessage: errorMessage ?? this.errorMessage,
@@ -91,6 +111,8 @@ final class FeedbackState extends SettingsState {
       appVersion: appVersion ?? this.appVersion,
       widgetUpdateFrequency:
           widgetUpdateFrequency ?? this.widgetUpdateFrequency,
+      dayStartHour: dayStartHour ?? this.dayStartHour,
+      nightStartHour: nightStartHour ?? this.nightStartHour,
     );
   }
 }
@@ -100,6 +122,8 @@ final class FeedbackSent extends SettingsState {
     required super.language,
     super.appVersion,
     super.widgetUpdateFrequency,
+    super.dayStartHour,
+    super.nightStartHour,
   });
 
   @override
@@ -108,6 +132,8 @@ final class FeedbackSent extends SettingsState {
         '  language: $language,'
         '  appVersion: $appVersion,'
         '  widgetUpdateFrequency: $widgetUpdateFrequency,'
+        '  dayStartHour: $dayStartHour,'
+        '  nightStartHour: $nightStartHour,'
         ')';
   }
 
@@ -116,12 +142,16 @@ final class FeedbackSent extends SettingsState {
     Language? language,
     String? appVersion,
     int? widgetUpdateFrequency,
+    int? dayStartHour,
+    int? nightStartHour,
   }) {
     return FeedbackSent(
       language: language ?? this.language,
       appVersion: appVersion ?? this.appVersion,
       widgetUpdateFrequency:
           widgetUpdateFrequency ?? this.widgetUpdateFrequency,
+      dayStartHour: dayStartHour ?? this.dayStartHour,
+      nightStartHour: nightStartHour ?? this.nightStartHour,
     );
   }
 }
@@ -131,6 +161,8 @@ final class LoadingSettingsState extends SettingsState {
     required super.language,
     super.appVersion,
     super.widgetUpdateFrequency,
+    super.dayStartHour,
+    super.nightStartHour,
   });
 
   @override
@@ -138,12 +170,16 @@ final class LoadingSettingsState extends SettingsState {
     Language? language,
     String? appVersion,
     int? widgetUpdateFrequency,
+    int? dayStartHour,
+    int? nightStartHour,
   }) {
     return LoadingSettingsState(
       language: language ?? this.language,
       appVersion: appVersion ?? this.appVersion,
       widgetUpdateFrequency:
           widgetUpdateFrequency ?? this.widgetUpdateFrequency,
+      dayStartHour: dayStartHour ?? this.dayStartHour,
+      nightStartHour: nightStartHour ?? this.nightStartHour,
     );
   }
 
@@ -153,6 +189,8 @@ final class LoadingSettingsState extends SettingsState {
         '  language: $language,'
         '  appVersion: $appVersion,'
         '  widgetUpdateFrequency: $widgetUpdateFrequency,'
+        '  dayStartHour: $dayStartHour,'
+        '  nightStartHour: $nightStartHour,'
         ')';
   }
 }
@@ -163,6 +201,8 @@ final class SettingsError extends SettingsState {
     required super.language,
     super.appVersion,
     super.widgetUpdateFrequency,
+    super.dayStartHour,
+    super.nightStartHour,
   });
 
   final String errorMessage;
@@ -173,6 +213,8 @@ final class SettingsError extends SettingsState {
     Language? language,
     String? appVersion,
     int? widgetUpdateFrequency,
+    int? dayStartHour,
+    int? nightStartHour,
   }) {
     return SettingsError(
       errorMessage: errorMessage ?? this.errorMessage,
@@ -180,6 +222,8 @@ final class SettingsError extends SettingsState {
       appVersion: appVersion ?? this.appVersion,
       widgetUpdateFrequency:
           widgetUpdateFrequency ?? this.widgetUpdateFrequency,
+      dayStartHour: dayStartHour ?? this.dayStartHour,
+      nightStartHour: nightStartHour ?? this.nightStartHour,
     );
   }
 
@@ -191,7 +235,9 @@ final class SettingsError extends SettingsState {
         other.errorMessage == errorMessage &&
         other.language == language &&
         other.appVersion == appVersion &&
-        other.widgetUpdateFrequency == widgetUpdateFrequency;
+        other.widgetUpdateFrequency == widgetUpdateFrequency &&
+        other.dayStartHour == dayStartHour &&
+        other.nightStartHour == nightStartHour;
   }
 
   @override
@@ -199,7 +245,9 @@ final class SettingsError extends SettingsState {
       errorMessage.hashCode ^
       language.hashCode ^
       appVersion.hashCode ^
-      widgetUpdateFrequency.hashCode;
+      widgetUpdateFrequency.hashCode ^
+      dayStartHour.hashCode ^
+      nightStartHour.hashCode;
 
   @override
   String toString() {
@@ -208,6 +256,8 @@ final class SettingsError extends SettingsState {
         '  appVersion: $appVersion,'
         '  errorMessage: $errorMessage,'
         '  widgetUpdateFrequency: $widgetUpdateFrequency,'
+        '  dayStartHour: $dayStartHour,'
+        '  nightStartHour: $nightStartHour,'
         ')';
   }
 }

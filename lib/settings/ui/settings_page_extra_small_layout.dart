@@ -9,12 +9,16 @@ import 'package:weather_fit/res/constants/constants.dart' as constant;
 import 'package:weather_fit/res/widgets/leading_widget.dart';
 import 'package:weather_fit/settings/bloc/settings_bloc.dart';
 import 'package:weather_fit/settings/ui/blurred_fab_with_border.dart';
+import 'package:weather_fit/settings/ui/setting_dropdown.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
+import 'package:weather_repository/weather_repository.dart';
 
 class SettingsPageExtraSmallLayout extends StatelessWidget {
   const SettingsPageExtraSmallLayout({
     required this.rebuildSettingsWhen,
     required this.onLanguageChanged,
+    required this.onDayStartHourChanged,
+    required this.onNightStartHourChanged,
     required this.rebuildUnitsWhen,
     required this.onUnitsChanged,
     required this.onAboutTap,
@@ -28,6 +32,8 @@ class SettingsPageExtraSmallLayout extends StatelessWidget {
 
   final BlocBuilderCondition<SettingsState> rebuildSettingsWhen;
   final ValueChanged<Language> onLanguageChanged;
+  final ValueChanged<int> onDayStartHourChanged;
+  final ValueChanged<int> onNightStartHourChanged;
   final BlocBuilderCondition<WeatherState> rebuildUnitsWhen;
   final ValueChanged<bool> onUnitsChanged;
   final GestureTapCallback onAboutTap;
@@ -104,6 +110,56 @@ class SettingsPageExtraSmallLayout extends StatelessWidget {
                     final bool isCelsius = index == 0;
                     onUnitsChanged(isCelsius);
                   }, // true if Celsius
+                );
+              },
+            ),
+            const SizedBox(height: 8),
+
+            // Day/night interval selectors.
+            BlocBuilder<SettingsBloc, SettingsState>(
+              buildWhen: rebuildSettingsWhen,
+              builder: (BuildContext context, SettingsState state) {
+                final List<int> dayOptions = List<int>.generate(
+                  WeatherCondition.maxDayStartHour -
+                      WeatherCondition.minDayStartHour +
+                      1,
+                  (int index) {
+                    return WeatherCondition.minDayStartHour + index;
+                  },
+                );
+                final List<int> nightOptions = List<int>.generate(
+                  WeatherCondition.maxNightStartHour -
+                      WeatherCondition.minNightStartHour +
+                      1,
+                  (int index) {
+                    return WeatherCondition.minNightStartHour + index;
+                  },
+                );
+
+                return Column(
+                  children: <Widget>[
+                    SettingDropdown(
+                      label: translate('settings.day_starts'),
+                      value: state.dayStartHour,
+                      options: dayOptions,
+                      onChanged: (int? value) {
+                        if (value != null) {
+                          onDayStartHourChanged(value);
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 8),
+                    SettingDropdown(
+                      label: translate('settings.night_starts'),
+                      value: state.nightStartHour,
+                      options: nightOptions,
+                      onChanged: (int? value) {
+                        if (value != null) {
+                          onNightStartHourChanged(value);
+                        }
+                      },
+                    ),
+                  ],
                 );
               },
             ),

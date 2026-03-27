@@ -463,6 +463,69 @@ class LocalDataSource {
             : constants.kAndroidDefaultMinutesFrequency);
   }
 
+  Future<bool> saveDayStartHour(int hour) {
+    final int nightStartHour = getNightStartHour();
+    final bool isValid = WeatherCondition.areDayNightHoursValid(
+      dayStartHour: hour,
+      nightStartHour: nightStartHour,
+    );
+
+    if (isValid) {
+      return _preferences.setInt(Settings.dayStartHour.key, hour);
+    } else {
+      return Future<bool>.value(false);
+    }
+  }
+
+  Future<bool> saveNightStartHour(int hour) {
+    final int dayStartHour = getDayStartHour();
+    final bool isValid = WeatherCondition.areDayNightHoursValid(
+      dayStartHour: dayStartHour,
+      nightStartHour: hour,
+    );
+
+    if (isValid) {
+      return _preferences.setInt(Settings.nightStartHour.key, hour);
+    } else {
+      return Future<bool>.value(false);
+    }
+  }
+
+  int getDayStartHour() {
+    final ({int dayStartHour, int nightStartHour}) validatedHours =
+        _getValidatedDayNightHours();
+    return validatedHours.dayStartHour;
+  }
+
+  int getNightStartHour() {
+    final ({int dayStartHour, int nightStartHour}) validatedHours =
+        _getValidatedDayNightHours();
+    return validatedHours.nightStartHour;
+  }
+
+  ({int dayStartHour, int nightStartHour}) _getValidatedDayNightHours() {
+    final int dayStartHour =
+        _preferences.getInt(Settings.dayStartHour.key) ??
+        WeatherCondition.defaultDayStartHour;
+    final int nightStartHour =
+        _preferences.getInt(Settings.nightStartHour.key) ??
+        WeatherCondition.defaultNightStartHour;
+
+    final bool isValid = WeatherCondition.areDayNightHoursValid(
+      dayStartHour: dayStartHour,
+      nightStartHour: nightStartHour,
+    );
+
+    if (isValid) {
+      return (dayStartHour: dayStartHour, nightStartHour: nightStartHour);
+    } else {
+      return (
+        dayStartHour: WeatherCondition.defaultDayStartHour,
+        nightStartHour: WeatherCondition.defaultNightStartHour,
+      );
+    }
+  }
+
   String _translateError(String key, String locale) {
     final Map<String, Map<String, String>> localizedErrors =
         <String, Map<String, String>>{

@@ -41,6 +41,8 @@ void main() {
   });
 
   setUp(() async {
+    SharedPreferences.setMockInitialValues(<String, Object>{});
+
     mockHomeWidgetService = MockHomeWidgetService();
     mockWeatherRepository = MockWeatherRepository();
     mockOutfitRepository = MockOutfitRepository();

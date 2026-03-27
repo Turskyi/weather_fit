@@ -25,8 +25,10 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     return context.isExtraSmallScreen
         ? SettingsPageExtraSmallLayout(
-            rebuildSettingsWhen: _isLanguageOrUpdateFrequencyChanged,
+            rebuildSettingsWhen: _isSettingsChanged,
             onLanguageChanged: _changeLanguage,
+            onDayStartHourChanged: _changeDayStartHour,
+            onNightStartHourChanged: _changeNightStartHour,
             rebuildUnitsWhen: _isUnitsChanged,
             onUnitsChanged: _changeUnits,
             onAboutTap: _navigateToAbout,
@@ -37,8 +39,10 @@ class _SettingsPageState extends State<SettingsPage> {
             onSearchPressed: _handleLocationSearchAndFetchWeather,
           )
         : SettingsPageDefaultLayout(
-            rebuildSettingsWhen: _isLanguageOrUpdateFrequencyChanged,
+            rebuildSettingsWhen: _isSettingsChanged,
             onLanguageChanged: _changeLanguage,
+            onDayStartHourChanged: _changeDayStartHour,
+            onNightStartHourChanged: _changeNightStartHour,
             rebuildUnitsWhen: _isUnitsChanged,
             onUnitsChanged: _changeUnits,
             onAboutTap: _navigateToAbout,
@@ -88,12 +92,11 @@ class _SettingsPageState extends State<SettingsPage> {
         current.weather.temperatureUnits;
   }
 
-  bool _isLanguageOrUpdateFrequencyChanged(
-    SettingsState previous,
-    SettingsState current,
-  ) {
+  bool _isSettingsChanged(SettingsState previous, SettingsState current) {
     return previous.language != current.language ||
-        previous.widgetUpdateFrequency != current.widgetUpdateFrequency;
+        previous.widgetUpdateFrequency != current.widgetUpdateFrequency ||
+        previous.dayStartHour != current.dayStartHour ||
+        previous.nightStartHour != current.nightStartHour;
   }
 
   void _changeLanguage(Language language) {
@@ -104,6 +107,14 @@ class _SettingsPageState extends State<SettingsPage> {
         context.read<SettingsBloc>().add(ChangeLanguageEvent(language));
       }
     });
+  }
+
+  void _changeDayStartHour(int hour) {
+    context.read<SettingsBloc>().add(ChangeDayStartHourEvent(hour));
+  }
+
+  void _changeNightStartHour(int hour) {
+    context.read<SettingsBloc>().add(ChangeNightStartHourEvent(hour));
   }
 
   Future<void> _handleLocationSearchAndFetchWeather() async {
