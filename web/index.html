@@ -125,6 +125,78 @@
       </title>
       <link href="manifest.json" rel="manifest">
 
+      <script>
+            const routeMetadata = {
+                  '/': {
+                        title: 'WeatherFit App – What to Wear Today & Outfit Planner for Weather',
+                        description:
+                              'WeatherFit suggests what to wear based on the weather and helps you plan outfits for future trips. Get simple clothing recommendations for any forecast.',
+                  },
+                  '/about': {
+                        title: 'About WeatherFit – Weather-Based Outfit Planner',
+                        description:
+                              'Learn what WeatherFit does across Android, iOS, and web, and how it helps you choose outfits based on weather conditions.',
+                  },
+                  '/support': {
+                        title: 'WeatherFit Support – Help, Feedback, and Contact',
+                        description:
+                              'Get WeatherFit support, find help, and contact the developer for feedback about the weather outfit planner app.',
+                  },
+                  '/privacy-policy': {
+                        title: 'WeatherFit Privacy Policy',
+                        description:
+                              'Read the WeatherFit privacy policy for Android, iOS, macOS, and web, including location and third-party service details.',
+                  },
+            };
+
+            const normalizedPath = window.location.pathname.replace(/\/+$/, '') || '/';
+            const pageMetadata = routeMetadata[normalizedPath] || routeMetadata['/'];
+            const canonicalUrl = `https://weather-fit.com${normalizedPath === '/' ? '/' : normalizedPath}`;
+
+            document.title = pageMetadata.title;
+
+            const descriptionMeta = document.querySelector('meta[name="description"]');
+            const ogTitleMeta = document.querySelector('meta[property="og:title"]');
+            const ogDescriptionMeta = document.querySelector('meta[property="og:description"]');
+            const ogUrlMeta = document.querySelector('meta[property="og:url"]');
+            const twitterTitleMeta = document.querySelector('meta[name="twitter:title"]');
+            const twitterDescriptionMeta = document.querySelector('meta[name="twitter:description"]');
+            const twitterUrlMeta = document.querySelector('meta[name="twitter:url"]');
+            const canonicalLink = document.querySelector('link[rel="canonical"]');
+
+            if (descriptionMeta) {
+                  descriptionMeta.setAttribute('content', pageMetadata.description);
+            }
+
+            if (ogTitleMeta) {
+                  ogTitleMeta.setAttribute('content', pageMetadata.title);
+            }
+
+            if (ogDescriptionMeta) {
+                  ogDescriptionMeta.setAttribute('content', pageMetadata.description);
+            }
+
+            if (ogUrlMeta) {
+                  ogUrlMeta.setAttribute('content', canonicalUrl);
+            }
+
+            if (twitterTitleMeta) {
+                  twitterTitleMeta.setAttribute('content', pageMetadata.title);
+            }
+
+            if (twitterDescriptionMeta) {
+                  twitterDescriptionMeta.setAttribute('content', pageMetadata.description);
+            }
+
+            if (twitterUrlMeta) {
+                  twitterUrlMeta.setAttribute('content', canonicalUrl);
+            }
+
+            if (canonicalLink) {
+                  canonicalLink.setAttribute('href', canonicalUrl);
+            }
+      </script>
+
       <!-- This script adds the flutter initialization JS code -->
       <!--suppress HtmlUnknownTarget -->
       <script defer src="flutter.js"></script>

@@ -9,7 +9,9 @@
 [![wakatime](https://wakatime.com/badge/user/f9df5074-b4ea-4c17-b001-fff428ab82aa/project/cd1aecce-fdc9-4b99-abfc-38310e1ce741.svg)](https://wakatime.com/badge/user/f9df5074-b4ea-4c17-b001-fff428ab82aa/project/cd1aecce-fdc9-4b99-abfc-38310e1ce741)
 <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/m/Turskyi/weather_fit">
 
-# Weather Fit
+# WeatherFit
+
+Official website: https://weather-fit.com
 
 **WeatherFit** is more than just a weather app, it’s a personal stylist that
 helps you dress well and stay comfortable. Whether you’re going to work,
