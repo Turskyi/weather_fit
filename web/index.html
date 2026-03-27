@@ -21,6 +21,11 @@
       </script>
 
       <link href="https://weather-fit.com/" rel="canonical">
+      <link href="https://weather-fit.com/" hreflang="x-default"
+            rel="alternate">
+      <link href="https://weather-fit.com/" hreflang="en" rel="alternate">
+      <link href="https://weather-fit.com/" hreflang="pl" rel="alternate">
+      <link href="https://weather-fit.com/" hreflang="uk" rel="alternate">
       <meta content="weather outfit planner, what to wear weather, outfit recommendation weather, weather clothing advice, weather outfit app, WeatherFit"
             name="keywords">
 
@@ -195,6 +200,10 @@
             if (canonicalLink) {
                   canonicalLink.setAttribute('href', canonicalUrl);
             }
+
+            document.querySelectorAll('link[rel="alternate"][hreflang]').forEach((link) => {
+                  link.setAttribute('href', canonicalUrl);
+            });
       </script>
 
       <!-- This script adds the flutter initialization JS code -->

@@ -60,6 +60,6 @@
             <string>weatherfit_background_update</string>
         </array>
         <key>FlutterDeepLinkingEnabled</key>
-        <false />
+	        <true />
     </dict>
 </plist>
