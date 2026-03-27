@@ -89,30 +89,40 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
   }
 
   void _updateLocations({bool resetToFirst = false}) {
-    final Location activeLocation = context
-        .read<LocalDataSource>()
-        .getLastSavedLocation();
+    final LocalDataSource localDataSource = context.read<LocalDataSource>();
+    final Location activeLocation = localDataSource.getLastSavedLocation();
+    final List<Location> previousLocations = _locations;
+    final int previousIndex = _currentPageIndex;
 
-    final List<Location> newList = _getSwipeList(
-      context.read<LocalDataSource>(),
-    );
+    final Location previousVisibleLocation;
+    if (previousLocations.isEmpty) {
+      previousVisibleLocation = const Location.empty();
+    } else {
+      final int safePreviousIndex = previousIndex.clamp(
+        0,
+        previousLocations.length - 1,
+      );
+      previousVisibleLocation = previousLocations[safePreviousIndex];
+    }
+
+    final List<Location> newList = _getSwipeList(localDataSource);
 
     final bool lengthChanged = newList.length != _locations.length;
 
     if (lengthChanged || resetToFirst) {
       setState(() {
         _locations = newList;
+        _currentPageIndex = _currentPageIndex.clamp(0, _locations.length - 1);
       });
 
+      bool jumpedToActiveLocation = false;
       if (_pageController.hasClients) {
         // On length change or explicit reset, jump to the active location
         if (resetToFirst) {
           _currentPageIndex = 0;
           _pageController.jumpToPage(0);
           return;
-        }
-
-        if (lengthChanged && activeLocation.isNotEmpty) {
+        } else if (activeLocation.isNotEmpty) {
           final int activeIndex = newList.indexWhere(
             (Location l) => _isSameLocation(l, activeLocation),
           );
@@ -120,7 +130,17 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
           if (activeIndex >= 0 && activeIndex != _currentPageIndex) {
             _currentPageIndex = activeIndex;
             _pageController.jumpToPage(activeIndex);
+            jumpedToActiveLocation = true;
           }
+        }
+      }
+
+      if (jumpedToActiveLocation) {
+        return;
+      } else {
+        final Location updatedVisibleLocation = _locations[_currentPageIndex];
+        if (!_isSameLocation(previousVisibleLocation, updatedVisibleLocation)) {
+          _fetchWeatherForCurrentPageLocation();
         }
       }
     }

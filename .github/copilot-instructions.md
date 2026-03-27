@@ -40,6 +40,9 @@ the agent will append it to this file.
   Avoid `if (!condition) return;` when the same logic can be written as a
   positive `if` with explicit `else`.
 
+- Prefer `else if` over nesting `if` inside `else` when branches are
+  mutually exclusive.
+
 - Use `final` for all local variables that are not reassigned.
 - Prefer named parameters for widget constructors.
 - Use `const` constructors and `const` widgets wherever possible.
