@@ -1,10 +1,10 @@
+import 'package:flutter/cupertino.dart' as cupertino;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
-import 'package:weather_fit/extensions/build_context_extensions.dart';
 import 'package:weather_fit/res/widgets/local_web_cors_error.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 import 'package:weather_fit/weather/ui/empty/weather_empty.dart';
@@ -14,7 +14,7 @@ import 'package:weather_fit/weather/ui/widgets/outfit_widget.dart';
 import 'package:weather_fit/weather/ui/widgets/weather_loading_widget.dart';
 import 'package:weather_repository/weather_repository.dart';
 
-class WeatherPageExtraSmallLayout extends StatelessWidget {
+class WeatherPageExtraSmallLayout extends StatefulWidget {
   const WeatherPageExtraSmallLayout({
     required this.onSettingsPressed,
     required this.onRefresh,
@@ -49,25 +49,39 @@ class WeatherPageExtraSmallLayout extends StatelessWidget {
   final Location? location;
   final Widget? bodyOverride;
 
+  @override
+  State<WeatherPageExtraSmallLayout> createState() =>
+      _WeatherPageExtraSmallLayoutState();
+}
+
+class _WeatherPageExtraSmallLayoutState
+    extends State<WeatherPageExtraSmallLayout> {
   static const Size _wearableOutfitPlaceholderSize = Size(148, 194);
-  static const double _topActionsReservedSpace = 46.0;
+  bool _isAtScrollBottom = false;
 
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final ColorScheme colorScheme = theme.colorScheme;
+    final bool showSearchFab = context.select<WeatherBloc, bool>((
+      WeatherBloc bloc,
+    ) {
+      final WeatherState state = bloc.state;
+      return state is WeatherInitial ||
+          (state is WeatherSuccess && state.weather.isNoLocation);
+    });
 
     final Widget content = BlocConsumer<WeatherBloc, WeatherState>(
       listener: _onWeatherStateChanged,
       builder: (BuildContext context, WeatherState state) {
-        if (bodyOverride != null) return bodyOverride!;
+        if (widget.bodyOverride != null) return widget.bodyOverride!;
 
-        if (location != null &&
-            location!.isNotEmpty &&
-            !state.location.isSamePlaceAs(location!)) {
+        if (widget.location != null &&
+            widget.location!.isNotEmpty &&
+            !state.location.isSamePlaceAs(widget.location!)) {
           return WeatherPopulated(
-            weather: Weather.empty.copyWith(location: location),
-            onRefresh: onRefresh,
+            weather: Weather.empty.copyWith(location: widget.location),
+            onRefresh: widget.onRefresh,
             child: const WeatherLoadingWidget(isShimmer: true),
           );
         }
@@ -75,14 +89,14 @@ class WeatherPageExtraSmallLayout extends StatelessWidget {
         final Weather stateWeather = state.weather;
         switch (state) {
           case WeatherInitial():
-            return WeatherEmpty(key: key);
+            return WeatherEmpty(key: widget.key);
           case WeatherLoadingState():
             if (stateWeather.location.isEmpty) {
               return const WeatherLoadingWidget();
             } else {
               return WeatherPopulated(
                 weather: stateWeather,
-                onRefresh: onRefresh,
+                onRefresh: widget.onRefresh,
                 child: const WeatherLoadingWidget(isShimmer: true),
               );
             }
@@ -96,7 +110,7 @@ class WeatherPageExtraSmallLayout extends StatelessWidget {
               outfitImageWidget = OutfitWidget(
                 outfitImage: state.outfitImage,
                 outfitRecommendation: stateOutfitRecommendation,
-                onRefresh: onRefresh,
+                onRefresh: widget.onRefresh,
               );
             } else if (state is LoadingOutfitState) {
               final BorderRadius borderRadius = BorderRadius.circular(20.0);
@@ -136,7 +150,7 @@ class WeatherPageExtraSmallLayout extends StatelessWidget {
 
             return WeatherPopulated(
               weather: stateWeather,
-              onRefresh: onRefresh,
+              onRefresh: widget.onRefresh,
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   boxShadow: <BoxShadow>[
@@ -156,11 +170,11 @@ class WeatherPageExtraSmallLayout extends StatelessWidget {
             if (stateWeather.isNotEmpty) {
               return WeatherPopulated(
                 weather: stateWeather,
-                onRefresh: onRefresh,
+                onRefresh: widget.onRefresh,
                 child: OutfitWidget(
                   outfitImage: state.outfitImage,
                   outfitRecommendation: state.outfitRecommendation,
-                  onRefresh: onRefresh,
+                  onRefresh: widget.onRefresh,
                 ),
               );
             }
@@ -169,70 +183,91 @@ class WeatherPageExtraSmallLayout extends StatelessWidget {
             if (stateWeather.isNotEmpty) {
               return WeatherPopulated(
                 weather: stateWeather,
-                onRefresh: onRefresh,
+                onRefresh: widget.onRefresh,
                 child: OutfitWidget(
                   outfitImage: state.outfitImage,
                   outfitRecommendation: state.outfitRecommendation,
-                  onRefresh: onRefresh,
+                  onRefresh: widget.onRefresh,
                 ),
               );
             }
             return WeatherError(
               message: state.message,
-              onReportPressed: onReportPressed,
-              onRetryPressed: onRefresh,
+              onReportPressed: widget.onReportPressed,
+              onRetryPressed: widget.onRefresh,
             );
         }
       },
     );
 
-    if (isEmbedded) return content;
+    if (widget.isEmbedded) return content;
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
       backgroundColor: Colors.black,
-      body: Stack(
-        children: <Widget>[
-          ColoredBox(
-            color: Colors.black,
-            child: Padding(
-              padding: const EdgeInsets.only(top: _topActionsReservedSpace),
-              child: Center(child: content),
-            ),
-          ),
-          SafeArea(
-            minimum: EdgeInsets.fromLTRB(
-              context.wearHorizontalPadding,
-              10,
-              context.wearHorizontalPadding,
-              0,
-            ),
-            child: Align(
-              alignment: Alignment.topCenter,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  _WatchActionButton(
-                    icon: Icons.search,
-                    semanticLabel: translate('search.label'),
-                    onPressed: onSearchPressed,
-                  ),
-                  const SizedBox(width: 10),
-                  _WatchActionButton(
-                    icon: Icons.settings,
-                    semanticLabel: translate('settings.title'),
-                    onPressed: onSettingsPressed,
-                  ),
-                ],
+      appBar: AppBar(
+        centerTitle: true,
+        toolbarHeight: cupertino
+            .kCupertinoButtonMinSize[cupertino.CupertinoButtonSize.medium],
+        forceMaterialTransparency: true,
+        title: Tooltip(
+          message: translate('settings.title'),
+          child: Material(
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+            shape: const CircleBorder(),
+            clipBehavior: Clip.antiAlias,
+            child: SizedBox.square(
+              dimension: 32.0,
+              child: InkResponse(
+                onTap: widget.onSettingsPressed,
+                containedInkWell: true,
+                customBorder: const CircleBorder(),
+                highlightShape: BoxShape.circle,
+                radius: 8,
+                splashColor: Colors.white.withValues(alpha: 0.20),
+                highlightColor: Colors.white.withValues(alpha: 0.10),
+                child: Icon(
+                  Icons.settings,
+                  color: colorScheme.surface,
+                  size: cupertino.kCupertinoButtonDefaultIconSize,
+                ),
               ),
             ),
           ),
-        ],
+        ),
       ),
+      body: NotificationListener<ScrollNotification>(
+        onNotification: (ScrollNotification notification) {
+          final bool isAtBottom =
+              notification.metrics.atEdge && notification.metrics.pixels > 0;
+          if (isAtBottom != _isAtScrollBottom) {
+            setState(() {
+              _isAtScrollBottom = isAtBottom;
+            });
+          }
+          return false;
+        },
+        child: ColoredBox(
+          color: Colors.black,
+          child: Center(child: content),
+        ),
+      ),
+      floatingActionButton: showSearchFab || _isAtScrollBottom
+          ? FloatingActionButton.small(
+              onPressed: widget.onSearchPressed,
+              tooltip: translate('search.label'),
+              child: Icon(
+                Icons.search,
+                semanticLabel: translate('search.label'),
+              ),
+            )
+          : null,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 
   void _onWeatherStateChanged(BuildContext context, WeatherState state) {
-    if (!isEmbedded &&
+    if (!widget.isEmbedded &&
         (state is WeatherFailure || state is LocalWebCorsFailure) &&
         state.weather.isNotEmpty) {
       ScaffoldMessenger.of(context)
@@ -254,48 +289,11 @@ class WeatherPageExtraSmallLayout extends StatelessWidget {
             ),
             action: SnackBarAction(
               label: translate('try_again'),
-              onPressed: onRefresh,
+              onPressed: widget.onRefresh,
             ),
           ),
         );
     }
-    weatherStateListener?.call(context, state);
-  }
-}
-
-class _WatchActionButton extends StatelessWidget {
-  const _WatchActionButton({
-    required this.icon,
-    required this.semanticLabel,
-    required this.onPressed,
-  });
-
-  final IconData icon;
-  final String semanticLabel;
-  final VoidCallback onPressed;
-
-  static const double _buttonSize = 40.0;
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-
-    return Semantics(
-      button: true,
-      label: semanticLabel,
-      child: Material(
-        color: theme.colorScheme.surface.withValues(alpha: 0.82),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(14),
-          onTap: onPressed,
-          child: SizedBox(
-            width: _buttonSize,
-            height: _buttonSize,
-            child: Icon(icon, color: theme.colorScheme.onSurface),
-          ),
-        ),
-      ),
-    );
+    widget.weatherStateListener?.call(context, state);
   }
 }

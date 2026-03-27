@@ -169,7 +169,7 @@
     "use_current_location_dialog_title": "Use your current location?",
     "location_not_found_use_current_dialog_content": "We couldn't find the correct location. Would you like to use your current location instead?",
     "location_not_found_dialog_title": "Location Not Found",
-    "location_not_found_suggestion_spell_check": "Please make sure the city or country is spelled correctly.",
+    "location_not_found_suggestion_spell_check": "We couldn't find that location. The spelling may be wrong, or try another nearby city or country.",
     "location_not_found_suggestion_use_gps": "Alternatively, you can get the weather for your current location using GPS.",
     "use_gps_button": "Use GPS",
     "quick_city_toronto": "Toronto",

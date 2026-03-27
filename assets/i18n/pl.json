@@ -169,7 +169,7 @@
     "use_current_location_dialog_title": "Użyć Twojej aktualnej lokalizacji?",
     "location_not_found_use_current_dialog_content": "Nie udało nam się znaleźć właściwej lokalizacji. Czy chcesz zamiast tego użyć swojej aktualnej lokalizacji?",
     "location_not_found_dialog_title": "Lokalizacja nie została znaleziona",
-    "location_not_found_suggestion_spell_check": "Upewnij się, że nazwa miasta lub kraju jest napisana poprawnie.",
+    "location_not_found_suggestion_spell_check": "Nie znaleźliśmy tej lokalizacji. Możliwe, że nazwa jest wpisana z błędem — spróbuj też pobliskiego miasta lub kraju.",
     "location_not_found_suggestion_use_gps": "Alternatywnie możesz pobrać pogodę dla swojej aktualnej lokalizacji za pomocą GPS.",
     "use_gps_button": "Użyj GPS",
     "quick_city_toronto": "Toronto",

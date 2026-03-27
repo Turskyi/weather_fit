@@ -170,7 +170,7 @@
     "use_current_location_dialog_title": "Використати ваше поточне місцезнаходження?",
     "location_not_found_use_current_dialog_content": "Нам не вдалося знайти правильне місцезнаходження. Бажаєте натомість використати ваше поточне місцезнаходження?",
     "location_not_found_dialog_title": "Місцезнаходження не знайдено",
-    "location_not_found_suggestion_spell_check": "Будь ласка, переконайтеся, що назва міста чи країни написана правильно.",
+    "location_not_found_suggestion_spell_check": "Ми не змогли знайти цю локацію. Можливо, є помилка в написанні, або спробуйте інше найближче місто чи країну.",
     "location_not_found_suggestion_use_gps": "Як варіант, ви можете отримати погоду для вашого поточного місцезнаходження за допомогою GPS.",
     "use_gps_button": "Використати GPS",
     "quick_city_toronto": "Торонто",

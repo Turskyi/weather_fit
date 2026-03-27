@@ -38,6 +38,12 @@ class WeatherContentExtraSmall extends StatelessWidget {
       color: watchForegroundColor,
     );
     final Color surfaceColor = theme.colorScheme.surface.withValues(alpha: 0.9);
+    final Color iconChipColor = surfaceColor.computeLuminance() > 0.5
+        ? theme.colorScheme.onSurface.withValues(alpha: 0.22)
+        : surfaceColor;
+    final Color temperatureTextColor = surfaceColor.computeLuminance() > 0.5
+        ? Colors.black
+        : Colors.white;
     final String countryCode = weather.countryCode.toLowerCase();
     final double infoBoxSize = 40.0;
     final BorderRadius infoBoxRadius = BorderRadius.circular(14.0);
@@ -71,7 +77,7 @@ class WeatherContentExtraSmall extends StatelessWidget {
                       _WearInfoChip(
                         size: infoBoxSize,
                         radius: infoBoxRadius,
-                        color: surfaceColor,
+                        color: iconChipColor,
                         child: WeatherIcon(condition: weather.condition),
                       ),
                       const SizedBox(width: 16),
@@ -82,7 +88,7 @@ class WeatherContentExtraSmall extends StatelessWidget {
                         child: Text(
                           weather.formattedTemperature,
                           style: textTheme.labelMedium?.copyWith(
-                            color: watchForegroundColor,
+                            color: temperatureTextColor,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -225,6 +231,7 @@ class WeatherContentExtraSmall extends StatelessWidget {
               }
             },
           ),
+          const SizedBox(height: 16),
         ],
       ),
     );
