@@ -6,6 +6,8 @@
       <base href="$FLUTTER_BASE_HREF">
 
       <meta charset="UTF-8">
+      <meta content="width=device-width, initial-scale=1.0" name="viewport">
+      <meta content="index, follow, max-image-preview:large" name="robots">
 
       <!-- Google tag (gtag.js) -->
       <script async
@@ -22,6 +24,9 @@
       <meta content="weather outfit planner, what to wear weather, outfit recommendation weather, weather clothing advice, weather outfit app, WeatherFit"
             name="keywords">
 
+      <meta content="website" property="og:type">
+      <meta content="https://weather-fit.com/" property="og:url">
+      <meta content="WeatherFit" property="og:site_name">
       <meta content="https://weather-fit.com/weather_fit-feature_graphic.png"
             property="og:image">
       <!-- Specify image dimensions of the feature graphic -->
@@ -37,23 +42,29 @@
       <meta content="WeatherFit" name="twitter:title">
       <meta content="WeatherFit helps you decide what to wear based on the weather. Get outfit recommendations for today or plan outfits for upcoming trips with the outfit planner. 🌤️👕👖👞"
             name="twitter:description">
+      <meta content="https://weather-fit.com/" name="twitter:url">
       <meta content="https://weather-fit.com/weather_fit-feature_graphic.png"
             name="twitter:image">
 
       <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "MobileApplication",
+                        "@type": "SoftwareApplication",
         "name": "WeatherFit",
-        "operatingSystem": "Android, iOS, Web",
+                        "alternateName": "Weather Fit",
+                        "operatingSystem": "Android, iOS, Web",
         "applicationCategory": "WeatherApplication",
-        "applicationSubCategory": "Outfit Recommendation",
         "description": "WeatherFit helps you decide what to wear based on the weather. Get outfit recommendations for today or plan outfits for upcoming trips with the outfit planner.",
         "url": "https://weather-fit.com",
         "image": "https://weather-fit.com/weather_fit-feature_graphic.png",
-        "author": {
-          "@type": "Person",
-          "name": "Dmytro Turskyi"
+                        "author": {
+                              "@type": "Person",
+                              "name": "Dmytro Turskyi"
+                        },
+                        "publisher": {
+                              "@type": "Organization",
+                              "name": "WeatherFit",
+                              "url": "https://weather-fit.com"
         },
         "offers": {
           "@type": "Offer",
@@ -66,10 +77,21 @@
         ],
         "downloadUrl": [
           "https://play.google.com/store/apps/details?id=com.turskyi.weather_fit",
-          "https://apps.apple.com/ca/app/weatherfit/id6743688355"
-        ]
+                              "https://apps.apple.com/ca/app/weatherfit/id6743688355"
+                        ]
       }
       </script>
+      <script type="application/ld+json">
+                  {
+                        "@context": "https://schema.org",
+                        "@type": "WebSite",
+                        "name": "WeatherFit",
+                        "alternateName": "Weather Fit",
+                        "url": "https://weather-fit.com/",
+                        "description": "WeatherFit is a weather outfit planner that helps people decide what to wear based on the forecast.",
+                        "inLanguage": "en"
+                  }
+                  </script>
       <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -88,6 +110,7 @@
       <meta content="Dmytro Turskyi" name="author">
       <meta content="WeatherFit suggests what to wear based on the weather and helps you plan outfits for future trips. Get simple clothing recommendations for any forecast."
             name="description">
+      <meta content="#0175C2" name="theme-color">
       <!-- iOS meta tags & icons -->
       <meta content="yes" name="apple-mobile-web-app-capable">
       <meta content="black" name="apple-mobile-web-app-status-bar-style">
@@ -98,7 +121,7 @@
       <!-- Favicon -->
       <link href="favicon.jpeg" rel="icon" type="image/jpeg" />
 
-      <title>WeatherFit – What to Wear Today & Outfit Planner for Future Weather
+      <title>WeatherFit App – What to Wear Today & Outfit Planner for Weather
       </title>
       <link href="manifest.json" rel="manifest">
 

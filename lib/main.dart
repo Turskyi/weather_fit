@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:weather_fit/app/weather_fit_app.dart';
 import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
 import 'package:weather_fit/data/repositories/location_repository.dart';
@@ -26,6 +27,7 @@ void main() async {
   // We need to call `WidgetsFlutterBinding.ensureInitialized` before any
   // `await` operation, otherwise app may stuck on black/white screen.
   WidgetsFlutterBinding.ensureInitialized();
+  usePathUrlStrategy();
 
   await initializeDeviceType();
 
