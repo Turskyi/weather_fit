@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:weather_fit/extensions/build_context_extensions.dart';
+import 'package:weather_fit/res/constants/constants.dart' as constants;
 
 class WeatherShimmer extends StatelessWidget {
   const WeatherShimmer({this.locationName, super.key});
@@ -53,7 +54,7 @@ class LocationNameShimmer extends StatelessWidget {
       highlightColor: colorScheme.surface.withValues(alpha: 0.5),
       child: Container(
         height: 56, // Matched to displayMedium height
-        width: 200,
+        width: constants.kWearCompactLayoutSize,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(8),

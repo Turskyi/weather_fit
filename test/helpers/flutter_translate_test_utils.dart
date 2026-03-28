@@ -122,6 +122,7 @@ const Map<String, Object?> _enTestTranslations = <String, Object?>{
   },
   'search': <String, String>{
     'city_or_country': 'City or country',
+    'enter_location': 'Enter location',
     'enter_city_or_country': 'Enter city or country',
     'page_semantics_label': 'City or country search page',
     'page_app_bar_title': 'City or country search',
@@ -286,8 +287,8 @@ const Map<String, Object?> _enTestTranslations = <String, Object?>{
         'Yes, the app lets you confirm and update your location during use.',
     'faq_theme_change_q': '• Why does the theme change at night?',
     'faq_theme_change_a':
-        'The app automatically switches to a moon-themed dark mode between '
-        '11pm and 5am for a more natural look.',
+        'The app automatically switches to a moon-themed dark mode at '
+        'night. You can adjust day/night start times in Settings.',
     'contact_intro': 'If you’re experiencing issues or have suggestions:',
     'contact_us_via_email_button': 'Contact Us via Email',
     'join_telegram_support_button': 'Join Telegram Support Group',
@@ -684,8 +685,8 @@ const Map<String, Object?> _ukTestTranslations = <String, Object?>{
         'місцезнаходження під час використання.',
     'faq_theme_change_q': '• Чому тема змінюється вночі?',
     'faq_theme_change_a':
-        'Програма автоматично перемикається на темний режим у місячній '
-        'тематиці між 23:00 та 5:00 для більш природного вигляду.',
+        'Програма автоматично перемикається на темний режим уночі. Час '
+        'початку дня та ночі можна змінити в налаштуваннях.',
     'contact_intro': 'Якщо у вас виникають проблеми або є пропозиції:',
     'contact_us_via_email_button': "Зв'язатися з нами електронною поштою",
     'join_telegram_support_button': 'Приєднатися до групи підтримки в Telegram',

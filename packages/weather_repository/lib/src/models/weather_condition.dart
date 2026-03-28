@@ -5,11 +5,58 @@ enum WeatherCondition {
   snowy,
   unknown;
 
+  static const int defaultDayStartHour = 6;
+  static const int defaultNightStartHour = 22;
+
+  static const int minDayStartHour = 4;
+  static const int maxDayStartHour = 10;
+  static const int minNightStartHour = 18;
+  static const int maxNightStartHour = 23;
+
+  static int _dayStartHour = defaultDayStartHour;
+  static int _nightStartHour = defaultNightStartHour;
+
+  static int get dayStartHour => _dayStartHour;
+
+  static int get nightStartHour => _nightStartHour;
+
+  static bool areDayNightHoursValid({
+    required int dayStartHour,
+    required int nightStartHour,
+  }) {
+    final bool dayStartInRange =
+        dayStartHour >= minDayStartHour && dayStartHour <= maxDayStartHour;
+    final bool nightStartInRange =
+        nightStartHour >= minNightStartHour &&
+        nightStartHour <= maxNightStartHour;
+
+    return dayStartInRange &&
+        nightStartInRange &&
+        dayStartHour < nightStartHour;
+  }
+
+  static void configureDayNightHours({
+    required int dayStartHour,
+    required int nightStartHour,
+  }) {
+    final bool isValid = areDayNightHoursValid(
+      dayStartHour: dayStartHour,
+      nightStartHour: nightStartHour,
+    );
+
+    if (isValid) {
+      _dayStartHour = dayStartHour;
+      _nightStartHour = nightStartHour;
+    } else {
+      _dayStartHour = defaultDayStartHour;
+      _nightStartHour = defaultNightStartHour;
+    }
+  }
+
   String get toEmoji {
     final DateTime now = DateTime.now();
     final int hour = now.hour;
-    // Assume daytime from 6 AM to 10 PM.
-    final bool isDaytime = hour >= 6 && hour < 22;
+    final bool isDaytime = hour >= _dayStartHour && hour < _nightStartHour;
     switch (this) {
       case WeatherCondition.clear:
         // Sun during day, moon at night.

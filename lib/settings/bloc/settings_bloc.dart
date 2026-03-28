@@ -18,6 +18,7 @@ import 'package:weather_fit/entities/models/exceptions/email_launch_exception.da
 import 'package:weather_fit/res/constants/constants.dart' as constants;
 import 'package:weather_fit/services/feedback_service.dart';
 import 'package:weather_fit/services/update_service.dart';
+import 'package:weather_repository/weather_repository.dart';
 import 'package:workmanager/workmanager.dart';
 
 part 'settings_event.dart';
@@ -32,6 +33,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         SettingsInitial(
           language: _localDataSource.getSavedLanguage(),
           widgetUpdateFrequency: _localDataSource.getWidgetUpdateFrequency(),
+          dayStartHour: _localDataSource.getDayStartHour(),
+          nightStartHour: _localDataSource.getNightStartHour(),
         ),
       ) {
     on<LoadSettingsEvent>(_onLoadSettings);
@@ -49,6 +52,15 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     on<ChangeLanguageEvent>(_changeLanguage);
 
     on<ChangeWidgetUpdateFrequencyEvent>(_onChangeWidgetUpdateFrequency);
+
+    on<ChangeDayStartHourEvent>(_onChangeDayStartHour);
+
+    on<ChangeNightStartHourEvent>(_onChangeNightStartHour);
+
+    _applyDayNightConfiguration(
+      dayStartHour: state.dayStartHour,
+      nightStartHour: state.nightStartHour,
+    );
 
     add(const LoadSettingsEvent());
     add(const CheckForUpdateEvent());
@@ -69,7 +81,13 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
           language: state.language,
           appVersion: '${packageInfo.version} (${packageInfo.buildNumber})',
           widgetUpdateFrequency: _localDataSource.getWidgetUpdateFrequency(),
+          dayStartHour: _localDataSource.getDayStartHour(),
+          nightStartHour: _localDataSource.getNightStartHour(),
         ),
+      );
+      _applyDayNightConfiguration(
+        dayStartHour: state.dayStartHour,
+        nightStartHour: state.nightStartHour,
       );
     } catch (e, stackTrace) {
       debugPrint('SettingsErrorEvent:$e\nStackTrace: $stackTrace');
@@ -97,6 +115,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         language: state.language,
         appVersion: state.appVersion,
         widgetUpdateFrequency: state.widgetUpdateFrequency,
+        dayStartHour: state.dayStartHour,
+        nightStartHour: state.nightStartHour,
       ),
     );
   }
@@ -111,6 +131,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
           language: state.language,
           appVersion: state.appVersion,
           widgetUpdateFrequency: state.widgetUpdateFrequency,
+          dayStartHour: state.dayStartHour,
+          nightStartHour: state.nightStartHour,
         ),
       );
       final UserFeedback feedback = event.feedback;
@@ -210,6 +232,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
                 language: state.language,
                 appVersion: state.appVersion,
                 widgetUpdateFrequency: state.widgetUpdateFrequency,
+                dayStartHour: state.dayStartHour,
+                nightStartHour: state.nightStartHour,
               ),
             );
           }
@@ -239,6 +263,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
             language: state.language,
             appVersion: state.appVersion,
             widgetUpdateFrequency: state.widgetUpdateFrequency,
+            dayStartHour: state.dayStartHour,
+            nightStartHour: state.nightStartHour,
           ),
         );
       } catch (e, stackTrace) {
@@ -249,6 +275,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
             language: state.language,
             appVersion: state.appVersion,
             widgetUpdateFrequency: state.widgetUpdateFrequency,
+            dayStartHour: state.dayStartHour,
+            nightStartHour: state.nightStartHour,
           ),
         );
       }
@@ -273,6 +301,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         errorMessage: errorMessage,
         appVersion: state.appVersion,
         widgetUpdateFrequency: state.widgetUpdateFrequency,
+        dayStartHour: state.dayStartHour,
+        nightStartHour: state.nightStartHour,
       ),
     );
   }
@@ -294,6 +324,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         language: state.language,
         appVersion: state.appVersion,
         widgetUpdateFrequency: state.widgetUpdateFrequency,
+        dayStartHour: state.dayStartHour,
+        nightStartHour: state.nightStartHour,
       ),
     );
   }
@@ -319,6 +351,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
               language: language,
               appVersion: state.appVersion,
               widgetUpdateFrequency: state.widgetUpdateFrequency,
+              dayStartHour: state.dayStartHour,
+              nightStartHour: state.nightStartHour,
             ),
           );
         }
@@ -332,6 +366,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
             language: state.language,
             appVersion: state.appVersion,
             widgetUpdateFrequency: state.widgetUpdateFrequency,
+            dayStartHour: state.dayStartHour,
+            nightStartHour: state.nightStartHour,
           ),
         );
       }
@@ -363,6 +399,83 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         }
       }
       emit(state.copyWith(widgetUpdateFrequency: minutes));
+    } else {
+      emit(
+        SettingsError(
+          errorMessage: translate('error.unexpected_error'),
+          language: state.language,
+          appVersion: state.appVersion,
+          widgetUpdateFrequency: state.widgetUpdateFrequency,
+          dayStartHour: state.dayStartHour,
+          nightStartHour: state.nightStartHour,
+        ),
+      );
     }
+  }
+
+  FutureOr<void> _onChangeDayStartHour(
+    ChangeDayStartHourEvent event,
+    Emitter<SettingsState> emit,
+  ) async {
+    final int dayStartHour = event.hour;
+    final bool isSaved = await _localDataSource.saveDayStartHour(dayStartHour);
+
+    if (isSaved) {
+      emit(state.copyWith(dayStartHour: dayStartHour));
+      _applyDayNightConfiguration(
+        dayStartHour: dayStartHour,
+        nightStartHour: state.nightStartHour,
+      );
+    } else {
+      emit(
+        SettingsError(
+          errorMessage: translate('error.unexpected_error'),
+          language: state.language,
+          appVersion: state.appVersion,
+          widgetUpdateFrequency: state.widgetUpdateFrequency,
+          dayStartHour: state.dayStartHour,
+          nightStartHour: state.nightStartHour,
+        ),
+      );
+    }
+  }
+
+  FutureOr<void> _onChangeNightStartHour(
+    ChangeNightStartHourEvent event,
+    Emitter<SettingsState> emit,
+  ) async {
+    final int nightStartHour = event.hour;
+    final bool isSaved = await _localDataSource.saveNightStartHour(
+      nightStartHour,
+    );
+
+    if (isSaved) {
+      emit(state.copyWith(nightStartHour: nightStartHour));
+      _applyDayNightConfiguration(
+        dayStartHour: state.dayStartHour,
+        nightStartHour: nightStartHour,
+      );
+    } else {
+      emit(
+        SettingsError(
+          errorMessage: translate('error.unexpected_error'),
+          language: state.language,
+          appVersion: state.appVersion,
+          widgetUpdateFrequency: state.widgetUpdateFrequency,
+          dayStartHour: state.dayStartHour,
+          nightStartHour: state.nightStartHour,
+        ),
+      );
+    }
+  }
+
+  void _applyDayNightConfiguration({
+    required int dayStartHour,
+    required int nightStartHour,
+  }) {
+    WeatherCondition.configureDayNightHours(
+      dayStartHour: dayStartHour,
+      nightStartHour: nightStartHour,
+    );
   }
 }

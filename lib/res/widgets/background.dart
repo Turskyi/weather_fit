@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:weather_fit/extensions/build_context_extensions.dart';
 import 'package:weather_fit/res/extensions/color_extensions.dart';
 
 class Background extends StatelessWidget {
@@ -6,6 +7,10 @@ class Background extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (context.isExtraSmallScreen) {
+      return const SizedBox.expand(child: ColoredBox(color: Colors.black));
+    }
+
     final Color color = Theme.of(context).colorScheme.primaryContainer;
     return SizedBox.expand(
       child: DecoratedBox(

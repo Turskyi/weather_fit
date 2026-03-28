@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
+import 'package:weather_fit/extensions/build_context_extensions.dart';
 
 class WeatherEmptyExtraSmallLayout extends StatelessWidget {
   const WeatherEmptyExtraSmallLayout({super.key});
@@ -19,7 +20,9 @@ class WeatherEmptyExtraSmallLayout extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Text(
             translate('weather.empty_search_prompt'),
-            style: textTheme.labelMedium,
+            style: textTheme.labelMedium?.copyWith(
+              color: context.watchForegroundColor,
+            ),
             textAlign: TextAlign.center,
           ),
         ),

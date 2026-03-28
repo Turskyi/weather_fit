@@ -6,6 +6,8 @@
       <base href="$FLUTTER_BASE_HREF">
 
       <meta charset="UTF-8">
+      <meta content="width=device-width, initial-scale=1.0" name="viewport">
+      <meta content="index, follow, max-image-preview:large" name="robots">
 
       <!-- Google tag (gtag.js) -->
       <script async
@@ -19,9 +21,17 @@
       </script>
 
       <link href="https://weather-fit.com/" rel="canonical">
+      <link href="https://weather-fit.com/" hreflang="x-default"
+            rel="alternate">
+      <link href="https://weather-fit.com/" hreflang="en" rel="alternate">
+      <link href="https://weather-fit.com/" hreflang="pl" rel="alternate">
+      <link href="https://weather-fit.com/" hreflang="uk" rel="alternate">
       <meta content="weather outfit planner, what to wear weather, outfit recommendation weather, weather clothing advice, weather outfit app, WeatherFit"
             name="keywords">
 
+      <meta content="website" property="og:type">
+      <meta content="https://weather-fit.com/" property="og:url">
+      <meta content="WeatherFit" property="og:site_name">
       <meta content="https://weather-fit.com/weather_fit-feature_graphic.png"
             property="og:image">
       <!-- Specify image dimensions of the feature graphic -->
@@ -37,23 +47,29 @@
       <meta content="WeatherFit" name="twitter:title">
       <meta content="WeatherFit helps you decide what to wear based on the weather. Get outfit recommendations for today or plan outfits for upcoming trips with the outfit planner. 🌤️👕👖👞"
             name="twitter:description">
+      <meta content="https://weather-fit.com/" name="twitter:url">
       <meta content="https://weather-fit.com/weather_fit-feature_graphic.png"
             name="twitter:image">
 
       <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "MobileApplication",
+                        "@type": "SoftwareApplication",
         "name": "WeatherFit",
-        "operatingSystem": "Android, iOS, Web",
+                        "alternateName": "Weather Fit",
+                        "operatingSystem": "Android, iOS, Web",
         "applicationCategory": "WeatherApplication",
-        "applicationSubCategory": "Outfit Recommendation",
         "description": "WeatherFit helps you decide what to wear based on the weather. Get outfit recommendations for today or plan outfits for upcoming trips with the outfit planner.",
         "url": "https://weather-fit.com",
         "image": "https://weather-fit.com/weather_fit-feature_graphic.png",
-        "author": {
-          "@type": "Person",
-          "name": "Dmytro Turskyi"
+                        "author": {
+                              "@type": "Person",
+                              "name": "Dmytro Turskyi"
+                        },
+                        "publisher": {
+                              "@type": "Organization",
+                              "name": "WeatherFit",
+                              "url": "https://weather-fit.com"
         },
         "offers": {
           "@type": "Offer",
@@ -66,10 +82,21 @@
         ],
         "downloadUrl": [
           "https://play.google.com/store/apps/details?id=com.turskyi.weather_fit",
-          "https://apps.apple.com/ca/app/weatherfit/id6743688355"
-        ]
+                              "https://apps.apple.com/ca/app/weatherfit/id6743688355"
+                        ]
       }
       </script>
+      <script type="application/ld+json">
+                  {
+                        "@context": "https://schema.org",
+                        "@type": "WebSite",
+                        "name": "WeatherFit",
+                        "alternateName": "Weather Fit",
+                        "url": "https://weather-fit.com/",
+                        "description": "WeatherFit is a weather outfit planner that helps people decide what to wear based on the forecast.",
+                        "inLanguage": "en"
+                  }
+                  </script>
       <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -88,6 +115,7 @@
       <meta content="Dmytro Turskyi" name="author">
       <meta content="WeatherFit suggests what to wear based on the weather and helps you plan outfits for future trips. Get simple clothing recommendations for any forecast."
             name="description">
+      <meta content="#0175C2" name="theme-color">
       <!-- iOS meta tags & icons -->
       <meta content="yes" name="apple-mobile-web-app-capable">
       <meta content="black" name="apple-mobile-web-app-status-bar-style">
@@ -98,9 +126,85 @@
       <!-- Favicon -->
       <link href="favicon.jpeg" rel="icon" type="image/jpeg" />
 
-      <title>WeatherFit – What to Wear Today & Outfit Planner for Future Weather
+      <title>WeatherFit App – What to Wear Today & Outfit Planner for Weather
       </title>
       <link href="manifest.json" rel="manifest">
+
+      <script>
+            const routeMetadata = {
+                  '/': {
+                        title: 'WeatherFit App – What to Wear Today & Outfit Planner for Weather',
+                        description:
+                              'WeatherFit suggests what to wear based on the weather and helps you plan outfits for future trips. Get simple clothing recommendations for any forecast.',
+                  },
+                  '/about': {
+                        title: 'About WeatherFit – Weather-Based Outfit Planner',
+                        description:
+                              'Learn what WeatherFit does across Android, iOS, and web, and how it helps you choose outfits based on weather conditions.',
+                  },
+                  '/support': {
+                        title: 'WeatherFit Support – Help, Feedback, and Contact',
+                        description:
+                              'Get WeatherFit support, find help, and contact the developer for feedback about the weather outfit planner app.',
+                  },
+                  '/privacy-policy': {
+                        title: 'WeatherFit Privacy Policy',
+                        description:
+                              'Read the WeatherFit privacy policy for Android, iOS, macOS, and web, including location and third-party service details.',
+                  },
+            };
+
+            const normalizedPath = window.location.pathname.replace(/\/+$/, '') || '/';
+            const pageMetadata = routeMetadata[normalizedPath] || routeMetadata['/'];
+            const canonicalUrl = `https://weather-fit.com${normalizedPath === '/' ? '/' : normalizedPath}`;
+
+            document.title = pageMetadata.title;
+
+            const descriptionMeta = document.querySelector('meta[name="description"]');
+            const ogTitleMeta = document.querySelector('meta[property="og:title"]');
+            const ogDescriptionMeta = document.querySelector('meta[property="og:description"]');
+            const ogUrlMeta = document.querySelector('meta[property="og:url"]');
+            const twitterTitleMeta = document.querySelector('meta[name="twitter:title"]');
+            const twitterDescriptionMeta = document.querySelector('meta[name="twitter:description"]');
+            const twitterUrlMeta = document.querySelector('meta[name="twitter:url"]');
+            const canonicalLink = document.querySelector('link[rel="canonical"]');
+
+            if (descriptionMeta) {
+                  descriptionMeta.setAttribute('content', pageMetadata.description);
+            }
+
+            if (ogTitleMeta) {
+                  ogTitleMeta.setAttribute('content', pageMetadata.title);
+            }
+
+            if (ogDescriptionMeta) {
+                  ogDescriptionMeta.setAttribute('content', pageMetadata.description);
+            }
+
+            if (ogUrlMeta) {
+                  ogUrlMeta.setAttribute('content', canonicalUrl);
+            }
+
+            if (twitterTitleMeta) {
+                  twitterTitleMeta.setAttribute('content', pageMetadata.title);
+            }
+
+            if (twitterDescriptionMeta) {
+                  twitterDescriptionMeta.setAttribute('content', pageMetadata.description);
+            }
+
+            if (twitterUrlMeta) {
+                  twitterUrlMeta.setAttribute('content', canonicalUrl);
+            }
+
+            if (canonicalLink) {
+                  canonicalLink.setAttribute('href', canonicalUrl);
+            }
+
+            document.querySelectorAll('link[rel="alternate"][hreflang]').forEach((link) => {
+                  link.setAttribute('href', canonicalUrl);
+            });
+      </script>
 
       <!-- This script adds the flutter initialization JS code -->
       <!--suppress HtmlUnknownTarget -->

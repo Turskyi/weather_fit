@@ -10,8 +10,12 @@ const String supportEmail = 'support@$kDomain';
 const String imagePath = 'assets/images/';
 const String outfitImagePath = '${imagePath}outfits/';
 const String kAppName = 'WeatherFit';
+const String kAndroidPackageName = 'com.turskyi.weather_fit';
+const String kDeviceMethodChannel = '$kAndroidPackageName/device';
+const String kSharedContainerMethodChannel =
+    '$kAndroidPackageName/shared_container';
 const String kGooglePlayUrl =
-    'https://play.google.com/store/apps/details?id=com.turskyi.weather_fit';
+    'https://play.google.com/store/apps/details?id=$kAndroidPackageName';
 const String kAppStoreUrl =
     'https://apps.apple.com/ca/app/weatherfit/id6743688355';
 const String itunesLookupUrl = 'https://itunes.apple.com/lookup?bundleId=';
@@ -49,6 +53,11 @@ const String remoteOutfitBaseUrl =
 /// The minimum width threshold to switch to a multi-column layout on
 /// Web/Desktop.
 const double kWideLayoutBreakpoint = 1000.0;
+
+/// Shared logical-pixel size threshold for Wear compact layouts.
+/// XL Watch emulator shortest side is 240dp, so Wear-specific layouts should
+/// still activate at this size.
+const double kWearCompactLayoutSize = 240.0;
 
 const String kMacOSLocationServicesSettingsUrl =
     'x-apple.systempreferences:com.apple.preference.security?'

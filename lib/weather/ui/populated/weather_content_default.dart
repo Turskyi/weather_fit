@@ -42,7 +42,7 @@ class WeatherContentDefault extends StatelessWidget {
       physics: const AlwaysScrollableScrollPhysics(),
       clipBehavior: Clip.none,
       padding: EdgeInsets.only(
-        top: (kIsWeb || Platform.isAndroid) ? 36 : 40,
+        top: (kIsWeb || Platform.isAndroid) ? 36 : 48,
         left: 16,
         right: 16,
       ),

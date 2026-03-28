@@ -126,12 +126,20 @@
     "location_services_disabled_title": "Usługi lokalizacji są wyłączone",
     "location_services_disabled_content": "Usługi lokalizacji są wyłączone на Twoim urządzeniu. Włącz je w ustawieniach systemowych, aby korzystać z aktualnej lokalizacji."
   },
+  "errors": {
+    "no_internet": "Brak połączenia z internetem. Sprawdź połączenie i spróbuj ponownie.",
+    "unknown": "Wystąpił nieznany błąd. Spróbuj ponownie."
+  },
   "settings": {
     "title": "Ustawienia",
     "language": "Język",
     "temperature_units": "Jednostki temperatury",
     "temperature_units_subtitle_metric": "Używaj jednostek metrycznych dla temperatury.",
     "temperature_units_subtitle_imperial": "Używaj jednostek imperialnych dla temperatury.",
+    "day_night_title": "Dzień i noc",
+    "day_night_subtitle": "Ustaw, kiedy zaczyna się dzień i kiedy zaczyna się noc.",
+    "day_starts": "Początek dnia",
+    "night_starts": "Początek nocy",
     "about_app_subtitle": "Dowiedz się więcej o «WeatherFit».",
     "feedback_subtitle": "Daj nam znać, co myślisz i jakie masz sugestie. Możesz także zgłaszać wszelkie problemy z treścią aplikacji.",
     "support_subtitle": "Odwiedź naszą stronę wsparcia, aby uzyskać pomoc i odpowiedzi na najczęściej zadawane pytania.",
@@ -156,6 +164,7 @@
   "search": {
     "label": "Szukaj",
     "city_or_country": "Miasto lub kraj",
+    "enter_location": "Wpisz lokalizację",
     "enter_city_or_country": "Wpisz miasto lub kraj",
     "page_semantics_label": "Strona wyszukiwania miasta lub kraju",
     "page_app_bar_title": "Wyszukiwanie miasta lub kraju",
@@ -164,7 +173,7 @@
     "use_current_location_dialog_title": "Użyć Twojej aktualnej lokalizacji?",
     "location_not_found_use_current_dialog_content": "Nie udało nam się znaleźć właściwej lokalizacji. Czy chcesz zamiast tego użyć swojej aktualnej lokalizacji?",
     "location_not_found_dialog_title": "Lokalizacja nie została znaleziona",
-    "location_not_found_suggestion_spell_check": "Upewnij się, że nazwa miasta lub kraju jest napisana poprawnie.",
+    "location_not_found_suggestion_spell_check": "Nie znaleźliśmy tej lokalizacji. Możliwe, że nazwa jest wpisana z błędem — spróbuj też pobliskiego miasta lub kraju.",
     "location_not_found_suggestion_use_gps": "Alternatywnie możesz pobrać pogodę dla swojej aktualnej lokalizacji za pomocą GPS.",
     "use_gps_button": "Użyj GPS",
     "quick_city_toronto": "Toronto",
@@ -239,7 +248,7 @@
     "faq_change_location_q": "• Czy mogę zmienić moją lokalizację później?",
     "faq_change_location_a": "Tak, aplikacja pozwala potwierdzić i zaktualizować lokalizację podczas użytkowania.",
     "faq_theme_change_q": "• Dlaczego motyw zmienia się w nocy?",
-    "faq_theme_change_a": "Aplikacja automatycznie przełącza się na tryb ciemny z motywem księżyca między 23:00 a 05:00, aby zapewnić bardziej naturalny wygląd.",
+    "faq_theme_change_a": "Aplikacja automatycznie przełącza się na ciemny motyw w nocy. Godziny początku dnia i nocy możesz zmienić w ustawieniach.",
     "contact_intro": "Jeśli masz problemy lub sugestie:",
     "contact_us_via_email_button": "Skontaktuj się z nami przez e-mail",
     "join_telegram_support_button": "Dołącz do grupy wsparcia na Telegramie",

@@ -32,49 +32,51 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     // Initialize locations list immediately so `PageView` has items on first
     // build.
-    _locations = _getSwipeList(context.read<LocalDataSource>());
+    final LocalDataSource dataSource = context.read<LocalDataSource>();
+    _locations = _getSwipeList(dataSource);
+
+    // Find and set the current index to the active location
+    final Location activeLocation = dataSource.getLastSavedLocation();
+    if (activeLocation.isNotEmpty) {
+      _currentPageIndex = _locations.indexWhere(
+        (Location l) => _isSameLocation(l, activeLocation),
+      );
+      if (_currentPageIndex < 0) {
+        _currentPageIndex = 0;
+      }
+    }
 
     WidgetsBinding.instance.addPostFrameCallback((Duration _) {
       if (mounted) {
+        // Jump to the active location's index if not already there
+        if (_pageController.hasClients &&
+            _currentPageIndex > 0 &&
+            _currentPageIndex < _locations.length) {
+          _pageController.jumpToPage(_currentPageIndex);
+        }
         _fetchWeatherForCurrentPageLocation();
       }
     });
   }
 
   List<Location> _getSwipeList(LocalDataSource localDataSource) {
-    final Location activeLocation = localDataSource.getLastSavedLocation();
     final Location lastSearched = localDataSource.getLastSearchedLocation();
     final List<Location> favourites = localDataSource.getFavouriteLocations();
 
     final List<Location> newList = <Location>[];
 
-    // 1. Active location FIRST.
-    if (activeLocation.isNotEmpty) {
-      newList.add(activeLocation);
-    }
-
-    // 2. Last searched if not already active and not a favorite.
+    // 1. Last searched if not a favorite.
     if (lastSearched.isNotEmpty) {
-      final bool isAlreadyInList = newList.any(
-        (Location l) => _isSameLocation(l, lastSearched),
-      );
       final bool isFavourite = favourites.any(
         (Location l) => _isSameLocation(l, lastSearched),
       );
-      if (!isAlreadyInList && !isFavourite) {
+      if (!isFavourite) {
         newList.add(lastSearched);
       }
     }
 
-    // 3. Favourites.
-    for (final Location fav in favourites) {
-      final bool alreadyExists = newList.any(
-        (Location l) => _isSameLocation(l, fav),
-      );
-      if (!alreadyExists) {
-        newList.add(fav);
-      }
-    }
+    // 2. Favourites in stable order.
+    newList.addAll(favourites);
 
     if (newList.isEmpty) {
       newList.add(const Location.empty());
@@ -87,23 +89,59 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
   }
 
   void _updateLocations({bool resetToFirst = false}) {
-    final List<Location> newList = _getSwipeList(
-      context.read<LocalDataSource>(),
-    );
+    final LocalDataSource localDataSource = context.read<LocalDataSource>();
+    final Location activeLocation = localDataSource.getLastSavedLocation();
+    final List<Location> previousLocations = _locations;
+    final int previousIndex = _currentPageIndex;
 
-    final bool setChanged =
-        newList.length != _locations.length ||
-        !newList.every(
-          (Location nl) =>
-              _locations.any((Location l) => _isSameLocation(l, nl)),
-        );
+    final Location previousVisibleLocation;
+    if (previousLocations.isEmpty) {
+      previousVisibleLocation = const Location.empty();
+    } else {
+      final int safePreviousIndex = previousIndex.clamp(
+        0,
+        previousLocations.length - 1,
+      );
+      previousVisibleLocation = previousLocations[safePreviousIndex];
+    }
 
-    if (setChanged || resetToFirst) {
+    final List<Location> newList = _getSwipeList(localDataSource);
+
+    final bool lengthChanged = newList.length != _locations.length;
+
+    if (lengthChanged || resetToFirst) {
       setState(() {
         _locations = newList;
+        _currentPageIndex = _currentPageIndex.clamp(0, _locations.length - 1);
       });
-      if (resetToFirst && _pageController.hasClients) {
-        _pageController.jumpToPage(0);
+
+      bool jumpedToActiveLocation = false;
+      if (_pageController.hasClients) {
+        // On length change or explicit reset, jump to the active location
+        if (resetToFirst) {
+          _currentPageIndex = 0;
+          _pageController.jumpToPage(0);
+          return;
+        } else if (activeLocation.isNotEmpty) {
+          final int activeIndex = newList.indexWhere(
+            (Location l) => _isSameLocation(l, activeLocation),
+          );
+
+          if (activeIndex >= 0 && activeIndex != _currentPageIndex) {
+            _currentPageIndex = activeIndex;
+            _pageController.jumpToPage(activeIndex);
+            jumpedToActiveLocation = true;
+          }
+        }
+      }
+
+      if (jumpedToActiveLocation) {
+        return;
+      } else {
+        final Location updatedVisibleLocation = _locations[_currentPageIndex];
+        if (!_isSameLocation(previousVisibleLocation, updatedVisibleLocation)) {
+          _fetchWeatherForCurrentPageLocation();
+        }
       }
     }
   }
@@ -121,6 +159,8 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     final bool isExtraSmall = context.isExtraSmallScreen;
     final bool isWide = context.screenWidth > constants.kWideLayoutBreakpoint;
+    final bool showPageArrows =
+        _locations.length > 1 && (isWearDevice || isWide);
 
     final Widget pageView = PageView.builder(
       controller: _pageController,
@@ -161,7 +201,7 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
       },
     );
 
-    final Widget body = isWide
+    final Widget body = showPageArrows
         ? Stack(
             children: <Widget>[
               pageView,
@@ -169,12 +209,17 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Padding(
-                    padding: const EdgeInsets.only(left: 8.0),
+                    padding: EdgeInsets.only(left: isExtraSmall ? 2.0 : 8.0),
                     child: IconButton(
-                      icon: const Icon(
+                      padding: EdgeInsets.zero,
+                      constraints: BoxConstraints(
+                        minWidth: isExtraSmall ? 36 : 56,
+                        minHeight: isExtraSmall ? 36 : 56,
+                      ),
+                      icon: Icon(
                         Icons.arrow_back_ios,
                         color: Colors.white54,
-                        size: 48,
+                        size: isExtraSmall ? 18 : 48,
                       ),
                       onPressed: () => _pageController.previousPage(
                         duration: const Duration(milliseconds: 300),
@@ -187,12 +232,17 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
                 Align(
                   alignment: Alignment.centerRight,
                   child: Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
+                    padding: EdgeInsets.only(right: isExtraSmall ? 2.0 : 8.0),
                     child: IconButton(
-                      icon: const Icon(
+                      padding: EdgeInsets.zero,
+                      constraints: BoxConstraints(
+                        minWidth: isExtraSmall ? 36 : 56,
+                        minHeight: isExtraSmall ? 36 : 56,
+                      ),
+                      icon: Icon(
                         Icons.arrow_forward_ios,
                         color: Colors.white54,
-                        size: 48,
+                        size: isExtraSmall ? 18 : 48,
                       ),
                       onPressed: () => _pageController.nextPage(
                         duration: const Duration(milliseconds: 300),
@@ -208,7 +258,11 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
     return BlocListener<WeatherBloc, WeatherState>(
       listener: (BuildContext context, WeatherState state) {
         _weatherBlocStateListener(context, state);
-        if (state is WeatherSuccess || state is WeatherInitial) {
+        // Update locations list whenever state changes to ensure new locations
+        // from search are added before loading state is shown
+        if (state is WeatherSuccess ||
+            state is WeatherInitial ||
+            state is WeatherLoadingState) {
           _updateLocations();
         }
       },
@@ -245,15 +299,26 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
   }
 
   void _navigateToSettingsAndRefreshOutfit() {
+    final LocalDataSource localDataSource = context.read<LocalDataSource>();
+    final Location locationBeforeNavigation = localDataSource
+        .getLastSavedLocation();
+
     Navigator.pushNamed(context, AppRoute.settings.path).whenComplete(() {
       if (mounted) {
-        final WeatherBloc weatherBloc = context.read<WeatherBloc>();
-        weatherBloc.add(
-          GetOutfitEvent(
-            weather: weatherBloc.state.weather,
-            origin: context.origin,
-          ),
-        );
+        final Location locationAfterNavigation = localDataSource
+            .getLastSavedLocation();
+        if (_isSameLocation(
+          locationBeforeNavigation,
+          locationAfterNavigation,
+        )) {
+          final WeatherBloc weatherBloc = context.read<WeatherBloc>();
+          weatherBloc.add(
+            GetOutfitEvent(
+              weather: weatherBloc.state.weather,
+              origin: context.origin,
+            ),
+          );
+        }
       }
     });
   }

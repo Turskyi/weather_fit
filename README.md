@@ -9,7 +9,9 @@
 [![wakatime](https://wakatime.com/badge/user/f9df5074-b4ea-4c17-b001-fff428ab82aa/project/cd1aecce-fdc9-4b99-abfc-38310e1ce741.svg)](https://wakatime.com/badge/user/f9df5074-b4ea-4c17-b001-fff428ab82aa/project/cd1aecce-fdc9-4b99-abfc-38310e1ce741)
 <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/m/Turskyi/weather_fit">
 
-# Weather Fit
+# WeatherFit
+
+Official website: https://weather-fit.com
 
 **WeatherFit** is more than just a weather app, it’s a personal stylist that
 helps you dress well and stay comfortable. Whether you’re going to work,
@@ -67,32 +69,32 @@ follow these steps:
 - Fork this repository and clone it to your local machine.
 - Create a new branch for your feature or bug-fix.
 - Set up the necessary configuration and secret files (these are not versioned):
-    - Create a `.env` file in the root directory:
-      ```env
-      RESEND_API_KEY="re_123abc"
-      ```
-      (Get a free token from [resend.com](https://resend.com))
-    - Create `android/key.properties` with the following content:
-      ```properties
-      # dev debug environment variables
-      SIGNING_KEY_DEBUG_PATH=../keystore/weather_fit_debug.keystore
-      SIGNING_KEY_DEBUG_PASSWORD=...
-      SIGNING_KEY_DEBUG_KEY=weather_fit_debug
-      SIGNING_KEY_DEBUG_KEY_PASSWORD=...
-      # production release environment variables
-      SIGNING_KEY_RELEASE_PATH=../keystore/weather_fit_release.keystore
-      SIGNING_KEY_RELEASE_PASSWORD=...
-      SIGNING_KEY_RELEASE_KEY=weather_fit_release
-      SIGNING_KEY_RELEASE_KEY_PASSWORD=...
-      # suppress inspection "UnusedProperty"
-      FIREBASE_ANDROID_APP_ID=1:...
-      # suppress inspection "UnusedProperty"
-      FIREBASE_TOKEN=1//...
-      ```
-    - Place the following files in their respective locations:
-        - `android/keystore/weather_fit_debug.keystore`
-        - `android/keystore/weather_fit_release.keystore`
-        - `android/app/google-services.json`
+  - Create a `.env` file in the root directory:
+    ```env
+    RESEND_API_KEY="re_123abc"
+    ```
+    (Get a free token from [resend.com](https://resend.com))
+  - Create `android/key.properties` with the following content:
+    ```properties
+    # dev debug environment variables
+    SIGNING_KEY_DEBUG_PATH=../keystore/weather_fit_debug.keystore
+    SIGNING_KEY_DEBUG_PASSWORD=...
+    SIGNING_KEY_DEBUG_KEY=weather_fit_debug
+    SIGNING_KEY_DEBUG_KEY_PASSWORD=...
+    # production release environment variables
+    SIGNING_KEY_RELEASE_PATH=../keystore/weather_fit_release.keystore
+    SIGNING_KEY_RELEASE_PASSWORD=...
+    SIGNING_KEY_RELEASE_KEY=weather_fit_release
+    SIGNING_KEY_RELEASE_KEY_PASSWORD=...
+    # suppress inspection "UnusedProperty"
+    FIREBASE_ANDROID_APP_ID=1:...
+    # suppress inspection "UnusedProperty"
+    FIREBASE_TOKEN=1//...
+    ```
+  - Place the following files in their respective locations:
+    - `android/keystore/weather_fit_debug.keystore`
+    - `android/keystore/weather_fit_release.keystore`
+    - `android/app/google-services.json`
 - Generate the necessary files by running:
   ```bash
   dart run build_runner build --delete-conflicting-outputs
@@ -113,8 +115,8 @@ features, or give feedback.
 To install **WeatherFit**, you need to have Flutter SDK and Android Studio
 installed on your machine. You can follow
 [the official documentation](https://docs.flutter.dev/get-started/install) to
-set up your development environment. To run a **WeatherFit** on your device or 
-emulator, you need to clone this repository and open it in Android Studio. 
+set up your development environment. To run a **WeatherFit** on your device or
+emulator, you need to clone this repository and open it in Android Studio.
 Then, you can use the run button or the command line to launch the app.
 For more information, see the Flutter documentation.
 
@@ -124,6 +126,111 @@ For more information, see the Flutter documentation.
 dart run build_runner clean
 dart run build_runner build --delete-conflicting-outputs
 ```
+
+## Android flavors (phone and Wear OS)
+
+This project uses two Android flavors:
+
+- `phone` — default mobile build.
+- `wear` — Wear OS targeted build.
+
+### Debug run configuration
+
+The build is configured to make debugging seamless:
+
+- **Default "main" run configuration works**: The build system is configured to
+  only build the `phone` flavor for debug builds. This means you can run the
+  standard debug configuration in Android Studio or use `flutter run` without
+  specifying a flavor. No setup required!
+- **For Wear OS testing**: Explicitly specify the `wear` flavor.
+
+CLI examples:
+
+```bash
+# Test phone (default, no flavor needed for debug builds)
+flutter run
+
+# Or explicitly specify phone
+flutter run --flavor phone
+
+# Test Wear OS (use --flavor wear for release builds too)
+flutter build appbundle --release --flavor wear -t lib/main.dart
+```
+
+Android Studio:
+
+- **Phone debugging**: Just press Debug with the default "main" configuration.
+- **Wear OS debugging**: Create a new Flutter run configuration and set
+  **Build flavor** to `wear`.
+
+Manifest overlays:
+
+- `android/app/src/main/AndroidManifest.xml` (shared)
+- `android/app/src/phone/AndroidManifest.xml` (phone-only additions)
+- `android/app/src/wear/AndroidManifest.xml` (Wear-only additions, including
+  `android.hardware.type.watch`)
+
+### Build phone release
+
+```bash
+flutter build appbundle --release --flavor phone -t lib/main.dart
+```
+
+Output:
+
+- `build/app/outputs/bundle/phoneRelease/app-phone-release.aab`
+
+### Build Wear OS release
+
+```bash
+flutter build appbundle --release --flavor wear -t lib/main.dart
+```
+
+Output:
+
+- `build/app/outputs/bundle/wearRelease/app-wear-release.aab`
+
+## Upload Wear build to Play Console
+
+1. Open your app in Google Play Console.
+2. Go to **Test & release** → choose a track (Internal/Closed/Production).
+3. In the release page header, switch the form-factor dropdown from
+   **Phones** to **Wear OS**.
+
+- This dropdown is easy to miss.
+- Example track URL where this switch appears:
+  `https://play.google.com/console/u/0/developers/8790223297246728168/app/4975841565581446594/tracks/4697313077494146074?tab=releases`
+
+4. Create a new release and upload
+   `build/app/outputs/bundle/wearRelease/app-wear-release.aab`.
+5. Verify the release is recognized as **Wear OS** in App Bundle Explorer
+   (supported form factors/devices).
+6. Save, review, and roll out.
+
+Tip: keep phone and wear releases as separate flavor artifacts. Do not manually
+toggle manifest lines before each build.
+
+### Release order and versioning rule
+
+Google Play requires unique Android `versionCode` values across phone and Wear
+artifacts (same package name).
+
+Recommended workflow for this project:
+
+1. Build and publish the **Wear OS** flavor manually from a release branch:
+
+```bash
+flutter build appbundle --release --flavor wear -t lib/main.dart
+```
+
+2. After the Wear OS release is published in Play Console, increment app
+   version (`version:` in `pubspec.yaml`) to produce the next Android
+   `versionCode`.
+3. Merge/push to `master` so CI/CD builds and publishes the **phone** flavor
+   with the incremented version number.
+
+This prevents Play Console conflicts where one form factor blocks publishing
+for the other because of duplicate `versionCode`.
 
 ## Test Coverage
 

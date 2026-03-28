@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:bloc_test/bloc_test.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -38,6 +41,8 @@ void main() {
   });
 
   setUp(() async {
+    SharedPreferences.setMockInitialValues(<String, Object>{});
+
     mockHomeWidgetService = MockHomeWidgetService();
     mockWeatherRepository = MockWeatherRepository();
     mockOutfitRepository = MockOutfitRepository();
@@ -167,6 +172,61 @@ void main() {
     });
 
     group('fetchWeather', () {
+      group('updateWeatherOnHomeWidget', () {
+        blocTest<WeatherBloc, WeatherState>(
+          'does not emit errors when home widget update throws '
+          'PlatformException',
+          build: () => weatherBloc,
+          setUp: () {
+            when(
+              () => mockHomeWidgetService.updateHomeWidget(
+                localDataSource: localDataSource,
+                weather: any(named: 'weather'),
+                forecast: any(named: 'forecast'),
+                outfitRepository: mockOutfitRepository,
+              ),
+            ).thenThrow(
+              PlatformException(
+                code: 'error',
+                message: 'Widget API not available',
+              ),
+            );
+          },
+          seed: () => WeatherSuccess(
+            locale: dummy_constants.dummyLocale,
+            weather: Weather.empty,
+            dailyForecast: const DailyForecastDomain(
+              forecast: <ForecastItemDomain>[
+                ForecastItemDomain(
+                  time: '2030-01-01T13:00:00',
+                  temperature: 20,
+                  weatherCode: 1,
+                ),
+              ],
+            ),
+            date: DateTime(2025),
+          ),
+          act: (WeatherBloc bloc) {
+            bloc.add(
+              const UpdateWeatherOnHomeWidgetEvent(
+                WeatherFetchOrigin.defaultDevice,
+              ),
+            );
+          },
+          expect: () => <WeatherState>[],
+          verify: (_) {
+            verify(
+              () => mockHomeWidgetService.updateHomeWidget(
+                localDataSource: localDataSource,
+                weather: any(named: 'weather'),
+                forecast: any(named: 'forecast'),
+                outfitRepository: mockOutfitRepository,
+              ),
+            ).called(1);
+          },
+        );
+      });
+
       group('refreshWeather', () {
         blocTest<WeatherBloc, WeatherState>(
           'emits initial when status is not success',
@@ -204,6 +264,87 @@ void main() {
           },
           expect: () => <Matcher>[isA<WeatherInitial>()],
           verify: (_) {
+            verifyNever(
+              () => mockWeatherRepository.getWeatherByLocation(any()),
+            );
+          },
+        );
+      });
+
+      group('stale location guards', () {
+        const Location otherLocation = Location(
+          latitude: 40.7128,
+          longitude: -74.0060,
+          locale: 'en',
+          name: 'New York',
+          countryCode: 'US',
+          country: 'United States',
+        );
+        const DailyForecastDomain dailyForecast = DailyForecastDomain(
+          forecast: <ForecastItemDomain>[
+            ForecastItemDomain(
+              time: dummy_constants.dummyForecastTime,
+              temperature: dummy_constants.dummyWeatherTemperature,
+              weatherCode: dummy_constants.dummyWeatherCode,
+            ),
+          ],
+        );
+
+        blocTest<WeatherBloc, WeatherState>(
+          'ignores fetch when event location is not selected location',
+          build: () => weatherBloc,
+          act: (WeatherBloc bloc) async {
+            await localDataSource.saveLocation(dummy_constants.dummyLocation);
+            bloc.add(
+              const FetchWeather(
+                location: otherLocation,
+                origin: WeatherFetchOrigin.defaultDevice,
+              ),
+            );
+          },
+          expect: () => <WeatherState>[],
+          verify: (_) {
+            verifyNever(() => mockWeatherRepository.getDailyForecast(any()));
+            verifyNever(
+              () => mockWeatherRepository.getWeatherByLocation(any()),
+            );
+          },
+        );
+
+        blocTest<WeatherBloc, WeatherState>(
+          'does not emit success when selected location changes mid-fetch',
+          build: () => weatherBloc,
+          setUp: () {
+            final Completer<DailyForecastDomain> completer =
+                Completer<DailyForecastDomain>();
+            when(
+              () => mockWeatherRepository.getDailyForecast(
+                dummy_constants.dummyLocation,
+              ),
+            ).thenAnswer((_) => completer.future);
+
+            Future<void>.microtask(() async {
+              await localDataSource.saveLocation(dummy_constants.dummyLocation);
+              await Future<void>.delayed(Duration.zero);
+              await localDataSource.saveLocation(otherLocation);
+              completer.complete(dailyForecast);
+            });
+          },
+          act: (WeatherBloc bloc) {
+            bloc.add(
+              const FetchWeather(
+                location: dummy_constants.dummyLocation,
+                origin: WeatherFetchOrigin.defaultDevice,
+              ),
+            );
+          },
+          expect: () => <Matcher>[isA<WeatherLoadingState>()],
+          verify: (_) {
+            verify(
+              () => mockWeatherRepository.getDailyForecast(
+                dummy_constants.dummyLocation,
+              ),
+            ).called(1);
             verifyNever(
               () => mockWeatherRepository.getWeatherByLocation(any()),
             );

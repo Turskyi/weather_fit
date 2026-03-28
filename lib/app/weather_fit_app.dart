@@ -98,10 +98,14 @@ class WeatherFitApp extends StatelessWidget {
         ],
         child: BlocBuilder<ThemeCubit, Color>(
           builder: (BuildContext context, Color color) {
+            final SettingsState settingsState = context
+                .watch<SettingsBloc>()
+                .state;
             final DateTime now = DateTime.now();
             final int hour = now.hour;
-            // Assume darkness from 10 PM to 6 AM.
-            final bool completeDarkness = hour < 6 || hour > 21;
+            final bool completeDarkness =
+                hour < settingsState.dayStartHour ||
+                hour >= settingsState.nightStartHour;
             final LocalizationDelegate localizationDelegate = LocalizedApp.of(
               context,
             ).delegate;

@@ -19,6 +19,7 @@ import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/entities/enums/weather_fetch_origin.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/localization/localization_delegate_getter.dart';
+import 'package:weather_fit/res/theme/cubit/theme_cubit.dart';
 import 'package:weather_fit/router/app_route.dart';
 import 'package:weather_fit/router/routes.dart' as router;
 import 'package:weather_fit/search/bloc/search_bloc.dart';
@@ -39,6 +40,7 @@ import 'helpers/hydrated_bloc.dart';
 import 'helpers/mocks/mock_blocs.dart';
 import 'helpers/mocks/mock_repositories.dart';
 import 'helpers/mocks/mock_services.dart';
+import 'helpers/mocks/mock_theme_cubit.dart';
 
 class MockLocalDataSource extends Mock implements LocalDataSource {}
 
@@ -120,6 +122,7 @@ void main() {
   late OutfitRepository outfitRepository;
   late HomeWidgetService mockHomeWidgetService;
   late SettingsBloc settingsBloc;
+  late ThemeCubit themeCubit;
 
   setUp(() {
     mockHomeWidgetService = MockHomeWidgetService();
@@ -128,10 +131,15 @@ void main() {
     mockLocalDataSource = MockLocalDataSource();
 
     settingsBloc = MockSettingsBloc();
+    themeCubit = MockThemeCubit();
 
     when(
       () => settingsBloc.state,
     ).thenReturn(const SettingsInitial(language: Language.en));
+    when(() => themeCubit.state).thenReturn(ThemeCubit.defaultColor);
+    when(
+      () => themeCubit.stream,
+    ).thenAnswer((_) => const Stream<Color>.empty());
 
     when(
       () => mockLocalDataSource.getLastSavedLocation(),
@@ -378,6 +386,7 @@ void main() {
                 providers: <SingleChildWidget>[
                   BlocProvider<WeatherBloc>.value(value: weatherBloc),
                   BlocProvider<SettingsBloc>.value(value: settingsBloc),
+                  BlocProvider<ThemeCubit>.value(value: themeCubit),
                 ],
                 child: prepareWidgetForTesting(
                   LocalizedApp(
@@ -490,6 +499,123 @@ void main() {
         await tester.pump(const Duration(milliseconds: 500));
         expect(find.byType(PageView), findsOneWidget);
       });
+
+      testWidgets(
+        'fetches weather for new visible page location when swipe list shrinks',
+        (WidgetTester tester) async {
+          final repository.Location nonFavouriteLocation = dummy_constants
+              .dummyLocation
+              .copyWith(
+                latitude: 40.7128,
+                longitude: -74.0060,
+                name: 'New York',
+                countryCode: '',
+              );
+          final repository.Location removedFavouriteLocation = dummy_constants
+              .dummyLocation
+              .copyWith(
+                latitude: 50.4501,
+                longitude: 30.5234,
+                name: 'Kyiv',
+                countryCode: '',
+              );
+
+          final List<repository.Location> favourites = <repository.Location>[
+            removedFavouriteLocation,
+          ];
+
+          when(
+            () => mockLocalDataSource.getLastSearchedLocation(),
+          ).thenReturn(nonFavouriteLocation);
+          when(
+            () => mockLocalDataSource.getLastSavedLocation(),
+          ).thenReturn(removedFavouriteLocation);
+          when(
+            () => mockLocalDataSource.getFavouriteLocations(),
+          ).thenAnswer((_) => List<repository.Location>.from(favourites));
+
+          final WeatherBloc weatherBloc = MockWeatherBloc();
+          final StreamController<WeatherState> controller =
+              StreamController<WeatherState>();
+          addTearDown(controller.close);
+          final Stream<WeatherState> stream = controller.stream
+              .asBroadcastStream();
+
+          final WeatherSuccess initialState = WeatherSuccess(
+            date: DateTime.now(),
+            locale: 'en',
+            weather: dummy_constants.dummyWeather.copyWith(
+              location: removedFavouriteLocation,
+              countryCode: '',
+            ),
+            outfitRecommendation: 'Test',
+            dailyForecast: const DailyForecastDomain(
+              forecast: <ForecastItemDomain>[
+                ForecastItemDomain(
+                  time: dummy_constants.dummyForecastTime,
+                  temperature: dummy_constants.dummyWeatherTemperature,
+                  weatherCode: dummy_constants.dummyWeatherCode,
+                ),
+              ],
+            ),
+          );
+
+          when(() => weatherBloc.state).thenReturn(initialState);
+          when(() => weatherBloc.stream).thenAnswer((_) => stream);
+          when(() => weatherBloc.add(any())).thenReturn(null);
+
+          await tester.pumpWidget(
+            MultiRepositoryProvider(
+              providers: <SingleChildWidget>[
+                RepositoryProvider<repository.WeatherRepository>.value(
+                  value: weatherRepository,
+                ),
+                RepositoryProvider<LocalDataSource>.value(
+                  value: mockLocalDataSource,
+                ),
+              ],
+              child: MultiBlocProvider(
+                providers: <SingleChildWidget>[
+                  BlocProvider<WeatherBloc>.value(value: weatherBloc),
+                  BlocProvider<SettingsBloc>.value(value: settingsBloc),
+                  BlocProvider<ThemeCubit>.value(value: themeCubit),
+                ],
+                child: prepareWidgetForTesting(
+                  LocalizedApp(
+                    localizationDelegate,
+                    const MaterialApp(home: WeatherPage()),
+                  ),
+                  localizationDelegate,
+                ),
+              ),
+            ),
+          );
+
+          await tester.pump();
+          await tester.pump(const Duration(milliseconds: 200));
+
+          favourites.clear();
+
+          controller.add(initialState);
+          await tester.pump();
+          await tester.pump();
+
+          verify(
+            () => weatherBloc.add(
+              any(
+                that: isA<FetchWeather>().having(
+                  (FetchWeather event) => event.location,
+                  'location',
+                  predicate<repository.Location>(
+                    (repository.Location location) =>
+                        location.isSamePlaceAs(nonFavouriteLocation),
+                  ),
+                ),
+              ),
+            ),
+          ).called(greaterThan(0));
+        },
+      );
     });
 
     group('UI Stability', () {

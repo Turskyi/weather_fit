@@ -4,7 +4,9 @@ enum Settings {
   lastSearchedLocation('last_searched_location'),
   savedPlans('saved_plans'),
   favourites('favourites'),
-  widgetUpdateFrequency('widget_update_frequency_minutes');
+  widgetUpdateFrequency('widget_update_frequency_minutes'),
+  dayStartHour('day_start_hour'),
+  nightStartHour('night_start_hour');
 
   const Settings(this.key);
 

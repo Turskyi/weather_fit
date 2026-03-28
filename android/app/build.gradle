@@ -48,8 +48,36 @@ android {
         versionCode = flutter.versionCode
         versionName = flutter.versionName
 
+        // Default to "phone" flavor when none is specified.
+        // This allows the "main" run configuration in Android Studio to work.
+        missingDimensionStrategy "device", "phone"
+
         ndk {
             abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
+        }
+    }
+
+    flavorDimensions += "device"
+    productFlavors {
+        phone {
+            dimension "device"
+        }
+        wear {
+            dimension "device"
+        }
+    }
+
+    def requestedTasks = gradle.startParameter.taskNames*.toLowerCase().join(" ")
+    def requestedWearVariant = requestedTasks.contains("wear")
+
+    // Default builds should resolve to phone, but explicit wear tasks must still work.
+    variantFilter { variant ->
+        def isDebugBuild = variant.buildType.name == "debug"
+        def isReleaseBuild = variant.buildType.name == "release"
+        def isWearFlavor = variant.name.contains("wear")
+
+        if ((isDebugBuild || isReleaseBuild) && isWearFlavor && !requestedWearVariant) {
+            variant.ignore = true
         }
     }
 
@@ -110,6 +138,30 @@ android {
         }
         debug {
             signingConfig = signingConfigs.dev
+        }
+    }
+
+    applicationVariants.all { variant ->
+        if (variant.buildType.name == "debug" && variant.flavorName == "phone") {
+            def flutterApkDir = new File("$buildDir/outputs/flutter-apk")
+            variant.assemble.doLast {
+                copy {
+                    from "$buildDir/outputs/apk/phone/debug/app-phone-debug.apk"
+                    into flutterApkDir
+                    rename { "app-debug.apk" }
+                }
+            }
+        }
+
+        if (variant.buildType.name == "release" && variant.flavorName == "phone") {
+            def flutterApkDir = new File("$buildDir/outputs/flutter-apk")
+            variant.assemble.doLast {
+                copy {
+                    from "$buildDir/outputs/apk/phone/release/app-phone-release.apk"
+                    into flutterApkDir
+                    rename { "app-release.apk" }
+                }
+            }
         }
     }
 

@@ -33,134 +33,136 @@ class _SupportPageState extends State<SupportPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 16.0),
-        child: ListView(
-          children: <Widget>[
-            const SizedBox(height: 8),
-            Text(
-              '«${translate('title')}» ${translate('support.title')}',
-              style: textTheme.headlineMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(translate('support.intro_line'), style: textTheme.bodyLarge),
-            const SizedBox(height: 32),
-            Text(
-              '📌 ${translate('faq')}',
-              style: textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 12),
-            RichText(
-              text: TextSpan(
-                style: textTheme.bodyMedium,
-                children: <TextSpan>[
-                  TextSpan(
-                    text: '${translate('support.faq_hourly_forecast_q')}\n  ',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  TextSpan(
-                    text: '${translate('support.faq_hourly_forecast_a')}\n',
-                  ),
-                ],
-              ),
-            ),
-            RichText(
-              text: TextSpan(
-                style: textTheme.bodyMedium,
-                children: <TextSpan>[
-                  TextSpan(
-                    text: '${translate('support.faq_change_location_q')}\n  ',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  TextSpan(
-                    text: '${translate('support.faq_change_location_a')}\n',
-                  ),
-                ],
-              ),
-            ),
-            RichText(
-              text: TextSpan(
-                style: textTheme.bodyMedium,
-                children: <TextSpan>[
-                  TextSpan(
-                    text: '${translate('support.faq_theme_change_q')}\n  ',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  TextSpan(
-                    text: '${translate('support.faq_theme_change_a')}\n',
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 32),
-            Text(
-              '📬 ${translate('contact_support')}',
-              style: textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              translate('support.contact_intro'),
-              style: textTheme.bodyMedium,
-            ),
-            const SizedBox(height: 8),
-            ElevatedButton.icon(
-              onPressed: () => _launchEmail(context),
-              icon: const Icon(Icons.mail),
-              label: Text(translate('support.contact_us_via_email_button')),
-            ),
-            const SizedBox(height: 8),
-            ElevatedButton.icon(
-              onPressed: () => launchUrl(
-                Uri.parse(constants.telegramUrl),
-                mode: LaunchMode.externalApplication,
-              ),
-              icon: const Icon(Icons.chat),
-              label: Text(translate('support.join_telegram_support_button')),
-            ),
-            const SizedBox(height: 8),
-            ElevatedButton.icon(
-              onPressed: () => launchUrl(
-                Uri.parse(constants.developerSupportUrl),
-                mode: LaunchMode.externalApplication,
-              ),
-              icon: const Icon(Icons.web),
-              label: Text(
-                translate('support.visit_developer_support_website_button'),
-              ),
-            ),
-            const SizedBox(height: 32),
-            Text(
-              translate('legal_and_app_info_title'),
-              style: textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              '${translate('developer')}: ${translate('developer_name')}',
-              style: textTheme.bodySmall,
-            ),
-            InkWell(
-              onTap: () => launchUrl(
-                Uri(
-                  scheme: constants.mailToScheme,
-                  path: constants.supportEmail,
+        child: SelectionArea(
+          child: ListView(
+            children: <Widget>[
+              const SizedBox(height: 8),
+              Text(
+                '«${translate('title')}» ${translate('support.title')}',
+                style: textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              child: SelectableText(
-                '${translate('email')}: ${constants.supportEmail}',
-                style: textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.primary,
-                  decoration: TextDecoration.underline,
+              const SizedBox(height: 16),
+              Text(translate('support.intro_line'), style: textTheme.bodyLarge),
+              const SizedBox(height: 32),
+              Text(
+                '📌 ${translate('faq')}',
+                style: textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-            ),
-            const SizedBox(height: 32),
-          ],
+              const SizedBox(height: 12),
+              RichText(
+                text: TextSpan(
+                  style: textTheme.bodyMedium,
+                  children: <TextSpan>[
+                    TextSpan(
+                      text: '${translate('support.faq_hourly_forecast_q')}\n  ',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    TextSpan(
+                      text: '${translate('support.faq_hourly_forecast_a')}\n',
+                    ),
+                  ],
+                ),
+              ),
+              RichText(
+                text: TextSpan(
+                  style: textTheme.bodyMedium,
+                  children: <TextSpan>[
+                    TextSpan(
+                      text: '${translate('support.faq_change_location_q')}\n  ',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    TextSpan(
+                      text: '${translate('support.faq_change_location_a')}\n',
+                    ),
+                  ],
+                ),
+              ),
+              RichText(
+                text: TextSpan(
+                  style: textTheme.bodyMedium,
+                  children: <TextSpan>[
+                    TextSpan(
+                      text: '${translate('support.faq_theme_change_q')}\n  ',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    TextSpan(
+                      text: '${translate('support.faq_theme_change_a')}\n',
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 32),
+              Text(
+                '📬 ${translate('contact_support')}',
+                style: textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                translate('support.contact_intro'),
+                style: textTheme.bodyMedium,
+              ),
+              const SizedBox(height: 8),
+              ElevatedButton.icon(
+                onPressed: () => _launchEmail(context),
+                icon: const Icon(Icons.mail),
+                label: Text(translate('support.contact_us_via_email_button')),
+              ),
+              const SizedBox(height: 8),
+              ElevatedButton.icon(
+                onPressed: () => launchUrl(
+                  Uri.parse(constants.telegramUrl),
+                  mode: LaunchMode.externalApplication,
+                ),
+                icon: const Icon(Icons.chat),
+                label: Text(translate('support.join_telegram_support_button')),
+              ),
+              const SizedBox(height: 8),
+              ElevatedButton.icon(
+                onPressed: () => launchUrl(
+                  Uri.parse(constants.developerSupportUrl),
+                  mode: LaunchMode.externalApplication,
+                ),
+                icon: const Icon(Icons.web),
+                label: Text(
+                  translate('support.visit_developer_support_website_button'),
+                ),
+              ),
+              const SizedBox(height: 32),
+              Text(
+                translate('legal_and_app_info_title'),
+                style: textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                '${translate('developer')}: ${translate('developer_name')}',
+                style: textTheme.bodySmall,
+              ),
+              InkWell(
+                onTap: () => launchUrl(
+                  Uri(
+                    scheme: constants.mailToScheme,
+                    path: constants.supportEmail,
+                  ),
+                ),
+                child: SelectableText(
+                  '${translate('email')}: ${constants.supportEmail}',
+                  style: textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.primary,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 32),
+            ],
+          ),
         ),
       ),
     );

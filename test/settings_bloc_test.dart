@@ -41,6 +41,8 @@ void main() {
 
     when(() => localDataSource.getSavedLanguage()).thenReturn(Language.en);
     when(() => localDataSource.getWidgetUpdateFrequency()).thenReturn(120);
+    when(() => localDataSource.getDayStartHour()).thenReturn(6);
+    when(() => localDataSource.getNightStartHour()).thenReturn(22);
     when(() => updateService.checkForUpdate()).thenAnswer((_) async {});
   });
 

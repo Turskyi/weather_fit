@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:http/http.dart' as http;
 import 'package:hydrated_bloc/hydrated_bloc.dart';
@@ -15,6 +16,7 @@ import 'package:weather_fit/entities/enums/weather_fetch_origin.dart';
 import 'package:weather_fit/entities/models/outfit/outfit_image.dart';
 import 'package:weather_fit/entities/models/temperature/temperature.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
+import 'package:weather_fit/extensions/build_context_extensions.dart';
 import 'package:weather_fit/extensions/date_time_extension.dart';
 import 'package:weather_fit/res/extensions/double_extension.dart';
 import 'package:weather_fit/services/home_widget_service.dart';
@@ -61,7 +63,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
   final HomeWidgetService _homeWidgetService;
 
   void _scheduleInitialHomeWidgetSync() {
-    if (kIsWeb) {
+    if (kIsWeb || isWearDevice) {
       return;
     }
 
@@ -110,140 +112,158 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     Emitter<WeatherState> emit,
   ) async {
     final Location eventLocation = event.location;
-    final String savedLocale = _localDataSource.getLanguageIsoCode();
-    final bool isFavourite = _localDataSource.isFavouriteLocation(
-      eventLocation,
-    );
-
-    // 1. Check for cached data to emit a "Stale" state immediately.
-    final Map<String, dynamic>? cachedData = _localDataSource
-        .getCachedWeatherBundle(eventLocation);
-
-    if (cachedData != null) {
-      try {
-        final Weather cachedWeather = Weather.fromJson(
-          cachedData['weather'] as Map<String, dynamic>,
-        );
-        final DailyForecastDomain cachedForecast = DailyForecastDomain.fromJson(
-          cachedData['dailyForecast'] as Map<String, dynamic>,
-        );
-        final OutfitImage cachedOutfitImage = OutfitImage.fromJson(
-          cachedData['outfitImage'] as Map<String, dynamic>,
-        );
-        final String cachedRecommendation =
-            cachedData['outfitRecommendation'] as String;
-
-        emit(
-          WeatherSuccess(
-            locale: savedLocale,
-            weather: cachedWeather,
-            dailyForecast: cachedForecast,
-            outfitRecommendation: cachedRecommendation,
-            outfitImage: cachedOutfitImage,
-            date: state.date,
-            isFavourite: isFavourite,
-          ),
-        );
-      } catch (e) {
-        debugPrint('Error loading cached weather bundle: $e');
-      }
-    }
-
-    if (eventLocation.isEmpty) {
-      emit(
-        WeatherInitial(
-          locale: savedLocale,
-          dailyForecast: state.dailyForecast,
-          date: DateTime.now(),
-          isFavourite: isFavourite,
-        ),
+    if (_isSelectedLocation(eventLocation)) {
+      final String savedLocale = _localDataSource.getLanguageIsoCode();
+      final bool isFavourite = _localDataSource.isFavouriteLocation(
+        eventLocation,
       );
-    } else {
-      // If we don't have cache, or even if we do, we show a localized loader
-      // (or just revalidate in background).
-      if (cachedData == null) {
-        emit(
-          WeatherLoadingState(
-            locale: savedLocale,
-            weather: state.weather,
-            dailyForecast: state.dailyForecast,
-            date: state.date,
-            isFavourite: isFavourite,
-          ),
-        );
+
+      // 1. Check for cached data to emit a "Stale" state immediately.
+      final Map<String, dynamic>? cachedData = _localDataSource
+          .getCachedWeatherBundle(eventLocation);
+
+      if (cachedData != null && _isSelectedLocation(eventLocation)) {
+        try {
+          final Weather cachedWeather = Weather.fromJson(
+            cachedData['weather'] as Map<String, dynamic>,
+          );
+          final DailyForecastDomain cachedForecast =
+              DailyForecastDomain.fromJson(
+                cachedData['dailyForecast'] as Map<String, dynamic>,
+              );
+          final OutfitImage cachedOutfitImage = OutfitImage.fromJson(
+            cachedData['outfitImage'] as Map<String, dynamic>,
+          );
+          final String cachedRecommendation =
+              cachedData['outfitRecommendation'] as String;
+
+          emit(
+            WeatherSuccess(
+              locale: savedLocale,
+              weather: cachedWeather,
+              dailyForecast: cachedForecast,
+              outfitRecommendation: cachedRecommendation,
+              outfitImage: cachedOutfitImage,
+              date: state.date,
+              isFavourite: isFavourite,
+            ),
+          );
+        } catch (e) {
+          debugPrint('Error loading cached weather bundle: $e');
+        }
       }
 
-      try {
-        final DailyForecastDomain dailyForecast = await _weatherRepository
-            .getDailyForecast(eventLocation);
-
-        final WeatherDomain domainWeather = await _getWeatherByLocation(
-          eventLocation,
-        );
-
-        final Weather weather = Weather.fromRepository(domainWeather);
-
-        final TemperatureUnits units = state.temperatureUnits;
-
-        final double value = units.isFahrenheit
-            ? weather.temperature.value.toFahrenheit()
-            : weather.temperature.value;
-
-        final Weather updatedWeather = weather.copyWith(
-          temperature: Temperature(value: value),
-          temperatureUnits: units,
-        );
-
-        final String outfitRecommendation = _getOutfitRecommendation(
-          updatedWeather,
-        );
-
-        final OutfitImage outfitImage = await _outfitRepository.getOutfitImage(
-          weather,
-        );
-
-        // 2. Persist the new "Weather Bundle" for future swipes.
-        await _localDataSource.cacheWeatherBundle(
-          location: eventLocation,
-          weather: updatedWeather,
-          dailyForecast: dailyForecast,
-          outfitRecommendation: outfitRecommendation,
-          outfitImage: outfitImage,
-        );
-
+      if (eventLocation.isEmpty) {
         emit(
-          WeatherSuccess(
+          WeatherInitial(
             locale: savedLocale,
-            weather: updatedWeather,
-            outfitRecommendation: outfitRecommendation,
-            outfitImage: outfitImage,
-            dailyForecast: dailyForecast,
-            date: state.date,
+            dailyForecast: state.dailyForecast,
+            date: DateTime.now(),
             isFavourite: isFavourite,
           ),
         );
-
-        final WeatherFetchOrigin eventOrigin = event.origin;
-        if (!kIsWeb && eventOrigin.isNotWearable) {
-          add(UpdateWeatherOnHomeWidgetEvent(eventOrigin));
-        }
-      } on Exception catch (exception) {
-        debugPrint('WeatherBloc _onFetchWeather Exception: $exception.');
+      } else {
+        // If we don't have cache, or even if we do, we show a localized loader
+        // (or just revalidate in background).
         if (cachedData == null) {
-          final String stateOutfitRecommendation = state.outfitRecommendation;
           emit(
-            WeatherFailure(
+            WeatherLoadingState(
               locale: savedLocale,
               weather: state.weather,
-              message: _mapExceptionToMessage(exception),
-              outfitRecommendation: stateOutfitRecommendation,
               dailyForecast: state.dailyForecast,
               date: state.date,
               isFavourite: isFavourite,
             ),
           );
         }
+
+        try {
+          final DailyForecastDomain dailyForecast = await _weatherRepository
+              .getDailyForecast(eventLocation);
+
+          if (_isSelectedLocation(eventLocation)) {
+            final WeatherDomain domainWeather = await _getWeatherByLocation(
+              eventLocation,
+            );
+
+            if (_isSelectedLocation(eventLocation)) {
+              final Weather weather = Weather.fromRepository(domainWeather);
+
+              final TemperatureUnits units = state.temperatureUnits;
+
+              final double value = units.isFahrenheit
+                  ? weather.temperature.value.toFahrenheit()
+                  : weather.temperature.value;
+
+              final Weather updatedWeather = weather.copyWith(
+                temperature: Temperature(value: value),
+                temperatureUnits: units,
+              );
+
+              final String outfitRecommendation = _getOutfitRecommendation(
+                updatedWeather,
+              );
+
+              final OutfitImage outfitImage = await _outfitRepository
+                  .getOutfitImage(weather);
+
+              // 2. Persist the new "Weather Bundle" for future swipes.
+              await _localDataSource.cacheWeatherBundle(
+                location: eventLocation,
+                weather: updatedWeather,
+                dailyForecast: dailyForecast,
+                outfitRecommendation: outfitRecommendation,
+                outfitImage: outfitImage,
+              );
+
+              if (_isSelectedLocation(eventLocation)) {
+                emit(
+                  WeatherSuccess(
+                    locale: savedLocale,
+                    weather: updatedWeather,
+                    outfitRecommendation: outfitRecommendation,
+                    outfitImage: outfitImage,
+                    dailyForecast: dailyForecast,
+                    date: state.date,
+                    isFavourite: isFavourite,
+                  ),
+                );
+
+                final WeatherFetchOrigin eventOrigin = event.origin;
+                if (!kIsWeb && eventOrigin.isNotWearable) {
+                  add(UpdateWeatherOnHomeWidgetEvent(eventOrigin));
+                }
+              }
+            }
+          }
+        } on Exception catch (exception) {
+          debugPrint('WeatherBloc _onFetchWeather Exception: $exception.');
+          if (cachedData == null) {
+            final String stateOutfitRecommendation = state.outfitRecommendation;
+            emit(
+              WeatherFailure(
+                locale: savedLocale,
+                weather: state.weather,
+                message: _mapExceptionToMessage(exception),
+                outfitRecommendation: stateOutfitRecommendation,
+                dailyForecast: state.dailyForecast,
+                date: state.date,
+                isFavourite: isFavourite,
+              ),
+            );
+          }
+        }
       }
+    }
+  }
+
+  bool _isSelectedLocation(Location location) {
+    final Location selectedLocation = _localDataSource.getLastSavedLocation();
+
+    if (selectedLocation.isEmpty) {
+      return true;
+    } else {
+      return selectedLocation.isSamePlaceAs(location);
     }
   }
 
@@ -597,12 +617,16 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
   ) async {
     final DailyForecastDomain? dailyForecast = state.dailyForecast;
     if (dailyForecast != null) {
-      await _homeWidgetService.updateHomeWidget(
-        localDataSource: _localDataSource,
-        weather: state.weather,
-        forecast: dailyForecast,
-        outfitRepository: _outfitRepository,
-      );
+      try {
+        await _homeWidgetService.updateHomeWidget(
+          localDataSource: _localDataSource,
+          weather: state.weather,
+          forecast: dailyForecast,
+          outfitRepository: _outfitRepository,
+        );
+      } on PlatformException catch (e) {
+        debugPrint('Home widget update skipped: $e');
+      }
     }
   }
 

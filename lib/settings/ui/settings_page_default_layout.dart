@@ -11,11 +11,14 @@ import 'package:weather_fit/res/widgets/background.dart';
 import 'package:weather_fit/res/widgets/leading_widget.dart';
 import 'package:weather_fit/settings/bloc/settings_bloc.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
+import 'package:weather_repository/weather_repository.dart';
 
 class SettingsPageDefaultLayout extends StatelessWidget {
   const SettingsPageDefaultLayout({
     required this.rebuildSettingsWhen,
     required this.onLanguageChanged,
+    required this.onDayStartHourChanged,
+    required this.onNightStartHourChanged,
     required this.rebuildUnitsWhen,
     required this.onUnitsChanged,
     required this.onAboutTap,
@@ -30,6 +33,10 @@ class SettingsPageDefaultLayout extends StatelessWidget {
 
   /// Called when the user changes the language.
   final ValueChanged<Language> onLanguageChanged;
+
+  final ValueChanged<int> onDayStartHourChanged;
+
+  final ValueChanged<int> onNightStartHourChanged;
 
   final BlocBuilderCondition<WeatherState> rebuildUnitsWhen;
 
@@ -111,6 +118,90 @@ class SettingsPageDefaultLayout extends StatelessWidget {
                               }).toList(),
                               selected: <Language>{settingsState.language},
                               onSelectionChanged: _onLanguageSelected,
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 20),
+                BlocBuilder<SettingsBloc, SettingsState>(
+                  buildWhen: rebuildSettingsWhen,
+                  builder: (BuildContext context, SettingsState state) {
+                    final List<int> dayOptions = List<int>.generate(
+                      WeatherCondition.maxDayStartHour -
+                          WeatherCondition.minDayStartHour +
+                          1,
+                      (int index) {
+                        return WeatherCondition.minDayStartHour + index;
+                      },
+                    );
+                    final List<int> nightOptions = List<int>.generate(
+                      WeatherCondition.maxNightStartHour -
+                          WeatherCondition.minNightStartHour +
+                          1,
+                      (int index) {
+                        return WeatherCondition.minNightStartHour + index;
+                      },
+                    );
+
+                    return Card(
+                      elevation: 2.0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text(
+                              translate('settings.day_night_title'),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              translate('settings.day_night_subtitle'),
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                            const SizedBox(height: 12),
+                            DropdownButtonFormField<int>(
+                              initialValue: state.dayStartHour,
+                              decoration: InputDecoration(
+                                labelText: translate('settings.day_starts'),
+                              ),
+                              items: dayOptions.map((int hour) {
+                                return DropdownMenuItem<int>(
+                                  value: hour,
+                                  child: Text(_formatHourLabel(hour)),
+                                );
+                              }).toList(),
+                              onChanged: (int? value) {
+                                if (value != null) {
+                                  onDayStartHourChanged(value);
+                                }
+                              },
+                            ),
+                            const SizedBox(height: 12),
+                            DropdownButtonFormField<int>(
+                              initialValue: state.nightStartHour,
+                              decoration: InputDecoration(
+                                labelText: translate('settings.night_starts'),
+                              ),
+                              items: nightOptions.map((int hour) {
+                                return DropdownMenuItem<int>(
+                                  value: hour,
+                                  child: Text(_formatHourLabel(hour)),
+                                );
+                              }).toList(),
+                              onChanged: (int? value) {
+                                if (value != null) {
+                                  onNightStartHourChanged(value);
+                                }
+                              },
                             ),
                           ],
                         ),
@@ -422,6 +513,10 @@ class SettingsPageDefaultLayout extends StatelessWidget {
     if (language != null) {
       onLanguageChanged(language);
     }
+  }
+
+  String _formatHourLabel(int hour) {
+    return '${hour.toString().padLeft(2, '0')}:00';
   }
 
   Future<void> _showWidgetInfoDialog(BuildContext context) {

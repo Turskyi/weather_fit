@@ -1,9 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://weather-fit.com/</loc>
-    <lastmod>2026-03-06</lastmod>
+    <lastmod>2026-03-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+    <xhtml:link href="https://weather-fit.com/" hreflang="x-default" rel="alternate"/>
+    <xhtml:link href="https://weather-fit.com/" hreflang="en" rel="alternate"/>
+    <xhtml:link href="https://weather-fit.com/" hreflang="pl" rel="alternate"/>
+    <xhtml:link href="https://weather-fit.com/" hreflang="uk" rel="alternate"/>
+  </url>
+  <url>
+    <loc>https://weather-fit.com/about</loc>
+    <lastmod>2026-03-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link href="https://weather-fit.com/about" hreflang="x-default" rel="alternate"/>
+    <xhtml:link href="https://weather-fit.com/about" hreflang="en" rel="alternate"/>
+    <xhtml:link href="https://weather-fit.com/about" hreflang="pl" rel="alternate"/>
+    <xhtml:link href="https://weather-fit.com/about" hreflang="uk" rel="alternate"/>
+  </url>
+  <url>
+    <loc>https://weather-fit.com/support</loc>
+    <lastmod>2026-03-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link href="https://weather-fit.com/support" hreflang="x-default" rel="alternate"/>
+    <xhtml:link href="https://weather-fit.com/support" hreflang="en" rel="alternate"/>
+    <xhtml:link href="https://weather-fit.com/support" hreflang="pl" rel="alternate"/>
+    <xhtml:link href="https://weather-fit.com/support" hreflang="uk" rel="alternate"/>
+  </url>
+  <url>
+    <loc>https://weather-fit.com/privacy-policy</loc>
+    <lastmod>2026-03-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link href="https://weather-fit.com/privacy-policy" hreflang="x-default" rel="alternate"/>
+    <xhtml:link href="https://weather-fit.com/privacy-policy" hreflang="en" rel="alternate"/>
+    <xhtml:link href="https://weather-fit.com/privacy-policy" hreflang="pl" rel="alternate"/>
+    <xhtml:link href="https://weather-fit.com/privacy-policy" hreflang="uk" rel="alternate"/>
   </url>
 </urlset>
