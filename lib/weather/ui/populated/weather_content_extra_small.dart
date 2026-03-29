@@ -54,185 +54,189 @@ class WeatherContentExtraSmall extends StatelessWidget {
       context.wearBottomPadding + 12,
     );
 
-    return SingleChildScrollView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      clipBehavior: Clip.none,
-      padding: contentPadding,
-      child: Column(
-        children: <Widget>[
-          Center(child: child),
-          const SizedBox(height: 10),
-          if (weather.wasUpdated)
-            Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.wearHorizontalPadding * 0.6,
-              ),
-              child: Align(
-                alignment: Alignment.center,
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 132),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      _WearInfoChip(
-                        size: infoBoxSize,
-                        radius: infoBoxRadius,
-                        color: iconChipColor,
-                        child: WeatherIcon(condition: weather.condition),
-                      ),
-                      const SizedBox(width: 16),
-                      _WearInfoChip(
-                        size: infoBoxSize,
-                        radius: infoBoxRadius,
-                        color: surfaceColor,
-                        child: Text(
-                          weather.formattedTemperature,
-                          style: textTheme.labelMedium?.copyWith(
-                            color: temperatureTextColor,
-                            fontWeight: FontWeight.bold,
+    return Scrollbar(
+      thickness: 2,
+      radius: const Radius.circular(2),
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        clipBehavior: Clip.none,
+        padding: contentPadding,
+        child: Column(
+          children: <Widget>[
+            Center(child: child),
+            const SizedBox(height: 10),
+            if (weather.wasUpdated)
+              Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: context.wearHorizontalPadding * 0.6,
+                ),
+                child: Align(
+                  alignment: Alignment.center,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 132),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        _WearInfoChip(
+                          size: infoBoxSize,
+                          radius: infoBoxRadius,
+                          color: iconChipColor,
+                          child: WeatherIcon(condition: weather.condition),
+                        ),
+                        const SizedBox(width: 16),
+                        _WearInfoChip(
+                          size: infoBoxSize,
+                          radius: infoBoxRadius,
+                          color: surfaceColor,
+                          child: Text(
+                            weather.formattedTemperature,
+                            style: textTheme.labelMedium?.copyWith(
+                              color: temperatureTextColor,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          const SizedBox(height: 12),
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 170),
-            child: Column(
-              children: <Widget>[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    if (countryCode.isNotEmpty)
-                      SvgPicture.network(
-                        '${constants.countryFlagsBaseUrl}$countryCode.svg',
-                        height: cityTextStyle?.fontSize,
-                        errorBuilder:
-                            (BuildContext _, Object error, StackTrace _) {
-                              debugPrint(
-                                'Error in `WeatherContentExtraSmall`:\n'
-                                'Failed to load country flag for country code '
-                                '"$countryCode".\n$error.',
-                              );
-                              return const SizedBox();
-                            },
-                      ),
-                    if (countryCode.isNotEmpty) const SizedBox(width: 6),
-                    Flexible(
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: BlocListener<SettingsBloc, SettingsState>(
-                          listenWhen: listenSettingsStateWhen,
-                          listener: settingsStateListener,
-                          child: Text(
-                            weather.locationName,
-                            textAlign: TextAlign.center,
-                            style: cityTextStyle,
+            const SizedBox(height: 12),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 170),
+              child: Column(
+                children: <Widget>[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      if (countryCode.isNotEmpty)
+                        SvgPicture.network(
+                          '${constants.countryFlagsBaseUrl}$countryCode.svg',
+                          height: cityTextStyle?.fontSize,
+                          errorBuilder:
+                              (BuildContext _, Object error, StackTrace _) {
+                                debugPrint(
+                                  'Error in `WeatherContentExtraSmall`:\n'
+                                  'Failed to load country flag for country '
+                                  'code "$countryCode".\n$error.',
+                                );
+                                return const SizedBox();
+                              },
+                        ),
+                      if (countryCode.isNotEmpty) const SizedBox(width: 6),
+                      Flexible(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: BlocListener<SettingsBloc, SettingsState>(
+                            listenWhen: listenSettingsStateWhen,
+                            listener: settingsStateListener,
+                            child: Text(
+                              weather.locationName,
+                              textAlign: TextAlign.center,
+                              style: cityTextStyle,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 4),
-                    IconButton(
-                      iconSize: 16,
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                      icon: BlocBuilder<WeatherBloc, WeatherState>(
-                        builder: (BuildContext context, WeatherState state) {
-                          final bool isFavourite = context
-                              .read<LocalDataSource>()
+                      const SizedBox(width: 4),
+                      IconButton(
+                        iconSize: 16,
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                        icon: BlocBuilder<WeatherBloc, WeatherState>(
+                          builder: (BuildContext context, WeatherState state) {
+                            final bool isFavourite = context
+                                .read<LocalDataSource>()
+                                .isFavouriteLocation(weather.location);
+                            return Icon(
+                              isFavourite ? Icons.star : Icons.star_border,
+                              color: isFavourite
+                                  ? Colors.amber
+                                  : watchForegroundColor,
+                            );
+                          },
+                        ),
+                        onPressed: () {
+                          final LocalDataSource localDataSource = context
+                              .read<LocalDataSource>();
+                          final bool isFavourite = localDataSource
                               .isFavouriteLocation(weather.location);
-                          return Icon(
-                            isFavourite ? Icons.star : Icons.star_border,
-                            color: isFavourite
-                                ? Colors.amber
-                                : watchForegroundColor,
+                          context.read<WeatherBloc>().add(
+                            ToggleFavouriteEvent(weather.location),
+                          );
+                          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              behavior: SnackBarBehavior.floating,
+                              margin: const EdgeInsets.symmetric(
+                                horizontal: 40,
+                                vertical: 24,
+                              ),
+                              content: Text(
+                                isFavourite
+                                    ? translate('location_removed')
+                                    : translate('location_saved'),
+                              ),
+                              duration: const Duration(seconds: 2),
+                            ),
                           );
                         },
                       ),
-                      onPressed: () {
-                        final LocalDataSource localDataSource = context
-                            .read<LocalDataSource>();
-                        final bool isFavourite = localDataSource
-                            .isFavouriteLocation(weather.location);
-                        context.read<WeatherBloc>().add(
-                          ToggleFavouriteEvent(weather.location),
-                        );
-                        ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            behavior: SnackBarBehavior.floating,
-                            margin: const EdgeInsets.symmetric(
-                              horizontal: 40,
-                              vertical: 24,
-                            ),
-                            content: Text(
-                              isFavourite
-                                  ? translate('location_removed')
-                                  : translate('location_saved'),
-                            ),
-                            duration: const Duration(seconds: 2),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 6),
-                BlocBuilder<SettingsBloc, SettingsState>(
-                  builder: (BuildContext _, SettingsState state) {
-                    final String lastUpdatedDateTime = weather
-                        .getFormattedLastUpdatedDateTime(state.locale);
-                    final String label = weather.neverUpdated
-                        ? lastUpdatedDateTime
-                        : '${translate('last_updated_on_label')}\n'
-                              '$lastUpdatedDateTime';
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  BlocBuilder<SettingsBloc, SettingsState>(
+                    builder: (BuildContext _, SettingsState state) {
+                      final String lastUpdatedDateTime = weather
+                          .getFormattedLastUpdatedDateTime(state.locale);
+                      final String label = weather.neverUpdated
+                          ? lastUpdatedDateTime
+                          : '${translate('last_updated_on_label')}\n'
+                                '$lastUpdatedDateTime';
 
-                    return Text(
-                      label,
-                      textAlign: TextAlign.center,
-                      style: textTheme.bodySmall?.copyWith(
-                        color: watchForegroundColor,
-                      ),
-                    );
-                  },
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  weather.translatedWeatherDescription,
-                  textAlign: TextAlign.center,
-                  style: textTheme.bodySmall?.copyWith(
-                    color: watchForegroundColor,
+                      return Text(
+                        label,
+                        textAlign: TextAlign.center,
+                        style: textTheme.bodySmall?.copyWith(
+                          color: watchForegroundColor,
+                        ),
+                      );
+                    },
                   ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-          const WearForecastSection(),
-          BlocBuilder<WeatherBloc, WeatherState>(
-            builder: (BuildContext context, WeatherState state) {
-              if (state.isNotLoading) {
-                return Padding(
-                  padding: const EdgeInsets.only(top: 16.0),
-                  child: ElevatedButton(
-                    onPressed: onRefresh,
-                    child: Text(
-                      translate('weather.check_latest_button'),
-                      textAlign: TextAlign.center,
+                  const SizedBox(height: 4),
+                  Text(
+                    weather.translatedWeatherDescription,
+                    textAlign: TextAlign.center,
+                    style: textTheme.bodySmall?.copyWith(
+                      color: watchForegroundColor,
                     ),
                   ),
-                );
-              } else {
-                return const SizedBox();
-              }
-            },
-          ),
-          const SizedBox(height: 16),
-        ],
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            const WearForecastSection(),
+            BlocBuilder<WeatherBloc, WeatherState>(
+              builder: (BuildContext context, WeatherState state) {
+                if (state.isNotLoading) {
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 16.0),
+                    child: ElevatedButton(
+                      onPressed: onRefresh,
+                      child: Text(
+                        translate('weather.check_latest_button'),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  );
+                } else {
+                  return const SizedBox();
+                }
+              },
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
       ),
     );
   }

@@ -59,68 +59,74 @@ class SearchPageExtraSmallLayout extends StatelessWidget {
             padding: contentPadding,
             child: LayoutBuilder(
               builder: (BuildContext context, BoxConstraints constraints) {
-                return SingleChildScrollView(
-                  keyboardDismissBehavior:
-                      ScrollViewKeyboardDismissBehavior.onDrag,
-                  padding: EdgeInsets.only(
-                    bottom: MediaQuery.viewInsetsOf(context).bottom + 12,
-                  ),
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minHeight: constraints.maxHeight,
+                return Scrollbar(
+                  thickness: 2,
+                  radius: const Radius.circular(2),
+                  child: SingleChildScrollView(
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.onDrag,
+                    padding: EdgeInsets.only(
+                      bottom: MediaQuery.viewInsetsOf(context).bottom + 12,
                     ),
-                    child: Center(
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 180),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            TextField(
-                              controller: textEditingController,
-                              autofocus: true,
-                              style: textTheme.labelSmall,
-                              textInputAction: TextInputAction.search,
-                              onSubmitted: (String value) =>
-                                  _onSearchSubmitted(context, value),
-                              decoration: InputDecoration(
-                                isDense: true,
-                                filled: true,
-                                fillColor: Theme.of(
-                                  context,
-                                ).colorScheme.surface.withValues(alpha: 0.92),
-                                hintText: translate('search.enter_location'),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(18),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: constraints.maxHeight,
+                      ),
+                      child: Center(
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 180),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              TextField(
+                                controller: textEditingController,
+                                autofocus: true,
+                                style: textTheme.labelSmall,
+                                textInputAction: TextInputAction.search,
+                                onSubmitted: (String value) =>
+                                    _onSearchSubmitted(context, value),
+                                decoration: InputDecoration(
+                                  isDense: true,
+                                  filled: true,
+                                  fillColor: Theme.of(
+                                    context,
+                                  ).colorScheme.surface.withValues(alpha: 0.92),
+                                  hintText: translate('search.enter_location'),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(18),
+                                  ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(height: 12),
-                            BlocConsumer<SearchBloc, SearchState>(
-                              listener: searchStateListener,
-                              builder: (BuildContext _, SearchState state) {
-                                return ValueListenableBuilder<TextEditingValue>(
-                                  valueListenable: textEditingController,
-                                  builder:
-                                      (
-                                        BuildContext context,
-                                        TextEditingValue value,
-                                        Widget? _,
-                                      ) {
-                                        return SearchButtons(
-                                          query: value.text,
-                                          isLoading: state is SearchLoading,
-                                          onSearchSubmitted: (String query) =>
-                                              _onSearchSubmitted(
-                                                context,
-                                                query,
-                                              ),
-                                          showGpsButton: false,
-                                        );
-                                      },
-                                );
-                              },
-                            ),
-                          ],
+                              const SizedBox(height: 12),
+                              BlocConsumer<SearchBloc, SearchState>(
+                                listener: searchStateListener,
+                                builder: (BuildContext _, SearchState state) {
+                                  return ValueListenableBuilder<
+                                    TextEditingValue
+                                  >(
+                                    valueListenable: textEditingController,
+                                    builder:
+                                        (
+                                          BuildContext context,
+                                          TextEditingValue value,
+                                          Widget? _,
+                                        ) {
+                                          return SearchButtons(
+                                            query: value.text,
+                                            isLoading: state is SearchLoading,
+                                            onSearchSubmitted: (String query) =>
+                                                _onSearchSubmitted(
+                                                  context,
+                                                  query,
+                                                ),
+                                            showGpsButton: false,
+                                          );
+                                        },
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),

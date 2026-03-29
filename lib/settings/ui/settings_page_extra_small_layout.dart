@@ -72,98 +72,102 @@ class SettingsPageExtraSmallLayout extends StatelessWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-        child: ListView(
-          padding: const EdgeInsets.only(bottom: 60, top: kToolbarHeight),
-          children: <Widget>[
-            // Language toggle.
-            BlocBuilder<SettingsBloc, SettingsState>(
-              buildWhen: rebuildSettingsWhen,
-              builder: (BuildContext _, SettingsState settingsState) {
-                final int selectedIndex = Language.values.indexOf(
-                  settingsState.language,
-                );
-                return _SettingSegmentedToggle(
-                  label: translate('settings.language'),
-                  selectedIndex: selectedIndex,
-                  options: Language.values
-                      .map((Language l) => translate(l.isoLanguageCode))
-                      .toList(),
-                  onSelected: (int index) {
-                    onLanguageChanged(Language.values[index]);
-                  },
-                );
-              },
-            ),
-            const SizedBox(height: 8),
+        child: Scrollbar(
+          thickness: 2,
+          radius: const Radius.circular(2),
+          child: ListView(
+            padding: const EdgeInsets.only(bottom: 60, top: kToolbarHeight),
+            children: <Widget>[
+              // Language toggle.
+              BlocBuilder<SettingsBloc, SettingsState>(
+                buildWhen: rebuildSettingsWhen,
+                builder: (BuildContext _, SettingsState settingsState) {
+                  final int selectedIndex = Language.values.indexOf(
+                    settingsState.language,
+                  );
+                  return _SettingSegmentedToggle(
+                    label: translate('settings.language'),
+                    selectedIndex: selectedIndex,
+                    options: Language.values
+                        .map((Language l) => translate(l.isoLanguageCode))
+                        .toList(),
+                    onSelected: (int index) {
+                      onLanguageChanged(Language.values[index]);
+                    },
+                  );
+                },
+              ),
+              const SizedBox(height: 8),
 
-            // Temperature units toggle.
-            BlocBuilder<WeatherBloc, WeatherState>(
-              buildWhen: rebuildUnitsWhen,
-              builder: (BuildContext context, WeatherState state) {
-                final int selectedIndex =
-                    state.weather.temperatureUnits.isCelsius ? 0 : 1;
-                return _SettingSegmentedToggle(
-                  label: translate('settings.temperature_units'),
-                  options: const <String>['°C', '°F'],
-                  selectedIndex: selectedIndex,
-                  onSelected: (int index) {
-                    final bool isCelsius = index == 0;
-                    onUnitsChanged(isCelsius);
-                  }, // true if Celsius
-                );
-              },
-            ),
-            const SizedBox(height: 8),
+              // Temperature units toggle.
+              BlocBuilder<WeatherBloc, WeatherState>(
+                buildWhen: rebuildUnitsWhen,
+                builder: (BuildContext context, WeatherState state) {
+                  final int selectedIndex =
+                      state.weather.temperatureUnits.isCelsius ? 0 : 1;
+                  return _SettingSegmentedToggle(
+                    label: translate('settings.temperature_units'),
+                    options: const <String>['°C', '°F'],
+                    selectedIndex: selectedIndex,
+                    onSelected: (int index) {
+                      final bool isCelsius = index == 0;
+                      onUnitsChanged(isCelsius);
+                    }, // true if Celsius
+                  );
+                },
+              ),
+              const SizedBox(height: 8),
 
-            // Day/night interval selectors.
-            BlocBuilder<SettingsBloc, SettingsState>(
-              buildWhen: rebuildSettingsWhen,
-              builder: (BuildContext context, SettingsState state) {
-                final List<int> dayOptions = List<int>.generate(
-                  WeatherCondition.maxDayStartHour -
-                      WeatherCondition.minDayStartHour +
-                      1,
-                  (int index) {
-                    return WeatherCondition.minDayStartHour + index;
-                  },
-                );
-                final List<int> nightOptions = List<int>.generate(
-                  WeatherCondition.maxNightStartHour -
-                      WeatherCondition.minNightStartHour +
-                      1,
-                  (int index) {
-                    return WeatherCondition.minNightStartHour + index;
-                  },
-                );
+              // Day/night interval selectors.
+              BlocBuilder<SettingsBloc, SettingsState>(
+                buildWhen: rebuildSettingsWhen,
+                builder: (BuildContext context, SettingsState state) {
+                  final List<int> dayOptions = List<int>.generate(
+                    WeatherCondition.maxDayStartHour -
+                        WeatherCondition.minDayStartHour +
+                        1,
+                    (int index) {
+                      return WeatherCondition.minDayStartHour + index;
+                    },
+                  );
+                  final List<int> nightOptions = List<int>.generate(
+                    WeatherCondition.maxNightStartHour -
+                        WeatherCondition.minNightStartHour +
+                        1,
+                    (int index) {
+                      return WeatherCondition.minNightStartHour + index;
+                    },
+                  );
 
-                return Column(
-                  children: <Widget>[
-                    SettingDropdown(
-                      label: translate('settings.day_starts'),
-                      value: state.dayStartHour,
-                      options: dayOptions,
-                      onChanged: (int? value) {
-                        if (value != null) {
-                          onDayStartHourChanged(value);
-                        }
-                      },
-                    ),
-                    const SizedBox(height: 8),
-                    SettingDropdown(
-                      label: translate('settings.night_starts'),
-                      value: state.nightStartHour,
-                      options: nightOptions,
-                      onChanged: (int? value) {
-                        if (value != null) {
-                          onNightStartHourChanged(value);
-                        }
-                      },
-                    ),
-                  ],
-                );
-              },
-            ),
-          ],
+                  return Column(
+                    children: <Widget>[
+                      SettingDropdown(
+                        label: translate('settings.day_starts'),
+                        value: state.dayStartHour,
+                        options: dayOptions,
+                        onChanged: (int? value) {
+                          if (value != null) {
+                            onDayStartHourChanged(value);
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 8),
+                      SettingDropdown(
+                        label: translate('settings.night_starts'),
+                        value: state.nightStartHour,
+                        options: nightOptions,
+                        onChanged: (int? value) {
+                          if (value != null) {
+                            onNightStartHourChanged(value);
+                          }
+                        },
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ],
+          ),
         ),
       ),
       floatingActionButton: BlurredFabWithBorder(
