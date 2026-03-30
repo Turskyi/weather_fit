@@ -211,7 +211,55 @@
       <script defer src="flutter.js"></script>
 </head>
 
+<style>
+      #splash {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(to bottom,
+                        #1565c0 0%,
+                        #1976d2 25%,
+                        #42a5f5 75%,
+                        #90caf9 100%);
+            z-index: 9999;
+            transition: opacity 0.35s ease;
+      }
+
+      #splash span {
+            color: #ffffff;
+            font-size: clamp(2.5rem, 10vw, 5rem);
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 300;
+            letter-spacing: 0.06em;
+            text-shadow: 0 2px 16px rgba(0, 0, 0, 0.18);
+            user-select: none;
+      }
+</style>
+
 <body>
+      <div id="splash"><span>WeatherFit</span></div>
+
+      <script>
+            (function () {
+                  const splash = document.getElementById('splash');
+                  const observer = new MutationObserver(function () {
+                        if (document.querySelector('flt-glass-pane, canvas')) {
+                              splash.style.opacity = '0';
+                              setTimeout(function () {
+                                    splash.remove();
+                              }, 350);
+                              observer.disconnect();
+                        }
+                  });
+                  observer.observe(document.body, {
+                        childList: true,
+                        subtree: true,
+                  });
+            })();
+      </script>
+
       <noscript>
             <h1>WeatherFit – Outfit recommendations based on weather</h1>
             <p>
