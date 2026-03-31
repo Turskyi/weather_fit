@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
+import 'package:weather_fit/app/deep_link_handler_app.dart';
 import 'package:weather_fit/app/weather_fit_app.dart';
 import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
 import 'package:weather_fit/data/repositories/location_repository.dart';
@@ -23,7 +24,7 @@ import 'package:weather_repository/weather_repository.dart';
 /// When [main] is released, it has utterly no effect on any of the other
 /// components in the system. They don’t know about [main], and they don’t care
 /// when it changes.
-void main() async {
+Future<void> main() async {
   // We need to call `WidgetsFlutterBinding.ensureInitialized` before any
   // `await` operation, otherwise app may stuck on black/white screen.
   WidgetsFlutterBinding.ensureInitialized();
@@ -51,7 +52,7 @@ void main() async {
   runApp(
     LocalizedApp(
       localizationDelegate,
-      WeatherFitApp(
+      DeepLinkHandlerApp(
         weatherRepository: weatherRepository,
         locationRepository: locationRepository,
         outfitRepository: outfitRepository,

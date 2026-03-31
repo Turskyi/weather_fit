@@ -1,3 +1,4 @@
+const String kWeatherRoute = '/weather';
 const String kAppleAppGroupId = 'group.dmytrowidget';
 const String iOSWidgetName = 'WeatherWidgets';
 const String androidWidgetName = 'WeatherWidget';
@@ -67,3 +68,6 @@ const int kIosDefaultMinutesFrequency = 180;
 const int kAndroidDefaultMinutesFrequency = 120;
 const String kBackgroundUniqueName = 'weatherfit_background_update';
 const String kBackgroundTaskName = 'updateWidgetTask';
+
+const String kWeatherFitScheme = 'weatherfit';
+const String kWeatherFitHost = 'open';

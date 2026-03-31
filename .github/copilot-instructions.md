@@ -79,6 +79,18 @@ the agent will append it to this file.
 - Address all analyzer problems introduced by the task before reporting
   completion.
 
+## Type Annotations
+
+- Prefer `Object?` over `dynamic` for type annotations.
+
+- Do not hardcode any string values if they are mentioned more than once; store them in `lib/res/constants/constants.dart` and use the constant instead.
+
+---
+
+## Function Ordering
+
+- If one function calls another, they should be vertically close, and the caller should be above the callee, if at all possible.
+
 ---
 
 _Last updated by agent on 2026-03-27._

@@ -57,13 +57,14 @@ dependencies:
     path: packages/nominatim_api
   open_meteo_api:
     path: packages/open_meteo_api
-  package_info_plus: ^9.0.0
+  package_info_plus: ^9.0.1
   path_provider: ^2.1.5
   permission_handler: ^12.0.1
   resend: ^1.0.0
   retrofit: ^4.9.2
   shared_preferences: ^2.5.5
   shimmer: ^3.0.0
+  uni_links: ^0.5.1
   url_launcher: ^6.3.2
   weather_repository:
     path: packages/weather_repository
