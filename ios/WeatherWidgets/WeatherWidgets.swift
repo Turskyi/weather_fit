@@ -2,6 +2,34 @@ import SwiftUI
 import UIKit
 import WidgetKit
 
+/**
+-------------------------------------------------------------------------------
+⚠️  iOS WidgetKit: Why Widgets Cannot Independently Fetch Weather Data ⚠️
+-------------------------------------------------------------------------------
+
+**Key Limitation:**
+    - WidgetKit extensions are sandboxed and cannot perform arbitrary background fetches or schedule their own updates.
+    - All widget timeline updates are strictly controlled by iOS. The system decides when (and if) your widget code runs.
+
+**What This Means:**
+    - You CANNOT bypass iOS background execution limits by moving weather fetching logic into the widget extension.
+    - The widget can only display data that was previously fetched and stored by the main app (using Workmanager or foreground fetch).
+    - Even if you try to fetch data in the widget's timeline provider, iOS may throttle, delay, or skip your reload requests.
+    - WidgetKit does not allow timers, polling, or persistent background execution.
+
+**Best Practice:**
+    - Always fetch and store weather data in the main app (background or foreground), then read it in the widget.
+    - In the widget, check the last update timestamp and display a “stale” indicator if needed.
+    - Accept that widgets may show stale data if iOS skips background updates—this is an OS-level limitation, not a code bug.
+
+**References:**
+    - Apple WidgetKit documentation: https://developer.apple.com/documentation/widgetkit
+    - Apple Forums: https://developer.apple.com/forums/thread/651795
+    - WidgetKit best practices: https://developer.apple.com/videos/play/wwdc2020/10028/
+
+-------------------------------------------------------------------------------
+*/
+
 /// WeatherFit iOS Home Widget - Outfit Recommendation Display
 ///
 /// **Architecture Overview:**
@@ -384,8 +412,7 @@ struct DateHelper {
         return formatter.date(from: string)
     }
 
-    static func getDay(from dateString: String, locale: String = "en") -> String
-    {
+    static func getDay(from dateString: String, locale: String = "en") -> String {
         guard let date = parseDateTime(from: dateString) else {
             return ""
         }
@@ -423,8 +450,7 @@ struct DateHelper {
         return dayFormatter.string(from: date)
     }
 
-    static func getTimeOfDay(from dateString: String, locale: String) -> String
-    {
+    static func getTimeOfDay(from dateString: String, locale: String) -> String {
         guard let date = parseDateTime(from: dateString) else {
             return ""
         }
