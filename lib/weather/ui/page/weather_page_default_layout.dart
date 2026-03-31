@@ -210,13 +210,13 @@ class WeatherPageDefaultLayout extends StatelessWidget {
           ? <Widget>[
               const StoreBadge(
                 url: constants.kGooglePlayUrl,
-                assetPath: constants.playStoreBadgePath,
+                assetPath: constants.kPlayStoreBadgePath,
               ),
               const StoreBadge(
                 url: constants.kAppStoreUrl,
-                assetPath: constants.appStoreBadgeAssetPath,
-                height: constants.appStoreBadgeHeight,
-                width: constants.appStoreBadgeWidth,
+                assetPath: constants.kAppStoreBadgeAssetPath,
+                height: constants.kAppStoreBadgeHeight,
+                width: constants.kAppStoreBadgeWidth,
               ),
             ]
           : null,
@@ -301,13 +301,13 @@ class WeatherPageDefaultLayout extends StatelessWidget {
       ),
       const StoreBadge(
         url: constants.kGooglePlayUrl,
-        assetPath: constants.playStoreBadgePath,
+        assetPath: constants.kPlayStoreBadgePath,
       ),
       const StoreBadge(
         url: constants.kAppStoreUrl,
-        assetPath: constants.appStoreBadgeAssetPath,
-        height: constants.appStoreBadgeHeight,
-        width: constants.appStoreBadgeWidth,
+        assetPath: constants.kAppStoreBadgeAssetPath,
+        height: constants.kAppStoreBadgeHeight,
+        width: constants.kAppStoreBadgeWidth,
       ),
     ];
   }

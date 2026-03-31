@@ -151,15 +151,15 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
               };
 
         final Map<String, Object?>? extra = feedback.extra;
-        final Object? rating = extra?[constants.ratingProperty];
-        final Object? type = extra?[constants.feedbackTypeProperty];
-        final Object? screenSize = extra?[constants.screenSizeProperty];
+        final Object? rating = extra?[constants.kRatingProperty];
+        final Object? type = extra?[constants.kFeedbackTypeProperty];
+        final Object? screenSize = extra?[constants.kScreenSizeProperty];
         final String feedbackText = feedback.text;
 
         // `extra?[constants.feedbackTextProperty]` is usually same as
         // `feedback.text`.
         final Object feedbackExtraText =
-            extra?[constants.feedbackTextProperty] ?? feedbackText;
+            extra?[constants.kFeedbackTextProperty] ?? feedbackText;
 
         final bool isFeedbackType = type is FeedbackType;
         final bool isFeedbackRating = rating is FeedbackRating;
@@ -200,13 +200,13 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
           );
         } else if (kIsWeb || Platform.isMacOS) {
           final Uri emailLaunchUri = Uri(
-            scheme: constants.mailToScheme,
-            path: constants.supportEmail,
+            scheme: constants.kMailToScheme,
+            path: constants.kSupportEmail,
             queryParameters: <String, Object?>{
-              constants.subjectParameter:
+              constants.kSubjectParameter:
                   '${translate('feedback.app_feedback')}: '
                   '${packageInfo.appName}',
-              constants.bodyParameter: feedbackBody.toString(),
+              constants.kBodyParameter: feedbackBody.toString(),
             },
           );
           try {
@@ -245,7 +245,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
             subject:
                 '${translate('feedback.app_feedback')}: ${packageInfo.appName}',
             body: feedbackBody.toString(),
-            recipients: <String>[constants.supportEmail],
+            recipients: <String>[constants.kSupportEmail],
             attachmentPaths: <String>[screenshotFilePath],
           );
           try {

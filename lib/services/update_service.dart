@@ -51,7 +51,7 @@ class UpdateServiceImpl implements UpdateService {
       final String bundleId = packageInfo.packageName;
       final String currentVersion = packageInfo.version;
 
-      final Uri url = Uri.parse('${constants.itunesLookupUrl}$bundleId');
+      final Uri url = Uri.parse('${constants.kItunesLookupUrl}$bundleId');
 
       final http.Response response = await http.get(url);
 

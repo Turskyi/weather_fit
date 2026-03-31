@@ -64,7 +64,7 @@ class WeatherContentDefault extends StatelessWidget {
                   children: <Widget>[
                     if (countryCode.isNotEmpty)
                       SvgPicture.network(
-                        '${constants.countryFlagsBaseUrl}$countryCode.svg',
+                        '${constants.kCountryFlagsBaseUrl}$countryCode.svg',
                         height: cityTextStyle?.fontSize,
                         errorBuilder:
                             (BuildContext _, Object error, StackTrace? _) {

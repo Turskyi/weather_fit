@@ -215,7 +215,7 @@ class _PrivacyPolicyAndroidPageState extends State<PrivacyPolicyAndroidPage> {
                     ),
                     recognizer: TapGestureRecognizer()
                       ..onTap = () =>
-                          launchUrl(Uri.parse(constants.artistInstagramUrl)),
+                          launchUrl(Uri.parse(constants.kArtistInstagramUrl)),
                   ),
                   TextSpan(text: translate('privacy.artwork_creation_method')),
                 ],
@@ -245,7 +245,7 @@ class _PrivacyPolicyAndroidPageState extends State<PrivacyPolicyAndroidPage> {
               translate('privacy.contact_us_invitation'),
               style: TextStyle(fontSize: bodySize),
             ),
-            const EmailText(constants.supportEmail),
+            const EmailText(constants.kSupportEmail),
             const SizedBox(height: 20),
           ],
         ),

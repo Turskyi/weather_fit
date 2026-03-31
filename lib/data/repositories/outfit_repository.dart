@@ -33,7 +33,7 @@ class OutfitRepository {
     if (kIsWeb) {
       return OutfitImage(
         paths: fileNames
-            .map((String name) => '${constants.remoteOutfitBaseUrl}$name')
+            .map((String name) => '${constants.kRemoteOutfitBaseUrl}$name')
             .toList(),
         source: OutfitImageSource.network,
       );

@@ -44,7 +44,7 @@ class LocalDataSource {
 
     // Do not use "else if", because for Fahrenheit we need both.
     if (temperatureValue < -40) {
-      return <String>['${constants.outfitImagePath}-40.png'];
+      return <String>['${constants.kOutfitImagePath}-40.png'];
     }
 
     // Round to the nearest 10 degrees (e.g., -4 becomes 0 and 5 becomes 10).
@@ -59,11 +59,11 @@ class LocalDataSource {
     // Handle unknowns early.
     if (condition.isUnknown) {
       return <String>[
-        '${constants.outfitImagePath}'
+        '${constants.kOutfitImagePath}'
             '${WeatherCondition.clear.name}_$roundedTemp.png',
-        '${constants.outfitImagePath}'
+        '${constants.kOutfitImagePath}'
             '${WeatherCondition.cloudy.name}_$roundedTemp.png',
-        '${constants.outfitImagePath}${precipitation}_$roundedTemp.png',
+        '${constants.kOutfitImagePath}${precipitation}_$roundedTemp.png',
       ];
     }
 
@@ -76,7 +76,7 @@ class LocalDataSource {
     };
 
     return <String>[
-      '${constants.outfitImagePath}${conditionName}_$roundedTemp.png',
+      '${constants.kOutfitImagePath}${conditionName}_$roundedTemp.png',
     ];
   }
 

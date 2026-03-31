@@ -246,7 +246,7 @@ class PrivacyPolicyPage extends StatelessWidget {
               style: TextStyle(fontSize: bodySize),
             ),
             const SizedBox(height: 10),
-            const EmailText(constants.supportEmail),
+            const EmailText(constants.kSupportEmail),
             const SizedBox(height: 20),
           ],
         ),

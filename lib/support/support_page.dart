@@ -116,7 +116,7 @@ class _SupportPageState extends State<SupportPage> {
               const SizedBox(height: 8),
               ElevatedButton.icon(
                 onPressed: () => launchUrl(
-                  Uri.parse(constants.telegramUrl),
+                  Uri.parse(constants.kTelegramUrl),
                   mode: LaunchMode.externalApplication,
                 ),
                 icon: const Icon(Icons.chat),
@@ -125,7 +125,7 @@ class _SupportPageState extends State<SupportPage> {
               const SizedBox(height: 8),
               ElevatedButton.icon(
                 onPressed: () => launchUrl(
-                  Uri.parse(constants.developerSupportUrl),
+                  Uri.parse(constants.kDeveloperSupportUrl),
                   mode: LaunchMode.externalApplication,
                 ),
                 icon: const Icon(Icons.web),
@@ -148,12 +148,12 @@ class _SupportPageState extends State<SupportPage> {
               InkWell(
                 onTap: () => launchUrl(
                   Uri(
-                    scheme: constants.mailToScheme,
-                    path: constants.supportEmail,
+                    scheme: constants.kMailToScheme,
+                    path: constants.kSupportEmail,
                   ),
                 ),
                 child: SelectableText(
-                  '${translate('email')}: ${constants.supportEmail}',
+                  '${translate('email')}: ${constants.kSupportEmail}',
                   style: textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.primary,
                     decoration: TextDecoration.underline,
@@ -179,19 +179,19 @@ class _SupportPageState extends State<SupportPage> {
 
   Future<void> _launchEmail(BuildContext context) async {
     final Uri emailLaunchUri = Uri(
-      scheme: constants.mailToScheme,
-      path: constants.supportEmail,
+      scheme: constants.kMailToScheme,
+      path: constants.kSupportEmail,
       query: _encodeQueryParameters(<String, String>{
-        constants.subjectParameter:
+        constants.kSubjectParameter:
             '«${translate('title')}» ${translate('support.title')}',
-        constants.bodyParameter: translate('support.email_default_body'),
+        constants.kBodyParameter: translate('support.email_default_body'),
       }),
     );
 
     if (await canLaunchUrl(emailLaunchUri)) {
       await launchUrl(emailLaunchUri);
     } else {
-      final Uri fallbackUri = Uri.parse(constants.developerSupportUrl);
+      final Uri fallbackUri = Uri.parse(constants.kDeveloperSupportUrl);
       if (await canLaunchUrl(fallbackUri)) {
         await launchUrl(fallbackUri);
       } else if (context.mounted) {

@@ -21,7 +21,7 @@ class LeadingWidget extends StatelessWidget {
               height: kMinInteractiveDimension,
               width: kMinInteractiveDimension,
               child: Ink.image(
-                image: const AssetImage('${constants.imagePath}logo.jpeg'),
+                image: const AssetImage('${constants.kImagePath}logo.jpeg'),
                 fit: BoxFit.cover,
               ),
             ),
