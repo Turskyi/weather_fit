@@ -182,55 +182,57 @@ class WeatherPageDefaultLayout extends StatelessWidget {
       },
     );
 
-    if (isEmbedded) return content;
+    if (isEmbedded) {
+      return content;
+    } else {
+      final double screenWidth = MediaQuery.widthOf(context);
+      final bool isLargeScreen = screenWidth > 800;
 
-    final double screenWidth = MediaQuery.widthOf(context);
-    final bool isLargeScreen = screenWidth > 800;
-
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        forceMaterialTransparency: true,
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: onSettingsPressed,
-          ),
-        ],
-      ),
-      body: content,
-      floatingActionButton: FloatingActionButton(
-        onPressed: onSearchPressed,
-        child: Icon(Icons.search, semanticLabel: translate('search.label')),
-      ),
-      persistentFooterAlignment: AlignmentDirectional.center,
-      persistentFooterButtons: (kIsWeb && isLargeScreen)
-          ? _buildSettingsButtons(context)
-          : kIsWeb
-          ? <Widget>[
-              const StoreBadge(
-                url: constants.kGooglePlayUrl,
-                assetPath: constants.kPlayStoreBadgePath,
-              ),
-              const StoreBadge(
-                url: constants.kAppStoreUrl,
-                assetPath: constants.kAppStoreBadgeAssetPath,
-                height: constants.kAppStoreBadgeHeight,
-                width: constants.kAppStoreBadgeWidth,
-              ),
-            ]
-          : null,
-      persistentFooterDecoration: BoxDecoration(
-        color: colorScheme.surface,
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: colorScheme.shadow.withValues(alpha: 0.5),
-            blurRadius: 10,
-            offset: const Offset(5, 5),
-          ),
-        ],
-      ),
-    );
+      return Scaffold(
+        extendBodyBehindAppBar: true,
+        appBar: AppBar(
+          forceMaterialTransparency: true,
+          actions: <Widget>[
+            IconButton(
+              icon: const Icon(Icons.settings),
+              onPressed: onSettingsPressed,
+            ),
+          ],
+        ),
+        body: content,
+        floatingActionButton: FloatingActionButton(
+          onPressed: onSearchPressed,
+          child: Icon(Icons.search, semanticLabel: translate('search.label')),
+        ),
+        persistentFooterAlignment: AlignmentDirectional.center,
+        persistentFooterButtons: (kIsWeb && isLargeScreen)
+            ? _buildSettingsButtons(context)
+            : kIsWeb
+            ? <Widget>[
+                const StoreBadge(
+                  url: constants.kGooglePlayUrl,
+                  assetPath: constants.kPlayStoreBadgePath,
+                ),
+                const StoreBadge(
+                  url: constants.kAppStoreUrl,
+                  assetPath: constants.kAppStoreBadgeAssetPath,
+                  height: constants.kAppStoreBadgeHeight,
+                  width: constants.kAppStoreBadgeWidth,
+                ),
+              ]
+            : null,
+        persistentFooterDecoration: BoxDecoration(
+          color: colorScheme.surface,
+          boxShadow: <BoxShadow>[
+            BoxShadow(
+              color: colorScheme.shadow.withValues(alpha: 0.5),
+              blurRadius: 10,
+              offset: const Offset(5, 5),
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   void _onWeatherStateChanged(BuildContext context, WeatherState state) {
