@@ -99,7 +99,7 @@ class AboutPage extends StatelessWidget {
                     recognizer: TapGestureRecognizer()
                       ..onTap = () {
                         launchUrl(
-                          Uri.parse(constants.artistInstagramUrl),
+                          Uri.parse(constants.kArtistInstagramUrl),
                           mode: LaunchMode.externalApplication,
                         );
                       },
@@ -173,14 +173,14 @@ class AboutPage extends StatelessWidget {
             TextButton.icon(
               icon: const Icon(Icons.chat),
               label: Text(translate('telegram_group')),
-              onPressed: () => launchUrl(Uri.parse(constants.telegramUrl)),
+              onPressed: () => launchUrl(Uri.parse(constants.kTelegramUrl)),
             ),
             const SizedBox(height: 4),
             TextButton.icon(
               icon: const Icon(Icons.email_outlined),
               label: Text(translate('developer_contact_form')),
               onPressed: () {
-                launchUrl(Uri.parse(constants.developerSupportUrl));
+                launchUrl(Uri.parse(constants.kDeveloperSupportUrl));
               },
             ),
             const SizedBox(height: 32),
@@ -191,13 +191,13 @@ class AboutPage extends StatelessWidget {
           ? <Widget>[
               const StoreBadge(
                 url: constants.kGooglePlayUrl,
-                assetPath: constants.playStoreBadgePath,
+                assetPath: constants.kPlayStoreBadgePath,
               ),
               const StoreBadge(
                 url: constants.kAppStoreUrl,
-                assetPath: constants.appStoreBadgeAssetPath,
-                height: constants.appStoreBadgeHeight,
-                width: constants.appStoreBadgeWidth,
+                assetPath: constants.kAppStoreBadgeAssetPath,
+                height: constants.kAppStoreBadgeHeight,
+                width: constants.kAppStoreBadgeWidth,
               ),
             ]
           : null,
@@ -206,7 +206,7 @@ class AboutPage extends StatelessWidget {
 
   void _onDeveloperTap() {
     launchUrl(
-      Uri.parse(constants.developerUrl),
+      Uri.parse(constants.kDeveloperUrl),
       mode: LaunchMode.externalApplication,
     );
   }

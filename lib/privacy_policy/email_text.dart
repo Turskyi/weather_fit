@@ -18,7 +18,7 @@ class EmailText extends StatelessWidget {
         ),
         onTap: () async {
           final Uri emailLaunchUri = Uri(
-            scheme: constants.mailToScheme,
+            scheme: constants.kMailToScheme,
             path: email,
           );
           if (await canLaunchUrl(emailLaunchUri)) {

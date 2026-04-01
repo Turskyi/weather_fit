@@ -8,6 +8,13 @@
 	<true/>
 	<key>com.apple.security.personal-information.location</key>
 	<true/>
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>applinks:weather-fit.com</string>
+		<string>applinks:en.weather-fit.com</string>
+		<string>applinks:pl.weather-fit.com</string>
+		<string>applinks:uk.weather-fit.com</string>
+	</array>
 	<key>com.apple.security.application-groups</key>
 	<array>
 		<string>group.dmytrowidget</string>

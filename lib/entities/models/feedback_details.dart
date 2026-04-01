@@ -14,9 +14,9 @@ class FeedbackDetails {
   @override
   String toString() {
     return <String, String?>{
-      if (rating != null) constants.ratingProperty: rating.toString(),
-      constants.feedbackTypeProperty: feedbackType.toString(),
-      constants.feedbackTextProperty: feedbackText,
+      if (rating != null) constants.kRatingProperty: rating.toString(),
+      constants.kFeedbackTypeProperty: feedbackType.toString(),
+      constants.kFeedbackTextProperty: feedbackText,
     }.toString();
   }
 
@@ -38,9 +38,9 @@ class FeedbackDetails {
 
   Map<String, Object?> toMap() {
     return <String, Object?>{
-      if (rating != null) constants.ratingProperty: rating,
-      constants.feedbackTypeProperty: feedbackType,
-      constants.feedbackTextProperty: feedbackText,
+      if (rating != null) constants.kRatingProperty: rating,
+      constants.kFeedbackTypeProperty: feedbackType,
+      constants.kFeedbackTextProperty: feedbackText,
     };
   }
 }

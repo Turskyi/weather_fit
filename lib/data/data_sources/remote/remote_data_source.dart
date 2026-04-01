@@ -4,7 +4,7 @@ import 'package:weather_fit/res/constants/constants.dart' as constants;
 
 part 'remote_data_source.g.dart';
 
-@RestApi(baseUrl: constants.remoteOutfitBaseUrl)
+@RestApi(baseUrl: constants.kRemoteOutfitBaseUrl)
 abstract class RemoteDataSource {
   factory RemoteDataSource(Dio dio, {String baseUrl}) = _RemoteDataSource;
 

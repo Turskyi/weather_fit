@@ -20,7 +20,7 @@ class FeedbackServiceImpl implements FeedbackService {
   }) {
     return Resend.instance.sendEmail(
       from: constants.feedbackEmailSender,
-      to: <String>[constants.supportEmail],
+      to: <String>[constants.kSupportEmail],
       subject: subject,
       text: text,
     );

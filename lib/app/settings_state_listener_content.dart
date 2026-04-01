@@ -96,7 +96,9 @@ class _SettingsStateListenerContentState
           text: feedbackText,
           screenshot: screenshot,
           extra: <String, Object?>{
-            constants.screenSizeProperty: MediaQuery.sizeOf(context).toString(),
+            constants.kScreenSizeProperty: MediaQuery.sizeOf(
+              context,
+            ).toString(),
           },
         );
 
