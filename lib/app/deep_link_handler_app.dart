@@ -1,13 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:uni_links/uni_links.dart';
+import 'package:weather_fit/app/app_links_deep_link_source.dart';
+import 'package:weather_fit/app/deep_link_navigation_logic.dart';
+import 'package:weather_fit/app/deep_link_source.dart';
 import 'package:weather_fit/app/weather_fit_app.dart';
 import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
 import 'package:weather_fit/data/repositories/location_repository.dart';
 import 'package:weather_fit/data/repositories/outfit_repository.dart';
 import 'package:weather_fit/entities/enums/language.dart';
-import 'package:weather_fit/res/constants/constants.dart' as constants;
 import 'package:weather_fit/router/navigator.dart';
 import 'package:weather_repository/weather_repository.dart';
 
@@ -19,6 +20,7 @@ class DeepLinkHandlerApp extends StatefulWidget {
     required this.localDataSource,
     required this.initialLanguage,
     required this.routes,
+    this.deepLinkSource,
     super.key,
   });
 
@@ -28,18 +30,21 @@ class DeepLinkHandlerApp extends StatefulWidget {
   final LocalDataSource localDataSource;
   final Language initialLanguage;
   final Map<String, WidgetBuilder> routes;
+  final DeepLinkSource? deepLinkSource;
 
   @override
   State<DeepLinkHandlerApp> createState() => _DeepLinkHandlerAppState();
 }
 
 class _DeepLinkHandlerAppState extends State<DeepLinkHandlerApp> {
-  StreamSubscription<Uri?>? _sub;
+  late final DeepLinkSource _deepLinkSource =
+      widget.deepLinkSource ?? AppLinksDeepLinkSource();
+  StreamSubscription<Uri>? _sub;
 
   @override
   void initState() {
     super.initState();
-    _initUniLinks();
+    _initAppLinks();
   }
 
   @override
@@ -60,18 +65,13 @@ class _DeepLinkHandlerAppState extends State<DeepLinkHandlerApp> {
     super.dispose();
   }
 
-  Future<void> _initUniLinks() async {
+  Future<void> _initAppLinks() async {
     // Listen for incoming links
-    _sub = uriLinkStream.listen(
-      (Uri? uri) {
-        if (uri != null &&
-            uri.scheme == constants.kWeatherFitScheme &&
-            uri.host == constants.kWeatherFitHost) {
-          // Always reset navigation stack to weather page
-          navigatorKey.currentState?.pushNamedAndRemoveUntil(
-            constants.kWeatherRoute,
-            (Route<Object?> route) => false,
-          );
+    _sub = _deepLinkSource.uriLinkStream.listen(
+      (Uri uri) {
+        if (isWeatherWidgetDeepLink(uri)) {
+          // Always reset navigation stack to weather page.
+          navigateToWeatherRoot(navigatorKey.currentState);
         }
       },
       onError: (Object err) {
@@ -81,15 +81,10 @@ class _DeepLinkHandlerAppState extends State<DeepLinkHandlerApp> {
 
     // Handle initial link if app was started from widget
     try {
-      final Uri? initialUri = await getInitialUri();
-      if (initialUri != null &&
-          initialUri.scheme == constants.kWeatherFitScheme &&
-          initialUri.host == constants.kWeatherFitHost) {
+      final Uri? initialUri = await _deepLinkSource.getInitialLink();
+      if (isWeatherWidgetDeepLink(initialUri)) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          navigatorKey.currentState?.pushNamedAndRemoveUntil(
-            constants.kWeatherRoute,
-            (Route<Object?> route) => false,
-          );
+          navigateToWeatherRoot(navigatorKey.currentState);
         });
       }
       // Dart's catch syntax does not allow a type annotation here (e.g., 'catch

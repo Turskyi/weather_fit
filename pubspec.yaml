@@ -22,6 +22,7 @@ environment:
   sdk: '>=3.9.2 <4.0.0'
 
 dependencies:
+  app_links: ^7.0.0
   bloc: ^9.2.0
   collection: ^1.19.1
   dart_openai: ^6.1.1
@@ -64,7 +65,6 @@ dependencies:
   retrofit: ^4.9.2
   shared_preferences: ^2.5.5
   shimmer: ^3.0.0
-  uni_links: ^0.5.1
   url_launcher: ^6.3.2
   weather_repository:
     path: packages/weather_repository
