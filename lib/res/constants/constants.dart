@@ -1,4 +1,3 @@
-const String kWeatherRoute = '/weather';
 const String kAppleAppGroupId = 'group.dmytrowidget';
 const String iOSWidgetName = 'WeatherWidgets';
 const String androidWidgetName = 'WeatherWidget';

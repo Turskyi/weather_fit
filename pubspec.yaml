@@ -22,7 +22,6 @@ environment:
   sdk: '>=3.9.2 <4.0.0'
 
 dependencies:
-  app_links: ^7.0.0
   bloc: ^9.2.0
   collection: ^1.19.1
   dart_openai: ^6.1.1

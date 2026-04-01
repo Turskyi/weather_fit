@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
-import 'package:weather_fit/app/deep_link_handler_app.dart';
 import 'package:weather_fit/app/weather_fit_app.dart';
 import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
 import 'package:weather_fit/data/repositories/location_repository.dart';
@@ -52,7 +51,7 @@ Future<void> main() async {
   runApp(
     LocalizedApp(
       localizationDelegate,
-      DeepLinkHandlerApp(
+      WeatherFitApp(
         weatherRepository: weatherRepository,
         locationRepository: locationRepository,
         outfitRepository: outfitRepository,
