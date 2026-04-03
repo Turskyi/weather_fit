@@ -217,7 +217,7 @@ class _WeatherPageExtraSmallLayoutState
             shape: const CircleBorder(),
             clipBehavior: Clip.antiAlias,
             child: SizedBox.square(
-              dimension: 32.0,
+              dimension: 30.0,
               child: InkResponse(
                 onTap: widget.onSettingsPressed,
                 containedInkWell: true,
