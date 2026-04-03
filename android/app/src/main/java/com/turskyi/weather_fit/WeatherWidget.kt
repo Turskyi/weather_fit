@@ -29,7 +29,7 @@ import kotlin.math.max
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
-private const val MAX_WIDGET_BITMAP_BYTES = 500 * 1024
+private const val MAX_CONSTRAINED_WIDGET_BITMAP_BYTES = 760 * 1024
 private const val FALLBACK_WIDGET_SIZE_DP = 220
 
 // Data class to match the JSON structure.
@@ -79,7 +79,11 @@ class WeatherWidget : AppWidgetProvider() {
 @RequiresApi(Build.VERSION_CODES.CUPCAKE)
 @SuppressLint("ObsoleteSdkInt")
 internal fun updateAppWidget(
-    context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int
+    context: Context,
+    appWidgetManager: AppWidgetManager,
+    appWidgetId: Int,
+    useConstrainedImage: Boolean = false,
+    includeImage: Boolean = true,
 ) {
     // Get reference to SharedPreferences.
     val widgetData: SharedPreferences = HomeWidgetPlugin.getData(context)
@@ -174,7 +178,7 @@ internal fun updateAppWidget(
         }
         val isImageAvailable: Boolean = imageFile?.exists() == true
 
-        if (isImageAvailable) {
+        if (isImageAvailable && includeImage) {
             @Suppress("UNNECESSARY_SAFE_CALL")
             imageFile?.let { file: File ->
                 val bitmap: Bitmap? = decodeWidgetBitmap(
@@ -182,6 +186,7 @@ internal fun updateAppWidget(
                     appWidgetManager,
                     appWidgetId,
                     file.absolutePath,
+                    useConstrainedImage,
                 )
                 bitmap?.let { bmp: Bitmap ->
                     setImageViewBitmap(
@@ -278,7 +283,31 @@ internal fun updateAppWidget(
         }
     }
 
-    appWidgetManager.updateAppWidget(appWidgetId, views)
+    try {
+        appWidgetManager.updateAppWidget(appWidgetId, views)
+    } catch (exception: IllegalArgumentException) {
+        val isBitmapLimitException: Boolean =
+            exception.message?.contains("exceeds maximum bitmap memory usage") == true
+        if (isBitmapLimitException && includeImage && !useConstrainedImage) {
+            updateAppWidget(
+                context,
+                appWidgetManager,
+                appWidgetId,
+                useConstrainedImage = true,
+                includeImage = true,
+            )
+        } else if (isBitmapLimitException && includeImage && useConstrainedImage) {
+            updateAppWidget(
+                context,
+                appWidgetManager,
+                appWidgetId,
+                useConstrainedImage = false,
+                includeImage = false,
+            )
+        } else {
+            throw exception
+        }
+    }
 }
 
 private fun decodeWidgetBitmap(
@@ -286,6 +315,7 @@ private fun decodeWidgetBitmap(
     appWidgetManager: AppWidgetManager,
     appWidgetId: Int,
     path: String,
+    useConstrainedImage: Boolean,
 ): Bitmap? {
     val boundsOptions: BitmapFactory.Options = BitmapFactory.Options().apply {
         inJustDecodeBounds = true
@@ -307,12 +337,20 @@ private fun decodeWidgetBitmap(
 
     val decodeOptions: BitmapFactory.Options = BitmapFactory.Options().apply {
         inSampleSize = sampleSize
-        inPreferredConfig = Bitmap.Config.RGB_565
+        inPreferredConfig = if (useConstrainedImage) {
+            Bitmap.Config.RGB_565
+        } else {
+            Bitmap.Config.ARGB_8888
+        }
     }
 
     val decodedBitmap: Bitmap? = BitmapFactory.decodeFile(path, decodeOptions)
     return decodedBitmap?.let { bitmap: Bitmap ->
-        downscaleToByteLimit(bitmap, MAX_WIDGET_BITMAP_BYTES)
+        if (useConstrainedImage) {
+            downscaleToByteLimit(bitmap, MAX_CONSTRAINED_WIDGET_BITMAP_BYTES)
+        } else {
+            bitmap
+        }
     }
 }
 

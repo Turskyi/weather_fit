@@ -131,10 +131,9 @@ class _DailyForecastState extends State<DailyForecast> {
           borderRadius: BorderRadius.circular(16),
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
-            child: Container(
-              width: double.infinity,
-              height: 132,
-              padding: const EdgeInsets.all(16.0),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
                 color: colors.surface.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(16),
