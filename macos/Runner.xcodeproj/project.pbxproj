@@ -119,6 +119,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				WeatherWidgets.swift,
+				WeatherWidgetsBundle.swift,
 			);
 			target = 66879C652DF5E8290037A706 /* WeatherWidgetsExtension */;
 		};
@@ -407,6 +408,9 @@
 		66879C642DF5E8290037A706 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
+			fileSystemSynchronizedGroups = (
+				66879C432DF5E5270037A706 /* WeatherWidgets */,
+			);
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -538,6 +542,9 @@
 		66879C622DF5E8290037A706 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
+			fileSystemSynchronizedGroups = (
+				66879C432DF5E5270037A706 /* WeatherWidgets */,
+			);
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -911,6 +918,7 @@
 				MARKETING_VERSION = 0.4.7;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.turskyi.weatherFit.WeatherWidgets;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -957,6 +965,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 15.5;
 				MARKETING_VERSION = 0.4.7;
 				MTL_FAST_MATH = YES;
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.turskyi.weatherFit.WeatherWidgets;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1002,6 +1011,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 15.5;
 				MARKETING_VERSION = 0.4.7;
 				MTL_FAST_MATH = YES;
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.turskyi.weatherFit.WeatherWidgets;
 				PRODUCT_NAME = "$(TARGET_NAME)";

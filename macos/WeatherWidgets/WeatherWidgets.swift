@@ -1,6 +1,12 @@
 import AppKit
 import SwiftUI
 import WidgetKit
+import os
+
+private let widgetLog = Logger(
+    subsystem: "com.turskyi.weatherFit.WeatherWidgets",
+    category: "lifecycle"
+)
 
 // Typealias UIImage to NSImage for cross-platform compatibility in the loader logic
 typealias UIImage = NSImage
@@ -95,8 +101,11 @@ struct Provider: TimelineProvider {
     private let updateFrequencyKey = "weatherfit_widget_update_frequency"
 
     func getWeatherData() -> WeatherData? {
+        widgetLog.debug("[getWeatherData] reading UserDefaults suite: \(appGroupIdentifier)")
         guard let sharedDefaults = UserDefaults(suiteName: appGroupIdentifier)
         else {
+            widgetLog.error(
+                "[getWeatherData] FAILED – cannot open UserDefaults suite \(appGroupIdentifier)")
             print("Could not load shared defaults.")
             return nil
         }
@@ -136,11 +145,16 @@ struct Provider: TimelineProvider {
                 )
                 forecast = forecastResponse["forecast"]
             } catch {
+                widgetLog.error(
+                    "[getWeatherData] forecast decode error: \(error.localizedDescription)")
                 print("WIDGET FORECAST DECODING FAILED: \(error)")
             }
         }
 
         let locale = sharedDefaults.string(forKey: "selected_language")
+        widgetLog.debug(
+            "[getWeatherData] result – location=\(location ?? "nil"), temp=\(temperature ?? "nil"), emoji=\(emoji ?? "nil"), imagePath=\(imagePath ?? "nil"), forecastItems=\(forecast?.count ?? 0)"
+        )
 
         return WeatherData(
             emoji: emoji,
@@ -155,17 +169,23 @@ struct Provider: TimelineProvider {
     }
 
     func placeholder(in context: Context) -> SimpleEntry {
-        SimpleEntry(date: Date(), weatherData: .placeholder)
+        widgetLog.debug("[placeholder] called – returning static placeholder")
+        return SimpleEntry(date: Date(), weatherData: .placeholder)
     }
 
     func getSnapshot(
         in context: Context,
         completion: @escaping (SimpleEntry) -> Void
     ) {
+        widgetLog.debug("[getSnapshot] called – isPreview=\(context.isPreview)")
         refreshWeatherDataFromNetworkIfPossible { weatherData in
+            let resolvedData = weatherData ?? self.getWeatherData() ?? .placeholder
+            widgetLog.debug(
+                "[getSnapshot] resolved – source=\(weatherData != nil ? "network" : "cache/placeholder"), location=\(resolvedData.location ?? "nil")"
+            )
             let entry = SimpleEntry(
                 date: Date(),
-                weatherData: weatherData ?? self.getWeatherData() ?? .placeholder
+                weatherData: resolvedData
             )
             completion(entry)
         }
@@ -175,18 +195,23 @@ struct Provider: TimelineProvider {
         in context: Context,
         completion: @escaping (Timeline<Entry>) -> Void
     ) {
+        widgetLog.debug("[getTimeline] called")
         let currentDate = Date()
         refreshWeatherDataFromNetworkIfPossible { weatherData in
-            let entry = SimpleEntry(
-                date: currentDate,
-                weatherData: weatherData ?? self.getWeatherData() ?? .placeholder
-            )
-            let nextUpdate = Calendar.current.date(
+            let resolvedData = weatherData ?? self.getWeatherData() ?? .placeholder
+            let next = Calendar.current.date(
                 byAdding: .minute,
                 value: refreshIntervalMinutes(),
                 to: currentDate
             )!
-            let timeline = Timeline(entries: [entry], policy: .after(nextUpdate))
+            widgetLog.debug(
+                "[getTimeline] resolved – source=\(weatherData != nil ? "network" : "cache/placeholder"), location=\(resolvedData.location ?? "nil"), nextUpdate=\(next.description)"
+            )
+            let entry = SimpleEntry(
+                date: currentDate,
+                weatherData: resolvedData
+            )
+            let timeline = Timeline(entries: [entry], policy: .after(next))
             completion(timeline)
         }
     }
@@ -194,8 +219,10 @@ struct Provider: TimelineProvider {
     private func refreshWeatherDataFromNetworkIfPossible(
         completion: @escaping (WeatherData?) -> Void
     ) {
+        widgetLog.debug("[network] refreshWeatherDataFromNetworkIfPossible – start")
         guard let sharedDefaults = UserDefaults(suiteName: appGroupIdentifier)
         else {
+            widgetLog.error("[network] FAILED – cannot open UserDefaults suite")
             completion(nil)
             return
         }
@@ -204,9 +231,11 @@ struct Provider: TimelineProvider {
             let latitude = sharedDefaults.object(forKey: latitudeKey) as? Double,
             let longitude = sharedDefaults.object(forKey: longitudeKey) as? Double
         else {
+            widgetLog.warning("[network] no lat/lon in UserDefaults – skipping network fetch")
             completion(nil)
             return
         }
+        widgetLog.debug("[network] lat=\(latitude), lon=\(longitude)")
 
         var components = URLComponents(string: "https://api.open-meteo.com/v1/forecast")
         components?.queryItems = [
@@ -223,14 +252,19 @@ struct Provider: TimelineProvider {
             return
         }
 
-        let task = URLSession.shared.dataTask(with: url) { data, _, error in
+        widgetLog.debug("[network] requesting URL: \(url.absoluteString)")
+        let task = URLSession.shared.dataTask(with: url) { data, response, error in
             if let error = error {
+                widgetLog.error("[network] fetch FAILED: \(error.localizedDescription)")
                 print("Widget network fetch failed: \(error)")
                 completion(nil)
                 return
             }
-
+            if let http = response as? HTTPURLResponse {
+                widgetLog.debug("[network] HTTP status: \(http.statusCode)")
+            }
             guard let data = data else {
+                widgetLog.error("[network] response had no data")
                 completion(nil)
                 return
             }
@@ -271,8 +305,12 @@ struct Provider: TimelineProvider {
                     sharedDefaults.set(forecastJson, forKey: "forecast_data")
                 }
 
+                widgetLog.debug(
+                    "[network] SUCCESS – temp=\(updatedData.temperature ?? "nil"), emoji=\(updatedData.emoji ?? "nil"), forecastItems=\(updatedData.forecast?.count ?? 0)"
+                )
                 completion(updatedData)
             } catch {
+                widgetLog.error("[network] JSON decode FAILED: \(error.localizedDescription)")
                 print("Widget response decode failed: \(error)")
                 completion(nil)
             }
@@ -439,6 +477,11 @@ struct WeatherWidgetsEntryView: View {
             }
         }
         .widgetURL(URL(string: "weatherfit://open")!)
+        .onAppear {
+            widgetLog.debug(
+                "[view] WeatherWidgetsEntryView appeared - family=\(family.debugDescription), location=\(entry.weatherData.location ?? "nil"), temp=\(entry.weatherData.temperature ?? "nil"), entryDate=\(entry.date.description)"
+            )
+        }
     }
 
     /// The Outfit Image section with rounded corners
