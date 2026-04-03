@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -7,6 +9,7 @@ import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
 import 'package:weather_fit/entities/enums/temperature_units.dart';
 import 'package:weather_fit/entities/models/temperature/temperature.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
+import 'package:weather_fit/res/constants/constants.dart' as constants;
 import 'package:weather_fit/res/enums/settings.dart';
 import 'package:weather_repository/weather_repository.dart';
 
@@ -15,6 +18,8 @@ import 'constants/dummy_constants.dart' as dummy_constants;
 class MockSharedPreferences extends Mock implements SharedPreferences {}
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   late LocalDataSource localDataSource;
   late MockSharedPreferences mockSharedPreferences;
 
@@ -288,6 +293,86 @@ void main() {
       ).thenReturn(<String>[jsonEncode(storedLocation.toJson())]);
 
       expect(localDataSource.isFavouriteLocation(queriedLocation), isTrue);
+    });
+  });
+
+  group('getAppDirectory on macOS', () {
+    const MethodChannel sharedContainerChannel = MethodChannel(
+      constants.kSharedContainerMethodChannel,
+    );
+    const MethodChannel pathProviderChannel = MethodChannel(
+      'plugins.flutter.io/path_provider',
+    );
+
+    setUp(() {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(pathProviderChannel, (
+            MethodCall call,
+          ) async {
+            if (call.method == 'getApplicationDocumentsDirectory') {
+              return '/tmp/test_app_docs';
+            }
+            return null;
+          });
+    });
+
+    tearDown(() {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(sharedContainerChannel, null);
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(pathProviderChannel, null);
+    });
+
+    test('returns shared container path when channel responds', () async {
+      if (!Platform.isMacOS) return;
+
+      const String expectedPath = '/tmp/test_shared_container';
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(sharedContainerChannel, (
+            MethodCall call,
+          ) async {
+            if (call.method == 'getSharedContainerPath') {
+              return expectedPath;
+            }
+            return null;
+          });
+
+      final Directory result = await localDataSource.getAppDirectory();
+
+      expect(result.path, expectedPath);
+    });
+
+    test('falls back to app documents dir when channel returns null', () async {
+      if (!Platform.isMacOS) return;
+
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(
+            sharedContainerChannel,
+            (MethodCall call) async => null,
+          );
+
+      final Directory result = await localDataSource.getAppDirectory();
+
+      expect(result.path, isNotEmpty);
+      expect(result.path, isNot(contains('shared_container')));
+    });
+
+    test('falls back to app documents dir when channel throws', () async {
+      if (!Platform.isMacOS) return;
+
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(sharedContainerChannel, (
+            MethodCall call,
+          ) async {
+            throw PlatformException(
+              code: 'UNAVAILABLE',
+              message: 'Channel unavailable',
+            );
+          });
+
+      final Directory result = await localDataSource.getAppDirectory();
+
+      expect(result.path, isNotEmpty);
     });
   });
 }
