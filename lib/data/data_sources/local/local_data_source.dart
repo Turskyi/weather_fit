@@ -387,7 +387,7 @@ class LocalDataSource {
   Future<Directory> getAppDirectory() async {
     if (kIsWeb) {
       throw UnsupportedError('Directory access is not supported on Web.');
-    } else if (Platform.isIOS) {
+    } else if (Platform.isIOS || Platform.isMacOS) {
       try {
         final String? sharedPath = await _channel.invokeMethod<String>(
           'getSharedContainerPath',

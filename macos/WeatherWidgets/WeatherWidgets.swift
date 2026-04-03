@@ -496,9 +496,7 @@ struct WeatherWidgetsEntryView: View {
                     .scaledToFit()
                     .clipShape(RoundedRectangle(cornerRadius: 16))
             } else {
-                Image(systemName: "tshirt.fill")
-                    .font(.system(size: 40))
-                    .foregroundColor(.white.opacity(0.3))
+                Color.clear
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -598,16 +596,41 @@ struct WeatherWidgets: Widget {
 // --- Helpers & Extensions ---
 
 struct WidgetImageLoader {
+    private static let appGroupIdentifier = "group.dmytrowidget"
+
     static func loadOutfitImage(
         imagePath: String?,
         forecast: [ForecastItem]?
     ) -> UIImage? {
-        if let imagePath = imagePath,
-            let image = UIImage(contentsOfFile: imagePath)
-        {
-            return image
+        // Level 1: Load from the Flutter-provided path.
+        if let imagePath = imagePath, !imagePath.isEmpty {
+            if let image = UIImage(contentsOfFile: imagePath) {
+                widgetLog.debug("[image] Level 1: loaded from path: \(imagePath)")
+                return image
+            } else {
+                widgetLog.error("[image] Level 1 FAILED – cannot read file at: \(imagePath)")
+            }
+        } else {
+            widgetLog.debug("[image] Level 1 skipped – imagePath is nil or empty")
         }
 
+        // Level 2: Look in the shared app group container for outfit_image.png.
+        if let groupURL = FileManager.default.containerURL(
+            forSecurityApplicationGroupIdentifier: appGroupIdentifier
+        ) {
+            let outfitURL = groupURL.appendingPathComponent("outfit_image.png")
+            if let image = UIImage(contentsOfFile: outfitURL.path) {
+                widgetLog.debug("[image] Level 2: loaded outfit_image.png from app group container")
+                return image
+            } else {
+                widgetLog.debug("[image] Level 2: outfit_image.png not found at \(outfitURL.path)")
+            }
+        } else {
+            widgetLog.error(
+                "[image] Level 2 FAILED – cannot open app group container \(appGroupIdentifier)")
+        }
+
+        // Level 3: Load from bundled PNG by weather condition + rounded temperature.
         if let forecast = forecast, !forecast.isEmpty {
             let weatherCode = forecast.first?.weatherCode ?? 0
             let temperature = Int(forecast.first?.temperature.rounded() ?? 0)
@@ -616,9 +639,17 @@ struct WidgetImageLoader {
             let fallbackImageName = "\(conditionName)_\(roundedTemp).png"
 
             if let image = UIImage(named: fallbackImageName) {
+                widgetLog.debug("[image] Level 3: loaded bundled asset \(fallbackImageName)")
                 return image
+            } else {
+                widgetLog.debug(
+                    "[image] Level 3 FAILED – bundled asset not found: \(fallbackImageName)")
             }
+        } else {
+            widgetLog.debug("[image] Level 3 skipped – no forecast data")
         }
+
+        widgetLog.error("[image] All fallbacks exhausted – no image available")
         return nil
     }
 
