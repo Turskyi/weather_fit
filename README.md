@@ -155,6 +155,9 @@ flutter run --flavor phone
 
 # Test Wear OS (use --flavor wear for release builds too)
 flutter build appbundle --release --flavor wear -t lib/main.dart
+
+# Equivalent shorter form
+flutter build appbundle --flavor wear --release
 ```
 
 Android Studio:
@@ -184,6 +187,9 @@ Output:
 
 ```bash
 flutter build appbundle --release --flavor wear -t lib/main.dart
+
+# Or, equivalently
+flutter build appbundle --flavor wear --release
 ```
 
 Output:
@@ -221,6 +227,9 @@ Recommended workflow for this project:
 
 ```bash
 flutter build appbundle --release --flavor wear -t lib/main.dart
+
+# Or, equivalently
+flutter build appbundle --flavor wear --release
 ```
 
 2. After the Wear OS release is published in Play Console, increment app
