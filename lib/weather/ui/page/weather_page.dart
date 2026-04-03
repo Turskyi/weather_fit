@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
@@ -24,6 +25,14 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
   late PageController _pageController;
   List<Location> _locations = <Location>[];
   int _currentPageIndex = 0;
+  AppLifecycleState? _lastLifecycleState;
+  DateTime? _lastResumeCheckAt;
+  DateTime? _lastLocationResyncAt;
+  DateTime? _lastStateSnapshotLogAt;
+
+  static const Duration _resumeCheckDebounce = Duration(seconds: 4);
+  static const Duration _locationResyncDebounce = Duration(seconds: 2);
+  static const Duration _stateSnapshotLogDebounce = Duration(seconds: 2);
 
   @override
   void initState() {
@@ -92,7 +101,7 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
     final LocalDataSource localDataSource = context.read<LocalDataSource>();
     final Location activeLocation = localDataSource.getLastSavedLocation();
     final List<Location> previousLocations = _locations;
-    final int previousIndex = _currentPageIndex;
+    final int previousIndex = _getCurrentVisibleIndex();
 
     final Location previousVisibleLocation;
     if (previousLocations.isEmpty) {
@@ -108,12 +117,24 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
     final List<Location> newList = _getSwipeList(localDataSource);
 
     final bool lengthChanged = newList.length != _locations.length;
+    final bool contentChanged = !_areLocationListsSame(
+      previousLocations,
+      newList,
+    );
+    final bool shouldUpdateList = contentChanged || resetToFirst;
 
-    if (lengthChanged || resetToFirst) {
+    if (shouldUpdateList) {
       setState(() {
         _locations = newList;
         _currentPageIndex = _currentPageIndex.clamp(0, _locations.length - 1);
       });
+
+      if (!lengthChanged && contentChanged) {
+        debugPrint(
+          'WeatherPage updateLocations: content/order changed without '
+          'length change.',
+        );
+      }
 
       bool jumpedToActiveLocation = false;
       if (_pageController.hasClients) {
@@ -138,20 +159,88 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
       if (jumpedToActiveLocation) {
         return;
       } else {
-        final Location updatedVisibleLocation = _locations[_currentPageIndex];
+        final int updatedVisibleIndex = _getCurrentVisibleIndex();
+        final Location updatedVisibleLocation = _locations[updatedVisibleIndex];
         if (!_isSameLocation(previousVisibleLocation, updatedVisibleLocation)) {
           _fetchWeatherForCurrentPageLocation();
         }
       }
+    } else {
+      final bool activeLocationMissingFromCurrent =
+          activeLocation.isNotEmpty &&
+          _locations.indexWhere(
+                (Location l) => _isSameLocation(l, activeLocation),
+              ) <
+              0;
+
+      if (activeLocationMissingFromCurrent) {
+        debugPrint(
+          'WeatherPage updateLocations: active location is missing in '
+          'current list while no update was needed '
+          '(active=$activeLocation, currentList=$_locations).',
+        );
+      }
+    }
+  }
+
+  bool _areLocationListsSame(List<Location> first, List<Location> second) {
+    if (first.length != second.length) {
+      return false;
+    } else {
+      for (int index = 0; index < first.length; index++) {
+        if (!_isSameLocation(first[index], second[index])) {
+          return false;
+        }
+      }
+      return true;
     }
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      // Check if the hour has changed while the app was in the background.
-      // Only reload if we've transitioned to a new hour.
-      context.read<WeatherBloc>().add(CheckHourChangeOnResume(context.origin));
+    final AppLifecycleState? previousState = _lastLifecycleState;
+    _lastLifecycleState = state;
+
+    final bool isResumed = state == AppLifecycleState.resumed;
+    if (isResumed) {
+      final DateTime now = DateTime.now();
+      final bool hasRecentResumeCheck =
+          _lastResumeCheckAt != null &&
+          now.difference(_lastResumeCheckAt!) < _resumeCheckDebounce;
+
+      final bool isFromBackgroundState =
+          previousState == AppLifecycleState.inactive ||
+          previousState == AppLifecycleState.hidden ||
+          previousState == AppLifecycleState.paused;
+      final bool shouldFilterMacDesktopTransition =
+          !kIsWeb &&
+          defaultTargetPlatform == TargetPlatform.macOS &&
+          !isFromBackgroundState;
+
+      if (shouldFilterMacDesktopTransition) {
+        debugPrint(
+          'WeatherPage lifecycle: skip resume weather check on macOS '
+          '(previousState=$previousState).',
+        );
+      } else if (hasRecentResumeCheck) {
+        debugPrint(
+          'WeatherPage lifecycle: skip debounced resume weather check '
+          '(previousState=$previousState).',
+        );
+      } else {
+        _lastResumeCheckAt = now;
+        debugPrint(
+          'WeatherPage lifecycle: dispatch resume weather check '
+          '(previousState=$previousState).',
+        );
+        // Check if the hour has changed while the app was in the background.
+        // Only reload if we've transitioned to a new hour.
+        context.read<WeatherBloc>().add(
+          CheckHourChangeOnResume(context.origin),
+        );
+      }
+
+      _reconcileVisibleLocationOnResume();
     }
   }
 
@@ -257,6 +346,7 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
 
     return BlocListener<WeatherBloc, WeatherState>(
       listener: (BuildContext context, WeatherState state) {
+        _logStateSnapshot(state);
         _weatherBlocStateListener(context, state);
         // Update locations list whenever state changes to ensure new locations
         // from search are added before loading state is shown
@@ -264,6 +354,7 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
             state is WeatherInitial ||
             state is WeatherLoadingState) {
           _updateLocations();
+          _syncVisibleLocationWithState(state);
         }
       },
       child: isExtraSmall
@@ -360,7 +451,7 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
       return;
     }
 
-    final int safeIndex = _currentPageIndex.clamp(0, _locations.length - 1);
+    final int safeIndex = _getCurrentVisibleIndex();
     final Location currentLocation = _locations[safeIndex];
 
     if (currentLocation.isNotEmpty) {
@@ -370,6 +461,153 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
       );
     } else {
       context.read<WeatherBloc>().add(RefreshWeather(context.origin));
+    }
+  }
+
+  void _syncVisibleLocationWithState(WeatherState state) {
+    if (_locations.isEmpty) {
+      debugPrint(
+        'WeatherPage state sync: skipped because locations are empty.',
+      );
+      return;
+    } else {
+      final int safeIndex = _getCurrentVisibleIndex();
+      final Location visibleLocation = _locations[safeIndex];
+      final Location stateLocation = state.location;
+
+      if (visibleLocation.isEmpty || stateLocation.isEmpty) {
+        debugPrint(
+          'WeatherPage state sync: skipped due to empty location '
+          '(visible=$visibleLocation, state=$stateLocation).',
+        );
+        return;
+      } else {
+        final bool locationsMismatch = !_isSameLocation(
+          visibleLocation,
+          stateLocation,
+        );
+        final bool loadingVisibleLocation =
+            state is WeatherLoadingState &&
+            _isSameLocation(stateLocation, visibleLocation);
+
+        if (locationsMismatch && !loadingVisibleLocation) {
+          final DateTime now = DateTime.now();
+          final bool hasRecentResync =
+              _lastLocationResyncAt != null &&
+              now.difference(_lastLocationResyncAt!) < _locationResyncDebounce;
+
+          if (hasRecentResync) {
+            debugPrint(
+              'WeatherPage state sync: skip debounced resync '
+              '(visible=$visibleLocation, state=$stateLocation).',
+            );
+          } else {
+            _lastLocationResyncAt = now;
+            debugPrint(
+              'WeatherPage state sync: fetch visible page location '
+              '(visible=$visibleLocation, state=$stateLocation).',
+            );
+            context.read<LocalDataSource>().saveLocation(visibleLocation);
+            context.read<WeatherBloc>().add(
+              FetchWeather(location: visibleLocation, origin: context.origin),
+            );
+          }
+        } else {
+          debugPrint(
+            'WeatherPage state sync: no resync needed '
+            '(locationsMismatch=$locationsMismatch, '
+            'loadingVisibleLocation=$loadingVisibleLocation, '
+            'visible=$visibleLocation, state=$stateLocation).',
+          );
+        }
+      }
+    }
+  }
+
+  void _reconcileVisibleLocationOnResume() {
+    if (_locations.isEmpty) {
+      debugPrint('WeatherPage lifecycle: resume resync skipped, no locations.');
+      return;
+    } else {
+      final int safeIndex = _getCurrentVisibleIndex();
+      final Location visibleLocation = _locations[safeIndex];
+      final WeatherState state = context.read<WeatherBloc>().state;
+      final Location stateLocation = state.location;
+
+      debugPrint(
+        'WeatherPage lifecycle: evaluate resume resync '
+        '(stateType=${state.runtimeType}, visible=$visibleLocation, '
+        'state=$stateLocation).',
+      );
+
+      if (visibleLocation.isEmpty || stateLocation.isEmpty) {
+        debugPrint(
+          'WeatherPage lifecycle: resume resync skipped due to empty location '
+          '(visible=$visibleLocation, state=$stateLocation).',
+        );
+        return;
+      } else {
+        final bool hasLocationMismatch = !_isSameLocation(
+          visibleLocation,
+          stateLocation,
+        );
+
+        if (hasLocationMismatch) {
+          final DateTime now = DateTime.now();
+          final bool hasRecentResync =
+              _lastLocationResyncAt != null &&
+              now.difference(_lastLocationResyncAt!) < _locationResyncDebounce;
+
+          if (hasRecentResync) {
+            debugPrint(
+              'WeatherPage lifecycle: skip debounced resume resync '
+              '(visible=$visibleLocation, state=$stateLocation).',
+            );
+          } else {
+            _lastLocationResyncAt = now;
+            debugPrint(
+              'WeatherPage lifecycle: fetch visible location on resume '
+              '(visible=$visibleLocation, state=$stateLocation).',
+            );
+            context.read<LocalDataSource>().saveLocation(visibleLocation);
+            context.read<WeatherBloc>().add(
+              FetchWeather(location: visibleLocation, origin: context.origin),
+            );
+          }
+        } else {
+          debugPrint(
+            'WeatherPage lifecycle: resume resync not needed '
+            '(visible matches state).',
+          );
+        }
+      }
+    }
+  }
+
+  void _logStateSnapshot(WeatherState state) {
+    final DateTime now = DateTime.now();
+    final bool shouldSkipLog =
+        _lastStateSnapshotLogAt != null &&
+        now.difference(_lastStateSnapshotLogAt!) < _stateSnapshotLogDebounce;
+
+    if (shouldSkipLog) {
+      return;
+    } else {
+      _lastStateSnapshotLogAt = now;
+
+      final Location visibleLocation;
+      if (_locations.isEmpty) {
+        visibleLocation = const Location.empty();
+      } else {
+        final int safeIndex = _getCurrentVisibleIndex();
+        visibleLocation = _locations[safeIndex];
+      }
+
+      debugPrint(
+        'WeatherPage snapshot: state=${state.runtimeType}, '
+        'stateLocation=${state.location}, visibleLocation=$visibleLocation, '
+        'pageIndex=$_currentPageIndex.',
+      );
     }
   }
 
@@ -414,6 +652,35 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
             ),
           );
       }
+    }
+  }
+
+  int _getCurrentVisibleIndex() {
+    if (_locations.isEmpty) {
+      return 0;
+    } else {
+      int resolvedIndex = _currentPageIndex.clamp(0, _locations.length - 1);
+
+      if (_pageController.hasClients) {
+        final double? page = _pageController.page;
+        if (page != null) {
+          final int controllerIndex = page.round().clamp(
+            0,
+            _locations.length - 1,
+          );
+
+          if (controllerIndex != resolvedIndex) {
+            debugPrint(
+              'WeatherPage page sync: align current index '
+              '(stateIndex=$resolvedIndex, controllerIndex=$controllerIndex).',
+            );
+            resolvedIndex = controllerIndex;
+            _currentPageIndex = controllerIndex;
+          }
+        }
+      }
+
+      return resolvedIndex;
     }
   }
 }

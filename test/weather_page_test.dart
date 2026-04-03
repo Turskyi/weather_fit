@@ -619,6 +619,132 @@ void main() {
     });
 
     group('UI Stability', () {
+      testWidgets(
+        'keeps Toronto visible and avoids shimmer after resize resume',
+        (WidgetTester tester) async {
+          tester.view.physicalSize = const Size(1280, 900);
+          tester.view.devicePixelRatio = 1.0;
+          addTearDown(() {
+            tester.view.resetPhysicalSize();
+            tester.view.resetDevicePixelRatio();
+          });
+
+          const repository.Location torontoLocation = repository.Location(
+            latitude: 43.6534817,
+            longitude: -79.3839347,
+            locale: 'uk',
+            name: 'Торонто',
+            countryCode: 'CA',
+            country: 'Канада',
+          );
+          const repository.Location alternateLocation = repository.Location(
+            latitude: 43.745785410577845,
+            longitude: -79.56322417038717,
+            locale: 'en',
+            name: '',
+            countryCode: '',
+            country: '',
+          );
+
+          when(
+            () => mockLocalDataSource.getLastSavedLocation(),
+          ).thenReturn(torontoLocation);
+          when(
+            () => mockLocalDataSource.getLastSearchedLocation(),
+          ).thenReturn(torontoLocation);
+          when(
+            () => mockLocalDataSource.getFavouriteLocations(),
+          ).thenReturn(<repository.Location>[alternateLocation]);
+
+          final DateTime futureDate = DateTime.now().add(
+            const Duration(days: 1),
+          );
+          final String futureTimeString =
+              '${futureDate.year}-'
+              '${futureDate.month.toString().padLeft(2, '0')}-'
+              '${futureDate.day.toString().padLeft(2, '0')}T08:00';
+
+          final WeatherBloc weatherBloc = MockWeatherBloc();
+          final StreamController<WeatherState> controller =
+              StreamController<WeatherState>.broadcast();
+          addTearDown(controller.close);
+
+          final WeatherSuccess successState = WeatherSuccess(
+            locale: 'uk',
+            date: DateTime.now(),
+            outfitRecommendation: 'Тест',
+            weather: dummy_constants.dummyWeather.copyWith(
+              location: torontoLocation,
+              countryCode: '',
+              locale: 'uk',
+            ),
+            dailyForecast: DailyForecastDomain(
+              forecast: <ForecastItemDomain>[
+                ForecastItemDomain(
+                  time: futureTimeString,
+                  temperature: 10,
+                  weatherCode: 0,
+                ),
+              ],
+            ),
+          );
+
+          when(() => weatherBloc.state).thenReturn(successState);
+          when(() => weatherBloc.stream).thenAnswer((_) => controller.stream);
+          when(() => weatherBloc.add(any())).thenReturn(null);
+          when(() => themeCubit.updateTheme(any())).thenReturn(null);
+
+          await tester.pumpWidget(
+            MultiRepositoryProvider(
+              providers: <SingleChildWidget>[
+                RepositoryProvider<repository.WeatherRepository>.value(
+                  value: weatherRepository,
+                ),
+                RepositoryProvider<LocalDataSource>.value(
+                  value: mockLocalDataSource,
+                ),
+              ],
+              child: MultiBlocProvider(
+                providers: <SingleChildWidget>[
+                  BlocProvider<WeatherBloc>.value(value: weatherBloc),
+                  BlocProvider<SettingsBloc>.value(value: settingsBloc),
+                  BlocProvider<ThemeCubit>.value(value: themeCubit),
+                ],
+                child: prepareWidgetForTesting(
+                  LocalizedApp(
+                    localizationDelegate,
+                    const MaterialApp(home: WeatherPage()),
+                  ),
+                  localizationDelegate,
+                ),
+              ),
+            ),
+          );
+
+          await tester.pump(const Duration(milliseconds: 500));
+
+          expect(find.text('Торонто'), findsOneWidget);
+          expect(find.byType(DailyForecast), findsOneWidget);
+          expect(find.byType(DailyForecastShimmer), findsNothing);
+
+          tester.view.physicalSize = const Size(1728, 1117);
+          tester.binding.handleAppLifecycleStateChanged(
+            AppLifecycleState.inactive,
+          );
+          tester.binding.handleAppLifecycleStateChanged(
+            AppLifecycleState.resumed,
+          );
+
+          await tester.pump();
+          await tester.pump(const Duration(milliseconds: 500));
+
+          expect(find.text('Торонто'), findsOneWidget);
+          expect(find.byType(DailyForecast), findsOneWidget);
+          expect(find.byType(DailyForecastShimmer), findsNothing);
+          expect(find.byType(WeatherShimmer), findsNothing);
+        },
+      );
+
       testWidgets('Content does not jump when swiping between locations', (
         WidgetTester tester,
       ) async {

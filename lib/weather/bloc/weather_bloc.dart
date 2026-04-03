@@ -112,7 +112,15 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     Emitter<WeatherState> emit,
   ) async {
     final Location eventLocation = event.location;
-    if (_isSelectedLocation(eventLocation)) {
+    final Location selectedLocation = _localDataSource.getLastSavedLocation();
+    final bool isSelectedAtStart = _isSelectedLocation(eventLocation);
+    debugPrint(
+      'WeatherBloc fetch: start '
+      '(eventLocation=$eventLocation, selectedLocation=$selectedLocation, '
+      'isSelected=$isSelectedAtStart).',
+    );
+
+    if (isSelectedAtStart) {
       final String savedLocale = _localDataSource.getLanguageIsoCode();
       final bool isFavourite = _localDataSource.isFavouriteLocation(
         eventLocation,
@@ -121,6 +129,11 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
       // 1. Check for cached data to emit a "Stale" state immediately.
       final Map<String, dynamic>? cachedData = _localDataSource
           .getCachedWeatherBundle(eventLocation);
+
+      debugPrint(
+        'WeatherBloc fetch: cache lookup '
+        '(eventLocation=$eventLocation, hasCache=${cachedData != null}).',
+      );
 
       if (cachedData != null && _isSelectedLocation(eventLocation)) {
         try {
@@ -166,6 +179,10 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
         // If we don't have cache, or even if we do, we show a localized loader
         // (or just revalidate in background).
         if (cachedData == null) {
+          debugPrint(
+            'WeatherBloc fetch: emit WeatherLoadingState '
+            '(eventLocation=$eventLocation).',
+          );
           emit(
             WeatherLoadingState(
               locale: savedLocale,
@@ -181,12 +198,18 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           final DailyForecastDomain dailyForecast = await _weatherRepository
               .getDailyForecast(eventLocation);
 
-          if (_isSelectedLocation(eventLocation)) {
+          final bool isSelectedAfterForecast = _isSelectedLocation(
+            eventLocation,
+          );
+          if (isSelectedAfterForecast) {
             final WeatherDomain domainWeather = await _getWeatherByLocation(
               eventLocation,
             );
 
-            if (_isSelectedLocation(eventLocation)) {
+            final bool isSelectedAfterWeather = _isSelectedLocation(
+              eventLocation,
+            );
+            if (isSelectedAfterWeather) {
               final Weather weather = Weather.fromRepository(domainWeather);
 
               final TemperatureUnits units = state.temperatureUnits;
@@ -233,8 +256,25 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
                 if (!kIsWeb && eventOrigin.isNotWearable) {
                   add(UpdateWeatherOnHomeWidgetEvent(eventOrigin));
                 }
+              } else {
+                debugPrint(
+                  'WeatherBloc fetch: skip emit WeatherSuccess '
+                  '(eventLocation=$eventLocation, reason=not_selected_final).',
+                );
               }
+            } else {
+              debugPrint(
+                'WeatherBloc fetch: skip weather mapping '
+                '(eventLocation=$eventLocation, '
+                'reason=not_selected_after_weather).',
+              );
             }
+          } else {
+            debugPrint(
+              'WeatherBloc fetch: skip weather request '
+              '(eventLocation=$eventLocation, '
+              'reason=not_selected_after_forecast).',
+            );
           }
         } on Exception catch (exception) {
           debugPrint('WeatherBloc _onFetchWeather Exception: $exception.');
@@ -254,6 +294,11 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           }
         }
       }
+    } else {
+      debugPrint(
+        'WeatherBloc fetch: ignore event '
+        '(eventLocation=$eventLocation, selectedLocation=$selectedLocation).',
+      );
     }
   }
 
@@ -617,6 +662,11 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
   ) async {
     final DailyForecastDomain? dailyForecast = state.dailyForecast;
     if (dailyForecast != null) {
+      debugPrint(
+        'WeatherBloc widget update: start '
+        '(origin=${event.origin}, state=${state.runtimeType}, '
+        'location=${state.weather.location}).',
+      );
       try {
         await _homeWidgetService.updateHomeWidget(
           localDataSource: _localDataSource,
@@ -624,9 +674,15 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           forecast: dailyForecast,
           outfitRepository: _outfitRepository,
         );
+        debugPrint('WeatherBloc widget update: completed.');
       } on PlatformException catch (e) {
         debugPrint('Home widget update skipped: $e');
       }
+    } else {
+      debugPrint(
+        'WeatherBloc widget update: skipped because forecast is null '
+        '(origin=${event.origin}).',
+      );
     }
   }
 
@@ -635,7 +691,18 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     Emitter<WeatherState> emit,
   ) {
     final DateTime now = DateTime.now();
-    if (!state.date.isSameHour(now)) {
+    if (state.date.isSameHour(now)) {
+      debugPrint(
+        'WeatherBloc resume check: skip refresh '
+        '(stateDate=${state.date.toIso8601String()}, '
+        'now=${now.toIso8601String()}).',
+      );
+    } else {
+      debugPrint(
+        'WeatherBloc resume check: refresh weather '
+        '(stateDate=${state.date.toIso8601String()}, '
+        'now=${now.toIso8601String()}).',
+      );
       add(RefreshWeather(event.origin));
     }
   }

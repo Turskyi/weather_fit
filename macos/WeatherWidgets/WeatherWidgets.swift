@@ -531,15 +531,22 @@ struct WeatherWidgets: Widget {
 
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: Provider()) { entry in
-            WeatherWidgetsEntryView(entry: entry)
-                .containerBackground(for: .widget) {
-                    WeatherHelper.getGradient(
-                        for: entry.weatherData.forecast?.first?.weatherCode ?? 0
-                    )
-                }
-                .clipShape(ContainerRelativeShape())
+            ZStack {
+                WeatherHelper.getGradient(
+                    for: entry.weatherData.forecast?.first?.weatherCode ?? 0
+                )
+
+                WeatherWidgetsEntryView(entry: entry)
+                    .padding(8)
+            }
+            .containerBackground(for: .widget) {
+                WeatherHelper.getGradient(
+                    for: entry.weatherData.forecast?.first?.weatherCode ?? 0
+                )
+            }
+            .clipShape(ContainerRelativeShape())
         }
-        .contentMarginsDisabled()
+        .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
         .configurationDisplayName("WeatherFit")
         .description("Check the weather and outfit recommendation.")
     }
