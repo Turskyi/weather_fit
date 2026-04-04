@@ -16,6 +16,39 @@ import 'package:weather_fit/weather/ui/widgets/outfit_widget.dart';
 import 'package:weather_fit/weather/ui/widgets/weather_loading_widget.dart';
 import 'package:weather_repository/weather_repository.dart';
 
+DateTime? _lastDefaultShimmerLogAt;
+String? _lastDefaultShimmerLogKey;
+
+void _logDefaultShimmerReason({
+  required String reason,
+  required WeatherState state,
+  Location? pageLocation,
+}) {
+  if (!kDebugMode) {
+    return;
+  } else {
+    final String key =
+        '$reason|${state.runtimeType}|${state.location}|$pageLocation';
+    final DateTime now = DateTime.now();
+    final bool shouldSkipLog =
+        _lastDefaultShimmerLogKey == key &&
+        _lastDefaultShimmerLogAt != null &&
+        now.difference(_lastDefaultShimmerLogAt!) < const Duration(seconds: 2);
+
+    if (shouldSkipLog) {
+      return;
+    } else {
+      _lastDefaultShimmerLogAt = now;
+      _lastDefaultShimmerLogKey = key;
+      debugPrint(
+        'WeatherPageDefault shimmer: reason=$reason, '
+        'state=${state.runtimeType}, stateLocation=${state.location}, '
+        'pageLocation=$pageLocation.',
+      );
+    }
+  }
+}
+
 class WeatherPageDefaultLayout extends StatelessWidget {
   const WeatherPageDefaultLayout({
     required this.onSettingsPressed,
@@ -63,6 +96,11 @@ class WeatherPageDefaultLayout extends StatelessWidget {
         if (location != null &&
             location!.isNotEmpty &&
             !state.location.isSamePlaceAs(location!)) {
+          _logDefaultShimmerReason(
+            reason: 'location_mismatch',
+            state: state,
+            pageLocation: location,
+          );
           return WeatherPopulated(
             weather: Weather.empty.copyWith(location: location),
             onRefresh: onRefresh,
@@ -78,6 +116,11 @@ class WeatherPageDefaultLayout extends StatelessWidget {
             if (stateWeather.location.isEmpty) {
               return const WeatherLoadingWidget();
             } else {
+              _logDefaultShimmerReason(
+                reason: 'weather_loading_state',
+                state: state,
+                pageLocation: location,
+              );
               return WeatherPopulated(
                 weather: stateWeather,
                 onRefresh: onRefresh,

@@ -30,6 +30,10 @@ class HomeWidgetServiceImpl implements HomeWidgetService {
       return Future<void>.value();
     }
     if (Platform.isMacOS) {
+      debugPrint(
+        'HomeWidgetService setAppGroupId: macOS channel call '
+        '(appGroupId=$appGroupId).',
+      );
       return _widgetChannel.invokeMethod<void>(
         'setAppGroupId',
         <String, String>{_appGroupIdArgKey: appGroupId},
@@ -44,6 +48,10 @@ class HomeWidgetServiceImpl implements HomeWidgetService {
       return Future<bool>.value(false);
     }
     if (Platform.isMacOS) {
+      debugPrint(
+        'HomeWidgetService saveWidgetData: macOS channel call '
+        '(key=$id, type=${data.runtimeType}).',
+      );
       return _widgetChannel.invokeMethod<bool>(
         'saveWidgetData',
         <String, Object?>{
@@ -67,6 +75,7 @@ class HomeWidgetServiceImpl implements HomeWidgetService {
       return Future<bool>.value(false);
     }
     if (Platform.isMacOS) {
+      debugPrint('HomeWidgetService updateWidget: macOS channel call.');
       return _widgetChannel.invokeMethod<bool>('updateWidget');
     }
     return HomeWidget.updateWidget(
@@ -84,6 +93,11 @@ class HomeWidgetServiceImpl implements HomeWidgetService {
     required DailyForecastDomain forecast,
     required OutfitRepository outfitRepository,
   }) async {
+    debugPrint(
+      'HomeWidgetService updateHomeWidget: start '
+      '(location=${weather.location}, '
+      'forecastItems=${forecast.forecast.length}).',
+    );
     final String savedLanguageIsoCode = localDataSource.getLanguageIsoCode();
 
     final TemperatureUnits units = weather.temperatureUnits;
@@ -181,6 +195,8 @@ class HomeWidgetServiceImpl implements HomeWidgetService {
       iOSName: constants.iOSWidgetName,
       androidName: constants.androidWidgetName,
     );
+
+    debugPrint('HomeWidgetService updateHomeWidget: completed.');
   }
 
   @override

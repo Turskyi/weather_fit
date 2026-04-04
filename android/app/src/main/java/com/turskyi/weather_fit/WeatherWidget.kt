@@ -6,8 +6,11 @@ import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.SharedPreferences
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Build
+import android.util.DisplayMetrics
+import android.util.TypedValue
 import android.view.View
 import android.widget.RemoteViews
 import androidx.annotation.RequiresApi
@@ -22,6 +25,12 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import kotlin.math.max
+import kotlin.math.roundToInt
+import kotlin.math.sqrt
+
+private const val MAX_CONSTRAINED_WIDGET_BITMAP_BYTES = 760 * 1024
+private const val FALLBACK_WIDGET_SIZE_DP = 220
 
 // Data class to match the JSON structure.
 data class ForecastItem(
@@ -70,7 +79,11 @@ class WeatherWidget : AppWidgetProvider() {
 @RequiresApi(Build.VERSION_CODES.CUPCAKE)
 @SuppressLint("ObsoleteSdkInt")
 internal fun updateAppWidget(
-    context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int
+    context: Context,
+    appWidgetManager: AppWidgetManager,
+    appWidgetId: Int,
+    useConstrainedImage: Boolean = false,
+    includeImage: Boolean = true,
 ) {
     // Get reference to SharedPreferences.
     val widgetData: SharedPreferences = HomeWidgetPlugin.getData(context)
@@ -165,12 +178,17 @@ internal fun updateAppWidget(
         }
         val isImageAvailable: Boolean = imageFile?.exists() == true
 
-        if (isImageAvailable) {
+        if (isImageAvailable && includeImage) {
             @Suppress("UNNECESSARY_SAFE_CALL")
             imageFile?.let { file: File ->
-                val bitmap: android.graphics.Bitmap? =
-                    BitmapFactory.decodeFile(file.absolutePath)
-                bitmap?.let { bmp: android.graphics.Bitmap ->
+                val bitmap: Bitmap? = decodeWidgetBitmap(
+                    context,
+                    appWidgetManager,
+                    appWidgetId,
+                    file.absolutePath,
+                    useConstrainedImage,
+                )
+                bitmap?.let { bmp: Bitmap ->
                     setImageViewBitmap(
                         R.id.image_weather,
                         bmp,
@@ -265,7 +283,154 @@ internal fun updateAppWidget(
         }
     }
 
-    appWidgetManager.updateAppWidget(appWidgetId, views)
+    try {
+        appWidgetManager.updateAppWidget(appWidgetId, views)
+    } catch (exception: IllegalArgumentException) {
+        val isBitmapLimitException: Boolean =
+            exception.message?.contains("exceeds maximum bitmap memory usage") == true
+        if (isBitmapLimitException && includeImage && !useConstrainedImage) {
+            updateAppWidget(
+                context,
+                appWidgetManager,
+                appWidgetId,
+                useConstrainedImage = true,
+                includeImage = true,
+            )
+        } else if (isBitmapLimitException && includeImage && useConstrainedImage) {
+            updateAppWidget(
+                context,
+                appWidgetManager,
+                appWidgetId,
+                useConstrainedImage = false,
+                includeImage = false,
+            )
+        } else {
+            throw exception
+        }
+    }
+}
+
+private fun decodeWidgetBitmap(
+    context: Context,
+    appWidgetManager: AppWidgetManager,
+    appWidgetId: Int,
+    path: String,
+    useConstrainedImage: Boolean,
+): Bitmap? {
+    val boundsOptions: BitmapFactory.Options = BitmapFactory.Options().apply {
+        inJustDecodeBounds = true
+    }
+    BitmapFactory.decodeFile(path, boundsOptions)
+
+    val widgetSizePx: Pair<Int, Int> = getWidgetSizePx(
+        context,
+        appWidgetManager,
+        appWidgetId,
+    )
+
+    val sampleSize: Int = calculateSampleSize(
+        boundsOptions.outWidth,
+        boundsOptions.outHeight,
+        widgetSizePx.first,
+        widgetSizePx.second,
+    )
+
+    val decodeOptions: BitmapFactory.Options = BitmapFactory.Options().apply {
+        inSampleSize = sampleSize
+        inPreferredConfig = if (useConstrainedImage) {
+            Bitmap.Config.RGB_565
+        } else {
+            Bitmap.Config.ARGB_8888
+        }
+    }
+
+    val decodedBitmap: Bitmap? = BitmapFactory.decodeFile(path, decodeOptions)
+    return decodedBitmap?.let { bitmap: Bitmap ->
+        if (useConstrainedImage) {
+            downscaleToByteLimit(bitmap, MAX_CONSTRAINED_WIDGET_BITMAP_BYTES)
+        } else {
+            bitmap
+        }
+    }
+}
+
+private fun getWidgetSizePx(
+    context: Context,
+    appWidgetManager: AppWidgetManager,
+    appWidgetId: Int,
+): Pair<Int, Int> {
+    val options = appWidgetManager.getAppWidgetOptions(appWidgetId)
+    val minWidthDp: Int = options.getInt(
+        AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH,
+        FALLBACK_WIDGET_SIZE_DP,
+    )
+    val minHeightDp: Int = options.getInt(
+        AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT,
+        FALLBACK_WIDGET_SIZE_DP,
+    )
+    val widthPx: Int = dpToPx(context.resources.displayMetrics, minWidthDp)
+    val heightPx: Int = dpToPx(context.resources.displayMetrics, minHeightDp)
+
+    return Pair(
+        max(widthPx, dpToPx(context.resources.displayMetrics, FALLBACK_WIDGET_SIZE_DP)),
+        max(heightPx, dpToPx(context.resources.displayMetrics, FALLBACK_WIDGET_SIZE_DP)),
+    )
+}
+
+private fun dpToPx(metrics: DisplayMetrics, dp: Int): Int {
+    return TypedValue.applyDimension(
+        TypedValue.COMPLEX_UNIT_DIP,
+        dp.toFloat(),
+        metrics,
+    ).roundToInt()
+}
+
+private fun calculateSampleSize(
+    sourceWidth: Int,
+    sourceHeight: Int,
+    targetWidth: Int,
+    targetHeight: Int,
+): Int {
+    if (sourceWidth <= 0 || sourceHeight <= 0) {
+        return 1
+    } else {
+        var inSampleSize = 1
+        if (sourceHeight > targetHeight || sourceWidth > targetWidth) {
+            var halfHeight = sourceHeight / 2
+            var halfWidth = sourceWidth / 2
+            while (
+                halfHeight / inSampleSize >= targetHeight &&
+                halfWidth / inSampleSize >= targetWidth
+            ) {
+                inSampleSize *= 2
+            }
+        }
+        return max(1, inSampleSize)
+    }
+}
+
+private fun downscaleToByteLimit(
+    bitmap: Bitmap,
+    maxBytes: Int,
+): Bitmap {
+    val currentBytes: Int = bitmap.allocationByteCount
+    if (currentBytes <= maxBytes) {
+        return bitmap
+    } else {
+        val scale: Double = sqrt(maxBytes.toDouble() / currentBytes.toDouble())
+        val scaledWidth: Int = max(1, (bitmap.width * scale).roundToInt())
+        val scaledHeight: Int = max(1, (bitmap.height * scale).roundToInt())
+        val scaledBitmap: Bitmap = Bitmap.createScaledBitmap(
+            bitmap,
+            scaledWidth,
+            scaledHeight,
+            true,
+        )
+        if (scaledBitmap != bitmap) {
+            bitmap.recycle()
+        }
+        return scaledBitmap
+    }
 }
 
 private fun getBackgroundResource(code: Int): Int {

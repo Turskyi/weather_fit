@@ -14,6 +14,40 @@ import 'package:weather_fit/weather/ui/widgets/outfit_widget.dart';
 import 'package:weather_fit/weather/ui/widgets/weather_loading_widget.dart';
 import 'package:weather_repository/weather_repository.dart';
 
+DateTime? _lastExtraSmallShimmerLogAt;
+String? _lastExtraSmallShimmerLogKey;
+
+void _logExtraSmallShimmerReason({
+  required String reason,
+  required WeatherState state,
+  Location? pageLocation,
+}) {
+  if (!kDebugMode) {
+    return;
+  } else {
+    final String key =
+        '$reason|${state.runtimeType}|${state.location}|$pageLocation';
+    final DateTime now = DateTime.now();
+    final bool shouldSkipLog =
+        _lastExtraSmallShimmerLogKey == key &&
+        _lastExtraSmallShimmerLogAt != null &&
+        now.difference(_lastExtraSmallShimmerLogAt!) <
+            const Duration(seconds: 2);
+
+    if (shouldSkipLog) {
+      return;
+    } else {
+      _lastExtraSmallShimmerLogAt = now;
+      _lastExtraSmallShimmerLogKey = key;
+      debugPrint(
+        'WeatherPageExtraSmall shimmer: reason=$reason, '
+        'state=${state.runtimeType}, stateLocation=${state.location}, '
+        'pageLocation=$pageLocation.',
+      );
+    }
+  }
+}
+
 class WeatherPageExtraSmallLayout extends StatefulWidget {
   const WeatherPageExtraSmallLayout({
     required this.onSettingsPressed,
@@ -79,6 +113,11 @@ class _WeatherPageExtraSmallLayoutState
         if (widget.location != null &&
             widget.location!.isNotEmpty &&
             !state.location.isSamePlaceAs(widget.location!)) {
+          _logExtraSmallShimmerReason(
+            reason: 'location_mismatch',
+            state: state,
+            pageLocation: widget.location,
+          );
           return WeatherPopulated(
             weather: Weather.empty.copyWith(location: widget.location),
             onRefresh: widget.onRefresh,
@@ -94,6 +133,11 @@ class _WeatherPageExtraSmallLayoutState
             if (stateWeather.location.isEmpty) {
               return const WeatherLoadingWidget();
             } else {
+              _logExtraSmallShimmerReason(
+                reason: 'weather_loading_state',
+                state: state,
+                pageLocation: widget.location,
+              );
               return WeatherPopulated(
                 weather: stateWeather,
                 onRefresh: widget.onRefresh,
@@ -217,7 +261,7 @@ class _WeatherPageExtraSmallLayoutState
             shape: const CircleBorder(),
             clipBehavior: Clip.antiAlias,
             child: SizedBox.square(
-              dimension: 32.0,
+              dimension: 30.0,
               child: InkResponse(
                 onTap: widget.onSettingsPressed,
                 containedInkWell: true,

@@ -70,13 +70,12 @@ android {
     def requestedTasks = gradle.startParameter.taskNames*.toLowerCase().join(" ")
     def requestedWearVariant = requestedTasks.contains("wear")
 
-    // Default builds should resolve to phone, but explicit wear tasks must still work.
+    // Keep phone as default while still exposing wear release/profile variants.
     variantFilter { variant ->
         def isDebugBuild = variant.buildType.name == "debug"
-        def isReleaseBuild = variant.buildType.name == "release"
         def isWearFlavor = variant.name.contains("wear")
 
-        if ((isDebugBuild || isReleaseBuild) && isWearFlavor && !requestedWearVariant) {
+        if (isDebugBuild && isWearFlavor && !requestedWearVariant) {
             variant.ignore = true
         }
     }
