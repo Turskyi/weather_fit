@@ -399,15 +399,17 @@ struct Provider: TimelineProvider {
         }
     }
 
+    // Returns the widget refresh interval in minutes, as set by Flutter (UserDefaults),
+    // or falls back to 30 minutes if not set or invalid.
     private func refreshIntervalMinutes() -> Int {
         guard
             let sharedDefaults = UserDefaults(suiteName: appGroupIdentifier),
             let minutes = sharedDefaults.object(forKey: updateFrequencyKey) as? Int,
             minutes > 0
         else {
-            return 15
+            return 30 // fallback to 30 minutes if not set or invalid
         }
-        return max(15, minutes)
+        return max(30, minutes) // never less than 30 minutes
     }
 }
 
