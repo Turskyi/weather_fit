@@ -192,8 +192,8 @@ class HomeWidgetServiceImpl implements HomeWidgetService {
 
     // Update the widget.
     await updateWidget(
-      iOSName: constants.iOSWidgetName,
-      androidName: constants.androidWidgetName,
+      iOSName: constants.kIosWidgetName,
+      androidName: constants.kAndroidWidgetName,
     );
 
     debugPrint('HomeWidgetService updateHomeWidget: completed.');

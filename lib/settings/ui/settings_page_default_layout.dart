@@ -491,6 +491,30 @@ class SettingsPageDefaultLayout extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 24),
+                if (kDebugMode)
+                  Card(
+                    elevation: 2.0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    child: BlocBuilder<SettingsBloc, SettingsState>(
+                      builder: (BuildContext context, SettingsState state) {
+                        return SwitchListTile(
+                          title: const Text('Force OpenWeatherMap (debug)'),
+                          subtitle: const Text(
+                            'Use OpenWeatherMap as the weather provider '
+                            '(fallback)',
+                          ),
+                          value: state.debugWeatherProviderOpenWeatherMap,
+                          onChanged: (bool value) {
+                            context.read<SettingsBloc>().add(
+                              ToggleDebugWeatherProviderEvent(value),
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ),
               ],
             ),
           ),

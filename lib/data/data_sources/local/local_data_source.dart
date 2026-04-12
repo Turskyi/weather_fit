@@ -27,10 +27,19 @@ class LocalDataSource {
     constants.kSharedContainerMethodChannel,
   );
 
+  /// Returns the primary asset path for an outfit image matching the [weather].
+  ///
+  /// If multiple paths are available, the first one is returned. Returns an
+  /// empty string if no paths are found.
   String getOutfitImageAssetPath(Weather weather) {
     return getOutfitImageAssetPaths(weather).firstOrNull ?? '';
   }
 
+  /// Returns a list of asset paths for outfit images that match the [weather].
+  ///
+  /// If the weather condition is [WeatherCondition.unknown], it returns
+  /// multiple options (clear, cloudy, and precipitation). For all other
+  /// conditions, it returns a list containing a single matching asset path.
   List<String> getOutfitImageAssetPaths(Weather weather) {
     final WeatherCondition condition = weather.condition;
     double temperatureValue = weather.temperature.value;
@@ -80,6 +89,8 @@ class LocalDataSource {
     ];
   }
 
+  /// Returns a localized recommendation string for what to wear based on
+  /// [weather].
   String getOutfitRecommendation(Weather weather) {
     final String locale = getLanguageIsoCode();
     final double temperature = weather.temperature.value;
@@ -154,6 +165,10 @@ class LocalDataSource {
     }
   }
 
+  /// Downloads and saves an asset to the local filesystem.
+  ///
+  /// Returns the absolute file path where the image was saved. On Web,
+  /// returns the original [assetPath].
   Future<String> downloadAndSaveImage(String assetPath) async {
     // Check if the platform is web.
     if (!kIsWeb) {
@@ -216,6 +231,11 @@ class LocalDataSource {
     );
   }
 
+  /// Returns the ISO language code to be used for localization.
+  ///
+  /// It first checks for a saved preference. If none is found, it falls back
+  /// to the system language if supported, or English otherwise. It also
+  /// attempts to detect the language from the host URI on Web.
   String getLanguageIsoCode() {
     final String? savedLanguageIsoCode = _preferences.getString(
       Settings.languageIsoCode.key,
@@ -371,7 +391,12 @@ class LocalDataSource {
     return _preferences.setString(key, jsonEncode(data));
   }
 
-  Map<String, dynamic>? getCachedWeatherBundle(Location location) {
+  /// Retrieves a cached weather bundle for the given [location].
+  ///
+  /// Returns a [Map] containing 'weather', 'dailyForecast',
+  /// 'outfitRecommendation', and 'outfitImage' keys if found; otherwise,
+  /// returns `null`.
+  Map<String, Object?>? getCachedWeatherBundle(Location location) {
     final String key =
         'weather_bundle_${location.latitude}_${location.longitude}';
     final String? jsonString = _preferences.getString(key);
@@ -440,9 +465,11 @@ class LocalDataSource {
       return p.date.isAtSameMomentAs(today) || p.date.isAfter(today);
     }).toList();
 
-    if (plans.length == futurePlans.length) return true;
-
-    return _savePlansList(futurePlans);
+    if (plans.length == futurePlans.length) {
+      return true;
+    } else {
+      return _savePlansList(futurePlans);
+    }
   }
 
   Future<bool> _savePlansList(List<SavedPlan> plans) {
@@ -524,6 +551,20 @@ class LocalDataSource {
         nightStartHour: WeatherCondition.defaultNightStartHour,
       );
     }
+  }
+
+  /// Returns true if OpenWeatherMap should be used instead of Open-Meteo
+  /// (debug only).
+  bool getDebugWeatherProviderOpenWeatherMap() {
+    return _preferences.getBool(constants.kDebugWeatherProviderKey) ?? false;
+  }
+
+  /// Sets whether OpenWeatherMap should be used instead of Open-Meteo
+  /// (debug only).
+  ///
+  /// Returns `true` if the value was successfully saved to persistent storage.
+  Future<bool> setDebugWeatherProviderOpenWeatherMap(bool value) {
+    return _preferences.setBool(constants.kDebugWeatherProviderKey, value);
   }
 
   String _translateError(String key, String locale) {

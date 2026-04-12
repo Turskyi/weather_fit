@@ -62,3 +62,8 @@ class ChangeNightStartHourEvent extends SettingsEvent {
 
   final int hour;
 }
+
+class ToggleDebugWeatherProviderEvent extends SettingsEvent {
+  const ToggleDebugWeatherProviderEvent(this.enabled);
+  final bool enabled;
+}

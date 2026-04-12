@@ -17,6 +17,7 @@ import 'package:weather_fit/data/repositories/outfit_repository.dart';
 import 'package:weather_fit/di/dependencies.dart';
 import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
+import 'package:weather_fit/env/env.dart';
 import 'package:weather_fit/localization/localization_delegate_getter.dart'
     as locale;
 import 'package:weather_fit/res/constants/constants.dart' as constants;
@@ -52,7 +53,30 @@ Future<Dependencies> injectDependencies() async {
     localDataSource,
     remoteDataSource,
   );
-  final WeatherRepository weatherRepository = WeatherRepository();
+
+  // Construct weather providers with fallback logic. We use the debug
+  // toggle saved in LocalDataSource to force OpenWeatherMap when enabled.
+  final bool forceOpenWeatherMap = localDataSource
+      .getDebugWeatherProviderOpenWeatherMap();
+
+  final OpenMeteoProvider openMeteoProvider = OpenMeteoProvider(
+    apiClient: OpenMeteoApiClient(),
+  );
+
+  final OpenWeatherMapProvider openWeatherMapProvider = OpenWeatherMapProvider(
+    apiKey: Env.openWeatherMapApiKey,
+  );
+
+  final FallbackWeatherProvider fallbackProvider = FallbackWeatherProvider(
+    openMeteo: openMeteoProvider,
+    openWeatherMap: openWeatherMapProvider,
+    forceOpenWeatherMap: forceOpenWeatherMap,
+  );
+
+  final WeatherRepository weatherRepository = WeatherRepository(
+    weatherProvider: fallbackProvider,
+  );
+
   final LocationRepository locationRepository = LocationRepository(
     NominatimApiClient(),
     OpenMeteoApiClient(),
@@ -253,7 +277,26 @@ Future<bool> _performWidgetUpdateTick() async {
       return false;
     }
 
-    final WeatherRepository weatherRepository = WeatherRepository();
+    // Background task should respect the debug toggle as well.
+    final bool forceOpenWeatherMap = localDataSource
+        .getDebugWeatherProviderOpenWeatherMap();
+
+    final OpenMeteoProvider openMeteoProvider = OpenMeteoProvider(
+      apiClient: OpenMeteoApiClient(),
+    );
+
+    final OpenWeatherMapProvider openWeatherMapProvider =
+        OpenWeatherMapProvider(apiKey: Env.openWeatherMapApiKey);
+
+    final FallbackWeatherProvider fallbackProvider = FallbackWeatherProvider(
+      openMeteo: openMeteoProvider,
+      openWeatherMap: openWeatherMapProvider,
+      forceOpenWeatherMap: forceOpenWeatherMap,
+    );
+
+    final WeatherRepository weatherRepository = WeatherRepository(
+      weatherProvider: fallbackProvider,
+    );
 
     final WeatherDomain domainWeather = await weatherRepository
         .getWeatherByLocation(lastSavedLocation);

@@ -35,6 +35,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
           widgetUpdateFrequency: _localDataSource.getWidgetUpdateFrequency(),
           dayStartHour: _localDataSource.getDayStartHour(),
           nightStartHour: _localDataSource.getNightStartHour(),
+          debugWeatherProviderOpenWeatherMap: _localDataSource
+              .getDebugWeatherProviderOpenWeatherMap(),
         ),
       ) {
     on<LoadSettingsEvent>(_onLoadSettings);
@@ -56,6 +58,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     on<ChangeDayStartHourEvent>(_onChangeDayStartHour);
 
     on<ChangeNightStartHourEvent>(_onChangeNightStartHour);
+
+    on<ToggleDebugWeatherProviderEvent>(_onToggleDebugWeatherProvider);
 
     _applyDayNightConfiguration(
       dayStartHour: state.dayStartHour,
@@ -467,6 +471,14 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         ),
       );
     }
+  }
+
+  FutureOr<void> _onToggleDebugWeatherProvider(
+    ToggleDebugWeatherProviderEvent event,
+    Emitter<SettingsState> emit,
+  ) async {
+    await _localDataSource.setDebugWeatherProviderOpenWeatherMap(event.enabled);
+    emit(state.copyWith(debugWeatherProviderOpenWeatherMap: event.enabled));
   }
 
   void _applyDayNightConfiguration({
