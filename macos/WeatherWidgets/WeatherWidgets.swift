@@ -419,12 +419,9 @@ struct ForecastItemView: View {
 
     var body: some View {
         VStack(spacing: 2) {
-            Text(DateHelper.getDay(from: item.time, locale: locale ?? "en"))
-                .font(.system(size: 8, weight: .bold))
-            Text(
-                DateHelper.getTimeOfDay(from: item.time, locale: locale ?? "en")
-            )
-            .font(.system(size: 8))
+            // Show full date and time on macOS
+            Text(DateHelper.getDateAndTimeString(from: item.time, locale: locale ?? "en"))
+                .font(.system(size: 9, weight: .bold))
             Text(WeatherHelper.getWeatherEmoji(for: item.weatherCode))
                 .font(.title3)
             Text("\(Int(item.temperature.rounded()))°")
@@ -681,6 +678,17 @@ struct DateHelper {
         formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm"
         return formatter.date(from: string)
+    }
+
+    /// Returns a formatted date and time string, e.g. "Apr 12, 09:00"
+    static func getDateAndTimeString(from dateString: String, locale: String = "en") -> String {
+        guard let date = parseDateTime(from: dateString) else {
+            return ""
+        }
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: locale)
+        formatter.setLocalizedDateFormatFromTemplate("MMM d, HH:mm")
+        return formatter.string(from: date)
     }
 
     static func getDay(from dateString: String, locale: String = "en") -> String {
