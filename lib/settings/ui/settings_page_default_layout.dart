@@ -237,10 +237,7 @@ class SettingsPageDefaultLayout extends StatelessWidget {
                     );
                   },
                 ),
-                if (!kIsWeb &&
-                    (defaultTargetPlatform == TargetPlatform.android ||
-                        defaultTargetPlatform ==
-                            TargetPlatform.iOS)) ...<Widget>[
+                if (!kIsWeb && !context.isExtraSmallScreen) ...<Widget>[
                   const SizedBox(height: 20),
                   // Home Widget Updates Card.
                   BlocBuilder<SettingsBloc, SettingsState>(
@@ -491,6 +488,30 @@ class SettingsPageDefaultLayout extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 24),
+                if (kDebugMode)
+                  Card(
+                    elevation: 2.0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    child: BlocBuilder<SettingsBloc, SettingsState>(
+                      builder: (BuildContext context, SettingsState state) {
+                        return SwitchListTile(
+                          title: const Text('Force OpenWeatherMap (debug)'),
+                          subtitle: const Text(
+                            'Use OpenWeatherMap as the weather provider '
+                            '(fallback)',
+                          ),
+                          value: state.debugWeatherProviderOpenWeatherMap,
+                          onChanged: (bool value) {
+                            context.read<SettingsBloc>().add(
+                              ToggleDebugWeatherProviderEvent(value),
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ),
               ],
             ),
           ),

@@ -95,6 +95,7 @@ void main() {
     "lat": "50.4500336",
     "lon": "30.5241361",
     "display_name": "Київ, Україна",
+    "name": "Київ",
     "address": {
       "country": "Україна",
       "country_code": "ua"

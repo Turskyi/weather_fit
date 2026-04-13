@@ -1,0 +1,15 @@
+# Project Rules
+
+- Never do anything else other than what was specifically asked for.
+- If you want to change "something similar" or make additional improvements not explicitly requested, you MUST ASK PERMISSION first.
+- Respect all linter rules listed in `analysis_options.yaml`, including but not limited to:
+    - Use trailing commas for all function calls and declarations with more than one parameter.
+    - Use single quotes for strings.
+    - Always specify types as per https://dart.dev/tools/linter-rules/always_specify_types (avoid `var`).
+    - Keep lines within 80 characters.
+    - Sort constructors first.
+    - Prefer `const` where possible.
+
+- Create only one class per file, except:
+    - Stateful widgets (where state is a separate class).
+    - Enum-like classes (for example, Bloc state and event classes).

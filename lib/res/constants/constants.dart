@@ -1,6 +1,6 @@
 const String kAppleAppGroupId = 'group.dmytrowidget';
-const String iOSWidgetName = 'WeatherWidgets';
-const String androidWidgetName = 'WeatherWidget';
+const String kIosWidgetName = 'WeatherWidgets';
+const String kAndroidWidgetName = 'WeatherWidget';
 const String kDeveloperDomain = 'turskyi.com';
 const String kDeveloperUrl = 'https://$kDeveloperDomain';
 const String kDomain = 'weather-fit.com';
@@ -43,7 +43,7 @@ const String kSearchError = 'searchError';
 const double kBlurSigma = 8;
 
 const String kDoNotReplySenderName = 'Do Not Reply';
-const String feedbackEmailSender =
+const String kFeedbackEmailSender =
     '$kDoNotReplySenderName $kAppName <no-reply@$kResendEmailDomain>';
 const String kFeedbackScreenshotFileName = 'feedback.png';
 
@@ -70,3 +70,4 @@ const String kBackgroundTaskName = 'updateWidgetTask';
 
 const String kWeatherFitScheme = 'weatherfit';
 const String kWeatherFitHost = 'open';
+const String kDebugWeatherProviderKey = 'debug_weather_provider_openweathermap';

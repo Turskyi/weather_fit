@@ -4,49 +4,39 @@ import 'package:open_meteo_api/open_meteo_api.dart';
 import 'package:weather_repository/weather_repository.dart';
 
 class WeatherRepository {
-  WeatherRepository({OpenMeteoApiClient? weatherApiClient})
-    : _openMeteoApiClient = weatherApiClient ?? OpenMeteoApiClient();
+  WeatherRepository({
+    OpenMeteoApiClient? weatherApiClient,
+    WeatherProvider? weatherProvider,
+  }) : _openMeteoApiClient = weatherApiClient ?? OpenMeteoApiClient(),
+       _weatherProvider =
+           weatherProvider ??
+           OpenMeteoProvider(
+             apiClient: weatherApiClient ?? OpenMeteoApiClient(),
+           );
 
   final OpenMeteoApiClient _openMeteoApiClient;
+  final WeatherProvider _weatherProvider;
 
   Future<WeatherDomain> getWeatherByLocation(Location location) async {
-    final double latitude = location.latitude;
-    final double longitude = location.longitude;
-
-    final WeatherResponse weatherResponse = await _openMeteoApiClient
-        .getWeather(latitude: latitude, longitude: longitude);
+    // Use provider (may fallback internally).
+    final WeatherDomain weatherDomain = await _weatherProvider
+        .getCurrentWeather(location);
 
     return WeatherDomain(
-      temperature: weatherResponse.temperature,
-      location: location,
-      condition: weatherResponse.code.toCondition,
-      countryCode: location.countryCode,
-      description: weatherResponse.description,
-      weatherCode: weatherResponse.code,
-      locale: location.locale,
+      temperature: weatherDomain.temperature,
+      location: weatherDomain.location,
+      condition: weatherDomain.condition,
+      countryCode: weatherDomain.countryCode,
+      description: weatherDomain.description,
+      weatherCode: weatherDomain.weatherCode,
+      locale: weatherDomain.locale,
     );
   }
 
   Future<DailyForecastDomain> getDailyForecast(Location location) async {
-    final DailyForecastResponse dailyForecastResponse =
-        await _openMeteoApiClient.getDailyForecast(
-          latitude: location.latitude,
-          longitude: location.longitude,
-        );
-
-    final List<ForecastItemDomain> forecastItems = <ForecastItemDomain>[];
-
-    for (int i = 0; i < dailyForecastResponse.hourly.time.length; i++) {
-      forecastItems.add(
-        ForecastItemDomain(
-          time: dailyForecastResponse.hourly.time[i],
-          temperature: dailyForecastResponse.hourly.temperature2m[i],
-          weatherCode: dailyForecastResponse.hourly.weathercode[i],
-        ),
-      );
-    }
-
-    return DailyForecastDomain(forecast: forecastItems);
+    final DailyForecastDomain dailyForecast = await _weatherProvider
+        .getForecast(location);
+    return dailyForecast;
   }
 
   Future<WeatherDomain> getClimateProjection({
@@ -101,46 +91,5 @@ class WeatherRepository {
       countryCode: response.countryCode,
       locale: locale,
     );
-  }
-}
-
-extension on int {
-  WeatherCondition get toCondition {
-    switch (this) {
-      case 0:
-        return WeatherCondition.clear;
-      case 1:
-      case 2:
-      case 3:
-      case 45:
-      case 48:
-        return WeatherCondition.cloudy;
-      case 51:
-      case 53:
-      case 55:
-      case 56:
-      case 57:
-      case 61:
-      case 63:
-      case 65:
-      case 66:
-      case 67:
-      case 80:
-      case 81:
-      case 82:
-      case 95:
-      case 96:
-      case 99:
-        return WeatherCondition.rainy;
-      case 71:
-      case 73:
-      case 75:
-      case 77:
-      case 85:
-      case 86:
-        return WeatherCondition.snowy;
-      default:
-        return WeatherCondition.unknown;
-    }
   }
 }

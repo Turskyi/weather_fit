@@ -6,7 +6,8 @@ enum Settings {
   favourites('favourites'),
   widgetUpdateFrequency('widget_update_frequency_minutes'),
   dayStartHour('day_start_hour'),
-  nightStartHour('night_start_hour');
+  nightStartHour('night_start_hour'),
+  temperatureUnits('temperature_units');
 
   const Settings(this.key);
 

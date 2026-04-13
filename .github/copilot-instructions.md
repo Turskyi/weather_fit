@@ -78,6 +78,8 @@ the agent will append it to this file.
 - Before saying a task is complete, always run `flutter analyze .`.
 - Address all analyzer problems introduced by the task before reporting
   completion.
+- After making any change, always run `flutter analyze .` and fix all errors, warnings, and info messages before proceeding. The analyzer output must be completely clean, as it was before your change.
+- Never lie or claim all issues are fixed if the analyzer output is not clean. Always report the true analyzer status and address all issues before claiming completion.
 
 ## Type Annotations
 
@@ -90,6 +92,14 @@ the agent will append it to this file.
 ## Function Ordering
 
 - If one function calls another, they should be vertically close, and the caller should be above the callee, if at all possible.
+
+---
+
+## Linter & Analyzer Rules
+
+- Always respect all linter and analyzer rules defined in `analysis_options.yaml`.
+  Do not introduce any code that would violate these rules. The analyzer output
+  must remain completely clean after every change.
 
 ---
 

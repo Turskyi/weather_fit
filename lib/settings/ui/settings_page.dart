@@ -83,7 +83,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   void _requestPinWidget() {
     context.read<HomeWidgetService>().requestPinWidget(
-      androidName: constants.androidWidgetName,
+      androidName: constants.kAndroidWidgetName,
     );
   }
 

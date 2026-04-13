@@ -39,6 +39,9 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
        super(
          WeatherInitial(
            locale: localDataSource.getLanguageIsoCode(),
+           weather: Weather.empty.copyWith(
+             temperatureUnits: localDataSource.getTemperatureUnits(),
+           ),
            dailyForecast: const DailyForecastDomain(
              forecast: <ForecastItemDomain>[],
            ),
@@ -140,6 +143,23 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           final Weather cachedWeather = Weather.fromJson(
             cachedData['weather'] as Map<String, dynamic>,
           );
+
+          final TemperatureUnits units = state.temperatureUnits;
+          final Weather updatedCachedWeather;
+
+          if (cachedWeather.temperatureUnits != units) {
+            final double value = units.isFahrenheit
+                ? cachedWeather.temperature.value.toFahrenheit()
+                : cachedWeather.temperature.value.toCelsius();
+
+            updatedCachedWeather = cachedWeather.copyWith(
+              temperature: Temperature(value: value),
+              temperatureUnits: units,
+            );
+          } else {
+            updatedCachedWeather = cachedWeather;
+          }
+
           final DailyForecastDomain cachedForecast =
               DailyForecastDomain.fromJson(
                 cachedData['dailyForecast'] as Map<String, dynamic>,
@@ -153,7 +173,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           emit(
             WeatherSuccess(
               locale: savedLocale,
-              weather: cachedWeather,
+              weather: updatedCachedWeather,
               dailyForecast: cachedForecast,
               outfitRecommendation: cachedRecommendation,
               outfitImage: cachedOutfitImage,
@@ -352,7 +372,10 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
       await _refreshWeatherAndCache(
         stateWeather: stateWeather.isNotEmpty
             ? stateWeather
-            : Weather.empty.copyWith(location: locationToRefresh),
+            : Weather.empty.copyWith(
+                location: locationToRefresh,
+                temperatureUnits: state.temperatureUnits,
+              ),
         emit: emit,
         savedLocale: savedLocale,
         now: now,
@@ -367,7 +390,10 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           locale: savedLocale,
           weather: stateWeather.isNotEmpty
               ? stateWeather
-              : Weather.empty.copyWith(location: locationToRefresh),
+              : Weather.empty.copyWith(
+                  location: locationToRefresh,
+                  temperatureUnits: state.temperatureUnits,
+                ),
           outfitRecommendation: stateOutfitRecommendation,
           outfitImage: stateOutfitImage,
           dailyForecast: state.dailyForecast,
@@ -501,11 +527,16 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     return translate('errors.unknown');
   }
 
-  FutureOr<void> _onToggleUnits(ToggleUnits event, Emitter<WeatherState> emit) {
+  FutureOr<void> _onToggleUnits(
+    ToggleUnits event,
+    Emitter<WeatherState> emit,
+  ) async {
     final Weather stateWeather = state.weather;
     final TemperatureUnits units = stateWeather.temperatureUnits.isCelsius
         ? TemperatureUnits.fahrenheit
         : TemperatureUnits.celsius;
+
+    await _localDataSource.saveTemperatureUnits(units);
 
     final double value = units.isFahrenheit
         ? stateWeather.temperature.value.toFahrenheit()

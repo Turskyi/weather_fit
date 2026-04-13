@@ -152,6 +152,43 @@ void main() {
       expect(weatherBloc.state.locale, locale);
       expect(weatherBloc.state, isA<WeatherInitial>());
       expect(weatherBloc.state.dailyForecast?.forecast, isEmpty);
+      expect(
+        weatherBloc.state.weather.temperatureUnits,
+        localDataSource.getTemperatureUnits(),
+      );
+    });
+
+    group('persistence', () {
+      blocTest<WeatherBloc, WeatherState>(
+        'ToggleUnits saves units to localDataSource',
+        build: () => weatherBloc,
+        act: (WeatherBloc bloc) => bloc.add(const ToggleUnits()),
+        verify: (_) {
+          expect(
+            localDataSource.getTemperatureUnits(),
+            TemperatureUnits.fahrenheit,
+          );
+        },
+      );
+
+      test('initializes with units from localDataSource', () async {
+        final SharedPreferences preferences =
+            await SharedPreferences.getInstance();
+        final LocalDataSource localDataSource = LocalDataSource(preferences);
+        await localDataSource.saveTemperatureUnits(TemperatureUnits.fahrenheit);
+
+        final WeatherBloc weatherBloc = WeatherBloc(
+          weatherRepository: mockWeatherRepository,
+          outfitRepository: mockOutfitRepository,
+          localDataSource: localDataSource,
+          homeWidgetService: mockHomeWidgetService,
+        );
+
+        expect(
+          weatherBloc.state.weather.temperatureUnits,
+          TemperatureUnits.fahrenheit,
+        );
+      });
     });
 
     group('toJson/fromJson', () {

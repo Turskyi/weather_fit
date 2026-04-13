@@ -8,6 +8,7 @@ sealed class SettingsState {
     this.widgetUpdateFrequency = 120,
     this.dayStartHour = WeatherCondition.defaultDayStartHour,
     this.nightStartHour = WeatherCondition.defaultNightStartHour,
+    this.debugWeatherProviderOpenWeatherMap = false,
   });
 
   final Language language;
@@ -15,6 +16,7 @@ sealed class SettingsState {
   final int widgetUpdateFrequency;
   final int dayStartHour;
   final int nightStartHour;
+  final bool debugWeatherProviderOpenWeatherMap;
 
   bool get isEnglish => language == Language.en;
 
@@ -30,6 +32,7 @@ sealed class SettingsState {
     int? widgetUpdateFrequency,
     int? dayStartHour,
     int? nightStartHour,
+    bool? debugWeatherProviderOpenWeatherMap,
   });
 }
 
@@ -40,6 +43,7 @@ final class SettingsInitial extends SettingsState {
     super.widgetUpdateFrequency,
     super.dayStartHour,
     super.nightStartHour,
+    super.debugWeatherProviderOpenWeatherMap,
   });
 
   @override
@@ -49,6 +53,7 @@ final class SettingsInitial extends SettingsState {
     int? widgetUpdateFrequency,
     int? dayStartHour,
     int? nightStartHour,
+    bool? debugWeatherProviderOpenWeatherMap,
   }) {
     return SettingsInitial(
       language: language ?? this.language,
@@ -57,6 +62,9 @@ final class SettingsInitial extends SettingsState {
           widgetUpdateFrequency ?? this.widgetUpdateFrequency,
       dayStartHour: dayStartHour ?? this.dayStartHour,
       nightStartHour: nightStartHour ?? this.nightStartHour,
+      debugWeatherProviderOpenWeatherMap:
+          debugWeatherProviderOpenWeatherMap ??
+          this.debugWeatherProviderOpenWeatherMap,
     );
   }
 
@@ -68,6 +76,8 @@ final class SettingsInitial extends SettingsState {
         '  widgetUpdateFrequency: $widgetUpdateFrequency,'
         '  dayStartHour: $dayStartHour,'
         '  nightStartHour: $nightStartHour,'
+        '  debugWeatherProviderOpenWeatherMap: '
+        '$debugWeatherProviderOpenWeatherMap'
         '}';
   }
 }
@@ -80,6 +90,7 @@ final class FeedbackState extends SettingsState {
     super.widgetUpdateFrequency,
     super.dayStartHour,
     super.nightStartHour,
+    super.debugWeatherProviderOpenWeatherMap,
   });
 
   final String errorMessage;
@@ -93,6 +104,8 @@ final class FeedbackState extends SettingsState {
         '  widgetUpdateFrequency: $widgetUpdateFrequency,'
         '  dayStartHour: $dayStartHour,'
         '  nightStartHour: $nightStartHour,'
+        '  debugWeatherProviderOpenWeatherMap: '
+        '$debugWeatherProviderOpenWeatherMap'
         ')';
   }
 
@@ -104,6 +117,7 @@ final class FeedbackState extends SettingsState {
     int? widgetUpdateFrequency,
     int? dayStartHour,
     int? nightStartHour,
+    bool? debugWeatherProviderOpenWeatherMap,
   }) {
     return FeedbackState(
       errorMessage: errorMessage ?? this.errorMessage,
@@ -113,6 +127,9 @@ final class FeedbackState extends SettingsState {
           widgetUpdateFrequency ?? this.widgetUpdateFrequency,
       dayStartHour: dayStartHour ?? this.dayStartHour,
       nightStartHour: nightStartHour ?? this.nightStartHour,
+      debugWeatherProviderOpenWeatherMap:
+          debugWeatherProviderOpenWeatherMap ??
+          this.debugWeatherProviderOpenWeatherMap,
     );
   }
 }
@@ -124,6 +141,7 @@ final class FeedbackSent extends SettingsState {
     super.widgetUpdateFrequency,
     super.dayStartHour,
     super.nightStartHour,
+    super.debugWeatherProviderOpenWeatherMap,
   });
 
   @override
@@ -134,6 +152,8 @@ final class FeedbackSent extends SettingsState {
         '  widgetUpdateFrequency: $widgetUpdateFrequency,'
         '  dayStartHour: $dayStartHour,'
         '  nightStartHour: $nightStartHour,'
+        '  debugWeatherProviderOpenWeatherMap: '
+        '$debugWeatherProviderOpenWeatherMap'
         ')';
   }
 
@@ -144,6 +164,7 @@ final class FeedbackSent extends SettingsState {
     int? widgetUpdateFrequency,
     int? dayStartHour,
     int? nightStartHour,
+    bool? debugWeatherProviderOpenWeatherMap,
   }) {
     return FeedbackSent(
       language: language ?? this.language,
@@ -152,6 +173,9 @@ final class FeedbackSent extends SettingsState {
           widgetUpdateFrequency ?? this.widgetUpdateFrequency,
       dayStartHour: dayStartHour ?? this.dayStartHour,
       nightStartHour: nightStartHour ?? this.nightStartHour,
+      debugWeatherProviderOpenWeatherMap:
+          debugWeatherProviderOpenWeatherMap ??
+          this.debugWeatherProviderOpenWeatherMap,
     );
   }
 }
@@ -163,6 +187,7 @@ final class LoadingSettingsState extends SettingsState {
     super.widgetUpdateFrequency,
     super.dayStartHour,
     super.nightStartHour,
+    super.debugWeatherProviderOpenWeatherMap,
   });
 
   @override
@@ -172,6 +197,7 @@ final class LoadingSettingsState extends SettingsState {
     int? widgetUpdateFrequency,
     int? dayStartHour,
     int? nightStartHour,
+    bool? debugWeatherProviderOpenWeatherMap,
   }) {
     return LoadingSettingsState(
       language: language ?? this.language,
@@ -180,6 +206,9 @@ final class LoadingSettingsState extends SettingsState {
           widgetUpdateFrequency ?? this.widgetUpdateFrequency,
       dayStartHour: dayStartHour ?? this.dayStartHour,
       nightStartHour: nightStartHour ?? this.nightStartHour,
+      debugWeatherProviderOpenWeatherMap:
+          debugWeatherProviderOpenWeatherMap ??
+          this.debugWeatherProviderOpenWeatherMap,
     );
   }
 
@@ -191,6 +220,8 @@ final class LoadingSettingsState extends SettingsState {
         '  widgetUpdateFrequency: $widgetUpdateFrequency,'
         '  dayStartHour: $dayStartHour,'
         '  nightStartHour: $nightStartHour,'
+        '  debugWeatherProviderOpenWeatherMap: '
+        '$debugWeatherProviderOpenWeatherMap'
         ')';
   }
 }
@@ -203,6 +234,7 @@ final class SettingsError extends SettingsState {
     super.widgetUpdateFrequency,
     super.dayStartHour,
     super.nightStartHour,
+    super.debugWeatherProviderOpenWeatherMap,
   });
 
   final String errorMessage;
@@ -215,6 +247,7 @@ final class SettingsError extends SettingsState {
     int? widgetUpdateFrequency,
     int? dayStartHour,
     int? nightStartHour,
+    bool? debugWeatherProviderOpenWeatherMap,
   }) {
     return SettingsError(
       errorMessage: errorMessage ?? this.errorMessage,
@@ -224,6 +257,9 @@ final class SettingsError extends SettingsState {
           widgetUpdateFrequency ?? this.widgetUpdateFrequency,
       dayStartHour: dayStartHour ?? this.dayStartHour,
       nightStartHour: nightStartHour ?? this.nightStartHour,
+      debugWeatherProviderOpenWeatherMap:
+          debugWeatherProviderOpenWeatherMap ??
+          this.debugWeatherProviderOpenWeatherMap,
     );
   }
 
@@ -237,7 +273,9 @@ final class SettingsError extends SettingsState {
         other.appVersion == appVersion &&
         other.widgetUpdateFrequency == widgetUpdateFrequency &&
         other.dayStartHour == dayStartHour &&
-        other.nightStartHour == nightStartHour;
+        other.nightStartHour == nightStartHour &&
+        other.debugWeatherProviderOpenWeatherMap ==
+            debugWeatherProviderOpenWeatherMap;
   }
 
   @override
@@ -247,7 +285,8 @@ final class SettingsError extends SettingsState {
       appVersion.hashCode ^
       widgetUpdateFrequency.hashCode ^
       dayStartHour.hashCode ^
-      nightStartHour.hashCode;
+      nightStartHour.hashCode ^
+      debugWeatherProviderOpenWeatherMap.hashCode;
 
   @override
   String toString() {
@@ -258,6 +297,8 @@ final class SettingsError extends SettingsState {
         '  widgetUpdateFrequency: $widgetUpdateFrequency,'
         '  dayStartHour: $dayStartHour,'
         '  nightStartHour: $nightStartHour,'
+        '  debugWeatherProviderOpenWeatherMap: '
+        '$debugWeatherProviderOpenWeatherMap'
         ')';
   }
 }
