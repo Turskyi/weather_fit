@@ -567,6 +567,18 @@ class LocalDataSource {
     return _preferences.setBool(constants.kDebugWeatherProviderKey, value);
   }
 
+  Future<bool> saveTemperatureUnits(TemperatureUnits units) {
+    return _preferences.setString(Settings.temperatureUnits.key, units.name);
+  }
+
+  TemperatureUnits getTemperatureUnits() {
+    final String? name = _preferences.getString(Settings.temperatureUnits.key);
+    return TemperatureUnits.values.firstWhere(
+      (TemperatureUnits u) => u.name == name,
+      orElse: () => TemperatureUnits.celsius,
+    );
+  }
+
   String _translateError(String key, String locale) {
     final Map<String, Map<String, String>> localizedErrors =
         <String, Map<String, String>>{

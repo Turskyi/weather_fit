@@ -237,10 +237,7 @@ class SettingsPageDefaultLayout extends StatelessWidget {
                     );
                   },
                 ),
-                if (!kIsWeb &&
-                    (defaultTargetPlatform == TargetPlatform.android ||
-                        defaultTargetPlatform ==
-                            TargetPlatform.iOS)) ...<Widget>[
+                if (!kIsWeb && !context.isExtraSmallScreen) ...<Widget>[
                   const SizedBox(height: 20),
                   // Home Widget Updates Card.
                   BlocBuilder<SettingsBloc, SettingsState>(
