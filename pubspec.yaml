@@ -44,7 +44,7 @@ dependencies:
     sdk: flutter
   geocoding: ^4.0.0
   geolocator: ^14.0.2
-  home_widget: ^0.9.0
+  home_widget: ^0.9.1
   http: ^1.6.0
   hydrated_bloc: ^11.0.0
   in_app_update: ^4.2.5
@@ -57,7 +57,7 @@ dependencies:
     path: packages/nominatim_api
   open_meteo_api:
     path: packages/open_meteo_api
-  package_info_plus: ^9.0.1
+  package_info_plus: any
   path_provider: ^2.1.5
   permission_handler: ^12.0.1
   resend: ^1.0.0
@@ -77,8 +77,8 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   json_serializable: ^6.13.1
-  mocktail: ^1.0.4
-  retrofit_generator: ^10.2.4
+  mocktail: ^1.0.5
+  retrofit_generator: ^10.2.5
 
 flutter:
   uses-material-design: true
