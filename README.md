@@ -69,11 +69,12 @@ follow these steps:
 - Fork this repository and clone it to your local machine.
 - Create a new branch for your feature or bug-fix.
 - Set up the necessary configuration and secret files (these are not versioned):
-  - Create a `.env` file in the root directory:
+  - Copy `.env.example` to `.env` in the root directory and fill in your API keys:
     ```env
-    RESEND_API_KEY="re_123abc"
+    RESEND_API_KEY="your_resend_api_key_here"
+    OPEN_WEATHER_MAP_API_KEY="your_open_weather_map_api_key_here"
     ```
-    (Get a free token from [resend.com](https://resend.com))
+    (Get a free token from [resend.com](https://resend.com) and [openweathermap.org](https://openweathermap.org/api))
   - Create `android/key.properties` with the following content:
     ```properties
     # dev debug environment variables
