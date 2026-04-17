@@ -234,7 +234,7 @@ class _SettingSegmentedToggle extends StatelessWidget {
         Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
-            color: Colors.white12,
+            color: colorScheme.onSurface.withValues(alpha: 0.12),
           ),
           padding: const EdgeInsets.all(4),
           child: Row(

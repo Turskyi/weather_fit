@@ -265,7 +265,7 @@ class WeatherPageDefaultLayout extends StatelessWidget {
               ]
             : null,
         persistentFooterDecoration: BoxDecoration(
-          color: colorScheme.surface,
+          color: colorScheme.surfaceContainer,
           boxShadow: <BoxShadow>[
             BoxShadow(
               color: colorScheme.shadow.withValues(alpha: 0.5),

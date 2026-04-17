@@ -54,13 +54,9 @@ class _WeatherContentExtraSmallState extends State<WeatherContentExtraSmall> {
     final TextStyle? cityTextStyle = textTheme.bodySmall?.copyWith(
       color: watchForegroundColor,
     );
-    final Color surfaceColor = theme.colorScheme.surface.withValues(alpha: 0.9);
-    final Color iconChipColor = surfaceColor.computeLuminance() > 0.5
-        ? theme.colorScheme.onSurface.withValues(alpha: 0.22)
-        : surfaceColor;
-    final Color temperatureTextColor = surfaceColor.computeLuminance() > 0.5
-        ? Colors.black
-        : Colors.white;
+    final Color surfaceColor = theme.colorScheme.surfaceContainer;
+    final Color iconChipColor = theme.colorScheme.primaryContainer;
+    final Color temperatureTextColor = theme.colorScheme.onSurface;
     final String countryCode = weather.countryCode.toLowerCase();
     const double infoBoxSize = 40.0;
     final BorderRadius infoBoxRadius = BorderRadius.circular(14.0);

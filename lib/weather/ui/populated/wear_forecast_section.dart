@@ -11,12 +11,11 @@ import 'package:weather_repository/weather_repository.dart';
 class WearForecastSection extends StatelessWidget {
   const WearForecastSection({super.key});
 
-  static const Color _watchForecastCardBackground = Colors.black;
-
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final Color watchForegroundColor = context.watchForegroundColor;
+    final Color cardBackground = theme.colorScheme.surfaceContainer;
 
     return BlocBuilder<WeatherBloc, WeatherState>(
       builder: (BuildContext context, WeatherState state) {
@@ -28,7 +27,7 @@ class WearForecastSection extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: _watchForecastCardBackground,
+            color: cardBackground,
             borderRadius: BorderRadius.circular(18),
           ),
           child: Column(
@@ -53,7 +52,12 @@ class WearForecastSection extends StatelessWidget {
                     isCelsius: state.isCelsius,
                   ),
                   if (index < forecast.length - 1)
-                    const Divider(height: 12, color: Colors.white24),
+                    Divider(
+                      height: 12,
+                      color: theme.colorScheme.onSurface.withValues(
+                        alpha: 0.12,
+                      ),
+                    ),
                 ],
             ],
           ),

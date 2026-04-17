@@ -248,7 +248,7 @@ class _WeatherPageExtraSmallLayoutState
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      backgroundColor: Colors.black,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         centerTitle: true,
         toolbarHeight: cupertino
@@ -268,8 +268,10 @@ class _WeatherPageExtraSmallLayoutState
                 customBorder: const CircleBorder(),
                 highlightShape: BoxShape.circle,
                 radius: 8,
-                splashColor: Colors.white.withValues(alpha: 0.20),
-                highlightColor: Colors.white.withValues(alpha: 0.10),
+                splashColor: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                highlightColor: theme.colorScheme.onSurface.withValues(
+                  alpha: 0.05,
+                ),
                 child: Icon(
                   Icons.settings,
                   color: colorScheme.surface,
@@ -292,7 +294,7 @@ class _WeatherPageExtraSmallLayoutState
           return false;
         },
         child: ColoredBox(
-          color: Colors.black,
+          color: theme.scaffoldBackgroundColor,
           child: Center(child: content),
         ),
       ),

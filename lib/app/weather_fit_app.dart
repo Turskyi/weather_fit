@@ -147,12 +147,18 @@ class WeatherFitApp extends StatelessWidget {
                   locale: localizationDelegate.currentLocale,
                   initialRoute: AppRoute.weather.path,
                   routes: routes,
-                  builder: (BuildContext _, Widget? child) {
-                    return SettingsStateListenerContent(child: child);
+                  builder: (BuildContext context, Widget? child) {
+                    final ThemeData theme = Theme.of(context);
+                    return ColoredBox(
+                      color: theme.scaffoldBackgroundColor,
+                      child: SettingsStateListenerContent(child: child),
+                    );
                   },
                   theme: ThemeData(
                     useMaterial3: true,
                     fontFamily: fontFamily,
+                    scaffoldBackgroundColor: lightColorScheme.primaryContainer,
+                    canvasColor: lightColorScheme.primaryContainer,
                     appBarTheme: AppBarTheme(
                       backgroundColor: Colors.transparent,
                       elevation: 0,
@@ -166,7 +172,10 @@ class WeatherFitApp extends StatelessWidget {
                     colorScheme: lightColorScheme,
                   ),
                   darkTheme: ThemeData(
+                    useMaterial3: true,
                     fontFamily: fontFamily,
+                    scaffoldBackgroundColor: darkColorScheme.primaryContainer,
+                    canvasColor: darkColorScheme.primaryContainer,
                     appBarTheme: AppBarTheme(
                       backgroundColor: Colors.transparent,
                       elevation: 0,

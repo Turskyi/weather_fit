@@ -246,6 +246,7 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
     final bool isExtraSmall = context.isExtraSmallScreen;
     final bool isWide = context.screenWidth > constants.kWideLayoutBreakpoint;
     final bool showPageArrows =
@@ -307,7 +308,9 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
                       ),
                       icon: Icon(
                         Icons.arrow_back_ios,
-                        color: Colors.white54,
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.54,
+                        ),
                         size: isExtraSmall ? 18 : 48,
                       ),
                       onPressed: () => _pageController.previousPage(
@@ -330,7 +333,9 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
                       ),
                       icon: Icon(
                         Icons.arrow_forward_ios,
-                        color: Colors.white54,
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.54,
+                        ),
                         size: isExtraSmall ? 18 : 48,
                       ),
                       onPressed: () => _pageController.nextPage(

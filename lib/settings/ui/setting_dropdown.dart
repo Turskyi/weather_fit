@@ -82,7 +82,9 @@ class SettingDropdown extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
-                color: Colors.white12,
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.12),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -111,13 +113,15 @@ class SettingDropdown extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 12),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
-            color: Colors.white12,
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurface.withValues(alpha: 0.12),
           ),
           child: DropdownButton<int>(
             value: value,
             isExpanded: true,
             underline: const SizedBox.shrink(),
-            dropdownColor: Colors.black,
+            dropdownColor: Theme.of(context).scaffoldBackgroundColor,
             style: TextStyle(color: watchForegroundColor),
             items: options.map((int hour) {
               return DropdownMenuItem<int>(

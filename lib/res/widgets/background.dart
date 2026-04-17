@@ -7,11 +7,11 @@ class Background extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Color color = Theme.of(context).colorScheme.primaryContainer;
     if (context.isExtraSmallScreen) {
       return const SizedBox.expand(child: ColoredBox(color: Colors.black));
     }
 
-    final Color color = Theme.of(context).colorScheme.primaryContainer;
     return SizedBox.expand(
       child: DecoratedBox(
         decoration: BoxDecoration(
