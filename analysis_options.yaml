@@ -9,10 +9,8 @@
 include: package:flutter_lints/flutter.yaml
 
 analyzer:
-  #  TODO: Consider uncomment this if you find a way to keep the type in
-  #  `lib/di/injector.dart`.
-  #  language:
-  #    strict-casts: true
+  language:
+    strict-casts: true
   exclude:
     - "**.g.dart"
 

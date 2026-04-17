@@ -9,7 +9,6 @@ import 'package:weather_fit/app/settings_state_listener_content.dart';
 import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
 import 'package:weather_fit/data/repositories/location_repository.dart';
 import 'package:weather_fit/data/repositories/outfit_repository.dart';
-import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/env/env.dart';
 import 'package:weather_fit/feedback/feedback_form.dart';
 import 'package:weather_fit/res/constants/constants.dart' as constants;
@@ -20,7 +19,6 @@ import 'package:weather_fit/router/navigator.dart';
 import 'package:weather_fit/search/bloc/search_bloc.dart';
 import 'package:weather_fit/services/feedback_service.dart';
 import 'package:weather_fit/services/home_widget_service.dart';
-import 'package:weather_fit/services/home_widget_service_impl.dart';
 import 'package:weather_fit/services/update_service.dart';
 import 'package:weather_fit/settings/bloc/settings_bloc.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
@@ -31,8 +29,10 @@ class WeatherFitApp extends StatelessWidget {
     required this.weatherRepository,
     required this.locationRepository,
     required this.outfitRepository,
+    required this.homeWidgetService,
     required this.localDataSource,
-    required this.initialLanguage,
+    required this.feedbackService,
+    required this.updateService,
     required this.routes,
     super.key,
   });
@@ -40,8 +40,10 @@ class WeatherFitApp extends StatelessWidget {
   final WeatherRepository weatherRepository;
   final LocationRepository locationRepository;
   final OutfitRepository outfitRepository;
+  final HomeWidgetService homeWidgetService;
   final LocalDataSource localDataSource;
-  final Language initialLanguage;
+  final FeedbackService feedbackService;
+  final UpdateService updateService;
   final Map<String, WidgetBuilder> routes;
 
   @override
@@ -53,36 +55,29 @@ class WeatherFitApp extends StatelessWidget {
         RepositoryProvider<LocationRepository>.value(value: locationRepository),
         RepositoryProvider<OutfitRepository>.value(value: outfitRepository),
         RepositoryProvider<LocalDataSource>.value(value: localDataSource),
-        RepositoryProvider<HomeWidgetService>(
-          create: (BuildContext _) => const HomeWidgetServiceImpl(),
-        ),
-        RepositoryProvider<FeedbackService>(
-          create: (BuildContext _) => const FeedbackServiceImpl(),
-        ),
-        RepositoryProvider<UpdateService>(
-          create: (BuildContext _) => const UpdateServiceImpl(),
-        ),
+        RepositoryProvider<HomeWidgetService>.value(value: homeWidgetService),
+        RepositoryProvider<FeedbackService>.value(value: feedbackService),
+        RepositoryProvider<UpdateService>.value(value: updateService),
       ],
       child: MultiBlocProvider(
         providers: <SingleChildWidget>[
-          // Provide the theme cubit.
           BlocProvider<ThemeCubit>(create: (BuildContext _) => ThemeCubit()),
           BlocProvider<WeatherBloc>(
-            create: (BuildContext context) {
+            create: (BuildContext _) {
               return WeatherBloc(
                 weatherRepository: weatherRepository,
                 outfitRepository: outfitRepository,
+                homeWidgetService: homeWidgetService,
                 localDataSource: localDataSource,
-                homeWidgetService: context.read<HomeWidgetService>(),
               );
             },
           ),
           BlocProvider<SettingsBloc>(
-            create: (BuildContext context) {
+            create: (BuildContext _) {
               return SettingsBloc(
                 localDataSource,
-                context.read<UpdateService>(),
-                context.read<FeedbackService>(),
+                updateService,
+                feedbackService,
               );
             },
           ),
@@ -171,7 +166,6 @@ class WeatherFitApp extends StatelessWidget {
                     colorScheme: lightColorScheme,
                   ),
                   darkTheme: ThemeData(
-                    useMaterial3: true,
                     fontFamily: fontFamily,
                     appBarTheme: AppBarTheme(
                       backgroundColor: Colors.transparent,

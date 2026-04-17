@@ -21,8 +21,10 @@ import 'package:weather_fit/env/env.dart';
 import 'package:weather_fit/localization/localization_delegate_getter.dart'
     as locale;
 import 'package:weather_fit/res/constants/constants.dart' as constants;
+import 'package:weather_fit/services/feedback_service.dart';
 import 'package:weather_fit/services/home_widget_service.dart';
 import 'package:weather_fit/services/home_widget_service_impl.dart';
+import 'package:weather_fit/services/update_service.dart';
 import 'package:weather_fit/use_cases/initialize_app_language_use_case.dart';
 import 'package:weather_fit/weather_bloc_observer.dart';
 import 'package:weather_repository/weather_repository.dart';
@@ -82,12 +84,17 @@ Future<Dependencies> injectDependencies() async {
     OpenMeteoApiClient(),
     localDataSource,
   );
+
   final InitializeAppLanguageUseCase initializeAppLanguageUseCase =
       InitializeAppLanguageUseCase(localDataSource: localDataSource);
 
   final Language savedLanguage = localDataSource.getSavedLanguage();
   final LocalizationDelegate localizationDelegate = await locale
       .getLocalizationDelegate(savedLanguage);
+
+  const HomeWidgetService homeWidgetService = HomeWidgetServiceImpl();
+  const FeedbackService feedbackService = FeedbackServiceImpl();
+  const UpdateService updateService = UpdateServiceImpl();
 
   return Dependencies(
     preferences: preferences,
@@ -98,14 +105,14 @@ Future<Dependencies> injectDependencies() async {
     locationRepository: locationRepository,
     initializeAppLanguageUseCase: initializeAppLanguageUseCase,
     localizationDelegate: localizationDelegate,
+    homeWidgetService: homeWidgetService,
+    feedbackService: feedbackService,
+    updateService: updateService,
   );
 }
 
 Future<void> _setupMobileHydratedStorage() async {
-  //TODO: review if it is possible to have a type here instead of `dynamic`.
-  // We cannot specify `Directory` type here, otherwise it will not work on
-  // Web.
-  final dynamic temporaryDirectory = await getTemporaryDirectory();
+  final Directory temporaryDirectory = await getTemporaryDirectory();
 
   final String storagePath = temporaryDirectory.path;
 
