@@ -102,9 +102,11 @@ Future<Dependencies> injectDependencies() async {
 }
 
 Future<void> _setupMobileHydratedStorage() async {
+  //TODO: review if it is possible to have a type here instead of `dynamic`.
   // We cannot specify `Directory` type here, otherwise it will not work on
   // Web.
   final dynamic temporaryDirectory = await getTemporaryDirectory();
+
   final String storagePath = temporaryDirectory.path;
 
   try {

@@ -8,12 +8,13 @@ import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/extensions/build_context_extensions.dart';
 import 'package:weather_fit/res/constants/constants.dart' as constants;
+import 'package:weather_fit/res/widgets/wear_position_indicator.dart';
 import 'package:weather_fit/settings/bloc/settings_bloc.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 import 'package:weather_fit/weather/ui/populated/wear_forecast_section.dart';
 import 'package:weather_fit/weather/ui/widgets/weather_icon.dart';
 
-class WeatherContentExtraSmall extends StatelessWidget {
+class WeatherContentExtraSmall extends StatefulWidget {
   const WeatherContentExtraSmall({
     required this.weather,
     required this.listenSettingsStateWhen,
@@ -30,7 +31,23 @@ class WeatherContentExtraSmall extends StatelessWidget {
   final RefreshCallback onRefresh;
 
   @override
+  State<WeatherContentExtraSmall> createState() {
+    return _WeatherContentExtraSmallState();
+  }
+}
+
+class _WeatherContentExtraSmallState extends State<WeatherContentExtraSmall> {
+  late final ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final Weather weather = widget.weather;
     final ThemeData theme = Theme.of(context);
     final TextTheme textTheme = theme.textTheme;
     final Color watchForegroundColor = context.watchForegroundColor;
@@ -45,7 +62,7 @@ class WeatherContentExtraSmall extends StatelessWidget {
         ? Colors.black
         : Colors.white;
     final String countryCode = weather.countryCode.toLowerCase();
-    final double infoBoxSize = 40.0;
+    const double infoBoxSize = 40.0;
     final BorderRadius infoBoxRadius = BorderRadius.circular(14.0);
     final EdgeInsets contentPadding = EdgeInsets.fromLTRB(
       context.wearHorizontalPadding,
@@ -54,16 +71,16 @@ class WeatherContentExtraSmall extends StatelessWidget {
       context.wearBottomPadding + 12,
     );
 
-    return Scrollbar(
-      thickness: 2,
-      radius: const Radius.circular(2),
+    return WearPositionIndicator(
+      controller: _scrollController,
       child: SingleChildScrollView(
+        controller: _scrollController,
         physics: const AlwaysScrollableScrollPhysics(),
         clipBehavior: Clip.none,
         padding: contentPadding,
         child: Column(
           children: <Widget>[
-            Center(child: child),
+            Center(child: widget.child),
             const SizedBox(height: 10),
             if (weather.wasUpdated)
               Padding(
@@ -128,8 +145,8 @@ class WeatherContentExtraSmall extends StatelessWidget {
                         child: FittedBox(
                           fit: BoxFit.scaleDown,
                           child: BlocListener<SettingsBloc, SettingsState>(
-                            listenWhen: listenSettingsStateWhen,
-                            listener: settingsStateListener,
+                            listenWhen: widget.listenSettingsStateWhen,
+                            listener: widget.settingsStateListener,
                             child: Text(
                               weather.locationName,
                               textAlign: TextAlign.center,
@@ -222,7 +239,7 @@ class WeatherContentExtraSmall extends StatelessWidget {
                   return Padding(
                     padding: const EdgeInsets.only(top: 16.0),
                     child: ElevatedButton(
-                      onPressed: onRefresh,
+                      onPressed: widget.onRefresh,
                       child: Text(
                         translate('weather.check_latest_button'),
                         textAlign: TextAlign.center,
@@ -239,6 +256,12 @@ class WeatherContentExtraSmall extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 }
 

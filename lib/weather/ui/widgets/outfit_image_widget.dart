@@ -47,7 +47,7 @@ class _OutfitImageWidgetState extends State<OutfitImageWidget> {
     return Container(
       color: colorScheme.surface,
       alignment: Alignment.center,
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(4.0),
       child: Stack(
         children: <Widget>[
           ClipRRect(

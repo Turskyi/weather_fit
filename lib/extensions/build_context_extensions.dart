@@ -49,12 +49,12 @@ extension ResponsiveChecks on BuildContext {
   }
 
   double get wearBottomPadding {
-    if (!isExtraSmallScreen) {
+    if (isExtraSmallScreen) {
+      final double proportionalPadding = shortestSide * 0.1;
+      return proportionalPadding.clamp(18.0, 28.0);
+    } else {
       return 24.0;
     }
-
-    final double proportionalPadding = shortestSide * 0.1;
-    return proportionalPadding.clamp(18.0, 28.0);
   }
 
   WeatherFetchOrigin get origin => isExtraSmallScreen

@@ -7,13 +7,14 @@ import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/extensions/build_context_extensions.dart';
 import 'package:weather_fit/res/constants/constants.dart' as constant;
 import 'package:weather_fit/res/widgets/leading_widget.dart';
+import 'package:weather_fit/res/widgets/wear_position_indicator.dart';
 import 'package:weather_fit/settings/bloc/settings_bloc.dart';
 import 'package:weather_fit/settings/ui/blurred_fab_with_border.dart';
 import 'package:weather_fit/settings/ui/setting_dropdown.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 import 'package:weather_repository/weather_repository.dart';
 
-class SettingsPageExtraSmallLayout extends StatelessWidget {
+class SettingsPageExtraSmallLayout extends StatefulWidget {
   const SettingsPageExtraSmallLayout({
     required this.rebuildSettingsWhen,
     required this.onLanguageChanged,
@@ -47,13 +48,35 @@ class SettingsPageExtraSmallLayout extends StatelessWidget {
   final VoidCallback onSearchPressed;
 
   @override
+  State<SettingsPageExtraSmallLayout> createState() {
+    return _SettingsPageExtraSmallLayoutState();
+  }
+}
+
+class _SettingsPageExtraSmallLayoutState
+    extends State<SettingsPageExtraSmallLayout> {
+  late final ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
       backgroundColor: Colors.black,
       appBar: AppBar(
-        backgroundColor: Colors.black,
-        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        backgroundColor: Colors.transparent,
         title: const Padding(
           padding: EdgeInsets.only(top: 8.0, bottom: 8.0),
           child: LeadingWidget(),
@@ -63,24 +86,24 @@ class SettingsPageExtraSmallLayout extends StatelessWidget {
         flexibleSpace: ClipRect(
           child: BackdropFilter(
             filter: ImageFilter.blur(
-              sigmaX: constant.kBlurSigma,
-              sigmaY: constant.kBlurSigma,
+              sigmaX: constant.kBlurSigmaSmall,
+              sigmaY: constant.kBlurSigmaSmall,
             ),
             child: Container(color: Colors.transparent),
           ),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-        child: Scrollbar(
-          thickness: 2,
-          radius: const Radius.circular(2),
+      body: WearPositionIndicator(
+        controller: _scrollController,
+        child: Padding(
+          padding: const EdgeInsets.only(left: 8.0, right: 8.0),
           child: ListView(
+            controller: _scrollController,
             padding: const EdgeInsets.only(bottom: 60, top: kToolbarHeight),
             children: <Widget>[
               // Language toggle.
               BlocBuilder<SettingsBloc, SettingsState>(
-                buildWhen: rebuildSettingsWhen,
+                buildWhen: widget.rebuildSettingsWhen,
                 builder: (BuildContext _, SettingsState settingsState) {
                   final int selectedIndex = Language.values.indexOf(
                     settingsState.language,
@@ -92,7 +115,7 @@ class SettingsPageExtraSmallLayout extends StatelessWidget {
                         .map((Language l) => translate(l.isoLanguageCode))
                         .toList(),
                     onSelected: (int index) {
-                      onLanguageChanged(Language.values[index]);
+                      widget.onLanguageChanged(Language.values[index]);
                     },
                   );
                 },
@@ -101,7 +124,7 @@ class SettingsPageExtraSmallLayout extends StatelessWidget {
 
               // Temperature units toggle.
               BlocBuilder<WeatherBloc, WeatherState>(
-                buildWhen: rebuildUnitsWhen,
+                buildWhen: widget.rebuildUnitsWhen,
                 builder: (BuildContext context, WeatherState state) {
                   final int selectedIndex =
                       state.weather.temperatureUnits.isCelsius ? 0 : 1;
@@ -111,7 +134,7 @@ class SettingsPageExtraSmallLayout extends StatelessWidget {
                     selectedIndex: selectedIndex,
                     onSelected: (int index) {
                       final bool isCelsius = index == 0;
-                      onUnitsChanged(isCelsius);
+                      widget.onUnitsChanged(isCelsius);
                     }, // true if Celsius
                   );
                 },
@@ -120,7 +143,7 @@ class SettingsPageExtraSmallLayout extends StatelessWidget {
 
               // Day/night interval selectors.
               BlocBuilder<SettingsBloc, SettingsState>(
-                buildWhen: rebuildSettingsWhen,
+                buildWhen: widget.rebuildSettingsWhen,
                 builder: (BuildContext context, SettingsState state) {
                   final List<int> dayOptions = List<int>.generate(
                     WeatherCondition.maxDayStartHour -
@@ -147,7 +170,7 @@ class SettingsPageExtraSmallLayout extends StatelessWidget {
                         options: dayOptions,
                         onChanged: (int? value) {
                           if (value != null) {
-                            onDayStartHourChanged(value);
+                            widget.onDayStartHourChanged(value);
                           }
                         },
                       ),
@@ -158,7 +181,7 @@ class SettingsPageExtraSmallLayout extends StatelessWidget {
                         options: nightOptions,
                         onChanged: (int? value) {
                           if (value != null) {
-                            onNightStartHourChanged(value);
+                            widget.onNightStartHourChanged(value);
                           }
                         },
                       ),
@@ -171,7 +194,7 @@ class SettingsPageExtraSmallLayout extends StatelessWidget {
         ),
       ),
       floatingActionButton: BlurredFabWithBorder(
-        onPressed: onSearchPressed,
+        onPressed: widget.onSearchPressed,
         tooltip: translate('search.label'),
         icon: Icons.search,
       ),

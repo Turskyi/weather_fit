@@ -41,6 +41,7 @@ const String kSearchError = 'searchError';
 
 /// Blur intensity constant.
 const double kBlurSigma = 8;
+const double kBlurSigmaSmall = 1;
 
 const String kDoNotReplySenderName = 'Do Not Reply';
 const String kFeedbackEmailSender =
