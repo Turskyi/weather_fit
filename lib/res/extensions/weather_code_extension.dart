@@ -1,5 +1,6 @@
 extension WeatherCodeToEmoji on int {
   String get toWeatherEmoji {
+    // WMO (Open-Meteo) codes: 0-99
     switch (this) {
       case 0:
         return '☀️';
@@ -34,8 +35,21 @@ extension WeatherCodeToEmoji on int {
       case 85:
       case 86:
         return '❄️';
-      default:
-        return '🤷';
     }
+
+    // OpenWeatherMap codes: 200-804
+    if (this >= 200 && this < 600) {
+      return '🌧️'; // Thunderstorm, Drizzle, Rain
+    } else if (this >= 600 && this < 700) {
+      return '❄️'; // Snow
+    } else if (this >= 700 && this < 800) {
+      return '🌫️'; // Atmosphere (Mist, Smoke, Haze, etc.)
+    } else if (this == 800) {
+      return '☀️'; // Clear
+    } else if (this > 800 && this < 900) {
+      return '☁️'; // Clouds (801, 802, 803, 804)
+    }
+
+    return '';
   }
 }

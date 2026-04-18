@@ -296,27 +296,30 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
             children: <Widget>[
               pageView,
               if (_currentPageIndex > 0)
-                Align(
+                Container(
                   alignment: Alignment.centerLeft,
-                  child: Padding(
-                    padding: EdgeInsets.only(left: isExtraSmall ? 2.0 : 8.0),
-                    child: IconButton(
-                      padding: EdgeInsets.zero,
-                      constraints: BoxConstraints(
-                        minWidth: isExtraSmall ? 36 : 56,
-                        minHeight: isExtraSmall ? 36 : 56,
+                  padding: EdgeInsets.only(left: isExtraSmall ? 2.0 : 8.0),
+                  child: IconButton(
+                    padding: EdgeInsets.zero,
+                    constraints: BoxConstraints(
+                      minWidth: isExtraSmall ? 36 : 56,
+                      minHeight: isExtraSmall ? 36 : 56,
+                    ),
+                    style: IconButton.styleFrom(
+                      backgroundColor: theme.colorScheme.surface.withValues(
+                        alpha: 0.48,
                       ),
-                      icon: Icon(
-                        Icons.arrow_back_ios,
-                        color: theme.colorScheme.onSurface.withValues(
-                          alpha: 0.54,
-                        ),
-                        size: isExtraSmall ? 18 : 48,
+                    ),
+                    icon: Icon(
+                      Icons.arrow_back_ios,
+                      color: theme.colorScheme.onSurface.withValues(
+                        alpha: 0.54,
                       ),
-                      onPressed: () => _pageController.previousPage(
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
-                      ),
+                      size: isExtraSmall ? 18 : 48,
+                    ),
+                    onPressed: () => _pageController.previousPage(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
                     ),
                   ),
                 ),
@@ -330,6 +333,11 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
                       constraints: BoxConstraints(
                         minWidth: isExtraSmall ? 36 : 56,
                         minHeight: isExtraSmall ? 36 : 56,
+                      ),
+                      style: IconButton.styleFrom(
+                        backgroundColor: theme.colorScheme.surface.withValues(
+                          alpha: 0.48,
+                        ),
                       ),
                       icon: Icon(
                         Icons.arrow_forward_ios,

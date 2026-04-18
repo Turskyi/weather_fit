@@ -31,20 +31,14 @@ class SearchPageExtraSmallLayout extends StatefulWidget {
 
 class _SearchPageExtraSmallLayoutState
     extends State<SearchPageExtraSmallLayout> {
-  late final ScrollController _scrollController;
-
-  @override
-  void initState() {
-    super.initState();
-    _scrollController = ScrollController();
-  }
+  final ScrollController _scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final EdgeInsets contentPadding = EdgeInsets.fromLTRB(
       context.wearHorizontalPadding,
-      math.max(MediaQuery.paddingOf(context).top, 32),
+      math.max(MediaQuery.paddingOf(context).top, 40),
       context.wearHorizontalPadding,
       0,
     );
@@ -99,6 +93,7 @@ class _SearchPageExtraSmallLayoutState
                                   style: textTheme.labelSmall,
                                   textInputAction: TextInputAction.search,
                                   onSubmitted: _onSearchSubmitted,
+                                  enableInteractiveSelection: false,
                                   decoration: InputDecoration(
                                     isDense: true,
                                     filled: true,

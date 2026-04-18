@@ -280,10 +280,7 @@ class _SearchPageState extends State<SearchPage> {
             ? Dialog.fullscreen(
                 child: SafeArea(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 32.0,
-                      vertical: 28.0,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 32.0),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
@@ -293,6 +290,7 @@ class _SearchPageState extends State<SearchPage> {
                               mainAxisSize: MainAxisSize.min,
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
+                                const SizedBox(height: 24.0),
                                 Text(
                                   translate(
                                     'search.location_not_found_dialog_title',
@@ -317,16 +315,31 @@ class _SearchPageState extends State<SearchPage> {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 4),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
-                            TextButton(
-                              onPressed: Navigator.of(dialogContext).pop,
-                              child: Text(translate('cancel')),
+                            DecoratedBox(
+                              decoration: BoxDecoration(
+                                color: Theme.of(dialogContext)
+                                    .colorScheme
+                                    .surfaceContainerHighest
+                                    .withValues(alpha: 0.5),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: TextButton(
+                                style: TextButton.styleFrom(
+                                  visualDensity: VisualDensity.compact,
+                                  tapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
+                                ),
+                                onPressed: Navigator.of(dialogContext).pop,
+                                child: Text(translate('cancel')),
+                              ),
                             ),
                           ],
                         ),
+                        const SizedBox(height: 8),
                       ],
                     ),
                   ),
