@@ -38,7 +38,7 @@ class _SearchPageExtraSmallLayoutState
     final TextTheme textTheme = Theme.of(context).textTheme;
     final EdgeInsets contentPadding = EdgeInsets.fromLTRB(
       context.wearHorizontalPadding,
-      math.max(MediaQuery.paddingOf(context).top, 40),
+      math.max(MediaQuery.paddingOf(context).top, 64),
       context.wearHorizontalPadding,
       0,
     );
@@ -89,11 +89,18 @@ class _SearchPageExtraSmallLayoutState
                               children: <Widget>[
                                 TextField(
                                   controller: widget.textEditingController,
-                                  autofocus: true,
+                                  autofocus: false,
                                   style: textTheme.labelSmall,
                                   textInputAction: TextInputAction.search,
                                   onSubmitted: _onSearchSubmitted,
                                   enableInteractiveSelection: false,
+                                  contextMenuBuilder:
+                                      (
+                                        BuildContext context,
+                                        EditableTextState editableTextState,
+                                      ) {
+                                        return const SizedBox.shrink();
+                                      },
                                   decoration: InputDecoration(
                                     isDense: true,
                                     filled: true,
