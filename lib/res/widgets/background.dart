@@ -40,6 +40,7 @@ class Background extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
+              stops: const <double>[0.0, 0.35, 0.65, 1.0],
               colors: _getGradientColors(
                 effectiveCondition,
                 context,
@@ -63,42 +64,77 @@ class Background extends StatelessWidget {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final Color baseColor = colorScheme.primaryContainer;
 
-    if (isNight) {
-      return <Color>[
-        colorScheme.surfaceContainerHighest,
-        colorScheme.surfaceContainerLow,
-        colorScheme.surface,
-      ];
-    }
-
     switch (condition) {
       case WeatherCondition.clear:
-        return <Color>[
-          baseColor,
-          baseColor.brighten(20),
-          baseColor.brighten(40),
-        ];
+        return isNight
+            ? <Color>[
+                baseColor.darken(65),
+                baseColor.darken(75),
+                baseColor.darken(85),
+                baseColor.darken(95),
+              ]
+            : <Color>[
+                baseColor,
+                baseColor.brighten(15),
+                baseColor.brighten(30),
+                baseColor.brighten(45),
+              ];
       case WeatherCondition.rainy:
-        return <Color>[
-          baseColor.darken(10),
-          baseColor.darken(20),
-          baseColor.darken(30),
-        ];
+        return isNight
+            ? <Color>[
+                baseColor.darken(50),
+                baseColor.darken(60),
+                baseColor.darken(70),
+                baseColor.darken(80),
+              ]
+            : <Color>[
+                baseColor.darken(5),
+                baseColor.darken(15),
+                baseColor.darken(25),
+                baseColor.darken(35),
+              ];
       case WeatherCondition.cloudy:
-        return <Color>[baseColor, baseColor.darken(10), baseColor.darken(20)];
+        return isNight
+            ? <Color>[
+                baseColor.darken(55),
+                baseColor.darken(65),
+                baseColor.darken(75),
+                baseColor.darken(85),
+              ]
+            : <Color>[
+                baseColor,
+                baseColor.darken(10),
+                baseColor.darken(15),
+                baseColor.darken(20),
+              ];
       case WeatherCondition.snowy:
-        return <Color>[
-          baseColor.brighten(30),
-          baseColor.brighten(40),
-          baseColor.brighten(50),
-        ];
+        return isNight
+            ? <Color>[
+                baseColor.darken(45),
+                baseColor.darken(55),
+                baseColor.darken(65),
+                baseColor.darken(75),
+              ]
+            : <Color>[
+                baseColor.brighten(25),
+                baseColor.brighten(35),
+                baseColor.brighten(45),
+                baseColor.brighten(55),
+              ];
       case WeatherCondition.unknown:
-        return <Color>[
-          baseColor,
-          baseColor.brighten(10),
-          baseColor.brighten(33),
-          baseColor.brighten(50),
-        ];
+        return isNight
+            ? <Color>[
+                baseColor.darken(60),
+                baseColor.darken(70),
+                baseColor.darken(80),
+                baseColor.darken(90),
+              ]
+            : <Color>[
+                baseColor,
+                baseColor.brighten(10),
+                baseColor.brighten(33),
+                baseColor.brighten(50),
+              ];
     }
   }
 }
@@ -128,12 +164,18 @@ class _WeatherPattern extends StatelessWidget {
         // Large number to ensure screen is filled
         itemCount: 200,
         itemBuilder: (BuildContext context, int index) {
+          final double opacity = isNight ? 0.07 : 0.22;
           return Center(
-            child: Opacity(
-              opacity: isNight ? 0.05 : 0.15,
-              child: Transform.rotate(
-                angle: index % 2 == 0 ? 0.2 : -0.2,
-                child: Text(emoji, style: TextStyle(fontSize: fontSize)),
+            child: Transform.rotate(
+              angle: index % 2 == 0 ? 0.2 : -0.2,
+              child: Text(
+                emoji,
+                style: TextStyle(
+                  fontSize: fontSize,
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurfaceVariant.withValues(alpha: opacity),
+                ),
               ),
             ),
           );
