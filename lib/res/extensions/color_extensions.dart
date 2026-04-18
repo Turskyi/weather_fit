@@ -19,6 +19,20 @@ extension ColorExtension on Color {
     );
   }
 
+  Color darken([int percent = 10]) {
+    assert(
+      1 <= percent && percent <= 100,
+      'percentage must be between 1 and 100',
+    );
+    final double f = 1 - percent / 100;
+    return Color.fromARGB(
+      (a * 255).toInt(),
+      (r * 255 * f).round(),
+      (g * 255 * f).round(),
+      (b * 255 * f).round(),
+    );
+  }
+
   int get intAlpha => _floatToInt8(a);
 
   int get intRed => _floatToInt8(r);
