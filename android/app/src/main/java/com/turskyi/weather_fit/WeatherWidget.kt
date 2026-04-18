@@ -434,13 +434,17 @@ private fun downscaleToByteLimit(
 }
 
 private fun getBackgroundResource(code: Int): Int {
-    return when (code) {
-        0 -> R.drawable.widget_background_sunny
-        1, 2, 3, 45, 48 -> R.drawable.widget_background_cloudy
-        51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82, 95, 96, 99 ->
+    return when {
+        code == 0 || code == 800 -> R.drawable.widget_background_sunny
+        (code in 1..3) || code == 45 || code == 48 || (code in 700..799) || (code in 801..804) ->
+            R.drawable.widget_background_cloudy
+
+        (code in 51..67) || (code in 80..82) || (code in 95..99) || (code in 200..599) ->
             R.drawable.widget_background_rainy
 
-        71, 73, 75, 77, 85, 86 -> R.drawable.widget_background_snowy
+        (code in 71..77) || (code in 85..86) || (code in 600..699) ->
+            R.drawable.widget_background_snowy
+
         else -> R.drawable.widget_background
     }
 }
@@ -523,15 +527,15 @@ private fun getTimeOfDay(
     }
 }
 
-private fun getWeatherEmoji(code: Int): String = when (code) {
-    0 -> "☀️"
-    1, 2, 3 -> "☁️"
-    45, 48 -> "🌫"
-    51, 53, 55, 56, 57 -> "💧"
-    61, 63, 65, 66, 67 -> "🌧"
-    71, 73, 75, 77 -> "❄️"
-    80, 81, 82 -> "⛈"
-    85, 86 -> "🌨"
-    95, 96, 99 -> "🌪"
-    else -> "🤔"
+private fun getWeatherEmoji(code: Int): String = when {
+    code == 0 || code == 800 -> "☀️"
+    (code in 1..3) || (code in 801..804) -> "☁️"
+    code == 45 || code == 48 || (code in 700..799) -> "🌫"
+    (code in 51..57) || (code in 200..599) -> "🌧"
+    code in 61..67 -> "🌧"
+    (code in 71..77) || (code in 600..699) -> "❄️"
+    code in 80..82 -> "⛈"
+    code in 85..86 -> "🌨"
+    code in 95..99 -> "🌪"
+    else -> ""
 }
