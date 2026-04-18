@@ -89,7 +89,7 @@ class _SearchPageExtraSmallLayoutState
                               children: <Widget>[
                                 TextField(
                                   controller: widget.textEditingController,
-                                  autofocus: false,
+                                  autofocus: true,
                                   style: textTheme.labelSmall,
                                   textInputAction: TextInputAction.search,
                                   onSubmitted: _onSearchSubmitted,
@@ -103,7 +103,18 @@ class _SearchPageExtraSmallLayoutState
                                       },
                                   decoration: InputDecoration(
                                     isDense: true,
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 10,
+                                    ),
                                     filled: true,
+                                    prefixIcon: const Icon(
+                                      Icons.search,
+                                      size: 18,
+                                    ),
+                                    prefixIconConstraints: const BoxConstraints(
+                                      minWidth: 30,
+                                    ),
                                     fillColor: Theme.of(context)
                                         .colorScheme
                                         .surface
@@ -166,8 +177,20 @@ class _SearchPageExtraSmallLayoutState
 
   void _onSearchSubmitted(String value) {
     final SearchState state = context.read<SearchBloc>().state;
-    if (state is! SearchLoading && value.trim().isNotEmpty) {
-      context.read<SearchBloc>().add(SearchLocation(value.trim()));
+    if (state is SearchLoading) {
+      return;
     }
+
+    if (value.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(translate('search.enter_location')),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+
+    context.read<SearchBloc>().add(SearchLocation(value.trim()));
   }
 }

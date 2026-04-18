@@ -43,9 +43,7 @@ class SearchButtons extends StatelessWidget {
         ElevatedButton(
           style: elevatedStyle,
           key: const Key('searchPage_search_iconButton'),
-          onPressed: !isLoading && query.trim().isNotEmpty
-              ? () => onSearchSubmitted(query)
-              : null,
+          onPressed: !isLoading ? () => onSearchSubmitted(query) : null,
           child: isLoading
               ? const SizedBox(
                   height: progressIndicatorSize,
