@@ -292,7 +292,7 @@ struct Provider: TimelineProvider {
                     location: sharedDefaults.string(forKey: "text_location"),
                     temperature: formattedTemperature,
                     recommendation: sharedDefaults.string(forKey: "weatherfit_text_recommendation"),
-                    lastUpdated: self.lastUpdatedText(),
+                    lastUpdated: self.lastUpdatedText(locale: locale),
                     locale: locale,
                     imagePath: sharedDefaults.string(forKey: "image_weather"),
                     forecast: forecast
@@ -383,9 +383,12 @@ struct Provider: TimelineProvider {
         return "\(rounded)°\(isFahrenheit ? "F" : "C")"
     }
 
-    private func lastUpdatedText() -> String {
+    private func lastUpdatedText(locale: String? = nil) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm"
+        if let locale = locale {
+            formatter.locale = Locale(identifier: locale)
+        }
+        formatter.setLocalizedDateFormatFromTemplate("MMM d, HH:mm")
         return formatter.string(from: Date())
     }
 
