@@ -145,6 +145,8 @@
     "support_subtitle": "Visit our support page for help and frequently asked questions.",
     "pin_widget": "Pin Widget",
     "pin_widget_subtitle": "Add a widget to your home screen to see the weather at a glance.",
+    "weather_background": "Weather Background",
+    "weather_background_subtitle": "Change the background based on current weather.",
     "frequency_15m": "15m",
     "frequency_30m": "30m",
     "frequency_1h": "1h",

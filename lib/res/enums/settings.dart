@@ -7,7 +7,8 @@ enum Settings {
   widgetUpdateFrequency('widget_update_frequency_minutes'),
   dayStartHour('day_start_hour'),
   nightStartHour('night_start_hour'),
-  temperatureUnits('temperature_units');
+  temperatureUnits('temperature_units'),
+  weatherBackground('weather_background');
 
   const Settings(this.key);
 

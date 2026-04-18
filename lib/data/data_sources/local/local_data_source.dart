@@ -579,6 +579,14 @@ class LocalDataSource {
     );
   }
 
+  Future<bool> saveWeatherBackgroundEnabled(bool enabled) {
+    return _preferences.setBool(Settings.weatherBackground.key, enabled);
+  }
+
+  bool isWeatherBackgroundEnabled() {
+    return _preferences.getBool(Settings.weatherBackground.key) ?? false;
+  }
+
   String _translateError(String key, String locale) {
     final Map<String, Map<String, String>> localizedErrors =
         <String, Map<String, String>>{

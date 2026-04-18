@@ -10,6 +10,7 @@ sealed class SettingsState {
     this.nightStartHour = WeatherCondition.defaultNightStartHour,
     this.debugWeatherProviderOpenWeatherMap = false,
     this.debugForceNight = false,
+    this.isWeatherBackgroundEnabled = false,
   });
 
   final Language language;
@@ -19,6 +20,7 @@ sealed class SettingsState {
   final int nightStartHour;
   final bool debugWeatherProviderOpenWeatherMap;
   final bool debugForceNight;
+  final bool isWeatherBackgroundEnabled;
 
   bool get isEnglish => language == Language.en;
 
@@ -36,6 +38,7 @@ sealed class SettingsState {
     int? nightStartHour,
     bool? debugWeatherProviderOpenWeatherMap,
     bool? debugForceNight,
+    bool? isWeatherBackgroundEnabled,
   });
 }
 
@@ -48,6 +51,7 @@ final class SettingsInitial extends SettingsState {
     super.nightStartHour,
     super.debugWeatherProviderOpenWeatherMap,
     super.debugForceNight,
+    super.isWeatherBackgroundEnabled,
   });
 
   @override
@@ -59,6 +63,7 @@ final class SettingsInitial extends SettingsState {
     int? nightStartHour,
     bool? debugWeatherProviderOpenWeatherMap,
     bool? debugForceNight,
+    bool? isWeatherBackgroundEnabled,
   }) {
     return SettingsInitial(
       language: language ?? this.language,
@@ -71,6 +76,8 @@ final class SettingsInitial extends SettingsState {
           debugWeatherProviderOpenWeatherMap ??
           this.debugWeatherProviderOpenWeatherMap,
       debugForceNight: debugForceNight ?? this.debugForceNight,
+      isWeatherBackgroundEnabled:
+          isWeatherBackgroundEnabled ?? this.isWeatherBackgroundEnabled,
     );
   }
 
@@ -84,7 +91,8 @@ final class SettingsInitial extends SettingsState {
         '  nightStartHour: $nightStartHour,'
         '  debugWeatherProviderOpenWeatherMap: '
         '$debugWeatherProviderOpenWeatherMap,'
-        '  debugForceNight: $debugForceNight'
+        '  debugForceNight: $debugForceNight,'
+        '  isWeatherBackgroundEnabled: $isWeatherBackgroundEnabled'
         '}';
   }
 }
@@ -99,6 +107,7 @@ final class FeedbackState extends SettingsState {
     super.nightStartHour,
     super.debugWeatherProviderOpenWeatherMap,
     super.debugForceNight,
+    super.isWeatherBackgroundEnabled,
   });
 
   final String errorMessage;
@@ -114,7 +123,8 @@ final class FeedbackState extends SettingsState {
         '  nightStartHour: $nightStartHour,'
         '  debugWeatherProviderOpenWeatherMap: '
         '$debugWeatherProviderOpenWeatherMap,'
-        '  debugForceNight: $debugForceNight'
+        '  debugForceNight: $debugForceNight,'
+        '  isWeatherBackgroundEnabled: $isWeatherBackgroundEnabled'
         ')';
   }
 
@@ -128,6 +138,7 @@ final class FeedbackState extends SettingsState {
     int? nightStartHour,
     bool? debugWeatherProviderOpenWeatherMap,
     bool? debugForceNight,
+    bool? isWeatherBackgroundEnabled,
   }) {
     return FeedbackState(
       errorMessage: errorMessage ?? this.errorMessage,
@@ -141,6 +152,8 @@ final class FeedbackState extends SettingsState {
           debugWeatherProviderOpenWeatherMap ??
           this.debugWeatherProviderOpenWeatherMap,
       debugForceNight: debugForceNight ?? this.debugForceNight,
+      isWeatherBackgroundEnabled:
+          isWeatherBackgroundEnabled ?? this.isWeatherBackgroundEnabled,
     );
   }
 }
@@ -154,6 +167,7 @@ final class FeedbackSent extends SettingsState {
     super.nightStartHour,
     super.debugWeatherProviderOpenWeatherMap,
     super.debugForceNight,
+    super.isWeatherBackgroundEnabled,
   });
 
   @override
@@ -166,7 +180,8 @@ final class FeedbackSent extends SettingsState {
         '  nightStartHour: $nightStartHour,'
         '  debugWeatherProviderOpenWeatherMap: '
         '$debugWeatherProviderOpenWeatherMap,'
-        '  debugForceNight: $debugForceNight'
+        '  debugForceNight: $debugForceNight,'
+        '  isWeatherBackgroundEnabled: $isWeatherBackgroundEnabled'
         ')';
   }
 
@@ -179,6 +194,7 @@ final class FeedbackSent extends SettingsState {
     int? nightStartHour,
     bool? debugWeatherProviderOpenWeatherMap,
     bool? debugForceNight,
+    bool? isWeatherBackgroundEnabled,
   }) {
     return FeedbackSent(
       language: language ?? this.language,
@@ -191,6 +207,8 @@ final class FeedbackSent extends SettingsState {
           debugWeatherProviderOpenWeatherMap ??
           this.debugWeatherProviderOpenWeatherMap,
       debugForceNight: debugForceNight ?? this.debugForceNight,
+      isWeatherBackgroundEnabled:
+          isWeatherBackgroundEnabled ?? this.isWeatherBackgroundEnabled,
     );
   }
 }
@@ -204,6 +222,7 @@ final class LoadingSettingsState extends SettingsState {
     super.nightStartHour,
     super.debugWeatherProviderOpenWeatherMap,
     super.debugForceNight,
+    super.isWeatherBackgroundEnabled,
   });
 
   @override
@@ -215,6 +234,7 @@ final class LoadingSettingsState extends SettingsState {
     int? nightStartHour,
     bool? debugWeatherProviderOpenWeatherMap,
     bool? debugForceNight,
+    bool? isWeatherBackgroundEnabled,
   }) {
     return LoadingSettingsState(
       language: language ?? this.language,
@@ -227,6 +247,8 @@ final class LoadingSettingsState extends SettingsState {
           debugWeatherProviderOpenWeatherMap ??
           this.debugWeatherProviderOpenWeatherMap,
       debugForceNight: debugForceNight ?? this.debugForceNight,
+      isWeatherBackgroundEnabled:
+          isWeatherBackgroundEnabled ?? this.isWeatherBackgroundEnabled,
     );
   }
 
@@ -240,7 +262,8 @@ final class LoadingSettingsState extends SettingsState {
         '  nightStartHour: $nightStartHour,'
         '  debugWeatherProviderOpenWeatherMap: '
         '$debugWeatherProviderOpenWeatherMap,'
-        '  debugForceNight: $debugForceNight'
+        '  debugForceNight: $debugForceNight,'
+        '  isWeatherBackgroundEnabled: $isWeatherBackgroundEnabled'
         ')';
   }
 }
@@ -255,6 +278,7 @@ final class SettingsError extends SettingsState {
     super.nightStartHour,
     super.debugWeatherProviderOpenWeatherMap,
     super.debugForceNight,
+    super.isWeatherBackgroundEnabled,
   });
 
   final String errorMessage;
@@ -269,6 +293,7 @@ final class SettingsError extends SettingsState {
     int? nightStartHour,
     bool? debugWeatherProviderOpenWeatherMap,
     bool? debugForceNight,
+    bool? isWeatherBackgroundEnabled,
   }) {
     return SettingsError(
       errorMessage: errorMessage ?? this.errorMessage,
@@ -282,6 +307,8 @@ final class SettingsError extends SettingsState {
           debugWeatherProviderOpenWeatherMap ??
           this.debugWeatherProviderOpenWeatherMap,
       debugForceNight: debugForceNight ?? this.debugForceNight,
+      isWeatherBackgroundEnabled:
+          isWeatherBackgroundEnabled ?? this.isWeatherBackgroundEnabled,
     );
   }
 
@@ -298,7 +325,8 @@ final class SettingsError extends SettingsState {
         other.nightStartHour == nightStartHour &&
         other.debugWeatherProviderOpenWeatherMap ==
             debugWeatherProviderOpenWeatherMap &&
-        other.debugForceNight == debugForceNight;
+        other.debugForceNight == debugForceNight &&
+        other.isWeatherBackgroundEnabled == isWeatherBackgroundEnabled;
   }
 
   @override
@@ -310,7 +338,8 @@ final class SettingsError extends SettingsState {
       dayStartHour.hashCode ^
       nightStartHour.hashCode ^
       debugWeatherProviderOpenWeatherMap.hashCode ^
-      debugForceNight.hashCode;
+      debugForceNight.hashCode ^
+      isWeatherBackgroundEnabled.hashCode;
 
   @override
   String toString() {
@@ -323,7 +352,8 @@ final class SettingsError extends SettingsState {
         '  nightStartHour: $nightStartHour,'
         '  debugWeatherProviderOpenWeatherMap: '
         '$debugWeatherProviderOpenWeatherMap,'
-        '  debugForceNight: $debugForceNight'
+        '  debugForceNight: $debugForceNight,'
+        '  isWeatherBackgroundEnabled: $isWeatherBackgroundEnabled'
         ')';
   }
 }

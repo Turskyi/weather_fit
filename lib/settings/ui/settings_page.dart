@@ -99,7 +99,9 @@ class _SettingsPageState extends State<SettingsPage> {
         previous.nightStartHour != current.nightStartHour ||
         previous.debugWeatherProviderOpenWeatherMap !=
             current.debugWeatherProviderOpenWeatherMap ||
-        previous.debugForceNight != current.debugForceNight;
+        previous.debugForceNight != current.debugForceNight ||
+        previous.isWeatherBackgroundEnabled !=
+            current.isWeatherBackgroundEnabled;
   }
 
   void _changeLanguage(Language language) {

@@ -210,6 +210,36 @@ class SettingsPageDefaultLayout extends StatelessWidget {
                   },
                 ),
                 const SizedBox(height: 20),
+                BlocBuilder<SettingsBloc, SettingsState>(
+                  buildWhen: rebuildSettingsWhen,
+                  builder: (BuildContext context, SettingsState state) {
+                    return Card(
+                      elevation: 2.0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      child: SwitchListTile(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        title: Text(
+                          translate('settings.weather_background'),
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Text(
+                          translate('settings.weather_background_subtitle'),
+                        ),
+                        value: state.isWeatherBackgroundEnabled,
+                        onChanged: (bool value) {
+                          context.read<SettingsBloc>().add(
+                            ToggleWeatherBackgroundEvent(value),
+                          );
+                        },
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 20),
                 BlocBuilder<WeatherBloc, WeatherState>(
                   buildWhen: rebuildUnitsWhen,
                   builder: (BuildContext context, WeatherState state) {

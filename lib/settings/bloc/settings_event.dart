@@ -72,3 +72,8 @@ class ToggleDebugForceNightEvent extends SettingsEvent {
   const ToggleDebugForceNightEvent(this.enabled);
   final bool enabled;
 }
+
+class ToggleWeatherBackgroundEvent extends SettingsEvent {
+  const ToggleWeatherBackgroundEvent(this.enabled);
+  final bool enabled;
+}

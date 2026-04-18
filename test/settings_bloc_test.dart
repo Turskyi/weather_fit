@@ -46,6 +46,7 @@ void main() {
     when(
       () => localDataSource.getDebugWeatherProviderOpenWeatherMap(),
     ).thenReturn(false);
+    when(() => localDataSource.isWeatherBackgroundEnabled()).thenReturn(true);
     when(() => updateService.checkForUpdate()).thenAnswer((_) async {});
   });
 

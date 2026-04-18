@@ -165,6 +165,17 @@ class _SettingsPageExtraSmallLayoutState
 
                   return Column(
                     children: <Widget>[
+                      _SettingSegmentedToggle(
+                        label: translate('settings.weather_background'),
+                        selectedIndex: state.isWeatherBackgroundEnabled ? 1 : 0,
+                        options: <String>[translate('no'), translate('yes')],
+                        onSelected: (int index) {
+                          context.read<SettingsBloc>().add(
+                            ToggleWeatherBackgroundEvent(index == 1),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 8),
                       SettingDropdown(
                         label: translate('settings.day_starts'),
                         value: state.dayStartHour,

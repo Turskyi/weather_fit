@@ -37,6 +37,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
           nightStartHour: _localDataSource.getNightStartHour(),
           debugWeatherProviderOpenWeatherMap: _localDataSource
               .getDebugWeatherProviderOpenWeatherMap(),
+          isWeatherBackgroundEnabled: _localDataSource
+              .isWeatherBackgroundEnabled(),
         ),
       ) {
     on<LoadSettingsEvent>(_onLoadSettings);
@@ -62,6 +64,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     on<ToggleDebugWeatherProviderEvent>(_onToggleDebugWeatherProvider);
 
     on<ToggleDebugForceNightEvent>(_onToggleDebugForceNight);
+
+    on<ToggleWeatherBackgroundEvent>(_onToggleWeatherBackground);
 
     _applyDayNightConfiguration(
       dayStartHour: state.dayStartHour,
@@ -89,6 +93,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
           widgetUpdateFrequency: _localDataSource.getWidgetUpdateFrequency(),
           dayStartHour: _localDataSource.getDayStartHour(),
           nightStartHour: _localDataSource.getNightStartHour(),
+          isWeatherBackgroundEnabled: _localDataSource
+              .isWeatherBackgroundEnabled(),
         ),
       );
       _applyDayNightConfiguration(
@@ -123,6 +129,10 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         widgetUpdateFrequency: state.widgetUpdateFrequency,
         dayStartHour: state.dayStartHour,
         nightStartHour: state.nightStartHour,
+        debugWeatherProviderOpenWeatherMap:
+            state.debugWeatherProviderOpenWeatherMap,
+        debugForceNight: state.debugForceNight,
+        isWeatherBackgroundEnabled: state.isWeatherBackgroundEnabled,
       ),
     );
   }
@@ -139,6 +149,10 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
           widgetUpdateFrequency: state.widgetUpdateFrequency,
           dayStartHour: state.dayStartHour,
           nightStartHour: state.nightStartHour,
+          debugWeatherProviderOpenWeatherMap:
+              state.debugWeatherProviderOpenWeatherMap,
+          debugForceNight: state.debugForceNight,
+          isWeatherBackgroundEnabled: state.isWeatherBackgroundEnabled,
         ),
       );
       final UserFeedback feedback = event.feedback;
@@ -240,6 +254,10 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
                 widgetUpdateFrequency: state.widgetUpdateFrequency,
                 dayStartHour: state.dayStartHour,
                 nightStartHour: state.nightStartHour,
+                debugWeatherProviderOpenWeatherMap:
+                    state.debugWeatherProviderOpenWeatherMap,
+                debugForceNight: state.debugForceNight,
+                isWeatherBackgroundEnabled: state.isWeatherBackgroundEnabled,
               ),
             );
           }
@@ -271,6 +289,10 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
             widgetUpdateFrequency: state.widgetUpdateFrequency,
             dayStartHour: state.dayStartHour,
             nightStartHour: state.nightStartHour,
+            debugWeatherProviderOpenWeatherMap:
+                state.debugWeatherProviderOpenWeatherMap,
+            debugForceNight: state.debugForceNight,
+            isWeatherBackgroundEnabled: state.isWeatherBackgroundEnabled,
           ),
         );
       } catch (e, stackTrace) {
@@ -283,6 +305,10 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
             widgetUpdateFrequency: state.widgetUpdateFrequency,
             dayStartHour: state.dayStartHour,
             nightStartHour: state.nightStartHour,
+            debugWeatherProviderOpenWeatherMap:
+                state.debugWeatherProviderOpenWeatherMap,
+            debugForceNight: state.debugForceNight,
+            isWeatherBackgroundEnabled: state.isWeatherBackgroundEnabled,
           ),
         );
       }
@@ -374,6 +400,10 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
             widgetUpdateFrequency: state.widgetUpdateFrequency,
             dayStartHour: state.dayStartHour,
             nightStartHour: state.nightStartHour,
+            debugWeatherProviderOpenWeatherMap:
+                state.debugWeatherProviderOpenWeatherMap,
+            debugForceNight: state.debugForceNight,
+            isWeatherBackgroundEnabled: state.isWeatherBackgroundEnabled,
           ),
         );
       }
@@ -414,6 +444,10 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
           widgetUpdateFrequency: state.widgetUpdateFrequency,
           dayStartHour: state.dayStartHour,
           nightStartHour: state.nightStartHour,
+          debugWeatherProviderOpenWeatherMap:
+              state.debugWeatherProviderOpenWeatherMap,
+          debugForceNight: state.debugForceNight,
+          isWeatherBackgroundEnabled: state.isWeatherBackgroundEnabled,
         ),
       );
     }
@@ -441,6 +475,10 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
           widgetUpdateFrequency: state.widgetUpdateFrequency,
           dayStartHour: state.dayStartHour,
           nightStartHour: state.nightStartHour,
+          debugWeatherProviderOpenWeatherMap:
+              state.debugWeatherProviderOpenWeatherMap,
+          debugForceNight: state.debugForceNight,
+          isWeatherBackgroundEnabled: state.isWeatherBackgroundEnabled,
         ),
       );
     }
@@ -470,6 +508,10 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
           widgetUpdateFrequency: state.widgetUpdateFrequency,
           dayStartHour: state.dayStartHour,
           nightStartHour: state.nightStartHour,
+          debugWeatherProviderOpenWeatherMap:
+              state.debugWeatherProviderOpenWeatherMap,
+          debugForceNight: state.debugForceNight,
+          isWeatherBackgroundEnabled: state.isWeatherBackgroundEnabled,
         ),
       );
     }
@@ -488,6 +530,14 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     Emitter<SettingsState> emit,
   ) {
     emit(state.copyWith(debugForceNight: event.enabled));
+  }
+
+  FutureOr<void> _onToggleWeatherBackground(
+    ToggleWeatherBackgroundEvent event,
+    Emitter<SettingsState> emit,
+  ) async {
+    await _localDataSource.saveWeatherBackgroundEnabled(event.enabled);
+    emit(state.copyWith(isWeatherBackgroundEnabled: event.enabled));
   }
 
   void _applyDayNightConfiguration({
