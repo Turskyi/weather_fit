@@ -129,6 +129,7 @@ const Map<String, Object?> _enTestTranslations = <String, Object?>{
     'instructions':
         'Type the city or country name and tap "Submit" to see the weather.',
     'confirm_location_dialog_title': 'Is this your location?',
+    'label': 'Search',
     'use_current_location_dialog_title': 'Use your current location?',
     'location_not_found_use_current_dialog_content':
         "We couldn't find the correct location. Would you like to use your "
@@ -501,6 +502,7 @@ const Map<String, Object?> _ukTestTranslations = <String, Object?>{
         'Введіть назву міста чи країни та натисніть "Відправити", '
         'щоб побачити погоду.',
     'confirm_location_dialog_title': 'Це ваше місцезнаходження?',
+    'label': 'Пошук',
     'use_current_location_dialog_title':
         'Використати ваше поточне '
         'місцезнаходження?',
