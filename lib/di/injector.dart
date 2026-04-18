@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -31,84 +32,188 @@ import 'package:weather_repository/weather_repository.dart';
 import 'package:workmanager/workmanager.dart';
 
 Future<Dependencies> injectDependencies() async {
-  await _initializeAllDateFormatting();
+  // 1. Start tasks that can run in parallel.
+  // We don't await SharedPreferences yet because we can start other tasks too.
+  final Future<SharedPreferences> preferencesFuture =
+      SharedPreferences.getInstance();
 
-  Bloc.observer = const WeatherBlocObserver();
+  final Future<void> storageFuture = kIsWeb
+      ? _initializeWebHydratedStorage()
+      : _setupMobileHydratedStorage();
 
-  if (kIsWeb) {
-    await _initializeWebHydratedStorage();
-  } else {
-    await _setupMobileHydratedStorage();
-  }
-
-  final SharedPreferences preferences = await SharedPreferences.getInstance();
+  // 2. Wait for SharedPreferences to get the saved language.
+  final SharedPreferences preferences = await preferencesFuture;
   final LocalDataSource localDataSource = LocalDataSource(preferences);
 
-  // Make sure we run on supported platforms:
-  // https://pub.dev/packages/workmanager
-  if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
-    _setupBackgroundWidgetUpdates(localDataSource);
-  }
-
-  final RemoteDataSource remoteDataSource = RemoteDataSource(Dio());
-  final OutfitRepository outfitRepository = OutfitRepository(
-    localDataSource,
-    remoteDataSource,
-  );
-
-  // Construct weather providers with fallback logic. We use the debug
-  // toggle saved in LocalDataSource to force OpenWeatherMap when enabled.
-  final bool forceOpenWeatherMap = localDataSource
-      .getDebugWeatherProviderOpenWeatherMap();
-
-  final OpenMeteoProvider openMeteoProvider = OpenMeteoProvider(
-    apiClient: OpenMeteoApiClient(),
-  );
-
-  final OpenWeatherMapProvider openWeatherMapProvider = OpenWeatherMapProvider(
-    apiKey: Env.openWeatherMapApiKey,
-  );
-
-  final FallbackWeatherProvider fallbackProvider = FallbackWeatherProvider(
-    openMeteo: openMeteoProvider,
-    openWeatherMap: openWeatherMapProvider,
-    forceOpenWeatherMap: forceOpenWeatherMap,
-  );
-
-  final WeatherRepository weatherRepository = WeatherRepository(
-    weatherProvider: fallbackProvider,
-  );
-
-  final LocationRepository locationRepository = LocationRepository(
-    NominatimApiClient(),
-    OpenMeteoApiClient(),
-    localDataSource,
-  );
-
-  final InitializeAppLanguageUseCase initializeAppLanguageUseCase =
-      InitializeAppLanguageUseCase(localDataSource: localDataSource);
-
+  // 3. Get saved language and initialize ONLY its date formatting for startup.
   final Language savedLanguage = localDataSource.getSavedLanguage();
-  final LocalizationDelegate localizationDelegate = await locale
-      .getLocalizationDelegate(savedLanguage);
+  await _initializeDateFormattingForLanguage(savedLanguage);
 
-  const HomeWidgetService homeWidgetService = HomeWidgetServiceImpl();
-  const FeedbackService feedbackService = FeedbackServiceImpl();
-  const UpdateService updateService = UpdateServiceImpl();
+  // 4. Load localization and wait for storage in parallel.
+  final List<Object?> results = await Future.wait(<Future<Object?>>[
+    locale.getLocalizationDelegate(savedLanguage),
+    storageFuture,
+    // Initialize other date formats in the background while we load
+    // localization.
+    _initializeAllDateFormatting(exclude: savedLanguage),
+  ]);
 
-  return Dependencies(
-    preferences: preferences,
-    localDataSource: localDataSource,
-    remoteDataSource: remoteDataSource,
-    outfitRepository: outfitRepository,
-    weatherRepository: weatherRepository,
-    locationRepository: locationRepository,
-    initializeAppLanguageUseCase: initializeAppLanguageUseCase,
-    localizationDelegate: localizationDelegate,
-    homeWidgetService: homeWidgetService,
-    feedbackService: feedbackService,
-    updateService: updateService,
-  );
+  if (results.isNotEmpty) {
+    final Object? firstObject = results.firstOrNull;
+    final LocalizationDelegate localizationDelegate =
+        firstObject is LocalizationDelegate
+        ? firstObject
+        : await locale.getLocalizationDelegate(savedLanguage);
+
+    Bloc.observer = const WeatherBlocObserver();
+
+    // Make sure we run on supported platforms:
+    // https://pub.dev/packages/workmanager
+    if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
+      // We don't strictly need to await this for the UI to show up,
+      // but initializing it early is fine as long as it's not blocking too
+      // much.
+      // However, it's safer to not block the main thread.
+      unawaited(_setupBackgroundWidgetUpdates(localDataSource));
+    }
+
+    final RemoteDataSource remoteDataSource = RemoteDataSource(Dio());
+    final OutfitRepository outfitRepository = OutfitRepository(
+      localDataSource,
+      remoteDataSource,
+    );
+
+    // Construct weather providers with fallback logic. We use the debug
+    // toggle saved in LocalDataSource to force OpenWeatherMap when enabled.
+    final bool forceOpenWeatherMap = localDataSource
+        .getDebugWeatherProviderOpenWeatherMap();
+
+    final OpenMeteoApiClient openMeteoApiClient = OpenMeteoApiClient();
+
+    final OpenMeteoProvider openMeteoProvider = OpenMeteoProvider(
+      apiClient: openMeteoApiClient,
+    );
+
+    final OpenWeatherMapProvider openWeatherMapProvider =
+        OpenWeatherMapProvider(apiKey: Env.openWeatherMapApiKey);
+
+    final FallbackWeatherProvider fallbackProvider = FallbackWeatherProvider(
+      openMeteo: openMeteoProvider,
+      openWeatherMap: openWeatherMapProvider,
+      forceOpenWeatherMap: forceOpenWeatherMap,
+    );
+
+    final WeatherRepository weatherRepository = WeatherRepository(
+      weatherProvider: fallbackProvider,
+    );
+
+    final LocationRepository locationRepository = LocationRepository(
+      NominatimApiClient(),
+      openMeteoApiClient,
+      localDataSource,
+    );
+
+    final InitializeAppLanguageUseCase initializeAppLanguageUseCase =
+        InitializeAppLanguageUseCase(localDataSource: localDataSource);
+
+    const HomeWidgetService homeWidgetService = HomeWidgetServiceImpl();
+    const FeedbackService feedbackService = FeedbackServiceImpl();
+    const UpdateService updateService = UpdateServiceImpl();
+
+    return Dependencies(
+      preferences: preferences,
+      localDataSource: localDataSource,
+      remoteDataSource: remoteDataSource,
+      outfitRepository: outfitRepository,
+      weatherRepository: weatherRepository,
+      locationRepository: locationRepository,
+      initializeAppLanguageUseCase: initializeAppLanguageUseCase,
+      localizationDelegate: localizationDelegate,
+      homeWidgetService: homeWidgetService,
+      feedbackService: feedbackService,
+      updateService: updateService,
+    );
+  } else {
+    await _initializeAllDateFormatting();
+
+    Bloc.observer = const WeatherBlocObserver();
+
+    if (kIsWeb) {
+      await _initializeWebHydratedStorage();
+    } else {
+      await _setupMobileHydratedStorage();
+    }
+
+    final SharedPreferences preferences = await SharedPreferences.getInstance();
+    final LocalDataSource localDataSource = LocalDataSource(preferences);
+
+    // Make sure we run on supported platforms:
+    // https://pub.dev/packages/workmanager
+    if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
+      _setupBackgroundWidgetUpdates(localDataSource);
+    }
+
+    final RemoteDataSource remoteDataSource = RemoteDataSource(Dio());
+    final OutfitRepository outfitRepository = OutfitRepository(
+      localDataSource,
+      remoteDataSource,
+    );
+
+    // Construct weather providers with fallback logic. We use the debug
+    // toggle saved in LocalDataSource to force OpenWeatherMap when enabled.
+    final bool forceOpenWeatherMap = localDataSource
+        .getDebugWeatherProviderOpenWeatherMap();
+
+    final OpenMeteoApiClient openMeteoApiClient = OpenMeteoApiClient();
+
+    final OpenMeteoProvider openMeteoProvider = OpenMeteoProvider(
+      apiClient: openMeteoApiClient,
+    );
+
+    final OpenWeatherMapProvider openWeatherMapProvider =
+        OpenWeatherMapProvider(apiKey: Env.openWeatherMapApiKey);
+
+    final FallbackWeatherProvider fallbackProvider = FallbackWeatherProvider(
+      openMeteo: openMeteoProvider,
+      openWeatherMap: openWeatherMapProvider,
+      forceOpenWeatherMap: forceOpenWeatherMap,
+    );
+
+    final WeatherRepository weatherRepository = WeatherRepository(
+      weatherProvider: fallbackProvider,
+    );
+
+    final LocationRepository locationRepository = LocationRepository(
+      NominatimApiClient(),
+      openMeteoApiClient,
+      localDataSource,
+    );
+
+    final InitializeAppLanguageUseCase initializeAppLanguageUseCase =
+        InitializeAppLanguageUseCase(localDataSource: localDataSource);
+
+    final Language savedLanguage = localDataSource.getSavedLanguage();
+    final LocalizationDelegate localizationDelegate = await locale
+        .getLocalizationDelegate(savedLanguage);
+
+    const HomeWidgetService homeWidgetService = HomeWidgetServiceImpl();
+    const FeedbackService feedbackService = FeedbackServiceImpl();
+    const UpdateService updateService = UpdateServiceImpl();
+
+    return Dependencies(
+      preferences: preferences,
+      localDataSource: localDataSource,
+      remoteDataSource: remoteDataSource,
+      outfitRepository: outfitRepository,
+      weatherRepository: weatherRepository,
+      locationRepository: locationRepository,
+      initializeAppLanguageUseCase: initializeAppLanguageUseCase,
+      localizationDelegate: localizationDelegate,
+      homeWidgetService: homeWidgetService,
+      feedbackService: feedbackService,
+      updateService: updateService,
+    );
+  }
 }
 
 Future<void> _setupMobileHydratedStorage() async {
@@ -284,66 +389,74 @@ Future<bool> _performWidgetUpdateTick() async {
 
     if (lastSavedLocation.isEmpty) {
       return false;
+    } else {
+      // Background task should respect the debug toggle as well.
+      final bool forceOpenWeatherMap = localDataSource
+          .getDebugWeatherProviderOpenWeatherMap();
+
+      final OpenMeteoProvider openMeteoProvider = OpenMeteoProvider(
+        apiClient: OpenMeteoApiClient(),
+      );
+
+      final OpenWeatherMapProvider openWeatherMapProvider =
+          OpenWeatherMapProvider(apiKey: Env.openWeatherMapApiKey);
+
+      final FallbackWeatherProvider fallbackProvider = FallbackWeatherProvider(
+        openMeteo: openMeteoProvider,
+        openWeatherMap: openWeatherMapProvider,
+        forceOpenWeatherMap: forceOpenWeatherMap,
+      );
+
+      final WeatherRepository weatherRepository = WeatherRepository(
+        weatherProvider: fallbackProvider,
+      );
+
+      final WeatherDomain domainWeather = await weatherRepository
+          .getWeatherByLocation(lastSavedLocation);
+
+      final DailyForecastDomain dailyForecast = await weatherRepository
+          .getDailyForecast(lastSavedLocation);
+
+      final OutfitRepository outfitRepository = OutfitRepository(
+        localDataSource,
+        remoteDataSource,
+      );
+
+      final Weather weather = Weather.fromRepository(domainWeather);
+
+      await homeWidgetService.updateHomeWidget(
+        localDataSource: localDataSource,
+        weather: weather,
+        outfitRepository: outfitRepository,
+        forecast: dailyForecast,
+      );
+
+      return true;
     }
-
-    // Background task should respect the debug toggle as well.
-    final bool forceOpenWeatherMap = localDataSource
-        .getDebugWeatherProviderOpenWeatherMap();
-
-    final OpenMeteoProvider openMeteoProvider = OpenMeteoProvider(
-      apiClient: OpenMeteoApiClient(),
-    );
-
-    final OpenWeatherMapProvider openWeatherMapProvider =
-        OpenWeatherMapProvider(apiKey: Env.openWeatherMapApiKey);
-
-    final FallbackWeatherProvider fallbackProvider = FallbackWeatherProvider(
-      openMeteo: openMeteoProvider,
-      openWeatherMap: openWeatherMapProvider,
-      forceOpenWeatherMap: forceOpenWeatherMap,
-    );
-
-    final WeatherRepository weatherRepository = WeatherRepository(
-      weatherProvider: fallbackProvider,
-    );
-
-    final WeatherDomain domainWeather = await weatherRepository
-        .getWeatherByLocation(lastSavedLocation);
-
-    final DailyForecastDomain dailyForecast = await weatherRepository
-        .getDailyForecast(lastSavedLocation);
-
-    final OutfitRepository outfitRepository = OutfitRepository(
-      localDataSource,
-      remoteDataSource,
-    );
-
-    final Weather weather = Weather.fromRepository(domainWeather);
-
-    await homeWidgetService.updateHomeWidget(
-      localDataSource: localDataSource,
-      weather: weather,
-      outfitRepository: outfitRepository,
-      forecast: dailyForecast,
-    );
-
-    return true;
   } catch (e) {
     debugPrint('Background widget update failed: $e');
     return false;
   }
 }
 
-Future<void> _initializeAllDateFormatting() async {
-  for (Language lang in Language.values) {
-    try {
-      await initializeDateFormatting(lang.isoLanguageCode, null);
-    } catch (e, stackTrace) {
-      debugPrint(
-        'Failed to initialize date formatting for ${lang.isoLanguageCode}.\n'
-        'Error: $e\n'
-        'StackTrace: $stackTrace',
-      );
+Future<void> _initializeAllDateFormatting({Language? exclude}) async {
+  for (final Language lang in Language.values) {
+    if (lang == exclude) {
+      continue;
+    } else {
+      await _initializeDateFormattingForLanguage(lang);
     }
+  }
+}
+
+Future<void> _initializeDateFormattingForLanguage(Language lang) async {
+  try {
+    await initializeDateFormatting(lang.isoLanguageCode, null);
+  } catch (e, stackTrace) {
+    debugPrint(
+      'Failed to initialize date formatting for ${lang.isoLanguageCode}.\n'
+      'Error: $e\n'
+      'StackTrace: $stackTrace',
+    );
   }
 }
