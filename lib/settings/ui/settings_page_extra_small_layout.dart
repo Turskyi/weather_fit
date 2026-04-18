@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
@@ -185,6 +186,31 @@ class _SettingsPageExtraSmallLayoutState
                           }
                         },
                       ),
+                      if (kDebugMode) ...<Widget>[
+                        const SizedBox(height: 8),
+                        _SettingSegmentedToggle(
+                          label: 'Night Mode (debug)',
+                          selectedIndex: state.debugForceNight ? 1 : 0,
+                          options: const <String>['Off', 'On'],
+                          onSelected: (int index) {
+                            context.read<SettingsBloc>().add(
+                              ToggleDebugForceNightEvent(index == 1),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 8),
+                        _SettingSegmentedToggle(
+                          label: 'Force OpenWeatherMap (debug)',
+                          selectedIndex:
+                              state.debugWeatherProviderOpenWeatherMap ? 1 : 0,
+                          options: const <String>['Off', 'On'],
+                          onSelected: (int index) {
+                            context.read<SettingsBloc>().add(
+                              ToggleDebugWeatherProviderEvent(index == 1),
+                            );
+                          },
+                        ),
+                      ],
                     ],
                   );
                 },

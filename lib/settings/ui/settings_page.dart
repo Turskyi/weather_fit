@@ -96,7 +96,10 @@ class _SettingsPageState extends State<SettingsPage> {
     return previous.language != current.language ||
         previous.widgetUpdateFrequency != current.widgetUpdateFrequency ||
         previous.dayStartHour != current.dayStartHour ||
-        previous.nightStartHour != current.nightStartHour;
+        previous.nightStartHour != current.nightStartHour ||
+        previous.debugWeatherProviderOpenWeatherMap !=
+            current.debugWeatherProviderOpenWeatherMap ||
+        previous.debugForceNight != current.debugForceNight;
   }
 
   void _changeLanguage(Language language) {

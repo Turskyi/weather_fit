@@ -61,6 +61,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
 
     on<ToggleDebugWeatherProviderEvent>(_onToggleDebugWeatherProvider);
 
+    on<ToggleDebugForceNightEvent>(_onToggleDebugForceNight);
+
     _applyDayNightConfiguration(
       dayStartHour: state.dayStartHour,
       nightStartHour: state.nightStartHour,
@@ -479,6 +481,13 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   ) async {
     await _localDataSource.setDebugWeatherProviderOpenWeatherMap(event.enabled);
     emit(state.copyWith(debugWeatherProviderOpenWeatherMap: event.enabled));
+  }
+
+  FutureOr<void> _onToggleDebugForceNight(
+    ToggleDebugForceNightEvent event,
+    Emitter<SettingsState> emit,
+  ) {
+    emit(state.copyWith(debugForceNight: event.enabled));
   }
 
   void _applyDayNightConfiguration({

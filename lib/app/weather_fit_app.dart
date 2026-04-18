@@ -99,6 +99,7 @@ class WeatherFitApp extends StatelessWidget {
             final DateTime now = DateTime.now();
             final int hour = now.hour;
             final bool completeDarkness =
+                settingsState.debugForceNight ||
                 hour < settingsState.dayStartHour ||
                 hour >= settingsState.nightStartHour;
             final LocalizationDelegate localizationDelegate = LocalizedApp.of(
