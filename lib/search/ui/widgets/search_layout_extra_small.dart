@@ -40,19 +40,6 @@ class _SearchPageExtraSmallLayoutState
   }
 
   @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  void _onSearchSubmitted(BuildContext context, String value) {
-    final SearchState state = context.read<SearchBloc>().state;
-    if (state is! SearchLoading && value.trim().isNotEmpty) {
-      context.read<SearchBloc>().add(SearchLocation(value.trim()));
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final EdgeInsets contentPadding = EdgeInsets.fromLTRB(
@@ -111,8 +98,7 @@ class _SearchPageExtraSmallLayoutState
                                   autofocus: true,
                                   style: textTheme.labelSmall,
                                   textInputAction: TextInputAction.search,
-                                  onSubmitted: (String value) =>
-                                      _onSearchSubmitted(context, value),
+                                  onSubmitted: _onSearchSubmitted,
                                   decoration: InputDecoration(
                                     isDense: true,
                                     filled: true,
@@ -147,11 +133,7 @@ class _SearchPageExtraSmallLayoutState
                                               query: value.text,
                                               isLoading: state is SearchLoading,
                                               onSearchSubmitted:
-                                                  (String query) =>
-                                                      _onSearchSubmitted(
-                                                        context,
-                                                        query,
-                                                      ),
+                                                  _onSearchSubmitted,
                                               showGpsButton: false,
                                             );
                                           },
@@ -172,5 +154,18 @@ class _SearchPageExtraSmallLayoutState
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onSearchSubmitted(String value) {
+    final SearchState state = context.read<SearchBloc>().state;
+    if (state is! SearchLoading && value.trim().isNotEmpty) {
+      context.read<SearchBloc>().add(SearchLocation(value.trim()));
+    }
   }
 }
