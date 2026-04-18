@@ -766,9 +766,9 @@ struct WeatherHelper {
         case 51, 53, 55, 56, 57, 200...599: return "🌧"
         case 61, 63, 65, 66, 67: return "🌧"
         case 71, 73, 75, 77, 600...699: return "❄️"
-        case 80, 81, 82: return "⛈"
+        case 80, 81, 82: return "🌧"
         case 85, 86: return "🌨"
-        case 95, 96, 99: return "🌪"
+        case 95, 96, 99: return "⛈"
         default: return ""
         }
     }

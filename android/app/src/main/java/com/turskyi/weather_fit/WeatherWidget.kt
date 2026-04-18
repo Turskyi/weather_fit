@@ -534,8 +534,8 @@ private fun getWeatherEmoji(code: Int): String = when {
     (code in 51..57) || (code in 200..599) -> "🌧"
     code in 61..67 -> "🌧"
     (code in 71..77) || (code in 600..699) -> "❄️"
-    code in 80..82 -> "⛈"
+    code in 80..82 -> "🌧"
     code in 85..86 -> "🌨"
-    code in 95..99 -> "🌪"
+    code in 95..99 -> "⛈"
     else -> ""
 }

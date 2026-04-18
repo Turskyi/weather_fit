@@ -24,17 +24,19 @@ extension WeatherCodeToEmoji on int {
       case 80:
       case 81:
       case 82:
+        return '🌧️';
       case 95:
       case 96:
       case 99:
-        return '🌧️';
+        return '⛈️';
       case 71:
       case 73:
       case 75:
       case 77:
+        return '❄️';
       case 85:
       case 86:
-        return '❄️';
+        return '🌨️';
     }
 
     // OpenWeatherMap codes: 200-804
