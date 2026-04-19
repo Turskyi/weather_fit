@@ -36,13 +36,12 @@
         <key>ITSAppUsesNonExemptEncryption</key>
         <false />
         <key>NSLocationUsageDescription</key>
-        <string>WeatherFit may use your location to find relevant weather
-            information
-            if you choose to use this feature.
-        </string>
+        <string>WeatherFit may use your location to find relevant weather information if you choose to use this feature.</string>
         <key>NSLocationWhenInUseUsageDescription</key>
-        <string>WeatherFit may use your location to find relevant weather
-            information if you choose to use this feature.
-        </string>
+        <string>WeatherFit may use your location to find relevant weather information if you choose to use this feature.</string>
+        <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+        <string>WeatherFit may use your location to find relevant weather information if you choose to use this feature.</string>
+        <key>NSLocationAlwaysUsageDescription</key>
+        <string>WeatherFit may use your location to find relevant weather information if you choose to use this feature.</string>
     </dict>
 </plist>

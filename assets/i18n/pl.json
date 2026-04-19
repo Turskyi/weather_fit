@@ -145,6 +145,8 @@
     "support_subtitle": "Odwiedź naszą stronę wsparcia, aby uzyskać pomoc i odpowiedzi na najczęściej zadawane pytania.",
     "pin_widget": "Przypnij widżet",
     "pin_widget_subtitle": "Dodaj widżet do ekranu głównego, aby szybko sprawdzać pogodę.",
+    "weather_background": "Tło pogodowe",
+    "weather_background_subtitle": "Zmieniaj tło w zależności od aktualnej pogody.",
     "frequency_15m": "15 min",
     "frequency_30m": "30 min",
     "frequency_1h": "1 godz.",

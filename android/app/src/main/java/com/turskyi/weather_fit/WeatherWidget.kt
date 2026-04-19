@@ -8,6 +8,11 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.LinearGradient
+import android.graphics.Paint
+import android.graphics.Shader
 import android.os.Build
 import android.util.DisplayMetrics
 import android.util.TypedValue
@@ -53,6 +58,7 @@ class WeatherWidget : AppWidgetProvider() {
         const val KEY_EMOJI = "weatherfit_text_emoji"
         const val KEY_TEXT_LAST_UPDATED = "weatherfit_text_last_updated"
         const val KEY_TEXT_RECOMMENDATION = "weatherfit_text_recommendation"
+        const val KEY_IS_WEATHER_BACKGROUND_ENABLED = "weatherfit_is_weather_background_enabled"
     }
 
     override fun onUpdate(
@@ -139,12 +145,40 @@ internal fun updateAppWidget(
             -1,
         )
         if (weatherCode != -1) {
-            val backgroundResId: Int = getBackgroundResource(weatherCode)
-            setInt(
-                R.id.widget_container,
-                "setBackgroundResource",
-                backgroundResId
+            val isWeatherBackgroundEnabled = widgetData.getBoolean(
+                WeatherWidget.KEY_IS_WEATHER_BACKGROUND_ENABLED,
+                false
             )
+            val widgetSizePx: Pair<Int, Int> = getWidgetSizePx(
+                context,
+                appWidgetManager,
+                appWidgetId,
+            )
+
+            // Generate 4-color gradient background
+            val isNight = isNight()
+            val gradientBitmap = generateGradientBitmap(
+                width = widgetSizePx.first,
+                height = widgetSizePx.second,
+                weatherCode = weatherCode,
+                isNight = isNight
+            )
+            setImageViewBitmap(R.id.image_background, gradientBitmap)
+
+            // Pattern Overlay
+            if (isWeatherBackgroundEnabled) {
+                val emoji = widgetData.getString(WeatherWidget.KEY_EMOJI, "☀️") ?: "☀️"
+                val patternBitmap = generatePatternBitmap(
+                    width = widgetSizePx.first,
+                    height = widgetSizePx.second,
+                    emoji = emoji,
+                    isNight = isNight
+                )
+                setImageViewBitmap(R.id.image_pattern, patternBitmap)
+                setViewVisibility(R.id.image_pattern, View.VISIBLE)
+            } else {
+                setViewVisibility(R.id.image_pattern, View.GONE)
+            }
 
             // Ensure text is readable on colored backgrounds.
             val textColor: Int = ContextCompat.getColor(
@@ -431,6 +465,158 @@ private fun downscaleToByteLimit(
         }
         return scaledBitmap
     }
+}
+
+private fun isNight(): Boolean {
+    val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+    return hour < 6 || hour >= 21
+}
+
+private fun generateGradientBitmap(
+    width: Int,
+    height: Int,
+    weatherCode: Int,
+    isNight: Boolean
+): Bitmap {
+    val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+    val canvas = Canvas(bitmap)
+
+    val colors = getGradientColors(weatherCode, isNight)
+    val shader = LinearGradient(
+        0f, 0f, 0f, height.toFloat(),
+        colors,
+        floatArrayOf(0.0f, 0.35f, 0.65f, 1.0f),
+        Shader.TileMode.CLAMP
+    )
+
+    val paint = Paint().apply {
+        this.shader = shader
+    }
+
+    canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paint)
+    return bitmap
+}
+
+private fun getGradientColors(code: Int, isNight: Boolean): IntArray {
+    return when {
+        code == 0 || code == 800 -> { // Sunny
+            if (isNight) {
+                intArrayOf(
+                    Color.parseColor("#1A1A33"),
+                    Color.parseColor("#0D0D1A"),
+                    Color.parseColor("#05050D"),
+                    Color.parseColor("#000005")
+                )
+            } else {
+                intArrayOf(
+                    Color.parseColor("#FFCC33"),
+                    Color.parseColor("#FF9900"),
+                    Color.parseColor("#E66600"),
+                    Color.parseColor("#CC4D00")
+                )
+            }
+        }
+        (code in 1..3) || code == 45 || code == 48 || (code in 701..799) || (code in 801..804) -> { // Cloudy
+            if (isNight) {
+                intArrayOf(
+                    Color.parseColor("#262633"),
+                    Color.parseColor("#1A1A26"),
+                    Color.parseColor("#0D0D1A"),
+                    Color.parseColor("#05050D")
+                )
+            } else {
+                intArrayOf(
+                    Color.parseColor("#99B2CC"),
+                    Color.parseColor("#8099B2"),
+                    Color.parseColor("#668099"),
+                    Color.parseColor("#4D6680")
+                )
+            }
+        }
+        (code in 51..67) || (code in 80..82) || (code in 95..99) || (code in 200..599) -> { // Rain
+            if (isNight) {
+                intArrayOf(
+                    Color.parseColor("#1A2640"),
+                    Color.parseColor("#0D1A33"),
+                    Color.parseColor("#050D26"),
+                    Color.parseColor("#00051A")
+                )
+            } else {
+                intArrayOf(
+                    Color.parseColor("#4D6699"),
+                    Color.parseColor("#334D80"),
+                    Color.parseColor("#1A3366"),
+                    Color.parseColor("#0D1A4D")
+                )
+            }
+        }
+        (code in 71..77) || (code in 85..86) || (code in 600..699) -> { // Snow
+            if (isNight) {
+                intArrayOf(
+                    Color.parseColor("#33334D"),
+                    Color.parseColor("#262640"),
+                    Color.parseColor("#1A1A33"),
+                    Color.parseColor("#0D0D26")
+                )
+            } else {
+                intArrayOf(
+                    Color.parseColor("#D9E6FF"),
+                    Color.parseColor("#BFCCFF"),
+                    Color.parseColor("#A6B2CC"),
+                    Color.parseColor("#8C99B2")
+                )
+            }
+        }
+        else -> {
+            if (isNight) {
+                intArrayOf(
+                    Color.parseColor("#1A0D33"),
+                    Color.parseColor("#0D0526"),
+                    Color.parseColor("#05031A"),
+                    Color.parseColor("#03000D")
+                )
+            } else {
+                intArrayOf(
+                    Color.parseColor("#4B0082"), // Indigo
+                    Color.parseColor("#800080"), // Purple
+                    Color.parseColor("#0000FF"), // Blue
+                    Color.parseColor("#00FFFF")  // Cyan
+                )
+            }
+        }
+    }
+}
+
+private fun generatePatternBitmap(
+    width: Int,
+    height: Int,
+    emoji: String,
+    isNight: Boolean
+): Bitmap {
+    val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+    val canvas = Canvas(bitmap)
+    val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        textSize = 60f
+        textAlign = Paint.Align.CENTER
+        alpha = if (isNight) (0.07f * 255).toInt() else (0.22f * 255).toInt()
+    }
+
+    val step = 120f
+    val cols = (width / step).toInt() + 1
+    val rows = (height / step).toInt() + 1
+    for (y in 0 until rows) {
+        for (x in 0 until cols) {
+            canvas.save()
+            val tx = x * step + step / 2f
+            val ty = y * step + step / 2f
+            canvas.translate(tx, ty)
+            canvas.rotate(if ((x + y) % 2 == 0) 15f else -15f)
+            canvas.drawText(emoji, 0f, 0f, paint)
+            canvas.restore()
+        }
+    }
+
+    return bitmap
 }
 
 private fun getBackgroundResource(code: Int): Int {

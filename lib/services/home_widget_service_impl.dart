@@ -172,6 +172,11 @@ class HomeWidgetServiceImpl implements HomeWidgetService {
       weather.code,
     );
 
+    await saveWidgetData<bool>(
+      HomeWidgetKey.isWeatherBackgroundEnabled.stringValue,
+      localDataSource.isWeatherBackgroundEnabled(),
+    );
+
     // The image feature is temporarily disabled.
     // For now, we take the first path if multiple are available.
     await saveWidgetData<String>(

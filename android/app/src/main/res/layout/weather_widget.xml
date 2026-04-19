@@ -1,229 +1,252 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/widget_container"
+    android:id="@+id/widget_root"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/widget_background"
-    android:orientation="vertical"
-    android:padding="8dp">
+    android:layout_height="match_parent">
 
-    <!-- Top Part with Image and Stacked Info -->
-    <!--suppress AndroidUnknownAttribute -->
-    <FrameLayout
+    <!-- Gradient Background -->
+    <ImageView
+        android:id="@+id/image_background"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:background="@drawable/rounded_corner_image"
-        android:clipToOutline="true"
-        tools:targetApi="31">
+        android:layout_height="match_parent"
+        android:contentDescription="@null"
+        android:scaleType="fitXY" />
 
-        <!-- Background Image -->
-        <ImageView
-            android:id="@+id/image_weather"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:adjustViewBounds="true"
-            android:contentDescription="@string/outfit_image"
-            android:scaleType="centerCrop"
-            android:visibility="gone"
-            tools:src="@mipmap/ic_launcher_round"
-            tools:visibility="visible" />
-
-        <!-- Info Card Overlay -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_marginStart="12dp"
-            android:layout_marginEnd="12dp"
-            android:layout_marginBottom="12dp"
-            android:background="@drawable/widget_text_background"
-            android:orientation="vertical"
-            android:padding="8dp">
-
-            <!-- Location and Temp -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/text_location"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:ellipsize="end"
-                    android:maxLines="1"
-                    android:textColor="@android:color/white"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    tools:text="San Francisco" />
-
-                <TextView
-                    android:id="@+id/text_temperature"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="8dp"
-                    android:paddingEnd="0dp"
-                    android:textColor="@android:color/white"
-                    android:textSize="22sp"
-                    android:textStyle="bold"
-                    tools:text="22°" />
-            </LinearLayout>
-
-            <!-- Recommendation and Emoji -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/text_outfit_recommendation"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:textColor="@android:color/white"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    tools:text="Recommended Outfit: Casual Jacket and Jeans" />
-
-                <TextView
-                    android:id="@+id/text_emoji"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="4dp"
-                    android:paddingEnd="0dp"
-                    android:textSize="32sp"
-                    tools:text="☀️" />
-            </LinearLayout>
-
-            <!-- Last Updated -->
-            <TextView
-                android:id="@+id/text_last_updated"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:textColor="#E0E0E0"
-                android:textSize="11sp"
-                tools:text="Updated 12:00 PM" />
-        </LinearLayout>
-    </FrameLayout>
-
-    <!-- Bottom Forecast Card -->
-    <LinearLayout
-        android:id="@+id/forecast_container"
+    <!-- Pattern Overlay -->
+    <ImageView
+        android:id="@+id/image_pattern"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:background="@drawable/widget_text_background"
-        android:baselineAligned="false"
-        android:orientation="horizontal"
-        android:padding="8dp"
+        android:layout_height="match_parent"
+        android:contentDescription="@null"
+        android:scaleType="fitXY"
         android:visibility="gone"
-        tools:visibility="visible">
+        tools:visibility="visible" />
 
-        <!-- Morning Forecast -->
-        <LinearLayout
-            android:id="@+id/forecast_morning"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
+    <LinearLayout
+        android:id="@+id/widget_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="8dp">
+
+        <!-- Top Part with Image and Stacked Info -->
+        <!--suppress AndroidUnknownAttribute -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
             android:layout_weight="1"
-            android:gravity="center_horizontal"
-            android:orientation="vertical">
+            android:background="@drawable/rounded_corner_image"
+            android:clipToOutline="true"
+            tools:targetApi="31">
 
-            <TextView
-                android:id="@+id/forecast_morning_time"
-                android:layout_width="wrap_content"
+            <!-- Background Image -->
+            <ImageView
+                android:id="@+id/image_weather"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:adjustViewBounds="true"
+                android:contentDescription="@string/outfit_image"
+                android:scaleType="centerCrop"
+                android:visibility="gone"
+                tools:src="@mipmap/ic_launcher_round"
+                tools:visibility="visible" />
+
+            <!-- Info Card Overlay -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="#E0E0E0"
-                android:textSize="11sp"
-                tools:text="Morn" />
+                android:layout_gravity="bottom"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/widget_text_background"
+                android:orientation="vertical"
+                android:padding="8dp">
 
-            <TextView
-                android:id="@+id/forecast_morning_emoji"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="14sp"
-                tools:text="☁️" />
+                <!-- Location and Temp -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/forecast_morning_temp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@android:color/white"
-                android:textSize="11sp"
-                tools:text="10°" />
-        </LinearLayout>
+                    <TextView
+                        android:id="@+id/text_location"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:textColor="@android:color/white"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        tools:text="San Francisco" />
 
-        <!-- Lunch Forecast -->
+                    <TextView
+                        android:id="@+id/text_temperature"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="0dp"
+                        android:textColor="@android:color/white"
+                        android:textSize="22sp"
+                        android:textStyle="bold"
+                        tools:text="22°" />
+                </LinearLayout>
+
+                <!-- Recommendation and Emoji -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/text_outfit_recommendation"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textColor="@android:color/white"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        tools:text="Recommended Outfit: Casual Jacket and Jeans" />
+
+                    <TextView
+                        android:id="@+id/text_emoji"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingStart="4dp"
+                        android:paddingEnd="0dp"
+                        android:textSize="32sp"
+                        tools:text="☀️" />
+                </LinearLayout>
+
+                <!-- Last Updated -->
+                <TextView
+                    android:id="@+id/text_last_updated"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:textColor="#E0E0E0"
+                    android:textSize="11sp"
+                    tools:text="Updated 12:00 PM" />
+            </LinearLayout>
+        </FrameLayout>
+
+        <!-- Bottom Forecast Card -->
         <LinearLayout
-            android:id="@+id/forecast_lunch"
-            android:layout_width="0dp"
+            android:id="@+id/forecast_container"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center_horizontal"
-            android:orientation="vertical">
+            android:layout_marginTop="8dp"
+            android:background="@drawable/widget_text_background"
+            android:baselineAligned="false"
+            android:orientation="horizontal"
+            android:padding="8dp"
+            android:visibility="gone"
+            tools:visibility="visible">
 
-            <TextView
-                android:id="@+id/forecast_lunch_time"
-                android:layout_width="wrap_content"
+            <!-- Morning Forecast -->
+            <LinearLayout
+                android:id="@+id/forecast_morning"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:textColor="#E0E0E0"
-                android:textSize="11sp"
-                tools:text="Noon" />
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/forecast_lunch_emoji"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="14sp"
-                tools:text="☀️" />
+                <TextView
+                    android:id="@+id/forecast_morning_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#E0E0E0"
+                    android:textSize="11sp"
+                    tools:text="Morn" />
 
-            <TextView
-                android:id="@+id/forecast_lunch_temp"
-                android:layout_width="wrap_content"
+                <TextView
+                    android:id="@+id/forecast_morning_emoji"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    tools:text="☁️" />
+
+                <TextView
+                    android:id="@+id/forecast_morning_temp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@android:color/white"
+                    android:textSize="11sp"
+                    tools:text="10°" />
+            </LinearLayout>
+
+            <!-- Lunch Forecast -->
+            <LinearLayout
+                android:id="@+id/forecast_lunch"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:textColor="@android:color/white"
-                android:textSize="11sp"
-                tools:text="15°" />
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/forecast_lunch_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#E0E0E0"
+                    android:textSize="11sp"
+                    tools:text="Noon" />
+
+                <TextView
+                    android:id="@+id/forecast_lunch_emoji"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    tools:text="☀️" />
+
+                <TextView
+                    android:id="@+id/forecast_lunch_temp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@android:color/white"
+                    android:textSize="11sp"
+                    tools:text="15°" />
+            </LinearLayout>
+
+            <!-- Evening Forecast -->
+            <LinearLayout
+                android:id="@+id/forecast_evening"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/forecast_evening_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#E0E0E0"
+                    android:textSize="11sp"
+                    tools:text="Eve" />
+
+                <TextView
+                    android:id="@+id/forecast_evening_emoji"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    tools:text="🌙" />
+
+                <TextView
+                    android:id="@+id/forecast_evening_temp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@android:color/white"
+                    android:textSize="11sp"
+                    tools:text="8°" />
+            </LinearLayout>
+
         </LinearLayout>
-
-        <!-- Evening Forecast -->
-        <LinearLayout
-            android:id="@+id/forecast_evening"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center_horizontal"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/forecast_evening_time"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#E0E0E0"
-                android:textSize="11sp"
-                tools:text="Eve" />
-
-            <TextView
-                android:id="@+id/forecast_evening_emoji"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="14sp"
-                tools:text="🌙" />
-
-            <TextView
-                android:id="@+id/forecast_evening_temp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@android:color/white"
-                android:textSize="11sp"
-                tools:text="8°" />
-        </LinearLayout>
-
     </LinearLayout>
-</LinearLayout>
+</FrameLayout>
