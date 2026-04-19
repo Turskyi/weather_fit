@@ -7,6 +7,7 @@ enum HomeWidgetKey {
   forecastData,
   imageWeather,
   weatherCode,
+  isWeatherBackgroundEnabled,
   locationLatitude,
   locationLongitude,
   temperatureUnit,
@@ -24,6 +25,8 @@ enum HomeWidgetKey {
         return 'forecast_data';
       case HomeWidgetKey.weatherCode:
         return 'weather_code';
+      case HomeWidgetKey.isWeatherBackgroundEnabled:
+        return 'weatherfit_is_weather_background_enabled';
       case HomeWidgetKey.textLastUpdated:
         return 'weatherfit_text_last_updated';
       case HomeWidgetKey.textRecommendation:

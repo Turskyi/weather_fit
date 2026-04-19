@@ -7,9 +7,11 @@ import 'package:weather_fit/data/repositories/location_repository.dart';
 import 'package:weather_fit/data/repositories/outfit_repository.dart';
 import 'package:weather_fit/di/dependencies.dart';
 import 'package:weather_fit/di/injector.dart' as di;
-import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/router/routes.dart' as router;
 import 'package:weather_fit/services/device_type_service.dart';
+import 'package:weather_fit/services/feedback_service.dart';
+import 'package:weather_fit/services/home_widget_service.dart';
+import 'package:weather_fit/services/update_service.dart';
 import 'package:weather_repository/weather_repository.dart';
 
 /// The [main] is the ultimate detail — the lowest-level policy.
@@ -37,14 +39,19 @@ Future<void> main() async {
   final LocalizationDelegate localizationDelegate =
       dependencies.localizationDelegate;
 
-  final Language initialLanguage = await dependencies
-      .initializeAppLanguageUseCase(localizationDelegate);
+  await dependencies.initializeAppLanguageUseCase(localizationDelegate);
 
   final OutfitRepository outfitRepository = dependencies.outfitRepository;
 
   final WeatherRepository weatherRepository = dependencies.weatherRepository;
 
   final LocationRepository locationRepository = dependencies.locationRepository;
+
+  final HomeWidgetService homeWidgetService = dependencies.homeWidgetService;
+
+  final FeedbackService feedbackService = dependencies.feedbackService;
+
+  final UpdateService updateService = dependencies.updateService;
 
   final Map<String, WidgetBuilder> routes = router.getRouteMap();
 
@@ -56,7 +63,9 @@ Future<void> main() async {
         locationRepository: locationRepository,
         outfitRepository: outfitRepository,
         localDataSource: localDataSource,
-        initialLanguage: initialLanguage,
+        homeWidgetService: homeWidgetService,
+        feedbackService: feedbackService,
+        updateService: updateService,
         routes: routes,
       ),
     ),

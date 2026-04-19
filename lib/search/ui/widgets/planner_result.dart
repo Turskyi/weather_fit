@@ -88,7 +88,7 @@ class _PlannerResultState extends State<PlannerResult> {
                   child: Shimmer.fromColors(
                     baseColor: Colors.transparent,
                     highlightColor: colorScheme.surface.withValues(alpha: 0.3),
-                    child: Container(color: Colors.white),
+                    child: ColoredBox(color: colorScheme.surface),
                   ),
                 ),
               ),

@@ -50,6 +50,7 @@ struct WeatherData: Codable {
     let locale: String?
     let imagePath: String?
     let forecast: [ForecastItem]?
+    let isWeatherBackgroundEnabled: Bool
 }
 
 struct SimpleEntry: TimelineEntry {
@@ -152,8 +153,11 @@ struct Provider: TimelineProvider {
         }
 
         let locale = sharedDefaults.string(forKey: "selected_language")
+        let isWeatherBackgroundEnabled = sharedDefaults.bool(
+            forKey: "weatherfit_is_weather_background_enabled"
+        )
         widgetLog.debug(
-            "[getWeatherData] result – location=\(location ?? "nil"), temp=\(temperature ?? "nil"), emoji=\(emoji ?? "nil"), imagePath=\(imagePath ?? "nil"), forecastItems=\(forecast?.count ?? 0)"
+            "[getWeatherData] result – location=\(location ?? "nil"), temp=\(temperature ?? "nil"), emoji=\(emoji ?? "nil"), imagePath=\(imagePath ?? "nil"), forecastItems=\(forecast?.count ?? 0), isWeatherBackgroundEnabled=\(isWeatherBackgroundEnabled)"
         )
 
         return WeatherData(
@@ -164,7 +168,8 @@ struct Provider: TimelineProvider {
             lastUpdated: lastUpdated,
             locale: locale,
             imagePath: imagePath,
-            forecast: forecast
+            forecast: forecast,
+            isWeatherBackgroundEnabled: isWeatherBackgroundEnabled
         )
     }
 
@@ -292,10 +297,13 @@ struct Provider: TimelineProvider {
                     location: sharedDefaults.string(forKey: "text_location"),
                     temperature: formattedTemperature,
                     recommendation: sharedDefaults.string(forKey: "weatherfit_text_recommendation"),
-                    lastUpdated: self.lastUpdatedText(),
+                    lastUpdated: self.lastUpdatedText(locale: locale),
                     locale: locale,
                     imagePath: sharedDefaults.string(forKey: "image_weather"),
-                    forecast: forecast
+                    forecast: forecast,
+                    isWeatherBackgroundEnabled: sharedDefaults.bool(
+                        forKey: "weatherfit_is_weather_background_enabled"
+                    )
                 )
 
                 sharedDefaults.set(updatedData.emoji, forKey: "weatherfit_text_emoji")
@@ -383,9 +391,12 @@ struct Provider: TimelineProvider {
         return "\(rounded)°\(isFahrenheit ? "F" : "C")"
     }
 
-    private func lastUpdatedText() -> String {
+    private func lastUpdatedText(locale: String? = nil) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm"
+        if let locale = locale {
+            formatter.locale = Locale(identifier: locale)
+        }
+        formatter.setLocalizedDateFormatFromTemplate("MMM d, HH:mm")
         return formatter.string(from: Date())
     }
 
@@ -442,35 +453,44 @@ struct WeatherWidgetsEntryView: View {
         // macOS systemLarge is vertical to match iOS Large alignment
         let isWide = family == .systemMedium
 
-        Group {
-            if isWide {
-                HStack(alignment: .top, spacing: 12) {
-                    // Left Column: Image and Recommendation
-                    VStack(alignment: .center, spacing: 8) {
-                        imageSection
-                        recommendationSection
-                    }
-                    .frame(maxWidth: .infinity)
+        ZStack {
+            if entry.weatherData.isWeatherBackgroundEnabled {
+                WeatherBackgroundPattern(
+                    emoji: entry.weatherData.emoji ?? "☀️",
+                    isNight: DateHelper.isNight()
+                )
+            }
 
-                    // Right Column: Header and Forecast
-                    VStack(alignment: .leading, spacing: 12) {
+            Group {
+                if isWide {
+                    HStack(alignment: .top, spacing: 12) {
+                        // Left Column: Image and Recommendation
+                        VStack(alignment: .center, spacing: 8) {
+                            imageSection
+                            recommendationSection
+                        }
+                        .frame(maxWidth: .infinity)
+
+                        // Right Column: Header and Forecast
+                        VStack(alignment: .leading, spacing: 12) {
+                            headerSection
+                            forecastSection
+                        }
+                        .frame(maxWidth: .infinity)
+                    }
+                } else {
+                    // Vertical layout for Small and Large widgets
+                    VStack(spacing: 8) {
                         headerSection
-                        forecastSection
-                    }
-                    .frame(maxWidth: .infinity)
-                }
-            } else {
-                // Vertical layout for Small and Large widgets
-                VStack(spacing: 8) {
-                    headerSection
 
-                    imageSection
-                        .frame(maxHeight: .infinity)
+                        imageSection
+                            .frame(maxHeight: .infinity)
 
-                    recommendationSection
+                        recommendationSection
 
-                    if family != .systemSmall {
-                        forecastSection
+                        if family != .systemSmall {
+                            forecastSection
+                        }
                     }
                 }
             }
@@ -571,9 +591,13 @@ struct WeatherWidgets: Widget {
 
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: Provider()) { entry in
+            let weatherCode = entry.weatherData.forecast?.first?.weatherCode ?? 0
+            let isNight = DateHelper.isNight()
+
             ZStack {
                 WeatherHelper.getGradient(
-                    for: entry.weatherData.forecast?.first?.weatherCode ?? 0
+                    for: weatherCode,
+                    isNight: isNight
                 )
 
                 WeatherWidgetsEntryView(entry: entry)
@@ -581,7 +605,8 @@ struct WeatherWidgets: Widget {
             }
             .containerBackground(for: .widget) {
                 WeatherHelper.getGradient(
-                    for: entry.weatherData.forecast?.first?.weatherCode ?? 0
+                    for: weatherCode,
+                    isNight: isNight
                 )
             }
             .clipShape(ContainerRelativeShape())
@@ -654,9 +679,9 @@ struct WidgetImageLoader {
 
     private static func getConditionName(from weatherCode: Int) -> String {
         switch weatherCode {
-        case 0: return "clear"
-        case 1, 2, 3, 45, 48: return "cloudy"
-        case 51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82, 85, 86:
+        case 0, 800: return "clear"
+        case 1, 2, 3, 45, 48, 701...799, 801...804: return "cloudy"
+        case 51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82, 85, 86, 95, 96, 99, 200...599, 600...699:
             return "precipitation"
         default: return "clear"
         }
@@ -675,6 +700,11 @@ struct WidgetImageLoader {
 }
 
 struct DateHelper {
+    static func isNight() -> Bool {
+        let hour = Calendar.current.component(.hour, from: Date())
+        return hour < 6 || hour >= 21
+    }
+
     private static func parseDateTime(from string: String) -> Date? {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
@@ -757,49 +787,121 @@ struct DateHelper {
 struct WeatherHelper {
     static func getWeatherEmoji(for code: Int) -> String {
         switch code {
-        case 0: return "☀️"
-        case 1, 2, 3: return "☁️"
-        case 45, 48: return "🌫"
-        case 51, 53, 55, 56, 57: return "💧"
+        case 0, 800: return "☀️"
+        case 1, 2, 3, 801...804: return "☁️"
+        case 45, 48, 701...799: return "🌫"
+        case 51, 53, 55, 56, 57, 200...599: return "🌧"
         case 61, 63, 65, 66, 67: return "🌧"
-        case 71, 73, 75, 77: return "❄️"
-        case 80, 81, 82: return "⛈"
+        case 71, 73, 75, 77, 600...699: return "❄️"
+        case 80, 81, 82: return "🌧"
         case 85, 86: return "🌨"
-        case 95, 96, 99: return "🌪"
-        default: return "🤔"
+        case 95, 96, 99: return "⛈"
+        default: return ""
         }
     }
 
-    static func getGradient(for code: Int) -> some View {
-        let gradient: Gradient
+    static func getGradient(for code: Int, isNight: Bool) -> some View {
+        let colors: [Color]
         switch code {
-        case 0:  // Sunny
-            gradient = Gradient(colors: [
-                Color(red: 1.0, green: 0.75, blue: 0.0),
-                Color(red: 0.9, green: 0.45, blue: 0.0),
-            ])
-        case 1, 2, 3, 45, 48:  // Cloudy/Foggy
-            gradient = Gradient(colors: [
-                Color(red: 0.6, green: 0.7, blue: 0.8),
-                Color(red: 0.4, green: 0.5, blue: 0.6),
-            ])
-        case 51...67, 80...82:  // Rain/Showers
-            gradient = Gradient(colors: [
-                Color(red: 0.3, green: 0.4, blue: 0.5),
-                Color(red: 0.1, green: 0.2, blue: 0.3),
-            ])
-        case 71...77, 85, 86:  // Snow
-            gradient = Gradient(colors: [
-                Color(red: 0.8, green: 0.85, blue: 0.95), .gray,
-            ])
+        case 0, 800:  // Sunny
+            colors = isNight
+                ? [
+                    Color(red: 0.1, green: 0.1, blue: 0.2),
+                    Color(red: 0.05, green: 0.05, blue: 0.1),
+                    Color(red: 0.02, green: 0.02, blue: 0.05),
+                    Color(red: 0.0, green: 0.0, blue: 0.02)
+                ]
+                : [
+                    Color(red: 1.0, green: 0.8, blue: 0.2),
+                    Color(red: 1.0, green: 0.6, blue: 0.0),
+                    Color(red: 0.9, green: 0.4, blue: 0.0),
+                    Color(red: 0.8, green: 0.3, blue: 0.0)
+                ]
+        case 1, 2, 3, 45, 48, 701...799, 801...804:  // Cloudy/Foggy
+            colors = isNight
+                ? [
+                    Color(red: 0.15, green: 0.15, blue: 0.2),
+                    Color(red: 0.1, green: 0.1, blue: 0.15),
+                    Color(red: 0.05, green: 0.05, blue: 0.1),
+                    Color(red: 0.02, green: 0.02, blue: 0.05)
+                ]
+                : [
+                    Color(red: 0.6, green: 0.7, blue: 0.8),
+                    Color(red: 0.5, green: 0.6, blue: 0.7),
+                    Color(red: 0.4, green: 0.5, blue: 0.6),
+                    Color(red: 0.3, green: 0.4, blue: 0.5)
+                ]
+        case 51...67, 80...82, 95...99, 200...599:  // Rain/Showers
+            colors = isNight
+                ? [
+                    Color(red: 0.1, green: 0.15, blue: 0.25),
+                    Color(red: 0.05, green: 0.1, blue: 0.2),
+                    Color(red: 0.02, green: 0.05, blue: 0.15),
+                    Color(red: 0.0, green: 0.02, blue: 0.1)
+                ]
+                : [
+                    Color(red: 0.3, green: 0.4, blue: 0.6),
+                    Color(red: 0.2, green: 0.3, blue: 0.5),
+                    Color(red: 0.1, green: 0.2, blue: 0.4),
+                    Color(red: 0.05, green: 0.1, blue: 0.3)
+                ]
+        case 71...77, 85, 86, 600...699:  // Snow
+            colors = isNight
+                ? [
+                    Color(red: 0.2, green: 0.2, blue: 0.3),
+                    Color(red: 0.15, green: 0.15, blue: 0.25),
+                    Color(red: 0.1, green: 0.1, blue: 0.2),
+                    Color(red: 0.05, green: 0.05, blue: 0.15)
+                ]
+                : [
+                    Color(red: 0.85, green: 0.9, blue: 1.0),
+                    Color(red: 0.75, green: 0.8, blue: 0.9),
+                    Color(red: 0.65, green: 0.7, blue: 0.8),
+                    Color(red: 0.55, green: 0.6, blue: 0.7)
+                ]
         default:
-            gradient = Gradient(colors: [.indigo, .purple])
+            colors = isNight
+                ? [
+                    Color(red: 0.1, green: 0.05, blue: 0.2),
+                    Color(red: 0.05, green: 0.02, blue: 0.15),
+                    Color(red: 0.02, green: 0.01, blue: 0.1),
+                    Color(red: 0.01, green: 0.0, blue: 0.05)
+                ]
+                : [Color.indigo, Color.purple, Color.blue, Color.cyan]
         }
         return LinearGradient(
-            gradient: gradient,
+            gradient: Gradient(colors: colors),
             startPoint: .top,
             endPoint: .bottom
         )
+    }
+}
+
+struct WeatherBackgroundPattern: View {
+    let emoji: String
+    let isNight: Bool
+
+    var body: some View {
+        GeometryReader { geometry in
+            let size = geometry.size
+            let columns = Int(size.width / 40) + 1
+            let rows = Int(size.height / 40) + 1
+
+            VStack(spacing: 20) {
+                ForEach(0..<rows, id: \.self) { row in
+                    HStack(spacing: 20) {
+                        ForEach(0..<columns, id: \.self) { column in
+                            Text(emoji)
+                                .font(.system(size: 20))
+                                .opacity(isNight ? 0.07 : 0.15)
+                                .rotationEffect(.degrees((row + column) % 2 == 0 ? 15 : -15))
+                        }
+                    }
+                }
+            }
+            .frame(width: size.width, height: size.height)
+            .clipped()
+        }
     }
 }
 
@@ -817,7 +919,8 @@ extension WeatherData {
                 .init(time: "2023-10-27T09:00", temperature: 18.0, weatherCode: 1),
                 .init(time: "2023-10-27T13:00", temperature: 22.0, weatherCode: 0),
                 .init(time: "2023-10-27T18:00", temperature: 19.0, weatherCode: 80),
-            ]
+            ],
+            isWeatherBackgroundEnabled: true
         )
     }
 }

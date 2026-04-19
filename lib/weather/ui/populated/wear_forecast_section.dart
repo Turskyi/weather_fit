@@ -53,7 +53,12 @@ class WearForecastSection extends StatelessWidget {
                     isCelsius: state.isCelsius,
                   ),
                   if (index < forecast.length - 1)
-                    const Divider(height: 12, color: Colors.white24),
+                    Divider(
+                      height: 12,
+                      color: theme.colorScheme.onSurface.withValues(
+                        alpha: 0.12,
+                      ),
+                    ),
                 ],
             ],
           ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
+import 'package:weather_fit/extensions/build_context_extensions.dart';
 import 'package:weather_fit/search/bloc/search_bloc.dart';
 
 class SearchButtons extends StatelessWidget {
@@ -42,16 +43,21 @@ class SearchButtons extends StatelessWidget {
         ElevatedButton(
           style: elevatedStyle,
           key: const Key('searchPage_search_iconButton'),
-          onPressed: !isLoading && query.trim().isNotEmpty
-              ? () => onSearchSubmitted(query)
-              : null,
+          onPressed: !isLoading ? () => onSearchSubmitted(query) : null,
           child: isLoading
               ? const SizedBox(
                   height: progressIndicatorSize,
                   width: progressIndicatorSize,
                   child: CircularProgressIndicator(),
                 )
-              : Text(translate('submit'), semanticsLabel: translate('submit')),
+              : Text(
+                  context.isExtraSmallScreen
+                      ? translate('search.label')
+                      : translate('submit'),
+                  semanticsLabel: context.isExtraSmallScreen
+                      ? translate('search.label')
+                      : translate('submit'),
+                ),
         ),
         if (showGpsButton)
           TextButton.icon(

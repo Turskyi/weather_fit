@@ -19,7 +19,7 @@ class WeatherPopulated extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: <Widget>[
-        const Background(),
+        Background(condition: weather.condition),
         RefreshIndicator(
           onRefresh: onRefresh,
           child: WeatherContent(

@@ -14,6 +14,7 @@ import 'package:weather_fit/entities/enums/search_error_type.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/extensions/build_context_extensions.dart';
 import 'package:weather_fit/res/constants/constants.dart' as constants;
+import 'package:weather_fit/res/widgets/wear_position_indicator.dart';
 import 'package:weather_fit/router/app_route.dart';
 import 'package:weather_fit/search/bloc/search_bloc.dart';
 import 'package:weather_fit/search/ui/widgets/search_layout_default.dart';
@@ -111,41 +112,35 @@ class _SearchPageState extends State<SearchPage> {
       context: context,
       builder: (BuildContext context) {
         final Widget dialog = context.isExtraSmallScreen
-            ? Dialog.fullscreen(
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                    left: 20.0,
-                    right: 20.0,
-                    top: 24.0,
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Text(
-                        translate('search.confirm_location_dialog_title'),
-                        textAlign: TextAlign.center,
-                      ),
-                      Text(
-                        displayLocation,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          TextButton(
-                            onPressed: _handleLocationConfirmationNo,
-                            child: Text(translate('no')),
-                          ),
-                          TextButton(
-                            autofocus: true,
-                            child: Text(translate('yes')),
-                            onPressed: () => _confirmLocationAndPop(location),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+            ? _WearDialog(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text(
+                      translate('search.confirm_location_dialog_title'),
+                      textAlign: TextAlign.center,
+                    ),
+                    Text(
+                      displayLocation,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        TextButton(
+                          onPressed: _handleLocationConfirmationNo,
+                          child: Text(translate('no')),
+                        ),
+                        TextButton(
+                          autofocus: true,
+                          child: Text(translate('yes')),
+                          onPressed: () => _confirmLocationAndPop(location),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               )
             : AlertDialog(
@@ -192,40 +187,34 @@ class _SearchPageState extends State<SearchPage> {
       context: context,
       builder: (BuildContext context) {
         final Widget dialog = context.isExtraSmallScreen
-            ? Dialog.fullscreen(
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                    top: 20.0,
-                    left: 16,
-                    right: 16,
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Text(
-                        translate(
-                          'search.'
-                          'location_not_found_suggestion_spell_check',
-                        ),
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: Theme.of(
-                            context,
-                          ).textTheme.bodySmall?.fontSize,
-                        ),
+            ? _WearDialog(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text(
+                      translate(
+                        'search.'
+                        'location_not_found_suggestion_spell_check',
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          TextButton(
-                            autofocus: true,
-                            onPressed: Navigator.of(context).pop,
-                            child: Text(translate('close')),
-                          ),
-                        ],
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: Theme.of(
+                          context,
+                        ).textTheme.bodySmall?.fontSize,
                       ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        TextButton(
+                          autofocus: true,
+                          onPressed: Navigator.of(context).pop,
+                          child: Text(translate('close')),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               )
             : AlertDialog(
@@ -276,101 +265,35 @@ class _SearchPageState extends State<SearchPage> {
     return showDialog<void>(
       context: context,
       builder: (BuildContext dialogContext) {
-        final Widget dialog = isExtraSmallScreen
-            ? Dialog.fullscreen(
-                child: SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 32.0,
-                      vertical: 28.0,
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Expanded(
-                          child: SingleChildScrollView(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Text(
-                                  translate(
-                                    'search.location_not_found_dialog_title',
-                                  ),
-                                  textAlign: TextAlign.center,
-                                  style: Theme.of(
-                                    dialogContext,
-                                  ).textTheme.titleSmall,
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  translate(
-                                    'search.location_not_found_'
-                                    'suggestion_spell_check',
-                                  ),
-                                  textAlign: TextAlign.center,
-                                  style: Theme.of(
-                                    dialogContext,
-                                  ).textTheme.bodySmall,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            TextButton(
-                              onPressed: Navigator.of(dialogContext).pop,
-                              child: Text(translate('cancel')),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              )
-            : AlertDialog(
-                title: Text(
-                  translate('search.location_not_found_dialog_title'),
-                ),
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Text(
-                      translate(
-                        'search.location_not_found_suggestion_spell_check',
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      translate('search.location_not_found_suggestion_use_gps'),
-                    ),
-                  ],
-                ),
-                actions: <Widget>[
-                  TextButton(
-                    onPressed: Navigator.of(dialogContext).pop,
-                    child: Text(translate('cancel')),
-                  ),
-                  TextButton(
-                    autofocus: true,
-                    onPressed: _handleUseGpsConfirm,
-                    child: Text(translate('search.use_gps_button')),
-                  ),
-                ],
-              );
+        if (isExtraSmallScreen) {
+          return _WearLocationNotFoundDialog(
+            onCancel: () => Navigator.of(dialogContext).pop(),
+          );
+        }
 
-        return CallbackShortcuts(
-          bindings: <ShortcutActivator, VoidCallback>{
-            const SingleActivator(LogicalKeyboardKey.arrowLeft): () =>
-                FocusScope.of(dialogContext).previousFocus(),
-            const SingleActivator(LogicalKeyboardKey.arrowRight): () =>
-                FocusScope.of(dialogContext).nextFocus(),
-          },
-          child: dialog,
+        return AlertDialog(
+          title: Text(translate('search.location_not_found_dialog_title')),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Text(
+                translate('search.location_not_found_suggestion_spell_check'),
+              ),
+              const SizedBox(height: 16),
+              Text(translate('search.location_not_found_suggestion_use_gps')),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: Navigator.of(dialogContext).pop,
+              child: Text(translate('cancel')),
+            ),
+            TextButton(
+              autofocus: true,
+              onPressed: _handleUseGpsConfirm,
+              child: Text(translate('search.use_gps_button')),
+            ),
+          ],
         );
       },
     );
@@ -403,48 +326,33 @@ class _SearchPageState extends State<SearchPage> {
       );
 
       if (context.isExtraSmallScreen) {
-        showGeneralDialog<void>(
+        showDialog<void>(
           context: context,
-          barrierDismissible: true,
-          barrierLabel: translate('close'),
-          pageBuilder:
-              (BuildContext context, Animation<double> _, Animation<double> _) {
-                return Center(
-                  child: Container(
-                    constraints: const BoxConstraints(
-                      maxWidth: constants.kWearCompactLayoutSize,
-                    ),
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surface,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: SingleChildScrollView(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          const Text('📍', style: TextStyle(fontSize: 28)),
-                          const SizedBox(height: 8),
-                          Text(
-                            translate('error.gps_unavailable_watch'),
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.labelSmall,
-                          ),
-                          const SizedBox(height: 12),
-                          ElevatedButton(
-                            onPressed: _handleReportErrorSnackBarAction,
-                            child: Text(translate('error.report_issue')),
-                          ),
-                          TextButton(
-                            onPressed: Navigator.of(context).pop,
-                            child: Text(translate('close')),
-                          ),
-                        ],
-                      ),
-                    ),
+          builder: (BuildContext context) {
+            return _WearDialog(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  const Text('📍', style: TextStyle(fontSize: 28)),
+                  const SizedBox(height: 8),
+                  Text(
+                    translate('error.gps_unavailable_watch'),
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.labelSmall,
                   ),
-                );
-              },
+                  const SizedBox(height: 12),
+                  ElevatedButton(
+                    onPressed: _handleReportErrorSnackBarAction,
+                    child: Text(translate('error.report_issue')),
+                  ),
+                  TextButton(
+                    onPressed: Navigator.of(context).pop,
+                    child: Text(translate('close')),
+                  ),
+                ],
+              ),
+            );
+          },
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -597,53 +505,31 @@ class _SearchPageState extends State<SearchPage> {
       return showDialog<void>(
         context: context,
         builder: (BuildContext dialogContext) {
-          return Dialog.fullscreen(
-            child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24.0,
-                  vertical: 20.0,
+          return _WearDialog(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Text(
+                  translate('error.location_services_disabled_title'),
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.titleSmall,
                 ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Expanded(
-                      child: SingleChildScrollView(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Text(
-                              translate(
-                                'error.location_services_disabled_title',
-                              ),
-                              textAlign: TextAlign.center,
-                              style: Theme.of(context).textTheme.titleSmall,
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              translate(
-                                'error.location_services_disabled_content',
-                              ),
-                              textAlign: TextAlign.center,
-                              style: Theme.of(context).textTheme.bodySmall,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    SizedBox(
-                      width: double.infinity,
-                      child: TextButton(
-                        autofocus: true,
-                        onPressed: Navigator.of(dialogContext).pop,
-                        child: Text(translate('close')),
-                      ),
-                    ),
-                  ],
+                const SizedBox(height: 12),
+                Text(
+                  translate('error.location_services_disabled_content'),
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodySmall,
                 ),
-              ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  child: TextButton(
+                    autofocus: true,
+                    onPressed: Navigator.of(dialogContext).pop,
+                    child: Text(translate('close')),
+                  ),
+                ),
+              ],
             ),
           );
         },
@@ -705,5 +591,105 @@ class _SearchPageState extends State<SearchPage> {
       BugReportPressedEvent(state is SearchError ? state.errorMessage : ''),
     );
     return ScaffoldMessenger.of(context).hideCurrentSnackBar();
+  }
+}
+
+class _WearDialog extends StatefulWidget {
+  const _WearDialog({required this.child});
+
+  final Widget child;
+
+  @override
+  State<_WearDialog> createState() => _WearDialogState();
+}
+
+class _WearDialogState extends State<_WearDialog> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog.fullscreen(
+      child: WearPositionIndicator(
+        controller: _scrollController,
+        child: SingleChildScrollView(
+          controller: _scrollController,
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+          child: widget.child,
+        ),
+      ),
+    );
+  }
+}
+
+class _WearLocationNotFoundDialog extends StatefulWidget {
+  const _WearLocationNotFoundDialog({required this.onCancel});
+
+  final VoidCallback onCancel;
+
+  @override
+  State<_WearLocationNotFoundDialog> createState() =>
+      _WearLocationNotFoundDialogState();
+}
+
+class _WearLocationNotFoundDialogState
+    extends State<_WearLocationNotFoundDialog> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog.fullscreen(
+      child: WearPositionIndicator(
+        controller: _scrollController,
+        child: SingleChildScrollView(
+          controller: _scrollController,
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                translate('search.location_not_found_dialog_title'),
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                translate('search.location_not_found_suggestion_spell_check'),
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+              const SizedBox(height: 4),
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: TextButton(
+                  style: TextButton.styleFrom(
+                    visualDensity: VisualDensity.compact,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  onPressed: widget.onCancel,
+                  child: Text(translate('cancel')),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

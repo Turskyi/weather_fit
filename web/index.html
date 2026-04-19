@@ -115,7 +115,7 @@
       <meta content="Dmytro Turskyi" name="author">
       <meta content="WeatherFit suggests what to wear based on the weather and helps you plan outfits for future trips. Get simple clothing recommendations for any forecast."
             name="description">
-      <meta content="#0175C2" name="theme-color">
+      <meta content="#1565c0" name="theme-color">
       <!-- iOS meta tags & icons -->
       <meta content="yes" name="apple-mobile-web-app-capable">
       <meta content="black" name="apple-mobile-web-app-status-bar-style">
@@ -128,7 +128,7 @@
       <!-- Favicon -->
       <link href="favicon.jpeg" rel="icon" type="image/jpeg" />
 
-      <title>WeatherFit App – What to Wear Today & Outfit Planner for Weather
+      <title>WeatherFit - What to Wear
       </title>
       <link href="manifest.json" rel="manifest">
 
@@ -211,85 +211,104 @@
       <!-- This script adds the flutter initialization JS code -->
       <!--suppress HtmlUnknownTarget -->
       <script defer src="flutter.js"></script>
-</head>
 
-<style>
-      #splash {
-            position: fixed;
-            inset: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(to bottom,
-                        #1565c0 0%,
-                        #1976d2 25%,
-                        #42a5f5 75%,
-                        #90caf9 100%);
-            z-index: 9999;
-            transition: opacity 0.35s ease;
-      }
-
-      #splash-content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 14px;
-      }
-
-      #splash-title {
-            color: #ffffff;
-            font-size: clamp(2.5rem, 10vw, 5rem);
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 700;
-            letter-spacing: 0.06em;
-            text-shadow: 0 2px 16px rgba(0, 0, 0, 0.18);
-            user-select: none;
-      }
-
-      #splash-loader {
-            display: flex;
-            gap: 8px;
-            font-size: clamp(1.25rem, 4.6vw, 2rem);
-      }
-
-      #splash-loader span {
-            opacity: 0.2;
-            animation: splash-loader 1.2s infinite ease-in-out;
-      }
-
-      #splash-loader span:nth-child(2) {
-            animation-delay: 0.2s;
-      }
-
-      #splash-loader span:nth-child(3) {
-            animation-delay: 0.4s;
-      }
-
-      #splash-loader span:nth-child(4) {
-            animation-delay: 0.6s;
-      }
-
-      @keyframes splash-loader {
-
-            0%,
-            100% {
-                  opacity: 0.2;
-                  transform: translateY(0);
+      <style>
+            html {
+                  background-color: #1565c0;
             }
 
-            40% {
-                  opacity: 1;
-                  transform: translateY(-3px);
+            body {
+                  margin: 0;
+                  padding: 0;
+                  background: linear-gradient(to bottom,
+                              #1565c0 0%,
+                              #1976d2 25%,
+                              #42a5f5 75%,
+                              #90caf9 100%) no-repeat fixed;
             }
-      }
 
-      @media (prefers-reduced-motion: reduce) {
+            flt-glass-pane,
+            flutter-view {
+                  background-color: transparent !important;
+            }
+
+            #splash {
+                  position: fixed;
+                  inset: 0;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  background: linear-gradient(to bottom,
+                              #1565c0 0%,
+                              #1976d2 25%,
+                              #42a5f5 75%,
+                              #90caf9 100%);
+                  z-index: 9999;
+                  transition: opacity 0.35s ease;
+            }
+
+            #splash-content {
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  gap: 14px;
+            }
+
+            #splash-title {
+                  color: #ffffff;
+                  font-size: clamp(2.5rem, 10vw, 5rem);
+                  font-family: 'Montserrat', sans-serif;
+                  font-weight: 700;
+                  letter-spacing: 0.06em;
+                  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.18);
+                  user-select: none;
+            }
+
+            #splash-loader {
+                  display: flex;
+                  gap: 8px;
+                  font-size: clamp(1.25rem, 4.6vw, 2rem);
+            }
+
             #splash-loader span {
-                  animation: none;
-                  opacity: 0.9;
+                  opacity: 0.2;
+                  animation: splash-loader 1.2s infinite ease-in-out;
             }
-      }
-</style>
+
+            #splash-loader span:nth-child(2) {
+                  animation-delay: 0.2s;
+            }
+
+            #splash-loader span:nth-child(3) {
+                  animation-delay: 0.4s;
+            }
+
+            #splash-loader span:nth-child(4) {
+                  animation-delay: 0.6s;
+            }
+
+            @keyframes splash-loader {
+
+                  0%,
+                  100% {
+                        opacity: 0.2;
+                        transform: translateY(0);
+                  }
+
+                  40% {
+                        opacity: 1;
+                        transform: translateY(-3px);
+                  }
+            }
+
+            @media (prefers-reduced-motion: reduce) {
+                  #splash-loader span {
+                        animation: none;
+                        opacity: 0.9;
+                  }
+            }
+      </style>
+</head>
 
 <body>
       <div id="splash">

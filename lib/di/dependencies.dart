@@ -4,6 +4,9 @@ import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
 import 'package:weather_fit/data/data_sources/remote/remote_data_source.dart';
 import 'package:weather_fit/data/repositories/location_repository.dart';
 import 'package:weather_fit/data/repositories/outfit_repository.dart';
+import 'package:weather_fit/services/feedback_service.dart';
+import 'package:weather_fit/services/home_widget_service.dart';
+import 'package:weather_fit/services/update_service.dart';
 import 'package:weather_fit/use_cases/initialize_app_language_use_case.dart';
 import 'package:weather_repository/weather_repository.dart';
 
@@ -18,6 +21,9 @@ class Dependencies {
     required this.locationRepository,
     required this.initializeAppLanguageUseCase,
     required this.localizationDelegate,
+    required this.homeWidgetService,
+    required this.feedbackService,
+    required this.updateService,
   });
 
   final SharedPreferences preferences;
@@ -28,4 +34,7 @@ class Dependencies {
   final LocationRepository locationRepository;
   final InitializeAppLanguageUseCase initializeAppLanguageUseCase;
   final LocalizationDelegate localizationDelegate;
+  final HomeWidgetService homeWidgetService;
+  final FeedbackService feedbackService;
+  final UpdateService updateService;
 }

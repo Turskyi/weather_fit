@@ -3,7 +3,7 @@ import 'package:weather_fit/data/repositories/outfit_repository.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_repository/weather_repository.dart';
 
-abstract class HomeWidgetService {
+abstract interface class HomeWidgetService {
   const HomeWidgetService();
 
   Future<void> setAppGroupId(String appGroupId);
