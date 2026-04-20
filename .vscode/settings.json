@@ -10,7 +10,7 @@
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "spellright.language": ["en"],
+  "spellright.language": ["uk", "en"],
   "spellright.documentTypes": [
     "markdown",
     "latex",
@@ -19,7 +19,8 @@
     "Log",
     "dart",
     "typescriptreact",
-    "typescript"
+    "typescript",
+    "html"
   ],
   "spellright.parserByClass": {
     "Log": {
