@@ -169,11 +169,7 @@ class _SettingsPageExtraSmallLayoutState
                         label: translate('settings.weather_background'),
                         selectedIndex: state.isWeatherBackgroundEnabled ? 1 : 0,
                         options: <String>[translate('no'), translate('yes')],
-                        onSelected: (int index) {
-                          context.read<SettingsBloc>().add(
-                            ToggleWeatherBackgroundEvent(index == 1),
-                          );
-                        },
+                        onSelected: _onWeatherBackgroundToggled,
                       ),
                       const SizedBox(height: 8),
                       SettingDropdown(
@@ -236,6 +232,12 @@ class _SettingsPageExtraSmallLayoutState
         icon: Icons.search,
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+    );
+  }
+
+  void _onWeatherBackgroundToggled(int index) {
+    return context.read<SettingsBloc>().add(
+      ToggleWeatherBackgroundEvent(index == 1),
     );
   }
 }
