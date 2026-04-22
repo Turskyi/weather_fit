@@ -6,7 +6,7 @@ import 'package:flutter_translate/flutter_translate.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/settings/bloc/settings_bloc.dart';
-import 'package:weather_fit/settings/ui/settings_page_extra_small_layout.dart';
+import 'package:weather_fit/settings/ui/widgets/settings_page_extra_small_layout.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 import 'package:weather_repository/weather_repository.dart';
 
