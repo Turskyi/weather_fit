@@ -621,9 +621,9 @@ class _SearchPageState extends State<SearchPage> {
     }
   }
 
-  Future<void> _handleOpenLocationSettingsAndPop() async {
+  Future<void> _handleOpenLocationSettingsAndPop() {
     Navigator.of(context).pop();
-    await _openDeviceLocationSettings();
+    return _openDeviceLocationSettings();
   }
 
   Future<void> _openDeviceLocationSettings() async {

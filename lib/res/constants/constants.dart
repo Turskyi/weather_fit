@@ -22,6 +22,8 @@ const String kItunesLookupUrl = 'https://itunes.apple.com/lookup?bundleId=';
 const String kDeveloperName = 'Dmytro Turskyi';
 const double kAppStoreBadgeHeight = 80.0;
 const double kAppStoreBadgeWidth = 140.0;
+const double kPageArrowBackgroundAlpha = 0.44;
+const double kPageArrowIconAlpha = 0.54;
 const String kCountryFlagsBaseUrl =
     'https://open-meteo.com/images/country-flags/';
 const String kArtistInstagramUrl = 'https://www.instagram.com/anartistart/';
