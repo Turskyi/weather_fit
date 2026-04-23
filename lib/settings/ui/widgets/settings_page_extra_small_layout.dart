@@ -165,13 +165,6 @@ class _SettingsPageExtraSmallLayoutState
 
                   return Column(
                     children: <Widget>[
-                      SettingSegmentedToggle(
-                        label: translate('settings.weather_background'),
-                        selectedIndex: state.isWeatherBackgroundEnabled ? 1 : 0,
-                        options: <String>[translate('no'), translate('yes')],
-                        onSelected: _onWeatherBackgroundToggled,
-                      ),
-                      const SizedBox(height: 8),
                       SettingDropdown(
                         label: translate('settings.day_starts'),
                         value: state.dayStartHour,
@@ -232,12 +225,6 @@ class _SettingsPageExtraSmallLayoutState
         icon: Icons.search,
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-    );
-  }
-
-  void _onWeatherBackgroundToggled(int index) {
-    return context.read<SettingsBloc>().add(
-      ToggleWeatherBackgroundEvent(index == 1),
     );
   }
 }

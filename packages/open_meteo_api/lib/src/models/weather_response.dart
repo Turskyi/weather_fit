@@ -19,6 +19,17 @@ class WeatherResponse {
   int get code => weatherCode.toInt();
 }
 
+/// Extension on [int] to provide human-readable descriptions for WMO
+/// weather codes.
+///
+/// This extension maps World Meteorological Organization (WMO) weather codes
+/// (ranging from 0 to 99) to descriptive strings. It is used by the Open-Meteo
+/// API responses to convert numeric weather codes into user-friendly
+/// descriptions.
+///
+/// OpenWeatherMap (OWM) codes are not handled here. The OWM provider maps OWM
+/// codes to equivalent WMO codes or uses API-provided descriptions directly,
+/// avoiding the need for OWM-specific mappings in this extension.
 extension WeatherCodeExtension on int {
   String get toDescription {
     switch (this) {

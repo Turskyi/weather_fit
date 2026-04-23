@@ -287,7 +287,7 @@
     "code_95": "Thunderstorm",
     "code_96": "Thunderstorm with slight hail",
     "code_99": "Thunderstorm with heavy hail",
-    "code_unknown": "Unknown weather",
+    "code_unknown": "",
     "empty_search_prompt": "Tap 🔍 to search for a city or country.",
     "loading_weather": "Loading Weather",
     "daily_forecast_title": "Forecast",
