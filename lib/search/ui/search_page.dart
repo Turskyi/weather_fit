@@ -117,9 +117,12 @@ class _SearchPageState extends State<SearchPage> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    Text(
-                      translate('search.confirm_location_dialog_title'),
-                      textAlign: TextAlign.center,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                      child: Text(
+                        translate('search.confirm_location_dialog_title'),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                     Text(
                       displayLocation,
@@ -192,16 +195,19 @@ class _SearchPageState extends State<SearchPage> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    Text(
-                      translate(
-                        'search.'
-                        'location_not_found_suggestion_spell_check',
-                      ),
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: Theme.of(
-                          context,
-                        ).textTheme.bodySmall?.fontSize,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                      child: Text(
+                        translate(
+                          'search.'
+                          'location_not_found_suggestion_spell_check',
+                        ),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: Theme.of(
+                            context,
+                          ).textTheme.bodySmall?.fontSize,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 12),
