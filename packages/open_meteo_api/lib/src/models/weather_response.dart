@@ -90,7 +90,7 @@ extension WeatherCodeExtension on int {
       case 99:
         return 'Thunderstorm with heavy hail';
       default:
-        return 'Unknown weather';
+        return '';
     }
   }
 }

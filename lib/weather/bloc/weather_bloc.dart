@@ -521,6 +521,11 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
   }
 
   String _mapExceptionToMessage(Exception exception) {
+    final String detailedMessage = exception.toString();
+    if (exception is HandshakeException &&
+        detailedMessage.contains('CERTIFICATE_VERIFY_FAILED')) {
+      return translate('error.certificate_validation_failed_user_message');
+    }
     if (exception is http.ClientException || exception is SocketException) {
       return translate('errors.no_internet');
     }
