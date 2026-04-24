@@ -32,13 +32,22 @@ class SearchPageExtraSmallLayout extends StatefulWidget {
 class _SearchPageExtraSmallLayoutState
     extends State<SearchPageExtraSmallLayout> {
   final ScrollController _scrollController = ScrollController();
+  final FocusNode _focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _focusNode.requestFocus();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final EdgeInsets contentPadding = EdgeInsets.fromLTRB(
       context.wearHorizontalPadding,
-      math.max(MediaQuery.paddingOf(context).top, 64),
+      math.max(MediaQuery.paddingOf(context).top, 56),
       context.wearHorizontalPadding,
       0,
     );
@@ -89,6 +98,7 @@ class _SearchPageExtraSmallLayoutState
                               children: <Widget>[
                                 TextField(
                                   controller: widget.textEditingController,
+                                  focusNode: _focusNode,
                                   autofocus: true,
                                   style: textTheme.labelSmall,
                                   textInputAction: TextInputAction.search,
@@ -108,12 +118,20 @@ class _SearchPageExtraSmallLayoutState
                                       vertical: 10,
                                     ),
                                     filled: true,
-                                    prefixIcon: const Icon(
-                                      Icons.search,
-                                      size: 18,
+                                    prefixIcon: SizedBox(
+                                      width: 26,
+                                      child: IconButton(
+                                        onPressed: _focusNode.requestFocus,
+                                        padding: EdgeInsets.zero,
+                                        constraints: const BoxConstraints(),
+                                        icon: const Icon(
+                                          Icons.search,
+                                          size: 18,
+                                        ),
+                                      ),
                                     ),
                                     prefixIconConstraints: const BoxConstraints(
-                                      minWidth: 30,
+                                      minWidth: 28,
                                     ),
                                     fillColor: Theme.of(context)
                                         .colorScheme
@@ -172,6 +190,7 @@ class _SearchPageExtraSmallLayoutState
   @override
   void dispose() {
     _scrollController.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -179,18 +198,19 @@ class _SearchPageExtraSmallLayoutState
     final SearchState state = context.read<SearchBloc>().state;
     if (state is SearchLoading) {
       return;
-    }
-
-    if (value.trim().isEmpty) {
+    } else if (value.trim().isEmpty) {
+      _focusNode.requestFocus();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(translate('search.enter_location')),
+          content: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: Text(translate('search.enter_location')),
+          ),
           duration: const Duration(seconds: 2),
         ),
       );
-      return;
+    } else {
+      context.read<SearchBloc>().add(SearchLocation(value.trim()));
     }
-
-    context.read<SearchBloc>().add(SearchLocation(value.trim()));
   }
 }
