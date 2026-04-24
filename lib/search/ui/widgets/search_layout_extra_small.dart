@@ -47,7 +47,7 @@ class _SearchPageExtraSmallLayoutState
     final TextTheme textTheme = Theme.of(context).textTheme;
     final EdgeInsets contentPadding = EdgeInsets.fromLTRB(
       context.wearHorizontalPadding,
-      math.max(MediaQuery.paddingOf(context).top, 56),
+      math.max(MediaQuery.paddingOf(context).top, 52),
       context.wearHorizontalPadding,
       0,
     );
@@ -56,8 +56,7 @@ class _SearchPageExtraSmallLayoutState
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
+        forceMaterialTransparency: true,
         title: const Padding(
           padding: EdgeInsets.only(top: 8.0),
           child: LeadingWidget(),
