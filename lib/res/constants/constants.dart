@@ -11,6 +11,8 @@ const String kImagePath = 'assets/images/';
 const String kOutfitImagePath = '${kImagePath}outfits/';
 const String kAppName = 'WeatherFit';
 const String kAndroidPackageName = 'com.turskyi.weather_fit';
+const String kQualifiedAndroidWidgetName =
+    '$kAndroidPackageName.$kAndroidWidgetName';
 const String kDeviceMethodChannel = '$kAndroidPackageName/device';
 const String kSharedContainerMethodChannel =
     '$kAndroidPackageName/shared_container';

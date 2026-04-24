@@ -199,6 +199,7 @@ class HomeWidgetServiceImpl implements HomeWidgetService {
     await updateWidget(
       iOSName: constants.kIosWidgetName,
       androidName: constants.kAndroidWidgetName,
+      qualifiedAndroidName: constants.kQualifiedAndroidWidgetName,
     );
 
     debugPrint('HomeWidgetService updateHomeWidget: completed.');
