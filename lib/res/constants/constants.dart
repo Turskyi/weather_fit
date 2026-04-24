@@ -76,3 +76,4 @@ const String kBackgroundTaskName = 'updateWidgetTask';
 const String kWeatherFitScheme = 'weatherfit';
 const String kWeatherFitHost = 'open';
 const String kDebugWeatherProviderKey = 'debug_weather_provider_openweathermap';
+const String kOpenRemoteInputMethod = 'openRemoteInput';

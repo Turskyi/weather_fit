@@ -9,6 +9,9 @@ import 'package:weather_fit/res/widgets/leading_widget.dart';
 import 'package:weather_fit/res/widgets/wear_position_indicator.dart';
 import 'package:weather_fit/search/bloc/search_bloc.dart';
 import 'package:weather_fit/search/ui/widgets/search_buttons.dart';
+import 'package:weather_fit/search/ui/widgets/search_location_placeholder.dart';
+import 'package:weather_fit/services/device_type_service.dart'
+    as device_service;
 
 class SearchPageExtraSmallLayout extends StatefulWidget {
   const SearchPageExtraSmallLayout({
@@ -32,19 +35,23 @@ class SearchPageExtraSmallLayout extends StatefulWidget {
 class _SearchPageExtraSmallLayoutState
     extends State<SearchPageExtraSmallLayout> {
   final ScrollController _scrollController = ScrollController();
-  final FocusNode _focusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _focusNode.requestFocus();
+      // Auto-open the native input dialog when the page is loaded.
+      // Small delay to ensure the page transition is finished.
+      Future<void>.delayed(const Duration(milliseconds: 500), () {
+        if (mounted) {
+          _onSearchBoxTapped();
+        }
+      });
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final TextTheme textTheme = Theme.of(context).textTheme;
     final EdgeInsets contentPadding = EdgeInsets.fromLTRB(
       context.wearHorizontalPadding,
       math.max(MediaQuery.paddingOf(context).top, 52),
@@ -95,52 +102,38 @@ class _SearchPageExtraSmallLayoutState
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
-                                TextField(
-                                  controller: widget.textEditingController,
-                                  focusNode: _focusNode,
-                                  autofocus: true,
-                                  style: textTheme.labelSmall,
-                                  textInputAction: TextInputAction.search,
-                                  onSubmitted: _onSearchSubmitted,
-                                  enableInteractiveSelection: false,
-                                  contextMenuBuilder:
-                                      (
-                                        BuildContext context,
-                                        EditableTextState editableTextState,
-                                      ) {
-                                        return const SizedBox.shrink();
-                                      },
-                                  decoration: InputDecoration(
-                                    isDense: true,
-                                    contentPadding: const EdgeInsets.symmetric(
+                                InkWell(
+                                  onTap: _onSearchBoxTapped,
+                                  borderRadius: BorderRadius.circular(18),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
                                       horizontal: 8,
                                       vertical: 10,
                                     ),
-                                    filled: true,
-                                    prefixIcon: SizedBox(
-                                      width: 26,
-                                      child: IconButton(
-                                        onPressed: _focusNode.requestFocus,
-                                        padding: EdgeInsets.zero,
-                                        constraints: const BoxConstraints(),
-                                        icon: const Icon(
-                                          Icons.search,
-                                          size: 18,
-                                        ),
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .surface
+                                          .withValues(alpha: 0.92),
+                                      borderRadius: BorderRadius.circular(18),
+                                      border: Border.all(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .outline
+                                            .withValues(alpha: 0.2),
                                       ),
                                     ),
-                                    prefixIconConstraints: const BoxConstraints(
-                                      minWidth: 28,
-                                    ),
-                                    fillColor: Theme.of(context)
-                                        .colorScheme
-                                        .surface
-                                        .withValues(alpha: 0.92),
-                                    hintText: translate(
-                                      'search.enter_location',
-                                    ),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(18),
+                                    child: Row(
+                                      children: <Widget>[
+                                        const Icon(Icons.search, size: 18),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: SearchLocationPlaceholder(
+                                            textEditingController:
+                                                widget.textEditingController,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
@@ -189,8 +182,17 @@ class _SearchPageExtraSmallLayoutState
   @override
   void dispose() {
     _scrollController.dispose();
-    _focusNode.dispose();
     super.dispose();
+  }
+
+  Future<void> _onSearchBoxTapped() async {
+    final String? result = await device_service.openRemoteInput(
+      label: translate('search.enter_location'),
+    );
+    if (result != null && mounted) {
+      widget.textEditingController.text = result;
+      _onSearchSubmitted(result);
+    }
   }
 
   void _onSearchSubmitted(String value) {
@@ -198,7 +200,6 @@ class _SearchPageExtraSmallLayoutState
     if (state is SearchLoading) {
       return;
     } else if (value.trim().isEmpty) {
-      _focusNode.requestFocus();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Padding(
