@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:intl/intl.dart';
+import 'package:weather_fit/entities/enums/temperature_units.dart';
 import 'package:weather_fit/res/extensions/double_extension.dart';
 import 'package:weather_fit/res/extensions/weather_code_extension.dart';
 import 'package:weather_repository/weather_repository.dart';
@@ -8,12 +9,12 @@ import 'package:weather_repository/weather_repository.dart';
 class ForecastItemWidget extends StatelessWidget {
   const ForecastItemWidget({
     required this.item,
-    required this.isCelsius,
+    required this.temperatureUnits,
     super.key,
   });
 
   final ForecastItemDomain item;
-  final bool isCelsius;
+  final TemperatureUnits temperatureUnits;
 
   String _getDay(DateTime itemDate) {
     final DateTime now = DateTime.now();
@@ -39,10 +40,10 @@ class ForecastItemWidget extends StatelessWidget {
     final TextTheme textTheme = Theme.of(context).textTheme;
 
     final double temperatureValue = item.temperature;
-    final double temperature = isCelsius
+    final double temperature = temperatureUnits.isCelsius
         ? temperatureValue
         : temperatureValue.toFahrenheit();
-    final String unit = isCelsius ? 'C' : 'F';
+    final String unit = temperatureUnits.unitSymbol;
 
     final DateTime itemDate = DateTime.parse(item.time);
     final String day = _getDay(itemDate);

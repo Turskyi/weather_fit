@@ -75,7 +75,7 @@ class _DailyForecastState extends State<DailyForecast> {
               child: ForecastOutfitPreview(
                 item: item,
                 baseWeather: state.weather,
-                isCelsius: state.isCelsius,
+                temperatureUnits: state.temperatureUnits,
               ),
             ),
           ),
@@ -177,8 +177,6 @@ class _DailyForecastState extends State<DailyForecast> {
                         );
                       }
 
-                      final bool isCelsius = state.isCelsius;
-
                       // Prepare keys for each item so we can compute positions.
                       _itemKeys.clear();
                       for (int i = 0; i < forecast.length; i++) {
@@ -239,7 +237,8 @@ class _DailyForecastState extends State<DailyForecast> {
                                       ),
                                       child: ForecastItemWidget(
                                         item: forecast[i],
-                                        isCelsius: isCelsius,
+                                        temperatureUnits:
+                                            state.temperatureUnits,
                                       ),
                                     ),
                                   ),
