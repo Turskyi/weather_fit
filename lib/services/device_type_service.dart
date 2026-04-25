@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' as platform;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:weather_fit/res/constants/constants.dart' as constants;
@@ -17,17 +18,19 @@ Future<void> initializeDeviceType() async {
   } else {
     _deviceTypeInitialized = true;
 
-    if (kIsWeb || defaultTargetPlatform != TargetPlatform.android) return;
-
-    try {
-      _isWearDevice =
-          await _deviceChannel.invokeMethod<bool>('isWearDevice') ?? false;
-    } on MissingPluginException catch (e) {
-      debugPrint('MissingPluginException in initializeDeviceType: $e');
-      _isWearDevice = false;
-    } on PlatformException catch (e) {
-      debugPrint('PlatformException in initializeDeviceType: $e');
-      _isWearDevice = false;
+    if (kIsWeb || platform.defaultTargetPlatform != TargetPlatform.android) {
+      return;
+    } else {
+      try {
+        _isWearDevice =
+            await _deviceChannel.invokeMethod<bool>('isWearDevice') ?? false;
+      } on MissingPluginException catch (e) {
+        debugPrint('MissingPluginException in initializeDeviceType: $e');
+        _isWearDevice = false;
+      } on PlatformException catch (e) {
+        debugPrint('PlatformException in initializeDeviceType: $e');
+        _isWearDevice = false;
+      }
     }
   }
 }
@@ -36,7 +39,7 @@ Future<void> initializeDeviceType() async {
 ///
 /// Returns the text entered by the user, or `null` if the user canceled.
 Future<String?> openRemoteInput({String? label}) async {
-  if (kIsWeb || defaultTargetPlatform != TargetPlatform.android) {
+  if (kIsWeb || platform.defaultTargetPlatform != TargetPlatform.android) {
     return null;
   } else {
     try {
