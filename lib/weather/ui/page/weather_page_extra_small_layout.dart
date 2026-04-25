@@ -294,7 +294,7 @@ class _WeatherPageExtraSmallLayoutState
           return false;
         },
         child: ColoredBox(
-          color: theme.scaffoldBackgroundColor,
+          color: Colors.black,
           child: Center(child: content),
         ),
       ),
