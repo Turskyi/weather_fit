@@ -159,6 +159,9 @@ flutter build appbundle --release --flavor wear -t lib/main.dart
 
 # Equivalent shorter form
 flutter build appbundle --flavor wear --release
+
+# Shortest form (release is default)
+flutter build appbundle --flavor wear
 ```
 
 Android Studio:
@@ -191,6 +194,9 @@ flutter build appbundle --release --flavor wear -t lib/main.dart
 
 # Or, equivalently
 flutter build appbundle --flavor wear --release
+
+# Or, simply (release is default)
+flutter build appbundle --flavor wear
 ```
 
 Output:
@@ -231,6 +237,9 @@ flutter build appbundle --release --flavor wear -t lib/main.dart
 
 # Or, equivalently
 flutter build appbundle --flavor wear --release
+
+# Or, simply (release is default)
+flutter build appbundle --flavor wear
 ```
 
 2. After the Wear OS release is published in Play Console, increment app

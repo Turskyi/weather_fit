@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="appwidget_text">VOORBEELD</string>
+    <string name="add_widget">Widget toevoegen</string>
+    <string name="app_widget_description">Dit is een widgetbeschrijving van de app</string>
+    <string name="outfit_image">Outfit afbeelding</string>
+    <string name="weatherfit">WeatherFit</string>
+    <string name="oops_no_outfit_suggestion_available">
+        👕 Oeps! Geen outfit suggestie beschikbaar.
+    </string>
+    <string name="looks_like_we_couldn_t_pick_an_outfit_this_time">
+        🤷 Het lijkt erop dat we deze keer geen outfit konden kiezen.
+    </string>
+    <string name="no_recommendation_time_to_mix_match_your_own_style">
+        <![CDATA[🎭 Geen aanbeveling? Tijd om je eigen stijl te mixen & matchen!]]>
+    </string>
+    <string name="your_fashion_instincts_take_the_lead_today">
+        💡 Je mode instincten nemen vandaag de leiding!
+    </string>
+    <string name="ai_is_taking_a_fashion_break_try_again">
+        🚀 AI neemt een mode pauze. Probeer het opnieuw!
+    </string>
+    <string name="no_outfit_picked_maybe_today_is_a_pajama_day">
+        🛌 Geen outfit gekozen—misschien is het vandaag een pyjama dag?
+    </string>
+    <string name="no_outfit_available">❌ Geen outfit beschikbaar</string>
+    <string name="no_recommendation">🤔 geen aanbeveling</string>
+    <string name="today">Vandaag</string>
+    <string name="tomorrow">Morgen</string>
+    <string name="morning">Ochtend</string>
+    <string name="lunch">Lunch</string>
+    <string name="evening">Avond</string>
+    <string name="night">Nacht</string>
+</resources>

@@ -91,7 +91,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     try {
       if (json.isEmpty) return null;
       // Since we primarily care about restoring successful weather data,
-      // we try to restore as WeatherSuccess.
+      // we try to restore as `WeatherSuccess`.
       return WeatherSuccess.fromJson(json);
     } catch (e) {
       debugPrint('WeatherBloc fromJson error: $e');

@@ -99,7 +99,7 @@ class LocalDataSource {
 
     final Map<String, String> outfitEn = <String, String>{
       'outfit.rainy': 'Take an umbrella',
-      'outfit.rainy_hot': 'Hot & rainy — light clothes + umbrella',
+      'outfit.rainy_hot': 'Hot & rainy - light clothes + umbrella',
       'outfit.snowy': 'Dress warmly, it\'s snowing!',
       'outfit.cold': 'Wear a warm jacket',
       'outfit.cool': 'Maybe bring a light jacket',
@@ -110,7 +110,7 @@ class LocalDataSource {
 
     final Map<String, String> outfitUk = <String, String>{
       'outfit.rainy': 'Візьміть парасольку',
-      'outfit.rainy_hot': 'Спекотно й дощ — легкий одяг і парасолька',
+      'outfit.rainy_hot': 'Спекотно й дощ - легкий одяг і парасолька',
       'outfit.snowy': 'Одягніться тепло, йде сніг!',
       'outfit.cold': 'Одягніться тепло',
       'outfit.cool': 'Можливо, знадобиться легка куртка',
@@ -121,7 +121,7 @@ class LocalDataSource {
 
     final Map<String, String> outfitPl = <String, String>{
       'outfit.rainy': 'Weź parasol',
-      'outfit.rainy_hot': 'Gorąco i pada — lekkie ubrania + parasol',
+      'outfit.rainy_hot': 'Gorąco i pada - lekkie ubrania + parasol',
       'outfit.snowy': 'Ubierz się ciepło, pada śnieg!',
       'outfit.cold': 'Ubierz się ciepło',
       'outfit.cool': 'Może przydać się lekka kurtka',
@@ -130,11 +130,24 @@ class LocalDataSource {
       'outfit.moderate': 'Dzisiaj jest przyjemna pogoda',
     };
 
+    final Map<String, String> outfitNl = <String, String>{
+      'outfit.rainy': 'Neem een paraplu',
+      'outfit.rainy_hot': 'Warm & regenachtig - licht kleding + paraplu',
+      'outfit.snowy': 'Kleed je warm aan, het sneeuwt!',
+      'outfit.cold': 'Trek een warme jas aan',
+      'outfit.cool': 'Misschien een licht jasje meenemen',
+      'outfit.warm': 'Lichte kleding zou prima zijn',
+      'outfit.hot': 'Het is heet! Kleed je licht',
+      'outfit.moderate': 'Comfortabel weer vandaag',
+    };
+
     final Map<String, String> outfit =
         locale.startsWith(Language.uk.isoLanguageCode)
         ? outfitUk
         : locale.startsWith(Language.pl.isoLanguageCode)
         ? outfitPl
+        : locale.startsWith(Language.nl.isoLanguageCode)
+        ? outfitNl
         : outfitEn;
 
     String localeTranslate(String key) => outfit[key] ?? key;
@@ -594,6 +607,7 @@ class LocalDataSource {
             'en': 'Failed to save asset image',
             'uk': 'Не вдалося зберегти зображення',
             'pl': 'Nie udało się zapisać obrazu zasobu',
+            'nl': 'Kon afbeelding niet opslaan',
           },
         };
     return localizedErrors[key]?[locale] ?? key;
