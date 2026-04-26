@@ -11,7 +11,8 @@ enum HomeWidgetKey {
   locationLatitude,
   locationLongitude,
   temperatureUnit,
-  widgetUpdateFrequency;
+  widgetUpdateFrequency,
+  selectedLanguage;
 
   String get stringValue {
     switch (this) {
@@ -41,6 +42,8 @@ enum HomeWidgetKey {
         return 'weatherfit_temperature_unit';
       case HomeWidgetKey.widgetUpdateFrequency:
         return 'weatherfit_widget_update_frequency';
+      case HomeWidgetKey.selectedLanguage:
+        return 'selected_language';
     }
   }
 }

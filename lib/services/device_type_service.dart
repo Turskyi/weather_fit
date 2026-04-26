@@ -23,7 +23,10 @@ Future<void> initializeDeviceType() async {
     } else {
       try {
         _isWearDevice =
-            await _deviceChannel.invokeMethod<bool>('isWearDevice') ?? false;
+            await _deviceChannel.invokeMethod<bool>(
+              constants.kIsWearDeviceMethod,
+            ) ??
+            false;
       } on MissingPluginException catch (e) {
         debugPrint('MissingPluginException in initializeDeviceType: $e');
         _isWearDevice = false;

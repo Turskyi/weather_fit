@@ -1,10 +1,12 @@
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart' as platform;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:weather_fit/entities/enums/language.dart';
+import 'package:weather_fit/extensions/build_context_extensions.dart' as type;
 import 'package:weather_fit/extensions/build_context_extensions.dart';
 import 'package:weather_fit/res/constants/constants.dart' as constant;
 import 'package:weather_fit/res/widgets/background.dart';
@@ -267,7 +269,9 @@ class SettingsPageDefaultLayout extends StatelessWidget {
                     );
                   },
                 ),
-                if (!kIsWeb && !context.isExtraSmallScreen) ...<Widget>[
+                if (!kIsWeb &&
+                    !context.isExtraSmallScreen &&
+                    !type.isWearDevice) ...<Widget>[
                   const SizedBox(height: 20),
                   // Home Widget Updates Card.
                   BlocBuilder<SettingsBloc, SettingsState>(
@@ -407,8 +411,8 @@ class SettingsPageDefaultLayout extends StatelessWidget {
                   ),
                 ],
                 if (!kIsWeb &&
-                    (defaultTargetPlatform ==
-                        TargetPlatform.android)) ...<Widget>[
+                    platform.defaultTargetPlatform == TargetPlatform.android &&
+                    !type.isWearDevice) ...<Widget>[
                   const SizedBox(height: 20),
                   Card(
                     elevation: 2.0,

@@ -212,6 +212,7 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
           previousState == AppLifecycleState.inactive ||
           previousState == AppLifecycleState.hidden ||
           previousState == AppLifecycleState.paused;
+
       final bool shouldFilterMacDesktopTransition =
           !kIsWeb &&
           defaultTargetPlatform == TargetPlatform.macOS &&

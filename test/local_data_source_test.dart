@@ -331,7 +331,7 @@ void main() {
           .setMockMethodCallHandler(sharedContainerChannel, (
             MethodCall call,
           ) async {
-            if (call.method == 'getSharedContainerPath') {
+            if (call.method == constants.kGetSharedContainerPathMethod) {
               return expectedPath;
             }
             return null;

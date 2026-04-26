@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
-import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/date_symbol_data_local.dart' as local;
 import 'package:nominatim_api/nominatim_api.dart';
 import 'package:open_meteo_api/open_meteo_api.dart';
 import 'package:path_provider/path_provider.dart';
@@ -19,9 +19,11 @@ import 'package:weather_fit/di/dependencies.dart';
 import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/env/env.dart';
+import 'package:weather_fit/extensions/build_context_extensions.dart' as type;
 import 'package:weather_fit/localization/localization_delegate_getter.dart'
     as locale;
 import 'package:weather_fit/res/constants/constants.dart' as constants;
+import 'package:weather_fit/res/home_widget_keys.dart';
 import 'package:weather_fit/services/feedback_service.dart';
 import 'package:weather_fit/services/home_widget_service.dart';
 import 'package:weather_fit/services/home_widget_service_impl.dart';
@@ -86,7 +88,7 @@ Future<Dependencies> _createDependenciesFromScratch() async {
 
   // Make sure we run on supported platforms:
   // https://pub.dev/packages/workmanager
-  if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
+  if (_supportsBackgroundWidgetUpdates) {
     _setupBackgroundWidgetUpdates(localDataSource);
   }
 
@@ -169,7 +171,7 @@ Future<Dependencies> _createDependenciesFromResults({
 
   // Make sure we run on supported platforms:
   // https://pub.dev/packages/workmanager
-  if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
+  if (_supportsBackgroundWidgetUpdates) {
     // We don't strictly need to await this for the UI to show up,
     // but initializing it early is fine as long as it's not blocking too
     // much.
@@ -398,7 +400,7 @@ Future<bool> _performWidgetUpdateTick() async {
     try {
       final String languageCode = localDataSource.getLanguageIsoCode();
       await homeWidgetService.saveWidgetData<String>(
-        'selected_language',
+        HomeWidgetKey.selectedLanguage.stringValue,
         languageCode,
       );
     } catch (e) {
@@ -471,7 +473,11 @@ Future<void> _initializeAllDateFormatting({Language? exclude}) async {
 
 Future<void> _initializeDateFormattingForLanguage(Language lang) async {
   try {
-    await initializeDateFormatting(lang.isoLanguageCode, null);
+    /// Pass `null` for the deprecated 'ignored' parameter in
+    /// `initializeDateFormatting`. This parameter is no longer used but must be
+    /// provided as `null` to maintain API compatibility and avoid potential
+    /// future issues with the intl package.
+    await local.initializeDateFormatting(lang.isoLanguageCode, null);
   } catch (e, stackTrace) {
     debugPrint(
       'Failed to initialize date formatting for ${lang.isoLanguageCode}.\n'
@@ -479,4 +485,10 @@ Future<void> _initializeDateFormattingForLanguage(Language lang) async {
       'StackTrace: $stackTrace',
     );
   }
+}
+
+bool get _supportsBackgroundWidgetUpdates {
+  return !kIsWeb &&
+      (Platform.isAndroid || Platform.isIOS) &&
+      !type.isWearDevice;
 }

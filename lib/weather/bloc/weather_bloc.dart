@@ -16,6 +16,7 @@ import 'package:weather_fit/entities/enums/weather_fetch_origin.dart';
 import 'package:weather_fit/entities/models/outfit/outfit_image.dart';
 import 'package:weather_fit/entities/models/temperature/temperature.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
+import 'package:weather_fit/extensions/build_context_extensions.dart' as type;
 import 'package:weather_fit/extensions/build_context_extensions.dart';
 import 'package:weather_fit/extensions/date_time_extension.dart';
 import 'package:weather_fit/res/extensions/double_extension.dart';
@@ -68,22 +69,24 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
   void _scheduleInitialHomeWidgetSync() {
     if (kIsWeb || isWearDevice) {
       return;
+    } else {
+      final DailyForecastDomain? dailyForecast = state.dailyForecast;
+      if (dailyForecast == null || dailyForecast.forecast.isEmpty) {
+        return;
+      } else {
+        if (state.weather.isEmpty) {
+          return;
+        } else {
+          Future<void>.microtask(() {
+            add(
+              const UpdateWeatherOnHomeWidgetEvent(
+                WeatherFetchOrigin.defaultDevice,
+              ),
+            );
+          });
+        }
+      }
     }
-
-    final DailyForecastDomain? dailyForecast = state.dailyForecast;
-    if (dailyForecast == null || dailyForecast.forecast.isEmpty) {
-      return;
-    }
-
-    if (state.weather.isEmpty) {
-      return;
-    }
-
-    Future<void>.microtask(() {
-      add(
-        const UpdateWeatherOnHomeWidgetEvent(WeatherFetchOrigin.defaultDevice),
-      );
-    });
   }
 
   @override
@@ -273,7 +276,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
                 );
 
                 final WeatherFetchOrigin eventOrigin = event.origin;
-                if (!kIsWeb && eventOrigin.isNotWearable) {
+                if (_shouldUpdateHomeWidget(eventOrigin)) {
                   add(UpdateWeatherOnHomeWidgetEvent(eventOrigin));
                 }
               } else {
@@ -491,7 +494,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
         );
 
         final WeatherFetchOrigin eventOrigin = event.origin;
-        if (!kIsWeb && eventOrigin.isNotWearable) {
+        if (_shouldUpdateHomeWidget(eventOrigin)) {
           add(UpdateWeatherOnHomeWidgetEvent(eventOrigin));
         }
       } on Exception catch (e) {
@@ -771,5 +774,9 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
         ),
       );
     }
+  }
+
+  bool _shouldUpdateHomeWidget(WeatherFetchOrigin eventOrigin) {
+    return !kIsWeb && eventOrigin.isNotWearable && !type.isWearDevice;
   }
 }

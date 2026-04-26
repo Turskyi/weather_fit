@@ -184,7 +184,9 @@ class LocalDataSource {
   /// returns the original [assetPath].
   Future<String> downloadAndSaveImage(String assetPath) async {
     // Check if the platform is web.
-    if (!kIsWeb) {
+    if (kIsWeb) {
+      return assetPath;
+    } else {
       try {
         // Load asset data as ByteData.
         final ByteData byteData = await rootBundle.load(assetPath);
@@ -224,8 +226,6 @@ class LocalDataSource {
           '${_translateError('error.save_asset_image_failed', locale)}: $e',
         );
       }
-    } else {
-      return assetPath;
     }
   }
 
@@ -428,7 +428,7 @@ class LocalDataSource {
     } else if (Platform.isIOS || Platform.isMacOS) {
       try {
         final String? sharedPath = await _channel.invokeMethod<String>(
-          'getSharedContainerPath',
+          constants.kGetSharedContainerPathMethod,
         );
 
         if (sharedPath != null && sharedPath.isNotEmpty) {
