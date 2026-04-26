@@ -122,7 +122,7 @@ class Weather extends Equatable {
   String get formattedTemperature {
     final String value = temperature.value.round().toString();
 
-    return '$value°${temperatureUnits.isCelsius ? 'C' : 'F'}';
+    return '$value°${temperatureUnits.unitSymbol}';
   }
 
   String get emoji => condition.toEmoji;
@@ -183,9 +183,21 @@ class Weather extends Equatable {
         'never_updated': <String, String>{
           'en': 'Never updated',
           'uk': 'Ще не оновлювалося',
+          'pl': 'Nigdy nie zaktualizowano',
+          'nl': 'Nooit bijgewerkt',
         },
-        'lat': <String, String>{'en': 'Lat', 'uk': 'Широта'},
-        'lon': <String, String>{'en': 'Lon', 'uk': 'Довгота'},
+        'lat': <String, String>{
+          'en': 'Lat',
+          'uk': 'Широта',
+          'pl': 'Szerokość geograficzna',
+          'nl': 'Breedtegraad',
+        },
+        'lon': <String, String>{
+          'en': 'Lon',
+          'uk': 'Довгота',
+          'pl': 'Długość geograficzna',
+          'nl': 'Lengtegraad',
+        },
       };
 
   String _localeTranslate(String key, String locale) {

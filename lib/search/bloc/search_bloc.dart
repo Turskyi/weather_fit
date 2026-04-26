@@ -107,7 +107,17 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       );
       SearchErrorType searchErrorType = SearchErrorType.unknown;
 
-      if (e is LocationServiceDisabledException) {
+      final String detailedMessage = e.toString();
+      if (e is HandshakeException &&
+          detailedMessage.contains('CERTIFICATE_VERIFY_FAILED')) {
+        userFriendlyErrorMessage = translate(
+          'error.certificate_validation_failed_user_message',
+        );
+        searchErrorType = SearchErrorType.certificateValidationFailed;
+      } else if (e is SocketException) {
+        userFriendlyErrorMessage = translate('error.network_error');
+        searchErrorType = SearchErrorType.network;
+      } else if (e is LocationServiceDisabledException) {
         userFriendlyErrorMessage = translate('error.location_unavailable');
         searchErrorType = SearchErrorType.locationServiceDisabled;
       } else if (e.toString().contains(
@@ -168,14 +178,27 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       );
 
       // 2. Determine the user-facing error message.
-      final String userFriendlyErrorMessage = translate(
+      String userFriendlyErrorMessage = translate(
         'error.getting_weather_search_by_location',
       );
+      SearchErrorType searchErrorType = SearchErrorType.unknown;
+
+      final String detailedMessage = e.toString();
+      if (e is HandshakeException &&
+          detailedMessage.contains('CERTIFICATE_VERIFY_FAILED')) {
+        userFriendlyErrorMessage = translate(
+          'error.certificate_validation_failed_user_message',
+        );
+        searchErrorType = SearchErrorType.certificateValidationFailed;
+      } else if (e is SocketException) {
+        userFriendlyErrorMessage = translate('error.network_error');
+        searchErrorType = SearchErrorType.network;
+      }
 
       emit(
         SearchError(
           errorMessage: userFriendlyErrorMessage,
-          errorType: SearchErrorType.unknown,
+          errorType: searchErrorType,
           query: '${event.latitude}, ${event.longitude}',
           quickCitiesSuggestions: _quickCitiesSuggestions,
         ),
@@ -206,15 +229,28 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       );
 
       // 2. Determine the user-facing error message.
-      final String userFriendlyErrorMessage = translate(
+      String userFriendlyErrorMessage = translate(
         'error.getting_weather_confirm_location',
       );
+      SearchErrorType searchErrorType = SearchErrorType.unknown;
+
+      final String detailedMessage = e.toString();
+      if (e is HandshakeException &&
+          detailedMessage.contains('CERTIFICATE_VERIFY_FAILED')) {
+        userFriendlyErrorMessage = translate(
+          'error.certificate_validation_failed_user_message',
+        );
+        searchErrorType = SearchErrorType.certificateValidationFailed;
+      } else if (e is SocketException) {
+        userFriendlyErrorMessage = translate('error.network_error');
+        searchErrorType = SearchErrorType.network;
+      }
 
       emit(
         SearchError(
           errorMessage: userFriendlyErrorMessage,
           query: '${event.location}',
-          errorType: SearchErrorType.unknown,
+          errorType: searchErrorType,
           quickCitiesSuggestions: _quickCitiesSuggestions,
         ),
       );
@@ -265,7 +301,17 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
 
       SearchErrorType searchErrorType = SearchErrorType.unknown;
 
-      if (e is LocationServiceDisabledException) {
+      final String detailedMessage = e.toString();
+      if (e is HandshakeException &&
+          detailedMessage.contains('CERTIFICATE_VERIFY_FAILED')) {
+        userFriendlyErrorMessage = translate(
+          'error.certificate_validation_failed_user_message',
+        );
+        searchErrorType = SearchErrorType.certificateValidationFailed;
+      } else if (e is SocketException) {
+        userFriendlyErrorMessage = translate('error.network_error');
+        searchErrorType = SearchErrorType.network;
+      } else if (e is LocationServiceDisabledException) {
         userFriendlyErrorMessage = translate(
           'error.location_services_disabled_content',
         );
@@ -344,23 +390,11 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
 
           userFriendlyMessage = translate('error.network_error');
           errorType = SearchErrorType.network;
-          emit(
-            SearchError(
-              errorMessage: userFriendlyMessage,
-              errorType: errorType,
-              query: eventQuery,
-              quickCitiesSuggestions: _quickCitiesSuggestions,
-            ),
-          );
-        } else if (e is LocationNotFoundFailure ||
-            detailedMessage.contains('LocationNotFoundFailure')) {
-          emit(
-            SearchLocationNotFound(
-              query: eventQuery,
-              quickCitiesSuggestions: _quickCitiesSuggestions,
-            ),
-          );
-        } else if (e is NominatimLocationRequestFailure ||
+        }
+
+        if (e is LocationNotFoundFailure ||
+            detailedMessage.contains('LocationNotFoundFailure') ||
+            e is NominatimLocationRequestFailure ||
             detailedMessage.contains('NominatimLocationRequestFailure')) {
           emit(
             SearchLocationNotFound(
@@ -378,6 +412,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
             ),
           );
         }
+
         debugPrint(
           '[_searchLocation] '
           'Error type: ${e.runtimeType}\n'

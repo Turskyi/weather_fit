@@ -3,22 +3,26 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:weather_fit/entities/enums/weather_fetch_origin.dart';
 import 'package:weather_fit/res/constants/constants.dart' as constants;
-import 'package:weather_fit/services/device_type_service.dart';
+import 'package:weather_fit/services/device_type_service.dart' as type;
 
 /// Returns `true` when the current device is a Wear OS watch.
 ///
 /// Uses [ui.PlatformDispatcher] so it works before any widget is built
 /// (no [BuildContext] required).
 bool get isWearDevice {
-  if (nativeWearDevice) {
+  if (type.nativeWearDevice) {
     return true;
-  }
+  } else {
+    final ui.FlutterView? view = ui.PlatformDispatcher.instance.implicitView;
+    if (view == null) {
+      return false;
+    } else {
+      final double shortest =
+          view.physicalSize.shortestSide / view.devicePixelRatio;
 
-  final ui.FlutterView? view = ui.PlatformDispatcher.instance.implicitView;
-  if (view == null) return false;
-  final double shortest =
-      view.physicalSize.shortestSide / view.devicePixelRatio;
-  return shortest <= constants.kWearCompactLayoutSize;
+      return shortest <= constants.kWearCompactLayoutSize;
+    }
+  }
 }
 
 extension ResponsiveChecks on BuildContext {
@@ -34,18 +38,19 @@ extension ResponsiveChecks on BuildContext {
 
   /// Returns `true` if the screen width is less than or equal to
   /// the shared Wear compact layout threshold.
-  bool get isExtraSmallScreen =>
-      isWearDevice || shortestSide <= constants.kWearCompactLayoutSize;
+  bool get isExtraSmallScreen {
+    return isWearDevice || shortestSide <= constants.kWearCompactLayoutSize;
+  }
 
   bool get isNarrowScreen => screenWidth <= _narrowScreenThreshold;
 
   double get wearHorizontalPadding {
-    if (!isExtraSmallScreen) {
+    if (isExtraSmallScreen) {
+      final double proportionalPadding = shortestSide * 0.12;
+      return proportionalPadding.clamp(14.0, 22.0);
+    } else {
       return 16.0;
     }
-
-    final double proportionalPadding = shortestSide * 0.12;
-    return proportionalPadding.clamp(14.0, 22.0);
   }
 
   double get wearBottomPadding {
@@ -63,7 +68,7 @@ extension ResponsiveChecks on BuildContext {
 
   double get maxWidth => screenWidth > 600 ? 600 : double.infinity;
 
-  /// The brightest colour available in the current theme — suitable for text
+  /// The brightest colour available in the current theme - suitable for text
   /// and icons rendered on the Wear OS black scaffold background.
   Color get watchForegroundColor {
     final ColorScheme cs = Theme.of(this).colorScheme;

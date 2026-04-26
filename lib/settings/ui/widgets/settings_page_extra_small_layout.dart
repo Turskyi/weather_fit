@@ -5,13 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:weather_fit/entities/enums/language.dart';
-import 'package:weather_fit/extensions/build_context_extensions.dart';
 import 'package:weather_fit/res/constants/constants.dart' as constant;
 import 'package:weather_fit/res/widgets/leading_widget.dart';
 import 'package:weather_fit/res/widgets/wear_position_indicator.dart';
 import 'package:weather_fit/settings/bloc/settings_bloc.dart';
-import 'package:weather_fit/settings/ui/blurred_fab_with_border.dart';
-import 'package:weather_fit/settings/ui/setting_dropdown.dart';
+import 'package:weather_fit/settings/ui/widgets/blurred_fab_with_border.dart';
+import 'package:weather_fit/settings/ui/widgets/setting_dropdown.dart';
+import 'package:weather_fit/settings/ui/widgets/setting_segmented_toggle.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 import 'package:weather_repository/weather_repository.dart';
 
@@ -109,7 +109,7 @@ class _SettingsPageExtraSmallLayoutState
                   final int selectedIndex = Language.values.indexOf(
                     settingsState.language,
                   );
-                  return _SettingSegmentedToggle(
+                  return SettingSegmentedToggle(
                     label: translate('settings.language'),
                     selectedIndex: selectedIndex,
                     options: Language.values
@@ -129,7 +129,7 @@ class _SettingsPageExtraSmallLayoutState
                 builder: (BuildContext context, WeatherState state) {
                   final int selectedIndex =
                       state.weather.temperatureUnits.isCelsius ? 0 : 1;
-                  return _SettingSegmentedToggle(
+                  return SettingSegmentedToggle(
                     label: translate('settings.temperature_units'),
                     options: const <String>['°C', '°F'],
                     selectedIndex: selectedIndex,
@@ -165,17 +165,6 @@ class _SettingsPageExtraSmallLayoutState
 
                   return Column(
                     children: <Widget>[
-                      _SettingSegmentedToggle(
-                        label: translate('settings.weather_background'),
-                        selectedIndex: state.isWeatherBackgroundEnabled ? 1 : 0,
-                        options: <String>[translate('no'), translate('yes')],
-                        onSelected: (int index) {
-                          context.read<SettingsBloc>().add(
-                            ToggleWeatherBackgroundEvent(index == 1),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 8),
                       SettingDropdown(
                         label: translate('settings.day_starts'),
                         value: state.dayStartHour,
@@ -199,7 +188,7 @@ class _SettingsPageExtraSmallLayoutState
                       ),
                       if (kDebugMode) ...<Widget>[
                         const SizedBox(height: 8),
-                        _SettingSegmentedToggle(
+                        SettingSegmentedToggle(
                           label: 'Night Mode (debug)',
                           selectedIndex: state.debugForceNight ? 1 : 0,
                           options: const <String>['Off', 'On'],
@@ -210,7 +199,7 @@ class _SettingsPageExtraSmallLayoutState
                           },
                         ),
                         const SizedBox(height: 8),
-                        _SettingSegmentedToggle(
+                        SettingSegmentedToggle(
                           label: 'Force OpenWeatherMap (debug)',
                           selectedIndex:
                               state.debugWeatherProviderOpenWeatherMap ? 1 : 0,
@@ -236,75 +225,6 @@ class _SettingsPageExtraSmallLayoutState
         icon: Icons.search,
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-    );
-  }
-}
-
-class _SettingSegmentedToggle extends StatelessWidget {
-  const _SettingSegmentedToggle({
-    required this.label,
-    required this.options,
-    required this.selectedIndex,
-    required this.onSelected,
-  });
-
-  final String label;
-  final List<String> options;
-  final int selectedIndex;
-  final ValueChanged<int> onSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    final Color watchForegroundColor = context.watchForegroundColor;
-
-    return Column(
-      children: <Widget>[
-        Text(
-          label,
-          style: Theme.of(
-            context,
-          ).textTheme.bodyMedium?.copyWith(color: watchForegroundColor),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 4),
-        Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            color: colorScheme.onSurface.withValues(alpha: 0.12),
-          ),
-          padding: const EdgeInsets.all(4),
-          child: Row(
-            children: List<Widget>.generate(options.length, (int index) {
-              final bool isSelected = index == selectedIndex;
-              return Expanded(
-                child: GestureDetector(
-                  onTap: () => onSelected(index),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? colorScheme.primary
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Text(
-                      options[index],
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: isSelected
-                            ? colorScheme.onPrimary
-                            : watchForegroundColor,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            }),
-          ),
-        ),
-      ],
     );
   }
 }

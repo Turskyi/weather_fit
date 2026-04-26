@@ -38,6 +38,7 @@ void main() {
     WidgetTester tester,
   ) {
     // Set a small circular-like screen size to simulate Wear OS
+    // and trigger isExtraSmallScreen layout.
     tester.view.physicalSize = const Size(220, 220);
     tester.view.devicePixelRatio = 1.0;
 
@@ -54,52 +55,42 @@ void main() {
   }
 
   group('Wear OS Regression Tests (Google Play Rejection Fixes)', () {
-    testWidgets(
-      'TextField MUST have interactive selection disabled and custom context '
-      'menu suppressed to prevent tooltip clipping',
-      (WidgetTester tester) async {
-        final TextEditingController controller = TextEditingController();
-        await tester.pumpWidget(buildSearchLayout(controller, tester));
-        await tester.pumpAndSettle();
+    testWidgets('Search input area MUST be tappable and localized to trigger '
+        'native input', (WidgetTester tester) async {
+      final TextEditingController controller = TextEditingController();
+      await tester.pumpWidget(buildSearchLayout(controller, tester));
 
-        final Finder textFieldFinder = find.byType(TextField);
-        expect(textFieldFinder, findsOneWidget);
+      // We use pump() instead of pumpAndSettle() because there is a pending
+      // timer from the auto-open logic in initState.
+      await tester.pump();
 
-        final TextField textField = tester.widget<TextField>(textFieldFinder);
+      // Regression Fix 1 & 4: Tappable container with search icon
+      // We find the InkWell that wraps the search box.
+      final Finder searchBoxFinder = find.byWidgetPredicate(
+        (Widget widget) =>
+            widget is InkWell &&
+            widget.child is Container &&
+            (widget.child as Container).child is Row,
+      );
+      expect(searchBoxFinder, findsOneWidget);
 
-        // Regression Fix 1: enableInteractiveSelection MUST be false
-        expect(
-          textField.enableInteractiveSelection,
-          isFalse,
-          reason:
-              'Interactive selection must be disabled to prevent "Paste" '
-              'tooltip on Wear OS',
-        );
+      final Finder searchIconFinder = find.byIcon(Icons.search);
+      expect(searchIconFinder, findsAtLeast(1));
 
-        // Regression Fix 2: contextMenuBuilder MUST return an empty widget
-        final BuildContext context = tester.element(textFieldFinder);
-        final EditableTextState state = tester.state<EditableTextState>(
-          find.descendant(
-            of: textFieldFinder,
-            matching: find.byType(EditableText),
-          ),
-        );
+      // Verify it contains the localized placeholder
+      expect(find.text(translate('search.enter_location')), findsOneWidget);
 
-        final Widget menuWidget = textField.contextMenuBuilder!(context, state);
-        expect(menuWidget, isA<SizedBox>());
-        expect((menuWidget as SizedBox).width, 0.0);
-        expect(menuWidget.height, 0.0);
-
-        tester.view.resetPhysicalSize();
-        tester.view.resetDevicePixelRatio();
-      },
-    );
+      // Clean up pending timers
+      await tester.pumpAndSettle(const Duration(seconds: 1));
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
 
     testWidgets('Search button MUST be enabled even for empty queries to prove '
         'functionality to reviewers', (WidgetTester tester) async {
       final TextEditingController controller = TextEditingController(text: '');
       await tester.pumpWidget(buildSearchLayout(controller, tester));
-      await tester.pumpAndSettle();
+      await tester.pump();
 
       final Finder searchButtonFinder = find.byType(ElevatedButton);
       expect(searchButtonFinder, findsOneWidget);
@@ -116,6 +107,8 @@ void main() {
             'Google Play functional description requirements',
       );
 
+      // Clean up pending timers
+      await tester.pumpAndSettle(const Duration(seconds: 1));
       tester.view.resetPhysicalSize();
       tester.view.resetDevicePixelRatio();
     });
@@ -125,7 +118,7 @@ void main() {
       (WidgetTester tester) async {
         final TextEditingController controller = TextEditingController();
         await tester.pumpWidget(buildSearchLayout(controller, tester));
-        await tester.pumpAndSettle();
+        await tester.pump();
 
         expect(
           find.byType(WearPositionIndicator),
@@ -135,31 +128,11 @@ void main() {
               'circular Wear OS devices',
         );
 
+        // Clean up pending timers
+        await tester.pumpAndSettle(const Duration(seconds: 1));
         tester.view.resetPhysicalSize();
         tester.view.resetDevicePixelRatio();
       },
     );
-
-    testWidgets('TextField MUST have a search icon to improve '
-        'discoverability', (WidgetTester tester) async {
-      final TextEditingController controller = TextEditingController();
-      await tester.pumpWidget(buildSearchLayout(controller, tester));
-      await tester.pumpAndSettle();
-
-      final Finder textFieldFinder = find.byType(TextField);
-      expect(textFieldFinder, findsOneWidget);
-      final TextField textField = tester.widget<TextField>(textFieldFinder);
-
-      expect(
-        textField.decoration?.prefixIcon,
-        isNotNull,
-        reason:
-            'Prefix search icon helps reviewers identify the field as a '
-            'keyword search option',
-      );
-
-      tester.view.resetPhysicalSize();
-      tester.view.resetDevicePixelRatio();
-    });
   });
 }

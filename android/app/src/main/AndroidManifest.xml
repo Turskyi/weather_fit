@@ -3,8 +3,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.turskyi.weather_fit"
-    android:versionCode="51"
-    android:versionName="0.5.1">
+    android:versionCode="53"
+    android:versionName="0.5.3">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- Grants approximate location access using Wi-Fi and mobile networks.
@@ -77,6 +77,11 @@
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="es.antonborri.home_widget.action.LAUNCH" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
 
             <intent-filter android:autoVerify="true">

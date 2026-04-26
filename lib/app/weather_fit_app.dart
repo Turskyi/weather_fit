@@ -10,6 +10,7 @@ import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
 import 'package:weather_fit/data/repositories/location_repository.dart';
 import 'package:weather_fit/data/repositories/outfit_repository.dart';
 import 'package:weather_fit/env/env.dart';
+import 'package:weather_fit/extensions/build_context_extensions.dart';
 import 'package:weather_fit/feedback/feedback_form.dart';
 import 'package:weather_fit/res/constants/constants.dart' as constants;
 import 'package:weather_fit/res/resources.dart';
@@ -106,6 +107,8 @@ class WeatherFitApp extends StatelessWidget {
               context,
             ).delegate;
 
+            final bool isExtraSmall = context.isExtraSmallScreen;
+
             const String fontFamily = 'Montserrat';
 
             final ColorScheme lightColorScheme = ColorScheme.fromSeed(
@@ -113,6 +116,54 @@ class WeatherFitApp extends StatelessWidget {
             );
             final ColorScheme darkColorScheme = ColorScheme.fromSeed(
               seedColor: color,
+              brightness: Brightness.dark,
+            );
+
+            final Color scaffoldBackgroundColor = isExtraSmall
+                ? Colors.black
+                : lightColorScheme.primaryContainer;
+            final Color darkScaffoldBackgroundColor = isExtraSmall
+                ? Colors.black
+                : darkColorScheme.primaryContainer;
+
+            final ThemeData theme = ThemeData(
+              useMaterial3: true,
+              fontFamily: fontFamily,
+              scaffoldBackgroundColor: scaffoldBackgroundColor,
+              canvasColor: scaffoldBackgroundColor,
+              appBarTheme: AppBarTheme(
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                titleTextStyle: TextStyle(
+                  fontFamily: fontFamily,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: lightColorScheme.onSurface,
+                ),
+              ),
+              colorScheme: isExtraSmall
+                  ? lightColorScheme.copyWith(surface: Colors.black)
+                  : lightColorScheme,
+            );
+
+            final ThemeData darkTheme = ThemeData(
+              useMaterial3: true,
+              fontFamily: fontFamily,
+              scaffoldBackgroundColor: darkScaffoldBackgroundColor,
+              canvasColor: darkScaffoldBackgroundColor,
+              appBarTheme: AppBarTheme(
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                titleTextStyle: TextStyle(
+                  fontFamily: fontFamily,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: darkColorScheme.onSurface,
+                ),
+              ),
+              colorScheme: isExtraSmall
+                  ? darkColorScheme.copyWith(surface: Colors.black)
+                  : darkColorScheme,
               brightness: Brightness.dark,
             );
 
@@ -130,9 +181,11 @@ class WeatherFitApp extends StatelessWidget {
                       );
                     },
                 theme: FeedbackThemeData(
-                  feedbackSheetColor: completeDarkness
-                      ? darkColorScheme.surface
-                      : lightColorScheme.surface,
+                  feedbackSheetColor: isExtraSmall
+                      ? Colors.black
+                      : (completeDarkness
+                            ? darkColorScheme.surface
+                            : lightColorScheme.surface),
                 ),
                 child: MaterialApp(
                   navigatorKey: navigatorKey,
@@ -155,44 +208,11 @@ class WeatherFitApp extends StatelessWidget {
                       child: SettingsStateListenerContent(child: child),
                     );
                   },
-                  theme: ThemeData(
-                    useMaterial3: true,
-                    fontFamily: fontFamily,
-                    scaffoldBackgroundColor: lightColorScheme.primaryContainer,
-                    canvasColor: lightColorScheme.primaryContainer,
-                    appBarTheme: AppBarTheme(
-                      backgroundColor: Colors.transparent,
-                      elevation: 0,
-                      titleTextStyle: TextStyle(
-                        fontFamily: fontFamily,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: lightColorScheme.onSurface,
-                      ),
-                    ),
-                    colorScheme: lightColorScheme,
-                  ),
-                  darkTheme: ThemeData(
-                    useMaterial3: true,
-                    fontFamily: fontFamily,
-                    scaffoldBackgroundColor: darkColorScheme.primaryContainer,
-                    canvasColor: darkColorScheme.primaryContainer,
-                    appBarTheme: AppBarTheme(
-                      backgroundColor: Colors.transparent,
-                      elevation: 0,
-                      titleTextStyle: TextStyle(
-                        fontFamily: fontFamily,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: darkColorScheme.onSurface,
-                      ),
-                    ),
-                    colorScheme: darkColorScheme,
-                    brightness: Brightness.dark,
-                  ),
-                  themeMode: completeDarkness
+                  theme: theme,
+                  darkTheme: darkTheme,
+                  themeMode: isExtraSmall
                       ? ThemeMode.dark
-                      : ThemeMode.light,
+                      : (completeDarkness ? ThemeMode.dark : ThemeMode.light),
                 ),
               ),
             );

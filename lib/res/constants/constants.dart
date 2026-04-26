@@ -11,6 +11,8 @@ const String kImagePath = 'assets/images/';
 const String kOutfitImagePath = '${kImagePath}outfits/';
 const String kAppName = 'WeatherFit';
 const String kAndroidPackageName = 'com.turskyi.weather_fit';
+const String kQualifiedAndroidWidgetName =
+    '$kAndroidPackageName.$kAndroidWidgetName';
 const String kDeviceMethodChannel = '$kAndroidPackageName/device';
 const String kSharedContainerMethodChannel =
     '$kAndroidPackageName/shared_container';
@@ -22,6 +24,8 @@ const String kItunesLookupUrl = 'https://itunes.apple.com/lookup?bundleId=';
 const String kDeveloperName = 'Dmytro Turskyi';
 const double kAppStoreBadgeHeight = 80.0;
 const double kAppStoreBadgeWidth = 140.0;
+const double kPageArrowBackgroundAlpha = 0.44;
+const double kPageArrowIconAlpha = 0.54;
 const String kCountryFlagsBaseUrl =
     'https://open-meteo.com/images/country-flags/';
 const String kArtistInstagramUrl = 'https://www.instagram.com/anartistart/';
@@ -58,7 +62,7 @@ const double kWideLayoutBreakpoint = 1000.0;
 /// Shared logical-pixel size threshold for Wear compact layouts.
 /// XL Watch emulator shortest side is 240dp, so Wear-specific layouts should
 /// still activate at this size.
-const double kWearCompactLayoutSize = 240.0;
+const double kWearCompactLayoutSize = 244.0;
 
 const String kMacOSLocationServicesSettingsUrl =
     'x-apple.systempreferences:com.apple.preference.security?'
@@ -72,3 +76,4 @@ const String kBackgroundTaskName = 'updateWidgetTask';
 const String kWeatherFitScheme = 'weatherfit';
 const String kWeatherFitHost = 'open';
 const String kDebugWeatherProviderKey = 'debug_weather_provider_openweathermap';
+const String kOpenRemoteInputMethod = 'openRemoteInput';

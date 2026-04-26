@@ -15,6 +15,11 @@ enum Language {
     name: _polishLanguage,
     isoLanguageCode: _polishIsoLanguageCode,
     flag: '🇵🇱',
+  ),
+  nl(
+    name: _dutchLanguage,
+    isoLanguageCode: _dutchIsoLanguageCode,
+    flag: '🇳🇱',
   );
 
   const Language({
@@ -39,6 +44,8 @@ enum Language {
         return Language.uk;
       case _polishIsoLanguageCode:
         return Language.pl;
+      case _dutchIsoLanguageCode:
+        return Language.nl;
       default:
         return Language.en;
     }
@@ -48,6 +55,8 @@ enum Language {
 const String _englishIsoLanguageCode = 'en';
 const String _ukrainianIsoLanguageCode = 'uk';
 const String _polishIsoLanguageCode = 'pl';
+const String _dutchIsoLanguageCode = 'nl';
 const String _englishLanguage = 'English';
 const String _ukrainianLanguage = 'Ukrainian';
 const String _polishLanguage = 'Polish';
+const String _dutchLanguage = 'Dutch';

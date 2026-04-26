@@ -91,7 +91,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     try {
       if (json.isEmpty) return null;
       // Since we primarily care about restoring successful weather data,
-      // we try to restore as WeatherSuccess.
+      // we try to restore as `WeatherSuccess`.
       return WeatherSuccess.fromJson(json);
     } catch (e) {
       debugPrint('WeatherBloc fromJson error: $e');
@@ -521,6 +521,11 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
   }
 
   String _mapExceptionToMessage(Exception exception) {
+    final String detailedMessage = exception.toString();
+    if (exception is HandshakeException &&
+        detailedMessage.contains('CERTIFICATE_VERIFY_FAILED')) {
+      return translate('error.certificate_validation_failed_user_message');
+    }
     if (exception is http.ClientException || exception is SocketException) {
       return translate('errors.no_internet');
     }

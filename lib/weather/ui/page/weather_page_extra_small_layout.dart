@@ -248,7 +248,7 @@ class _WeatherPageExtraSmallLayoutState
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      backgroundColor: theme.scaffoldBackgroundColor,
+      backgroundColor: Colors.black,
       appBar: AppBar(
         centerTitle: true,
         toolbarHeight: cupertino
@@ -294,7 +294,7 @@ class _WeatherPageExtraSmallLayoutState
           return false;
         },
         child: ColoredBox(
-          color: theme.scaffoldBackgroundColor,
+          color: Colors.black,
           child: Center(child: content),
         ),
       ),

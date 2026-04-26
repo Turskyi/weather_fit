@@ -731,17 +731,20 @@ struct DateHelper {
         let isUk = locale.lowercased().hasPrefix("uk")
         let isPl = locale.lowercased().hasPrefix("pl")
         let isDe = locale.lowercased().hasPrefix("de")
+        let isNl = locale.lowercased().hasPrefix("nl")
 
         if Calendar.current.isDateInToday(date) {
             if isUk { return "Сьогодні" }
             if isPl { return "Dzisiaj" }
             if isDe { return "Heute" }
+            if isNl { return "Vandaag" }
             return "Today"
         }
         if Calendar.current.isDateInTomorrow(date) {
             if isUk { return "Завтра" }
             if isPl { return "Jutro" }
             if isDe { return "Morgen" }
+            if isNl { return "Morgen" }
             return "Tomorrow"
         }
         let dayFormatter = DateFormatter()
@@ -758,27 +761,32 @@ struct DateHelper {
         let isUk = locale.lowercased().hasPrefix("uk")
         let isPl = locale.lowercased().hasPrefix("pl")
         let isDe = locale.lowercased().hasPrefix("de")
+        let isNl = locale.lowercased().hasPrefix("nl")
 
         switch hour {
         case 5...11:
             if isUk { return "Ранок" }
             if isPl { return "Poranek" }
             if isDe { return "Morgen" }
+            if isNl { return "Ochtend" }
             return "Morning"
         case 12...16:
             if isUk { return "Обід" }
             if isPl { return "Południe" }
             if isDe { return "Mittag" }
+            if isNl { return "Middag" }
             return "Lunch"
         case 17...21:
             if isUk { return "Вечір" }
             if isPl { return "Wieczór" }
             if isDe { return "Abend" }
+            if isNl { return "Avond" }
             return "Evening"
         default:
             if isUk { return "Ніч" }
             if isPl { return "Noc" }
             if isDe { return "Nacht" }
+            if isNl { return "Nacht" }
             return "Night"
         }
     }

@@ -9,8 +9,8 @@ import 'package:weather_fit/res/constants/constants.dart' as constants;
 import 'package:weather_fit/router/app_route.dart';
 import 'package:weather_fit/services/home_widget_service.dart';
 import 'package:weather_fit/settings/bloc/settings_bloc.dart';
-import 'package:weather_fit/settings/ui/settings_page_default_layout.dart';
-import 'package:weather_fit/settings/ui/settings_page_extra_small_layout.dart';
+import 'package:weather_fit/settings/ui/widgets/settings_page_default_layout.dart';
+import 'package:weather_fit/settings/ui/widgets/settings_page_extra_small_layout.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -84,6 +84,7 @@ class _SettingsPageState extends State<SettingsPage> {
   void _requestPinWidget() {
     context.read<HomeWidgetService>().requestPinWidget(
       androidName: constants.kAndroidWidgetName,
+      qualifiedAndroidName: constants.kQualifiedAndroidWidgetName,
     );
   }
 

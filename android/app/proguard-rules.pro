@@ -6,3 +6,8 @@
 # accessed via reflection, causing a ClassCastException at runtime.
 -keep class com.turskyi.weather_fit.ForecastItem { *; }
 -keep class com.turskyi.weather_fit.ForecastData { *; }
+
+# Keep Glance internal classes to avoid issues with trampoline activity.
+-keep class androidx.glance.appwidget.action.** { *; }
+-keep class androidx.glance.appwidget.** { *; }
+-keep class * extends androidx.glance.appwidget.action.ActionCallback

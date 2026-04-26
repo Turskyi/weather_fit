@@ -12,13 +12,13 @@ class ForecastOutfitPreview extends StatefulWidget {
   const ForecastOutfitPreview({
     required this.item,
     required this.baseWeather,
-    required this.isCelsius,
+    required this.temperatureUnits,
     super.key,
   });
 
   final ForecastItemDomain item;
   final Weather baseWeather;
-  final bool isCelsius;
+  final TemperatureUnits temperatureUnits;
 
   @override
   State<ForecastOutfitPreview> createState() => _ForecastOutfitPreviewState();
@@ -113,9 +113,7 @@ class _ForecastOutfitPreviewState extends State<ForecastOutfitPreview>
       lastUpdatedDateTime: null,
       location: widget.baseWeather.location,
       temperature: Temperature(value: widget.item.temperature),
-      temperatureUnits: widget.isCelsius
-          ? TemperatureUnits.celsius
-          : TemperatureUnits.fahrenheit,
+      temperatureUnits: widget.temperatureUnits,
       countryCode: widget.baseWeather.countryCode,
       description: widget.baseWeather.description,
       code: widget.item.weatherCode,

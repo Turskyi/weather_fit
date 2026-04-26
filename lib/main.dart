@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:flutter_web_plugins/url_strategy.dart';
+import 'package:flutter_web_plugins/url_strategy.dart' as web;
 import 'package:weather_fit/app/weather_fit_app.dart';
 import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
 import 'package:weather_fit/data/repositories/location_repository.dart';
@@ -8,7 +8,7 @@ import 'package:weather_fit/data/repositories/outfit_repository.dart';
 import 'package:weather_fit/di/dependencies.dart';
 import 'package:weather_fit/di/injector.dart' as di;
 import 'package:weather_fit/router/routes.dart' as router;
-import 'package:weather_fit/services/device_type_service.dart';
+import 'package:weather_fit/services/device_type_service.dart' as service;
 import 'package:weather_fit/services/feedback_service.dart';
 import 'package:weather_fit/services/home_widget_service.dart';
 import 'package:weather_fit/services/update_service.dart';
@@ -29,9 +29,10 @@ Future<void> main() async {
   // We need to call `WidgetsFlutterBinding.ensureInitialized` before any
   // `await` operation, otherwise app may stuck on black/white screen.
   WidgetsFlutterBinding.ensureInitialized();
-  usePathUrlStrategy();
 
-  await initializeDeviceType();
+  web.usePathUrlStrategy();
+
+  await service.initializeDeviceType();
 
   final Dependencies dependencies = await di.injectDependencies();
 

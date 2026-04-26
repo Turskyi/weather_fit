@@ -307,13 +307,13 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
                     ),
                     style: IconButton.styleFrom(
                       backgroundColor: theme.colorScheme.surface.withValues(
-                        alpha: 0.48,
+                        alpha: constants.kPageArrowBackgroundAlpha,
                       ),
                     ),
                     icon: Icon(
                       Icons.arrow_back_ios,
                       color: theme.colorScheme.onSurface.withValues(
-                        alpha: 0.54,
+                        alpha: constants.kPageArrowIconAlpha,
                       ),
                       size: isExtraSmall ? 18 : 48,
                     ),
@@ -336,13 +336,13 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
                       ),
                       style: IconButton.styleFrom(
                         backgroundColor: theme.colorScheme.surface.withValues(
-                          alpha: 0.48,
+                          alpha: constants.kPageArrowBackgroundAlpha,
                         ),
                       ),
                       icon: Icon(
                         Icons.arrow_forward_ios,
                         color: theme.colorScheme.onSurface.withValues(
-                          alpha: 0.54,
+                          alpha: constants.kPageArrowIconAlpha,
                         ),
                         size: isExtraSmall ? 18 : 48,
                       ),

@@ -443,6 +443,7 @@ struct DateHelper {
         let isUk = locale.lowercased().hasPrefix("uk")
         let isPl = locale.lowercased().hasPrefix("pl")
         let isDe = locale.lowercased().hasPrefix("de")
+        let isNl = locale.lowercased().hasPrefix("nl")
 
         if Calendar.current.isDateInToday(date) {
             if isUk {
@@ -454,6 +455,9 @@ struct DateHelper {
             if isDe {
                 return "Heute"
             }
+            if isNl {
+                return "Vandaag"
+            }
             return "Today"
         }
         if Calendar.current.isDateInTomorrow(date) {
@@ -464,6 +468,9 @@ struct DateHelper {
                 return "Jutro"
             }
             if isDe {
+                return "Morgen"
+            }
+            if isNl {
                 return "Morgen"
             }
             return "Tomorrow"
@@ -482,6 +489,7 @@ struct DateHelper {
         let isUk = locale.lowercased().hasPrefix("uk")
         let isPl = locale.lowercased().hasPrefix("pl")
         let isDe = locale.lowercased().hasPrefix("de")
+        let isNl = locale.lowercased().hasPrefix("nl")
 
         switch hour {
         case 5...11:
@@ -494,6 +502,9 @@ struct DateHelper {
             if isDe {
                 return "Morgen"
             }
+            if isNl {
+                return "Ochtend"
+            }
             return "Morning"
         case 12...16:
             if isUk {
@@ -504,6 +515,9 @@ struct DateHelper {
             }
             if isDe {
                 return "Mittag"
+            }
+            if isNl {
+                return "Middag"
             }
             return "Lunch"
         case 17...21:
@@ -516,6 +530,9 @@ struct DateHelper {
             if isDe {
                 return "Abend"
             }
+            if isNl {
+                return "Avond"
+            }
             return "Evening"
         default:
             if isUk {
@@ -525,6 +542,9 @@ struct DateHelper {
                 return "Noc"
             }
             if isDe {
+                return "Nacht"
+            }
+            if isNl {
                 return "Nacht"
             }
             return "Night"
