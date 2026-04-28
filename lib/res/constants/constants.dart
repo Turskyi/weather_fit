@@ -42,6 +42,7 @@ const String kFeedbackTextProperty = 'feedback_text';
 const String kRatingProperty = 'rating';
 const String kScreenSizeProperty = 'screenSize';
 const String kSearchError = 'searchError';
+const String kPrecipitation = 'precipitation';
 
 /// Blur intensity constant.
 const double kBlurSigma = 8;

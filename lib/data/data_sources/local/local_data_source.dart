@@ -63,8 +63,6 @@ class LocalDataSource {
     if (roundedTemp > 30) roundedTemp = 30;
     if (roundedTemp < -30) roundedTemp = -30;
 
-    const String precipitation = 'precipitation';
-
     // Handle unknowns early.
     if (condition.isUnknown) {
       return <String>[
@@ -72,7 +70,8 @@ class LocalDataSource {
             '${WeatherCondition.clear.name}_$roundedTemp.png',
         '${constants.kOutfitImagePath}'
             '${WeatherCondition.cloudy.name}_$roundedTemp.png',
-        '${constants.kOutfitImagePath}${precipitation}_$roundedTemp.png',
+        '${constants.kOutfitImagePath}${constants.kPrecipitation}_'
+            '$roundedTemp.png',
       ];
     }
 
@@ -80,7 +79,8 @@ class LocalDataSource {
     final String conditionName = switch (condition) {
       WeatherCondition.clear => condition.name,
       WeatherCondition.cloudy => condition.name,
-      WeatherCondition.rainy || WeatherCondition.snowy => precipitation,
+      WeatherCondition.rainy ||
+      WeatherCondition.snowy => constants.kPrecipitation,
       _ => WeatherCondition.unknown.name,
     };
 

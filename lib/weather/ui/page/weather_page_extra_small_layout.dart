@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
+import 'package:weather_fit/extensions/build_context_extensions.dart';
 import 'package:weather_fit/res/widgets/local_web_cors_error.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 import 'package:weather_fit/weather/ui/empty/weather_empty.dart';
@@ -321,18 +322,15 @@ class _WeatherPageExtraSmallLayoutState
         ..showSnackBar(
           SnackBar(
             behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.symmetric(horizontal: 40, vertical: 24),
-            duration: const Duration(seconds: 2),
-            content: Row(
-              children: <Widget>[
-                Expanded(child: SelectableText(state.message)),
-                TextButton(
-                  onPressed: () =>
-                      ScaffoldMessenger.of(context).hideCurrentSnackBar(),
-                  child: Text(translate('ok')),
-                ),
-              ],
+            shape: const StadiumBorder(),
+            margin: EdgeInsets.fromLTRB(
+              28,
+              0,
+              28,
+              context.wearBottomPadding + 8,
             ),
+            duration: const Duration(seconds: 3),
+            content: Text(state.message, textAlign: TextAlign.center),
             action: SnackBarAction(
               label: translate('try_again'),
               onPressed: widget.onRefresh,

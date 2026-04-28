@@ -7,7 +7,6 @@ import 'package:weather_fit/entities/enums/outfit_image_source.dart';
 import 'package:weather_fit/entities/enums/temperature_units.dart';
 import 'package:weather_fit/entities/models/outfit/outfit_image.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
-import 'package:weather_fit/extensions/build_context_extensions.dart';
 import 'package:weather_fit/res/constants/constants.dart' as constants;
 import 'package:weather_fit/res/extensions/double_extension.dart';
 import 'package:weather_repository/weather_repository.dart';
@@ -17,8 +16,6 @@ class OutfitRepository {
 
   final LocalDataSource _localDataSource;
   final RemoteDataSource _remoteDataSource;
-
-  static const String _precipitation = 'precipitation';
 
   Future<OutfitImage> getOutfitImage(Weather weather) async {
     final double temperatureValue = _getTemperatureInCelsius(weather);
@@ -37,9 +34,8 @@ class OutfitRepository {
             .toList(),
         source: OutfitImageSource.network,
       );
-    } else if (isWearDevice || roundedTemp % 10 == 0) {
-      // On Wear OS, network fetch is unreliable; always use bundled assets.
-      // Also use assets when the temperature ends with 0.
+    } else if (roundedTemp % 10 == 0) {
+      // Use assets when the temperature ends with 0.
       return OutfitImage(
         paths: getOutfitImageAssetPaths(weather),
         source: OutfitImageSource.asset,
@@ -56,18 +52,17 @@ class OutfitRepository {
           // Check if the image is already downloaded locally.
           if (await _localDataSource.fileExists(filePath)) {
             filePaths.add(filePath);
-            continue;
+          } else {
+            // Attempt to download from remote source.
+            final List<int> bytes = await _remoteDataSource
+                .downloadOutfitImage(fileName)
+                .timeout(const Duration(seconds: 5));
+
+            // Save to local app storage.
+            final File file = File(filePath);
+            await file.writeAsBytes(bytes);
+            filePaths.add(filePath);
           }
-
-          // Attempt to download from remote source.
-          final List<int> bytes = await _remoteDataSource
-              .downloadOutfitImage(fileName)
-              .timeout(const Duration(seconds: 5));
-
-          // Save to local app storage.
-          final File file = File(filePath);
-          await file.writeAsBytes(bytes);
-          filePaths.add(filePath);
         }
 
         return OutfitImage(paths: filePaths, source: OutfitImageSource.file);
@@ -130,7 +125,7 @@ class OutfitRepository {
       return <String>[
         '${WeatherCondition.clear.name}_$roundedTemp.png',
         '${WeatherCondition.cloudy.name}_$roundedTemp.png',
-        '${_precipitation}_$roundedTemp.png',
+        '${constants.kPrecipitation}_$roundedTemp.png',
       ];
     } else {
       final String conditionName = _getConditionName(condition);
@@ -142,7 +137,8 @@ class OutfitRepository {
     return switch (condition) {
       WeatherCondition.clear => condition.name,
       WeatherCondition.cloudy => condition.name,
-      WeatherCondition.rainy || WeatherCondition.snowy => _precipitation,
+      WeatherCondition.rainy ||
+      WeatherCondition.snowy => constants.kPrecipitation,
       _ => WeatherCondition.unknown.name,
     };
   }
