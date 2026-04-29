@@ -284,16 +284,7 @@ class _WeatherPageExtraSmallLayoutState
         ),
       ),
       body: NotificationListener<ScrollNotification>(
-        onNotification: (ScrollNotification notification) {
-          final bool isAtBottom =
-              notification.metrics.atEdge && notification.metrics.pixels > 0;
-          if (isAtBottom != _isAtScrollBottom) {
-            setState(() {
-              _isAtScrollBottom = isAtBottom;
-            });
-          }
-          return false;
-        },
+        onNotification: _onScrollNotification,
         child: ColoredBox(
           color: Colors.black,
           child: Center(child: content),
@@ -339,5 +330,23 @@ class _WeatherPageExtraSmallLayoutState
         );
     }
     widget.weatherStateListener?.call(context, state);
+  }
+
+  bool _onScrollNotification(ScrollNotification notification) {
+    final bool isAtBottom =
+        notification.metrics.atEdge && notification.metrics.pixels > 0;
+    // Guard against redundant state updates and use `postFrameCallback` to
+    // avoid "Build scheduled during frame" errors if setState is triggered
+    // during layout.
+    if (isAtBottom != _isAtScrollBottom) {
+      WidgetsBinding.instance.addPostFrameCallback((Duration _) {
+        if (mounted) {
+          setState(() {
+            _isAtScrollBottom = isAtBottom;
+          });
+        }
+      });
+    }
+    return false;
   }
 }
