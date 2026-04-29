@@ -58,7 +58,10 @@ class _SettingsStateListenerContentState
   void _settingsBlocStateListener(BuildContext context, SettingsState state) {
     if (state is FeedbackState) {
       if (context.isExtraSmallScreen) {
-        _sendFeedbackImmediately(state.errorMessage);
+        _sendFeedbackImmediately(
+          errorText: state.errorMessage,
+          query: state.query,
+        );
       } else {
         _showFeedbackUi();
       }
@@ -81,7 +84,10 @@ class _SettingsStateListenerContentState
     }
   }
 
-  Future<void> _sendFeedbackImmediately(String errorText) async {
+  Future<void> _sendFeedbackImmediately({
+    required String errorText,
+    String query = '',
+  }) async {
     try {
       final Uint8List screenshot = await _captureWidgetScreenshot();
 
@@ -89,16 +95,16 @@ class _SettingsStateListenerContentState
           'Smart Watch user report\n'
           'Device: Smart Watch (detected extra small)\n'
           'Error: $errorText\n'
+          '${query.isNotEmpty ? 'Query: $query\n' : ''}'
           'Timestamp: ${DateTime.now().toIso8601String()}';
 
       if (mounted) {
+        final Size size = MediaQuery.sizeOf(context);
         final UserFeedback feedback = UserFeedback(
           text: feedbackText,
           screenshot: screenshot,
           extra: <String, Object?>{
-            constants.kScreenSizeProperty: MediaQuery.sizeOf(
-              context,
-            ).toString(),
+            constants.kScreenSizeProperty: '${size.width}x${size.height}',
           },
         );
 

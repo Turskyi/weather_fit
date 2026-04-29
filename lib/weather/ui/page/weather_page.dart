@@ -399,7 +399,9 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
   void _handleReportPressed() {
     final WeatherState state = context.read<WeatherBloc>().state;
     context.read<SettingsBloc>().add(
-      BugReportPressedEvent(state is WeatherFailure ? state.message : ''),
+      BugReportPressedEvent(
+        errorText: state is WeatherFailure ? state.message : '',
+      ),
     );
   }
 

@@ -101,6 +101,7 @@ final class FeedbackState extends SettingsState {
   const FeedbackState({
     required this.errorMessage,
     required super.language,
+    this.query = '',
     super.appVersion,
     super.widgetUpdateFrequency,
     super.dayStartHour,
@@ -111,11 +112,13 @@ final class FeedbackState extends SettingsState {
   });
 
   final String errorMessage;
+  final String query;
 
   @override
   String toString() {
     return 'FeedbackState('
         '  errorMessage: $errorMessage,'
+        '  query: $query,'
         '  language: $language,'
         '  appVersion: $appVersion,'
         '  widgetUpdateFrequency: $widgetUpdateFrequency,'
@@ -131,6 +134,7 @@ final class FeedbackState extends SettingsState {
   @override
   FeedbackState copyWith({
     String? errorMessage,
+    String? query,
     Language? language,
     String? appVersion,
     int? widgetUpdateFrequency,
@@ -142,6 +146,7 @@ final class FeedbackState extends SettingsState {
   }) {
     return FeedbackState(
       errorMessage: errorMessage ?? this.errorMessage,
+      query: query ?? this.query,
       language: language ?? this.language,
       appVersion: appVersion ?? this.appVersion,
       widgetUpdateFrequency:

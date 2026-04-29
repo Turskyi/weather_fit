@@ -647,15 +647,30 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   void _handleReportActionAndPop(String errorText) {
-    context.read<SettingsBloc>().add(BugReportPressedEvent(errorText));
+    final SearchState searchState = context.read<SearchBloc>().state;
+    String query = '';
+    if (searchState is SearchError) {
+      query = searchState.query;
+    }
+
+    context.read<SettingsBloc>().add(
+      BugReportPressedEvent(errorText: errorText, query: query),
+    );
     return Navigator.of(context).pop();
   }
 
   void _handleReportErrorSnackBarAction() {
     final SearchState state = context.read<SearchBloc>().state;
 
+    String query = '';
+    String errorMessage = '';
+    if (state is SearchError) {
+      query = state.query;
+      errorMessage = state.errorMessage;
+    }
+
     context.read<SettingsBloc>().add(
-      BugReportPressedEvent(state is SearchError ? state.errorMessage : ''),
+      BugReportPressedEvent(errorText: errorMessage, query: query),
     );
     return ScaffoldMessenger.of(context).hideCurrentSnackBar();
   }

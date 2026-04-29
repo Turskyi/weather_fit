@@ -67,8 +67,11 @@ class _SettingsPageState extends State<SettingsPage> {
 
   void _handleFeedbackRequest() {
     final SettingsState state = context.read<SettingsBloc>().state;
+    final String errorMessage = state is SettingsError
+        ? state.errorMessage
+        : '';
     context.read<SettingsBloc>().add(
-      BugReportPressedEvent(state is SettingsError ? state.errorMessage : ''),
+      BugReportPressedEvent(errorText: errorMessage),
     );
   }
 
