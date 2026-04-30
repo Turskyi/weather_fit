@@ -31,7 +31,6 @@
     <!--suppress AndroidDomInspection -->
     <application
         android:name="${applicationName}"
-        android:extractNativeLibs="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/weatherfit"
         android:roundIcon="@mipmap/ic_launcher_round"

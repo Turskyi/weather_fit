@@ -42,6 +42,8 @@ extension ResponsiveChecks on BuildContext {
     return isWearDevice || shortestSide <= constants.kWearCompactLayoutSize;
   }
 
+  bool get isNotExtraSmallScreen => !isExtraSmallScreen;
+
   bool get isNarrowScreen => screenWidth <= _narrowScreenThreshold;
 
   double get wearHorizontalPadding {
