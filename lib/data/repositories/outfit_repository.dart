@@ -49,19 +49,21 @@ class OutfitRepository {
         for (final String fileName in fileNames) {
           final String filePath = '${directory.path}/$fileName';
 
-          // Check if the image is already downloaded locally.
+          // Check if the image is already downloaded locally and is not empty.
           if (await _localDataSource.fileExists(filePath)) {
-            filePaths.add(filePath);
-          } else {
-            // Attempt to download from remote source.
-            final List<int> bytes = await _remoteDataSource
-                .downloadOutfitImage(fileName)
-                .timeout(const Duration(seconds: 5));
-
-            // Save to local app storage.
             final File file = File(filePath);
-            await file.writeAsBytes(bytes);
-            filePaths.add(filePath);
+            if (await file.length() > 0) {
+              filePaths.add(filePath);
+            } else {
+              debugPrint(
+                'OutfitRepository: File $filePath is empty, deleting and '
+                're-downloading.',
+              );
+              await file.delete();
+              await _downloadAndSave(fileName, file, filePaths);
+            }
+          } else {
+            await _downloadAndSave(fileName, File(filePath), filePaths);
           }
         }
 
@@ -77,6 +79,21 @@ class OutfitRepository {
         );
       }
     }
+  }
+
+  Future<void> _downloadAndSave(
+    String fileName,
+    File file,
+    List<String> filePaths,
+  ) async {
+    // Attempt to download from remote source.
+    final List<int> bytes = await _remoteDataSource
+        .downloadOutfitImage(fileName)
+        .timeout(const Duration(seconds: 5));
+
+    // Save to local app storage.
+    await file.writeAsBytes(bytes);
+    filePaths.add(file.path);
   }
 
   List<String> getOutfitImageAssetPaths(Weather weather) {

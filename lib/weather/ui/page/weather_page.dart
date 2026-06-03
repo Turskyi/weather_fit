@@ -274,6 +274,7 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
           return WeatherPageExtraSmallLayout(
             onSettingsPressed: _navigateToSettingsAndRefreshOutfit,
             onRefresh: _refresh,
+            onOutfitRefresh: _refreshOutfit,
             onSearchPressed: _handleLocationSearchAndFetchWeather,
             onReportPressed: _handleReportPressed,
             isEmbedded: true,
@@ -283,6 +284,7 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
           return WeatherPageDefaultLayout(
             onSettingsPressed: _navigateToSettingsAndRefreshOutfit,
             onRefresh: _refresh,
+            onOutfitRefresh: _refreshOutfit,
             onSearchPressed: _handleLocationSearchAndFetchWeather,
             onReportPressed: _handleReportPressed,
             isEmbedded: true,
@@ -375,6 +377,7 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
           ? WeatherPageExtraSmallLayout(
               onSettingsPressed: _navigateToSettingsAndRefreshOutfit,
               onRefresh: _refresh,
+              onOutfitRefresh: _refreshOutfit,
               onSearchPressed: _handleLocationSearchAndFetchWeather,
               onReportPressed: _handleReportPressed,
               bodyOverride: body,
@@ -382,6 +385,7 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
           : WeatherPageDefaultLayout(
               onSettingsPressed: _navigateToSettingsAndRefreshOutfit,
               onRefresh: _refresh,
+              onOutfitRefresh: _refreshOutfit,
               onSearchPressed: _handleLocationSearchAndFetchWeather,
               onReportPressed: _handleReportPressed,
               bodyOverride: body,
@@ -456,26 +460,61 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
   Future<void> _refresh() {
     return Future<void>.delayed(Duration.zero, () {
       if (mounted) {
-        _fetchWeatherForCurrentPageLocation();
+        final int safeIndex = _getCurrentVisibleIndex();
+        final Location currentLocation = _locations[safeIndex];
+
+        if (currentLocation.isNotEmpty) {
+          context.read<LocalDataSource>().saveLocation(currentLocation);
+        }
+        context.read<WeatherBloc>().add(RefreshWeather(context.origin));
       }
     });
   }
 
+  Future<void> _refreshOutfit() async {
+    debugPrint('🔄 WeatherPage: _refreshOutfit called');
+    final WeatherBloc weatherBloc = context.read<WeatherBloc>();
+    final Weather currentWeather = weatherBloc.state.weather;
+
+    if (currentWeather.isNotEmpty) {
+      debugPrint(
+        '🔄 WeatherPage: Dispatching GetOutfitEvent for current weather',
+      );
+      weatherBloc.add(
+        GetOutfitEvent(weather: currentWeather, origin: context.origin),
+      );
+    } else {
+      debugPrint(
+        '🔄 WeatherPage: Weather is empty, falling back to full refresh',
+      );
+      await _refresh();
+    }
+  }
+
   void _fetchWeatherForCurrentPageLocation() {
+    debugPrint('🔄 WeatherPage: _fetchWeatherForCurrentPageLocation called');
     if (_locations.isEmpty) {
+      debugPrint('🔄 WeatherPage: locations empty, dispatching RefreshWeather');
       context.read<WeatherBloc>().add(RefreshWeather(context.origin));
       return;
     }
 
     final int safeIndex = _getCurrentVisibleIndex();
     final Location currentLocation = _locations[safeIndex];
+    debugPrint('🔄 WeatherPage: current location is "$currentLocation"');
 
     if (currentLocation.isNotEmpty) {
       context.read<LocalDataSource>().saveLocation(currentLocation);
+      debugPrint(
+        '🔄 WeatherPage: dispatching FetchWeather for "$currentLocation"',
+      );
       context.read<WeatherBloc>().add(
         FetchWeather(location: currentLocation, origin: context.origin),
       );
     } else {
+      debugPrint(
+        '🔄 WeatherPage: location is empty, dispatching RefreshWeather',
+      );
       context.read<WeatherBloc>().add(RefreshWeather(context.origin));
     }
   }

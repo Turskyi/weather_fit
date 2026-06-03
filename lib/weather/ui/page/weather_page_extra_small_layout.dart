@@ -53,6 +53,7 @@ class WeatherPageExtraSmallLayout extends StatefulWidget {
   const WeatherPageExtraSmallLayout({
     required this.onSettingsPressed,
     required this.onRefresh,
+    required this.onOutfitRefresh,
     required this.onSearchPressed,
     required this.onReportPressed,
     this.weatherStateListener,
@@ -73,6 +74,8 @@ class WeatherPageExtraSmallLayout extends StatefulWidget {
   /// far enough to demonstrate that they want the app to refresh. The returned
   /// [Future] must complete when the refresh operation is finished.
   final RefreshCallback onRefresh;
+
+  final RefreshCallback onOutfitRefresh;
 
   /// The callback that is called when the "Search" button is tapped or
   /// otherwise activated.
@@ -155,7 +158,7 @@ class _WeatherPageExtraSmallLayoutState
               outfitImageWidget = OutfitWidget(
                 outfitImage: state.outfitImage,
                 outfitRecommendation: stateOutfitRecommendation,
-                onRefresh: widget.onRefresh,
+                onRefresh: widget.onOutfitRefresh,
               );
             } else if (state is LoadingOutfitState) {
               final BorderRadius borderRadius = BorderRadius.circular(20.0);
@@ -219,7 +222,7 @@ class _WeatherPageExtraSmallLayoutState
                 child: OutfitWidget(
                   outfitImage: state.outfitImage,
                   outfitRecommendation: state.outfitRecommendation,
-                  onRefresh: widget.onRefresh,
+                  onRefresh: widget.onOutfitRefresh,
                 ),
               );
             }
@@ -232,7 +235,7 @@ class _WeatherPageExtraSmallLayoutState
                 child: OutfitWidget(
                   outfitImage: state.outfitImage,
                   outfitRecommendation: state.outfitRecommendation,
-                  onRefresh: widget.onRefresh,
+                  onRefresh: widget.onOutfitRefresh,
                 ),
               );
             }
