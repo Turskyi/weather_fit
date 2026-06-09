@@ -716,10 +716,9 @@ private fun getTimeOfDay(
     val cal: Calendar = Calendar.getInstance()
     cal.time = date
     return when (cal.get(Calendar.HOUR_OF_DAY)) {
-        in 5..11 -> localizedContext.getString(R.string.morning)
-        in 12..16 -> localizedContext.getString(R.string.lunch)
-        in 17..21 -> localizedContext.getString(R.string.evening)
-        else -> localizedContext.getString(R.string.night)
+        in 0..9 -> localizedContext.getString(R.string.morning)
+        in 10..16 -> localizedContext.getString(R.string.day)
+        else -> localizedContext.getString(R.string.evening)
     }
 }
 

@@ -342,19 +342,15 @@ struct Provider: TimelineProvider {
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm"
 
         let now = Date()
-        var futureItems: [ForecastItem] = []
+        var allItems: [ForecastItem] = []
 
         for index in 0..<count {
             let timeString = hourly.time[index]
-            guard let date = formatter.date(from: timeString), date > now else {
-                continue
-            }
-
             let celsius = hourly.temperature2m[index]
             let temperature = isFahrenheit ? (celsius * 9 / 5) + 32 : celsius
             let weatherCode = hourly.weatherCode[index]
 
-            futureItems.append(
+            allItems.append(
                 ForecastItem(
                     time: timeString,
                     temperature: temperature,
@@ -363,26 +359,87 @@ struct Provider: TimelineProvider {
             )
         }
 
-        let morning = futureItems.first { item in
-            guard let date = formatter.date(from: item.time) else { return false }
-            let hour = Calendar.current.component(.hour, from: date)
-            return (8...11).contains(hour)
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: now)
+        var result: [ForecastItem] = []
+
+        // Evaluate 3 periods starting from today
+        for dayOffset in 0...2 {
+            guard let date = calendar.date(byAdding: .day, value: dayOffset, to: today) else { continue }
+
+            // Morning (0-10)
+            if let morning = aggregatePeriod(items: allItems, date: date, startHour: 0, endHour: 10, representativeHour: 8, formatter: formatter),
+               isPeriodRelevant(item: morning, now: now, endHour: 10, formatter: formatter) {
+                result.append(morning)
+            }
+            if result.count >= 3 { break }
+
+            // Day (10-17)
+            if let day = aggregatePeriod(items: allItems, date: date, startHour: 10, endHour: 17, representativeHour: 13, formatter: formatter),
+               isPeriodRelevant(item: day, now: now, endHour: 17, formatter: formatter) {
+                result.append(day)
+            }
+            if result.count >= 3 { break }
+
+            // Evening (17-24)
+            if let evening = aggregatePeriod(items: allItems, date: date, startHour: 17, endHour: 24, representativeHour: 19, formatter: formatter),
+               isPeriodRelevant(item: evening, now: now, endHour: 24, formatter: formatter) {
+                result.append(evening)
+            }
+            if result.count >= 3 { break }
         }
 
-        let lunch = futureItems.first { item in
-            guard let date = formatter.date(from: item.time) else { return false }
-            let hour = Calendar.current.component(.hour, from: date)
-            return (12...15).contains(hour)
+        return Array(result.prefix(3))
+    }
+
+    private func isPeriodRelevant(item: ForecastItem, now: Date, endHour: Int, formatter: DateFormatter) -> Bool {
+        guard let itemDate = formatter.date(from: item.time) else { return false }
+        let periodEnd = Calendar.current.date(bySettingHour: endHour, minute: 0, second: 0, of: itemDate) ?? itemDate
+        return periodEnd > now
+    }
+
+    private func aggregatePeriod(
+        items: [ForecastItem],
+        date: Date,
+        startHour: Int,
+        endHour: Int,
+        representativeHour: Int,
+        formatter: DateFormatter
+    ) -> ForecastItem? {
+        let calendar = Calendar.current
+        let periodItems = items.filter { item in
+            guard let itemDate = formatter.date(from: item.time) else { return false }
+            return calendar.isDate(itemDate, inSameDayAs: date) &&
+                   calendar.component(.hour, from: itemDate) >= startHour &&
+                   calendar.component(.hour, from: itemDate) < endHour
         }
 
-        let evening = futureItems.first { item in
-            guard let date = formatter.date(from: item.time) else { return false }
-            let hour = Calendar.current.component(.hour, from: date)
-            return (17...20).contains(hour)
+        guard !periodItems.isEmpty else { return nil }
+
+        // Rule 1: Rain Detection
+        let rainCodes = [51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82, 95, 96, 99]
+        let rainItem = periodItems.first { rainCodes.contains($0.weatherCode) }
+
+        let weatherCode: Int
+        if let rainItem = rainItem {
+            weatherCode = rainItem.weatherCode
+        } else {
+            // Rule 2: Majority Condition
+            let counts = periodItems.reduce(into: [Int: Int]()) { $0[$1.weatherCode, default: 0] += 1 }
+            weatherCode = counts.max(by: { $0.value < $1.value })?.key ?? periodItems[0].weatherCode
         }
 
-        let result = [morning, lunch, evening].compactMap { $0 }
-        return result.sorted { $0.time < $1.time }
+        // Temperature: Median
+        let temps = periodItems.map { $0.temperature }.sorted()
+        let representativeTemp = temps[temps.count / 2]
+
+        guard let repDate = calendar.date(bySettingHour: representativeHour, minute: 0, second: 0, of: date) else { return nil }
+
+        return ForecastItem(
+            time: formatter.string(from: repDate),
+            temperature: representativeTemp,
+            weatherCode: weatherCode
+        )
     }
 
     private func formatTemperature(celsiusValue: Double, isFahrenheit: Bool) -> String {
@@ -764,30 +821,24 @@ struct DateHelper {
         let isNl = locale.lowercased().hasPrefix("nl")
 
         switch hour {
-        case 5...11:
-            if isUk { return "Ранок" }
-            if isPl { return "Poranek" }
-            if isDe { return "Morgen" }
-            if isNl { return "Ochtend" }
-            return "Morning"
-        case 12...16:
-            if isUk { return "Обід" }
-            if isPl { return "Południe" }
-            if isDe { return "Mittag" }
-            if isNl { return "Middag" }
-            return "Lunch"
-        case 17...21:
-            if isUk { return "Вечір" }
-            if isPl { return "Wieczór" }
-            if isDe { return "Abend" }
-            if isNl { return "Avond" }
-            return "Evening"
+        case 0...9:
+            if isUk { return "Ранок (0–10)" }
+            if isPl { return "Poranek (0–10)" }
+            if isDe { return "Morgen (0–10)" }
+            if isNl { return "Ochtend (0–10)" }
+            return "Morning (0–10)"
+        case 10...16:
+            if isUk { return "День (10–17)" }
+            if isPl { return "Dzień (10–17)" }
+            if isDe { return "Tag (10–17)" }
+            if isNl { return "Dag (10–17)" }
+            return "Day (10–17)"
         default:
-            if isUk { return "Ніч" }
-            if isPl { return "Noc" }
-            if isDe { return "Nacht" }
-            if isNl { return "Nacht" }
-            return "Night"
+            if isUk { return "Вечір (17–0)" }
+            if isPl { return "Wieczór (17–0)" }
+            if isDe { return "Abend (17–0)" }
+            if isNl { return "Avond (17–0)" }
+            return "Evening (17–0)"
         }
     }
 }

@@ -297,9 +297,9 @@
     "today": "Dzisiaj",
     "tomorrow": "Jutro",
     "time_of_day": {
-      "morning": "Rano",
-      "lunch": "Obiad",
-      "evening": "Wieczór"
+      "morning": "Poranek (0–10)",
+      "day": "Dzień (10–17)",
+      "evening": "Wieczór (17–0)"
     }
   },
   "outfit": {

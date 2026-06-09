@@ -298,9 +298,9 @@
     "tomorrow": "Завтра",
     "today": "Сьогодні",
     "time_of_day": {
-      "morning": "Ранок",
-      "lunch": "Обід",
-      "evening": "Вечір"
+      "morning": "Ранок (0–10)",
+      "day": "День (10–17)",
+      "evening": "Вечір (17–0)"
     }
   },
   "outfit": {

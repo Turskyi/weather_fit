@@ -27,8 +27,9 @@
     <string name="no_recommendation">🤔 немає рекомендацій</string>
     <string name="today">Сьогодні</string>
     <string name="tomorrow">Завтра</string>
-    <string name="morning">Ранок</string>
-    <string name="lunch">Обід</string>
-    <string name="evening">Вечір</string>
+    <string name="morning">Ранок (0–10)</string>
+    <string name="day">День (10–17)</string>
+    <string name="lunch">День (10–17)</string>
+    <string name="evening">Вечір (17–0)</string>
     <string name="night">Ніч</string>
 </resources>

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:weather_fit/extensions/build_context_extensions.dart';
+import 'package:weather_fit/services/forecast_aggregation_service.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 import 'package:weather_fit/weather/ui/populated/wear_forecast_row.dart';
 import 'package:weather_repository/weather_repository.dart';
@@ -66,28 +67,6 @@ class WearForecastSection extends StatelessWidget {
   }
 
   List<ForecastItemDomain> _selectForecast(List<ForecastItemDomain> forecast) {
-    final DateTime now = DateTime.now();
-    const List<int> preferredHours = <int>[8, 13, 19];
-
-    final List<ForecastItemDomain> future = forecast.where((
-      ForecastItemDomain item,
-    ) {
-      final DateTime? itemTime = DateTime.tryParse(item.time);
-      return itemTime != null && itemTime.isAfter(now);
-    }).toList();
-
-    final List<ForecastItemDomain> preferred = future
-        .where((ForecastItemDomain item) {
-          final DateTime? itemTime = DateTime.tryParse(item.time);
-          return itemTime != null && preferredHours.contains(itemTime.hour);
-        })
-        .take(3)
-        .toList();
-
-    if (preferred.isNotEmpty) {
-      return preferred;
-    }
-
-    return future.take(3).toList();
+    return aggregateForecastItems(forecast);
   }
 }

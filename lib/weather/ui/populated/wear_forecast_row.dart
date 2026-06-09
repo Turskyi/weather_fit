@@ -88,11 +88,11 @@ class WearForecastRow extends StatelessWidget {
   }
 
   String _getTimeOfDay(int hour) {
-    if (hour >= 5 && hour < 12) {
+    if (hour >= 0 && hour < 10) {
       return translate('weather.time_of_day.morning');
     }
-    if (hour >= 12 && hour < 17) {
-      return translate('weather.time_of_day.lunch');
+    if (hour >= 10 && hour < 17) {
+      return translate('weather.time_of_day.day');
     }
     return translate('weather.time_of_day.evening');
   }

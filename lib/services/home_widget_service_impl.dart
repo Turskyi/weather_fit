@@ -14,6 +14,7 @@ import 'package:weather_fit/extensions/build_context_extensions.dart' as type;
 import 'package:weather_fit/res/constants/constants.dart' as constants;
 import 'package:weather_fit/res/extensions/double_extension.dart';
 import 'package:weather_fit/res/home_widget_keys.dart';
+import 'package:weather_fit/services/forecast_aggregation_service.dart';
 import 'package:weather_fit/services/home_widget_service.dart';
 import 'package:weather_repository/weather_repository.dart';
 
@@ -230,49 +231,7 @@ class HomeWidgetServiceImpl implements HomeWidgetService {
   List<ForecastItemDomain> _filterForecastForWidget(
     List<ForecastItemDomain> fullForecast,
   ) {
-    if (fullForecast.isNotEmpty) {
-      final DateTime now = DateTime.now();
-      // 1. Get all forecasts that are in the future.
-      final List<ForecastItemDomain> futureForecasts = fullForecast.where((
-        ForecastItemDomain item,
-      ) {
-        final DateTime? itemDate = DateTime.tryParse(item.time);
-        return itemDate != null && itemDate.isAfter(now);
-      }).toList();
-
-      // 2. Find the first available item for each time slot.
-      final ForecastItemDomain? morning = futureForecasts.firstWhereOrNull(
-        (ForecastItemDomain item) =>
-            DateTime.parse(item.time).hour >= 8 &&
-            DateTime.parse(item.time).hour <= 11,
-      );
-      final ForecastItemDomain? lunch = futureForecasts.firstWhereOrNull(
-        (ForecastItemDomain item) =>
-            DateTime.parse(item.time).hour >= 12 &&
-            DateTime.parse(item.time).hour <= 15,
-      );
-      final ForecastItemDomain? evening = futureForecasts.firstWhereOrNull(
-        (ForecastItemDomain item) =>
-            DateTime.parse(item.time).hour >= 17 &&
-            DateTime.parse(item.time).hour <= 20,
-      );
-
-      // 3. Build the result list, removing any nulls.
-      final List<ForecastItemDomain> result = <ForecastItemDomain?>[
-        morning,
-        lunch,
-        evening,
-      ].whereType<ForecastItemDomain>().toList();
-
-      // 4. Sort by time to ensure chronological order.
-      result.sort((ForecastItemDomain a, ForecastItemDomain b) {
-        return a.time.compareTo(b.time);
-      });
-
-      return result;
-    } else {
-      return <ForecastItemDomain>[];
-    }
+    return aggregateForecastItems(fullForecast);
   }
 
   bool get _isWidgetUnsupported => kIsWeb || type.isWearDevice;

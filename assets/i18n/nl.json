@@ -298,9 +298,9 @@
     "today": "Vandaag",
     "tomorrow": "Morgen",
     "time_of_day": {
-      "morning": "Ochtend",
-      "lunch": "Lunch",
-      "evening": "Avond"
+      "morning": "Ochtend (0–10)",
+      "day": "Dag (10–17)",
+      "evening": "Avond (17–0)"
     }
   },
   "outfit": {

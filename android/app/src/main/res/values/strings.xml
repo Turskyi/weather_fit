@@ -29,8 +29,9 @@
     <string name="no_recommendation">🤔 no recommendation</string>
     <string name="today">Today</string>
     <string name="tomorrow">Tomorrow</string>
-    <string name="morning">Morning</string>
-    <string name="lunch">Lunch</string>
-    <string name="evening">Evening</string>
+    <string name="morning">Morning (0–10)</string>
+    <string name="day">Day (10–17)</string>
+    <string name="lunch">Day (10–17)</string>
+    <string name="evening">Evening (17–0)</string>
     <string name="night">Night</string>
 </resources>

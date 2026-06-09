@@ -492,62 +492,48 @@ struct DateHelper {
         let isNl = locale.lowercased().hasPrefix("nl")
 
         switch hour {
-        case 5...11:
+        case 0...9:
             if isUk {
-                return "Ранок"
+                return "Ранок (0–10)"
             }
             if isPl {
-                return "Poranek"
+                return "Poranek (0–10)"
             }
             if isDe {
-                return "Morgen"
+                return "Morgen (0–10)"
             }
             if isNl {
-                return "Ochtend"
+                return "Ochtend (0–10)"
             }
-            return "Morning"
-        case 12...16:
+            return "Morning (0–10)"
+        case 10...16:
             if isUk {
-                return "Обід"
+                return "День (10–17)"
             }
             if isPl {
-                return "Południe"
+                return "Dzień (10–17)"
             }
             if isDe {
-                return "Mittag"
+                return "Tag (10–17)"
             }
             if isNl {
-                return "Middag"
+                return "Dag (10–17)"
             }
-            return "Lunch"
-        case 17...21:
-            if isUk {
-                return "Вечір"
-            }
-            if isPl {
-                return "Wieczór"
-            }
-            if isDe {
-                return "Abend"
-            }
-            if isNl {
-                return "Avond"
-            }
-            return "Evening"
+            return "Day (10–17)"
         default:
             if isUk {
-                return "Ніч"
+                return "Вечір (17–0)"
             }
             if isPl {
-                return "Noc"
+                return "Wieczór (17–0)"
             }
             if isDe {
-                return "Nacht"
+                return "Abend (17–0)"
             }
             if isNl {
-                return "Nacht"
+                return "Avond (17–0)"
             }
-            return "Night"
+            return "Evening (17–0)"
         }
     }
 }

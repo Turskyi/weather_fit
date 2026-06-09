@@ -27,8 +27,9 @@
     <string name="no_recommendation">🤔 brak rekomendacji</string>
     <string name="today">Dzisiaj</string>
     <string name="tomorrow">Jutro</string>
-    <string name="morning">Rano</string>
-    <string name="lunch">Obiad</string>
-    <string name="evening">Wieczór</string>
+    <string name="morning">Poranek (0–10)</string>
+    <string name="day">Dzień (10–17)</string>
+    <string name="lunch">Dzień (10–17)</string>
+    <string name="evening">Wieczór (17–0)</string>
     <string name="night">Noc</string>
 </resources>

@@ -69,10 +69,10 @@ class ForecastItemWidget extends StatelessWidget {
   }
 
   String _getTimeOfDay(int hour) {
-    if (hour >= 5 && hour < 12) {
+    if (hour >= 0 && hour < 10) {
       return translate('weather.time_of_day.morning');
-    } else if (hour >= 12 && hour < 17) {
-      return translate('weather.time_of_day.lunch');
+    } else if (hour >= 10 && hour < 17) {
+      return translate('weather.time_of_day.day');
     } else {
       return translate('weather.time_of_day.evening');
     }

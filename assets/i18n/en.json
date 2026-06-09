@@ -297,9 +297,9 @@
     "today": "Today",
     "tomorrow": "Tomorrow",
     "time_of_day": {
-      "morning": "Morning",
-      "lunch": "Lunch",
-      "evening": "Evening"
+      "morning": "Morning (0–10)",
+      "day": "Day (10–17)",
+      "evening": "Evening (17–0)"
     }
   },
   "outfit": {
