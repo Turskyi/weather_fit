@@ -98,14 +98,14 @@ class LocalDataSource {
     final TemperatureUnits units = weather.temperatureUnits;
 
     final Map<String, String> outfitEn = <String, String>{
-      'outfit.rainy': 'Take an umbrella',
-      'outfit.rainy_hot': 'Hot & rainy - light clothes + umbrella',
-      'outfit.snowy': 'Dress warmly, it\'s snowing!',
-      'outfit.cold': 'Wear a warm jacket',
-      'outfit.cool': 'Maybe bring a light jacket',
-      'outfit.warm': 'Light clothing should be fine',
-      'outfit.hot': 'It\'s hot! Dress lightly',
-      'outfit.moderate': 'Comfortable weather today',
+      'outfit.rainy': 'It\'s rainy! Consider wearing a waterproof jacket and boots.',
+      'outfit.rainy_hot': 'Rainy but hot! Light, breathable clothes and an umbrella are your best bet.',
+      'outfit.snowy': 'It\'s snowy! Dress warmly with a heavy coat, hat, gloves, and scarf.',
+      'outfit.cold': 'It\'s cold! Wear a warm jacket, sweater, and consider a hat and gloves.',
+      'outfit.cool': 'It\'s cool. A light jacket or sweater should be comfortable.',
+      'outfit.warm': 'It\'s warm. Shorts, t-shirts, and light dresses are great options.',
+      'outfit.hot': 'It\'s hot! Wear light, breathable clothing like tank tops and shorts.',
+      'outfit.moderate': 'The weather is moderate. You can wear a variety of outfits.',
     };
 
     final Map<String, String> outfitUk = <String, String>{

@@ -428,7 +428,18 @@ class SettingsPageDefaultLayout extends StatelessWidget {
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       subtitle: Text(translate('settings.pin_widget_subtitle')),
-                      trailing: const Icon(Icons.push_pin_outlined),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          IconButton(
+                            icon: const Icon(Icons.info_outline),
+                            onPressed: () {
+                              _showPinWidgetInfoDialog(context);
+                            },
+                          ),
+                          const Icon(Icons.push_pin_outlined),
+                        ],
+                      ),
                       onTap: onPinWidgetTap,
                     ),
                   ),
@@ -615,6 +626,24 @@ class SettingsPageDefaultLayout extends StatelessWidget {
                 ? translate('settings.widget_info_content_android')
                 : translate('settings.widget_info_content_ios'),
           ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: Navigator.of(context).pop,
+              child: Text(translate('settings.ok')),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _showPinWidgetInfoDialog(BuildContext context) {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(translate('settings.pin_widget_instructions_title')),
+          content: Text(translate('settings.pin_widget_instructions_content')),
           actions: <Widget>[
             TextButton(
               onPressed: Navigator.of(context).pop,
