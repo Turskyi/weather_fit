@@ -188,7 +188,7 @@ class WeatherContentDefault extends StatelessWidget {
 
             if (isWide) {
               return Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Expanded(
                     flex: 2,
