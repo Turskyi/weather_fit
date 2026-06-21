@@ -10,6 +10,14 @@ class ForecastItemDomain extends Equatable {
     required this.time,
     required this.temperature,
     required this.weatherCode,
+    this.feelsLike,
+    this.humidity,
+    this.windSpeed,
+    this.uvIndex,
+    this.visibility,
+    this.cloudCover,
+    this.pressure,
+    this.dewPoint,
   });
 
   factory ForecastItemDomain.fromJson(Map<String, Object?> json) {
@@ -19,6 +27,14 @@ class ForecastItemDomain extends Equatable {
   final String time;
   final double temperature;
   final int weatherCode;
+  final double? feelsLike;
+  final double? humidity;
+  final double? windSpeed;
+  final double? uvIndex;
+  final double? visibility;
+  final double? cloudCover;
+  final double? pressure;
+  final double? dewPoint;
 
   Map<String, Object?> toJson() => _$ForecastItemDomainToJson(this);
 

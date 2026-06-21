@@ -101,13 +101,16 @@ class OpenMeteoApiClient {
     required double latitude,
     required double longitude,
   }) async {
-    final Uri weatherRequest =
-        Uri.https(_baseUrlWeather, 'v1/forecast', <String, String>{
-          'latitude': '$latitude',
-          'longitude': '$longitude',
-          'hourly': 'temperature_2m,weathercode',
-          'timezone': 'auto',
-        });
+    final Uri
+    weatherRequest = Uri.https(_baseUrlWeather, 'v1/forecast', <String, String>{
+      'latitude': '$latitude',
+      'longitude': '$longitude',
+      'hourly':
+          'temperature_2m,weathercode,apparent_temperature,'
+          'relative_humidity_2m,wind_speed_10m,uv_index,visibility,cloud_cover,'
+          'pressure_msl,dew_point_2m',
+      'timezone': 'auto',
+    });
 
     final http.Response weatherResponse = await _httpClient.get(weatherRequest);
 

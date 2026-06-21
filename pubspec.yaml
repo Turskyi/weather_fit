@@ -32,7 +32,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_bloc: ^9.1.1
-  flutter_email_sender: ^9.0.0
+  flutter_email_sender: ^10.0.1
   flutter_localizations:
     sdk: flutter
   flutter_svg: ^2.3.0
@@ -43,7 +43,7 @@ dependencies:
   flutter_web_plugins:
     sdk: flutter
   geocoding: ^4.0.0
-  geolocator: ^14.0.2
+  geolocator: ^14.0.3
   home_widget: ^0.9.3
   http: ^1.6.0
   hydrated_bloc: ^11.0.0
@@ -57,8 +57,8 @@ dependencies:
     path: packages/nominatim_api
   open_meteo_api:
     path: packages/open_meteo_api
-  package_info_plus: any
-  path_provider: ^2.1.5
+  package_info_plus: ^10.1.0
+  path_provider: ^2.1.6
   permission_handler: ^12.0.3
   resend: ^1.0.0
   retrofit: ^4.9.2
@@ -78,7 +78,7 @@ dev_dependencies:
     sdk: flutter
   json_serializable: ^6.14.0
   mocktail: ^1.0.5
-  retrofit_generator: ^10.2.6
+  retrofit_generator: ^10.2.7
 
 flutter:
   uses-material-design: true

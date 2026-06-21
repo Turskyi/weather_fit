@@ -35,6 +35,21 @@ Weather _$WeatherFromJson(Map<String, dynamic> json) => $checkedCreate(
         'last_updated_date_time',
         (v) => v == null ? null : DateTime.parse(v as String),
       ),
+      feelsLike: $checkedConvert(
+        'feels_like',
+        (v) =>
+            v == null ? null : Temperature.fromJson(v as Map<String, dynamic>),
+      ),
+      humidity: $checkedConvert('humidity', (v) => (v as num?)?.toDouble()),
+      windSpeed: $checkedConvert('wind_speed', (v) => (v as num?)?.toDouble()),
+      uvIndex: $checkedConvert('uv_index', (v) => (v as num?)?.toDouble()),
+      visibility: $checkedConvert('visibility', (v) => (v as num?)?.toDouble()),
+      cloudCover: $checkedConvert(
+        'cloud_cover',
+        (v) => (v as num?)?.toDouble(),
+      ),
+      pressure: $checkedConvert('pressure', (v) => (v as num?)?.toDouble()),
+      dewPoint: $checkedConvert('dew_point', (v) => (v as num?)?.toDouble()),
     );
     return val;
   },
@@ -42,6 +57,11 @@ Weather _$WeatherFromJson(Map<String, dynamic> json) => $checkedCreate(
     'temperatureUnits': 'temperature_units',
     'countryCode': 'country_code',
     'lastUpdatedDateTime': 'last_updated_date_time',
+    'feelsLike': 'feels_like',
+    'windSpeed': 'wind_speed',
+    'uvIndex': 'uv_index',
+    'cloudCover': 'cloud_cover',
+    'dewPoint': 'dew_point',
   },
 );
 
@@ -55,6 +75,14 @@ Map<String, dynamic> _$WeatherToJson(Weather instance) => <String, dynamic>{
   'description': instance.description,
   'code': instance.code,
   'locale': instance.locale,
+  'feels_like': instance.feelsLike?.toJson(),
+  'humidity': instance.humidity,
+  'wind_speed': instance.windSpeed,
+  'uv_index': instance.uvIndex,
+  'visibility': instance.visibility,
+  'cloud_cover': instance.cloudCover,
+  'pressure': instance.pressure,
+  'dew_point': instance.dewPoint,
 };
 
 const _$WeatherConditionEnumMap = {

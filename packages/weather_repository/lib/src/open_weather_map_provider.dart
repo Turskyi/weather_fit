@@ -31,6 +31,13 @@ class OpenWeatherMapProvider implements WeatherProvider {
     final Map<String, dynamic> data =
         jsonDecode(response.body) as Map<String, dynamic>;
     final double temp = (data['main']['temp'] as num).toDouble();
+    final double? feelsLike = (data['main']['feels_like'] as num?)?.toDouble();
+    final double? humidity = (data['main']['humidity'] as num?)?.toDouble();
+    final double? pressure = (data['main']['pressure'] as num?)?.toDouble();
+    final double? windSpeed = (data['wind']['speed'] as num?)?.toDouble();
+    final double? visibility = (data['visibility'] as num?)?.toDouble();
+    final double? cloudCover = (data['clouds']['all'] as num?)?.toDouble();
+
     final int rawCode = (data['weather'] as List<dynamic>).isNotEmpty
         ? (data['weather'][0]['id'] as int)
         : 0;
@@ -46,6 +53,12 @@ class OpenWeatherMapProvider implements WeatherProvider {
       description: desc,
       weatherCode: wmoCode,
       locale: location.locale,
+      feelsLike: feelsLike,
+      humidity: humidity,
+      windSpeed: windSpeed,
+      pressure: pressure,
+      visibility: visibility,
+      cloudCover: cloudCover,
     );
   }
 
@@ -70,6 +83,14 @@ class OpenWeatherMapProvider implements WeatherProvider {
     final List<ForecastItemDomain> forecastItems = data.map((dynamic item) {
       final String dtTxt = item['dt_txt'] as String;
       final double temp = (item['main']['temp'] as num).toDouble();
+      final double? feelsLike = (item['main']['feels_like'] as num?)
+          ?.toDouble();
+      final double? humidity = (item['main']['humidity'] as num?)?.toDouble();
+      final double? pressure = (item['main']['pressure'] as num?)?.toDouble();
+      final double? windSpeed = (item['wind']['speed'] as num?)?.toDouble();
+      final double? visibility = (item['visibility'] as num?)?.toDouble();
+      final double? cloudCover = (item['clouds']['all'] as num?)?.toDouble();
+
       final int rawCode = (item['weather'] as List<dynamic>).isNotEmpty
           ? (item['weather'][0]['id'] as int)
           : 0;
@@ -77,6 +98,12 @@ class OpenWeatherMapProvider implements WeatherProvider {
         time: dtTxt,
         temperature: temp,
         weatherCode: _mapOwmToWmo(rawCode),
+        feelsLike: feelsLike,
+        humidity: humidity,
+        pressure: pressure,
+        windSpeed: windSpeed,
+        visibility: visibility,
+        cloudCover: cloudCover,
       );
     }).toList();
     return DailyForecastDomain(forecast: forecastItems);

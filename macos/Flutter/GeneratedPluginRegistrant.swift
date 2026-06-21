@@ -5,7 +5,7 @@
 import FlutterMacOS
 import Foundation
 
-import flutter_email_sender
+import flutter_email_sender_method_channel
 import geolocator_apple
 import location
 import package_info_plus

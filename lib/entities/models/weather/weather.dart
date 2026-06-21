@@ -21,6 +21,14 @@ class Weather extends Equatable {
     required this.code,
     required this.locale,
     this.lastUpdatedDateTime,
+    this.feelsLike,
+    this.humidity,
+    this.windSpeed,
+    this.uvIndex,
+    this.visibility,
+    this.cloudCover,
+    this.pressure,
+    this.dewPoint,
   });
 
   factory Weather.fromJson(Map<String, Object?> json) {
@@ -51,6 +59,16 @@ class Weather extends Equatable {
       description: weatherDomain.description,
       code: weatherDomain.weatherCode,
       locale: weatherDomain.locale,
+      feelsLike: weatherDomain.feelsLike != null
+          ? Temperature(value: weatherDomain.feelsLike!)
+          : null,
+      humidity: weatherDomain.humidity,
+      windSpeed: weatherDomain.windSpeed,
+      uvIndex: weatherDomain.uvIndex,
+      visibility: weatherDomain.visibility,
+      cloudCover: weatherDomain.cloudCover,
+      pressure: weatherDomain.pressure,
+      dewPoint: weatherDomain.dewPoint,
     );
   }
 
@@ -63,6 +81,14 @@ class Weather extends Equatable {
   final String description;
   final int code;
   final String locale;
+  final Temperature? feelsLike;
+  final double? humidity;
+  final double? windSpeed;
+  final double? uvIndex;
+  final double? visibility;
+  final double? cloudCover;
+  final double? pressure;
+  final double? dewPoint;
 
   static const Weather empty = Weather(
     condition: WeatherCondition.unknown,
@@ -86,6 +112,14 @@ class Weather extends Equatable {
     description,
     code,
     locale,
+    feelsLike,
+    humidity,
+    windSpeed,
+    uvIndex,
+    visibility,
+    cloudCover,
+    pressure,
+    dewPoint,
   ];
 
   @override
@@ -105,6 +139,14 @@ class Weather extends Equatable {
     String? description,
     int? code,
     String? locale,
+    Temperature? feelsLike,
+    double? humidity,
+    double? windSpeed,
+    double? uvIndex,
+    double? visibility,
+    double? cloudCover,
+    double? pressure,
+    double? dewPoint,
   }) {
     return Weather(
       condition: condition ?? this.condition,
@@ -116,12 +158,26 @@ class Weather extends Equatable {
       description: description ?? this.description,
       code: code ?? this.code,
       locale: locale ?? this.locale,
+      feelsLike: feelsLike ?? this.feelsLike,
+      humidity: humidity ?? this.humidity,
+      windSpeed: windSpeed ?? this.windSpeed,
+      uvIndex: uvIndex ?? this.uvIndex,
+      visibility: visibility ?? this.visibility,
+      cloudCover: cloudCover ?? this.cloudCover,
+      pressure: pressure ?? this.pressure,
+      dewPoint: dewPoint ?? this.dewPoint,
     );
   }
 
   String get formattedTemperature {
     final String value = temperature.value.round().toString();
 
+    return '$value°${temperatureUnits.unitSymbol}';
+  }
+
+  String? get formattedFeelsLike {
+    if (feelsLike == null) return null;
+    final String value = feelsLike!.value.round().toString();
     return '$value°${temperatureUnits.unitSymbol}';
   }
 

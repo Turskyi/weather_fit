@@ -18,6 +18,14 @@ class Hourly {
     required this.time,
     required this.temperature2m,
     required this.weathercode,
+    this.apparentTemperature,
+    this.relativeHumidity2m,
+    this.windSpeed10m,
+    this.uvIndex,
+    this.visibility,
+    this.cloudCover,
+    this.pressureMSL,
+    this.dewPoint2m,
   });
 
   factory Hourly.fromJson(Map<String, Object?> json) => _$HourlyFromJson(json);
@@ -26,4 +34,19 @@ class Hourly {
   @JsonKey(name: 'temperature_2m')
   final List<double> temperature2m;
   final List<int> weathercode;
+  @JsonKey(name: 'apparent_temperature')
+  final List<double>? apparentTemperature;
+  @JsonKey(name: 'relative_humidity_2m')
+  final List<double>? relativeHumidity2m;
+  @JsonKey(name: 'wind_speed_10m')
+  final List<double>? windSpeed10m;
+  @JsonKey(name: 'uv_index')
+  final List<double>? uvIndex;
+  final List<double>? visibility;
+  @JsonKey(name: 'cloud_cover')
+  final List<double>? cloudCover;
+  @JsonKey(name: 'pressure_msl')
+  final List<double>? pressureMSL;
+  @JsonKey(name: 'dew_point_2m')
+  final List<double>? dewPoint2m;
 }

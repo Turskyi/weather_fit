@@ -65,13 +65,13 @@ Don't assume iOS background tasks execute predictably.
 
 ## Critical Services
 
-| Service             | Purpose                                       | Location                                 |
-|---------------------|-----------------------------------------------|------------------------------------------|
-| `HomeWidgetService` | Sync weather to native widgets                | `lib/services/home_widget_service*.dart` |
-| `FeedbackService`   | Send feedback email (Resend API)              | `lib/services/feedback_service.dart`     |
-| `UpdateService`     | In-app Android updates                        | `lib/services/update_service.dart`       |
-| `DeviceTypeService` | Classify device; called before DI in `main()` | `lib/services/device_type_service.dart`  |
-| `Forecast Aggregation` | Logic for Morning/Day/Evening summaries | `lib/services/forecast_aggregation_service.dart` |
+| Service                | Purpose                                       | Location                                         |
+|------------------------|-----------------------------------------------|--------------------------------------------------|
+| `HomeWidgetService`    | Sync weather to native widgets                | `lib/services/home_widget_service*.dart`         |
+| `FeedbackService`      | Send feedback email (Resend API)              | `lib/services/feedback_service.dart`             |
+| `UpdateService`        | In-app Android updates                        | `lib/services/update_service.dart`               |
+| `DeviceTypeService`    | Classify device; called before DI in `main()` | `lib/services/device_type_service.dart`          |
+| `Forecast Aggregation` | Logic for Morning/Day/Evening summaries       | `lib/services/forecast_aggregation_service.dart` |
 
 ---
 
