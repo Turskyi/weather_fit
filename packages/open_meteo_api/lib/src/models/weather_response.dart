@@ -4,7 +4,18 @@ part 'weather_response.g.dart';
 
 @JsonSerializable()
 class WeatherResponse {
-  const WeatherResponse({required this.temperature, required this.weatherCode});
+  const WeatherResponse({
+    required this.temperature,
+    required this.weatherCode,
+    this.apparentTemperature,
+    this.relativeHumidity,
+    this.windSpeed,
+    this.uvIndex,
+    this.visibility,
+    this.cloudCover,
+    this.pressure,
+    this.dewPoint,
+  });
 
   factory WeatherResponse.fromJson(Map<String, Object?> json) {
     return _$WeatherResponseFromJson(json);
@@ -13,6 +24,21 @@ class WeatherResponse {
   final double temperature;
   @JsonKey(name: 'weathercode')
   final double weatherCode;
+  @JsonKey(name: 'apparent_temperature')
+  final double? apparentTemperature;
+  @JsonKey(name: 'relative_humidity_2m')
+  final double? relativeHumidity;
+  @JsonKey(name: 'windspeed')
+  final double? windSpeed;
+  @JsonKey(name: 'uv_index')
+  final double? uvIndex;
+  final double? visibility;
+  @JsonKey(name: 'cloud_cover')
+  final double? cloudCover;
+  @JsonKey(name: 'pressure_msl')
+  final double? pressure;
+  @JsonKey(name: 'dew_point_2m')
+  final double? dewPoint;
 
   String get description => weatherCode.toInt().toDescription;
 

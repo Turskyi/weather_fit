@@ -24,6 +24,14 @@ class OpenMeteoProvider implements WeatherProvider {
       description: weatherResponse.description,
       weatherCode: weatherResponse.code,
       locale: location.locale,
+      feelsLike: weatherResponse.apparentTemperature,
+      humidity: weatherResponse.relativeHumidity,
+      windSpeed: weatherResponse.windSpeed,
+      uvIndex: weatherResponse.uvIndex,
+      visibility: weatherResponse.visibility,
+      cloudCover: weatherResponse.cloudCover,
+      pressure: weatherResponse.pressure,
+      dewPoint: weatherResponse.dewPoint,
     );
   }
 

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:intl/intl.dart';
+import 'package:weather_fit/entities/models/temperature/temperature.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/settings/bloc/settings_bloc.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
@@ -29,32 +30,56 @@ class _WeatherDetailsSectionState extends State<WeatherDetailsSection>
   }
 
   @override
-  Widget build(BuildContext _) {
-    return Column(
-      children: <Widget>[
-        ElevatedButton(
-          onPressed: _toggleExpanded,
-          child: Text(translate('weather.details_button')),
-        ),
-        AnimatedSize(
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-          child: _isExpanded
-              ? Padding(
-                  padding: const EdgeInsets.only(top: 24.0),
-                  child: Column(
-                    children: <Widget>[
-                      _FeelsLikeCard(weather: widget.weather),
-                      const SizedBox(height: 16),
-                      const _HourlyForecastSection(),
-                      const SizedBox(height: 16),
-                      _AdditionalMetricsGrid(weather: widget.weather),
-                    ],
-                  ),
-                )
-              : const SizedBox.shrink(),
-        ),
-      ],
+  Widget build(BuildContext context) {
+    return BlocBuilder<WeatherBloc, WeatherState>(
+      builder: (BuildContext context, WeatherState state) {
+        // Try to get "current" data from the first hour of forecast if
+        // the main weather object is missing metrics.
+        final ForecastItemDomain? currentHour =
+            state.dailyForecast?.forecast.firstOrNull;
+
+        final Weather weatherToUse = widget.weather.copyWith(
+          feelsLike:
+              widget.weather.feelsLike ??
+              (currentHour?.feelsLike != null
+                  ? Temperature(value: currentHour!.feelsLike!)
+                  : null),
+          humidity: widget.weather.humidity ?? currentHour?.humidity,
+          windSpeed: widget.weather.windSpeed ?? currentHour?.windSpeed,
+          uvIndex: widget.weather.uvIndex ?? currentHour?.uvIndex,
+          visibility: widget.weather.visibility ?? currentHour?.visibility,
+          cloudCover: widget.weather.cloudCover ?? currentHour?.cloudCover,
+          pressure: widget.weather.pressure ?? currentHour?.pressure,
+          dewPoint: widget.weather.dewPoint ?? currentHour?.dewPoint,
+        );
+
+        return Column(
+          children: <Widget>[
+            OutlinedButton(
+              onPressed: _toggleExpanded,
+              child: Text(translate('weather.details_button')),
+            ),
+            AnimatedSize(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+              child: _isExpanded
+                  ? Padding(
+                      padding: const EdgeInsets.only(top: 24.0),
+                      child: Column(
+                        children: <Widget>[
+                          _FeelsLikeCard(weather: weatherToUse),
+                          const SizedBox(height: 16),
+                          const _HourlyForecastSection(),
+                          const SizedBox(height: 16),
+                          _AdditionalMetricsGrid(weather: weatherToUse),
+                        ],
+                      ),
+                    )
+                  : const SizedBox.shrink(),
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -241,20 +266,24 @@ class _AdditionalMetricsGrid extends StatelessWidget {
 
     if (metrics.isEmpty) return const SizedBox.shrink();
 
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-        childAspectRatio: 2,
+    return MediaQuery.removePadding(
+      context: context,
+      removeTop: true,
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+          childAspectRatio: 2,
+        ),
+        itemCount: metrics.length,
+        itemBuilder: (BuildContext context, int index) {
+          final _MetricData metric = metrics[index];
+          return _MetricItem(metric: metric);
+        },
       ),
-      itemCount: metrics.length,
-      itemBuilder: (BuildContext context, int index) {
-        final _MetricData metric = metrics[index];
-        return _MetricItem(metric: metric);
-      },
     );
   }
 }

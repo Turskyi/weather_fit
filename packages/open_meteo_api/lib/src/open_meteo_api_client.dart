@@ -63,15 +63,15 @@ class OpenMeteoApiClient {
     required double latitude,
     required double longitude,
   }) async {
-    final Uri weatherRequest = Uri.https(
-      _baseUrlWeather,
-      'v1/forecast',
-      <String, String>{
-        'latitude': '$latitude',
-        'longitude': '$longitude',
-        'current_weather': 'true',
-      },
-    );
+    final Uri weatherRequest =
+        Uri.https(_baseUrlWeather, 'v1/forecast', <String, String>{
+          'latitude': '$latitude',
+          'longitude': '$longitude',
+          'current':
+              'temperature_2m,weather_code,apparent_temperature,'
+              'relative_humidity_2m,wind_speed_10m,uv_index,visibility,'
+              'cloud_cover,pressure_msl,dew_point_2m',
+        });
 
     final http.Response weatherResponse = await _httpClient.get(weatherRequest);
 
@@ -85,12 +85,20 @@ class OpenMeteoApiClient {
     final Object weatherData = jsonDecode(weatherResponse.body);
     if (weatherData is Map<String, Object?>) {
       final Map<String, Object?> weatherJson = weatherData;
-      if (!weatherJson.containsKey('current_weather')) {
+      if (!weatherJson.containsKey('current')) {
         throw WeatherNotFoundFailure();
       }
-      final Object? currentWeather = weatherJson['current_weather'];
+      final Object? currentWeather = weatherJson['current'];
       if (currentWeather is Map<String, Object?>) {
-        return WeatherResponse.fromJson(currentWeather);
+        final Map<String, Object?> mappedWeather = Map<String, Object?>.from(
+          currentWeather,
+        );
+        // Map new API field names to the ones expected by WeatherResponse
+        mappedWeather['temperature'] = mappedWeather['temperature_2m'];
+        mappedWeather['weathercode'] = mappedWeather['weather_code'];
+        mappedWeather['windspeed'] = mappedWeather['wind_speed_10m'];
+
+        return WeatherResponse.fromJson(mappedWeather);
       }
     }
 
