@@ -134,15 +134,11 @@ class WeatherContentDefault extends StatelessWidget {
                   height: 56,
                   child: Center(
                     child: weather.wasUpdated
-                        ? BlocBuilder<WeatherBloc, WeatherState>(
-                            builder: (BuildContext _, WeatherState state) {
-                              return Text(
-                                weather.formattedTemperature,
-                                style: textTheme.displaySmall?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              );
-                            },
+                        ? Text(
+                            weather.formattedTemperature,
+                            style: textTheme.displaySmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
                           )
                         : const TemperatureShimmer(),
                   ),
@@ -201,6 +197,7 @@ class WeatherContentDefault extends StatelessWidget {
                           builder: (BuildContext _, WeatherState state) {
                             final bool isLocationMatch = weather.location
                                 .isSamePlaceAs(state.location);
+
                             if (isLocationMatch && state.forecast.isNotEmpty) {
                               return const DailyForecast();
                             } else {
@@ -264,6 +261,7 @@ class WeatherContentDefault extends StatelessWidget {
                     builder: (BuildContext _, WeatherState state) {
                       final bool isLocationMatch = weather.location
                           .isSamePlaceAs(state.location);
+
                       if (isLocationMatch && state.forecast.isNotEmpty) {
                         return const DailyForecast();
                       } else {

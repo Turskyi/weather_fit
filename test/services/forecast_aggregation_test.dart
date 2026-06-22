@@ -201,5 +201,32 @@ void main() {
         }
       }
     });
+
+    test('Regression: should handle 3-hourly data (OpenWeatherMap style)', () {
+      final List<ForecastItemDomain> hourlyData = <ForecastItemDomain>[];
+      // OWM typically provides data every 3 hours: 0, 3, 6, 9, 12, 15, 18, 21
+      for (int i = 0; i < 24; i += 3) {
+        hourlyData.add(
+          ForecastItemDomain(
+            time: '${tomorrowStr}T${i.toString().padLeft(2, '0')}:00',
+            temperature: 20,
+            weatherCode: 0,
+          ),
+        );
+      }
+
+      final List<ForecastItemDomain> result = aggregateForecastItems(
+        hourlyData,
+      );
+
+      // We expect 3 periods to be aggregated even though none hit 8, 13, 19
+      // Morning (0-10) should catch 0, 3, 6, 9
+      // Day (10-17) should catch 12, 15
+      // Evening (17-24) should catch 18, 21
+      expect(result.length, 3);
+      expect(DateTime.parse(result[0].time).hour, 8);
+      expect(DateTime.parse(result[1].time).hour, 13);
+      expect(DateTime.parse(result[2].time).hour, 19);
+    });
   });
 }

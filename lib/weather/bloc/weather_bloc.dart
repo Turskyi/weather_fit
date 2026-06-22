@@ -20,6 +20,7 @@ import 'package:weather_fit/extensions/build_context_extensions.dart' as type;
 import 'package:weather_fit/extensions/build_context_extensions.dart';
 import 'package:weather_fit/extensions/date_time_extension.dart';
 import 'package:weather_fit/res/extensions/double_extension.dart';
+import 'package:weather_fit/services/forecast_aggregation_service.dart';
 import 'package:weather_fit/services/home_widget_service.dart';
 import 'package:weather_repository/weather_repository.dart';
 

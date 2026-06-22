@@ -607,6 +607,38 @@ void main() {
           },
         );
       });
+
+      group('forecast aggregation', () {
+        test('state.forecast handles 3-hourly data correctly', () {
+          final DateTime tomorrow = DateTime.now().add(const Duration(days: 1));
+          final String tomorrowStr =
+              '${tomorrow.year}-${tomorrow.month.toString().padLeft(2, '0')}-'
+              '${tomorrow.day.toString().padLeft(2, '0')}';
+
+          final List<ForecastItemDomain> owmForecast = <ForecastItemDomain>[];
+          for (int i = 0; i < 24; i += 3) {
+            owmForecast.add(
+              ForecastItemDomain(
+                time: '${tomorrowStr}T${i.toString().padLeft(2, '0')}:00:00',
+                temperature: 20,
+                weatherCode: 0,
+              ),
+            );
+          }
+
+          final WeatherSuccess state = WeatherSuccess(
+            locale: 'en',
+            dailyForecast: DailyForecastDomain(forecast: owmForecast),
+            date: DateTime.now(),
+            weather: Weather.empty,
+          );
+
+          expect(state.forecast.length, 3);
+          expect(DateTime.parse(state.forecast[0].time).hour, 8);
+          expect(DateTime.parse(state.forecast[1].time).hour, 13);
+          expect(DateTime.parse(state.forecast[2].time).hour, 19);
+        });
+      });
     });
   });
 }
