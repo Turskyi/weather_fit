@@ -145,7 +145,9 @@
     "feedback_subtitle": "Let us know your thoughts and suggestions. You can also report any issues with the app’s content.",
     "support_subtitle": "Visit our support page for help and frequently asked questions.",
     "pin_widget": "Pin Widget",
-    "pin_widget_subtitle": "Add a widget to your home screen to see the weather at a glance.",
+    "pin_widget_subtitle": "Add a widget to your home screen to see weather and clothing suggestions at a glance.",
+    "pin_widget_instructions_title": "How to add the widget",
+    "pin_widget_instructions_content": "You can add the WeatherFit widget in two ways:\n\n1. Use the \"Pin Widget\" button below (requires a compatible launcher).\n2. Long-press on your home screen, select \"Widgets\", find WeatherFit, and drag the widget to your screen.",
     "weather_background": "Weather Background",
     "weather_background_subtitle": "Change the background based on current weather.",
     "frequency_15m": "15m",
@@ -260,6 +262,16 @@
   },
   "weather": {
     "check_latest_button": "Check Latest Weather",
+    "details_button": "Weather Details",
+    "feels_like": "Feels Like",
+    "humidity": "Humidity",
+    "wind_speed": "Wind Speed",
+    "uv_index": "UV Index",
+    "visibility": "Visibility",
+    "cloud_cover": "Cloud Cover",
+    "pressure": "Pressure",
+    "dew_point": "Dew Point",
+    "hourly_forecast_title": "Hourly Forecast",
     "code_0": "Clear sky",
     "code_1": "Mainly clear",
     "code_2": "Partly cloudy",
@@ -297,9 +309,9 @@
     "today": "Today",
     "tomorrow": "Tomorrow",
     "time_of_day": {
-      "morning": "Morning",
-      "lunch": "Lunch",
-      "evening": "Evening"
+      "morning": "Morning (0–10)",
+      "day": "Day (10–17)",
+      "evening": "Evening (17–0)"
     }
   },
   "outfit": {

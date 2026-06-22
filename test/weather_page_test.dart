@@ -399,6 +399,7 @@ void main() {
                       home: WeatherPageDefaultLayout(
                         onSettingsPressed: () {},
                         onRefresh: () async {},
+                        onOutfitRefresh: () async {},
                         onSearchPressed: () {},
                         onReportPressed: () {},
                         isEmbedded: true,

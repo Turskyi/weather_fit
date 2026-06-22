@@ -3,8 +3,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.turskyi.weather_fit"
-    android:versionCode="53"
-    android:versionName="0.5.3">
+    android:versionCode="55"
+    android:versionName="0.5.5">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- Grants approximate location access using Wi-Fi and mobile networks.
@@ -31,11 +31,16 @@
     <!--suppress AndroidDomInspection -->
     <application
         android:name="${applicationName}"
-        android:extractNativeLibs="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/weatherfit"
         android:roundIcon="@mipmap/ic_launcher_round"
         tools:ignore="UnusedAttribute">
+
+        <activity
+            android:name="androidx.glance.appwidget.action.InvisibleActionTrampolineActivity"
+            android:exported="false"
+            tools:replace="android:exported" />
+
         <!--suppress AndroidDomInspection -->
         <receiver
             android:name=".WeatherWidget"

@@ -15,6 +15,7 @@ import 'package:weather_fit/entities/enums/feedback_submission_type.dart';
 import 'package:weather_fit/entities/enums/feedback_type.dart';
 import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/entities/models/exceptions/email_launch_exception.dart';
+import 'package:weather_fit/extensions/build_context_extensions.dart' as type;
 import 'package:weather_fit/res/constants/constants.dart' as constants;
 import 'package:weather_fit/services/feedback_service.dart';
 import 'package:weather_fit/services/update_service.dart';
@@ -421,7 +422,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     if (isSaved) {
       if (!kIsWeb &&
           !Platform.isMacOS &&
-          (Platform.isAndroid || Platform.isIOS)) {
+          (Platform.isAndroid || Platform.isIOS) &&
+          !type.isWearDevice) {
         try {
           await Workmanager().registerPeriodicTask(
             constants.kBackgroundUniqueName,

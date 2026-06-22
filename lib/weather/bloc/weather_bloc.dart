@@ -16,9 +16,11 @@ import 'package:weather_fit/entities/enums/weather_fetch_origin.dart';
 import 'package:weather_fit/entities/models/outfit/outfit_image.dart';
 import 'package:weather_fit/entities/models/temperature/temperature.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
+import 'package:weather_fit/extensions/build_context_extensions.dart' as type;
 import 'package:weather_fit/extensions/build_context_extensions.dart';
 import 'package:weather_fit/extensions/date_time_extension.dart';
 import 'package:weather_fit/res/extensions/double_extension.dart';
+import 'package:weather_fit/services/forecast_aggregation_service.dart';
 import 'package:weather_fit/services/home_widget_service.dart';
 import 'package:weather_repository/weather_repository.dart';
 
@@ -68,22 +70,22 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
   void _scheduleInitialHomeWidgetSync() {
     if (kIsWeb || isWearDevice) {
       return;
+    } else {
+      final DailyForecastDomain? dailyForecast = state.dailyForecast;
+      if (dailyForecast == null || dailyForecast.forecast.isEmpty) {
+        return;
+      } else if (state.weather.isEmpty) {
+        return;
+      } else {
+        Future<void>.microtask(() {
+          add(
+            const UpdateWeatherOnHomeWidgetEvent(
+              WeatherFetchOrigin.defaultDevice,
+            ),
+          );
+        });
+      }
     }
-
-    final DailyForecastDomain? dailyForecast = state.dailyForecast;
-    if (dailyForecast == null || dailyForecast.forecast.isEmpty) {
-      return;
-    }
-
-    if (state.weather.isEmpty) {
-      return;
-    }
-
-    Future<void>.microtask(() {
-      add(
-        const UpdateWeatherOnHomeWidgetEvent(WeatherFetchOrigin.defaultDevice),
-      );
-    });
   }
 
   @override
@@ -170,6 +172,9 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           final String cachedRecommendation =
               cachedData['outfitRecommendation'] as String;
 
+          debugPrint(
+            'WeatherBloc fetch: emitting cached data for "$eventLocation"',
+          );
           emit(
             WeatherSuccess(
               locale: savedLocale,
@@ -215,6 +220,9 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
         }
 
         try {
+          debugPrint(
+            'WeatherBloc fetch: requesting fresh forecast for "$eventLocation"',
+          );
           final DailyForecastDomain dailyForecast = await _weatherRepository
               .getDailyForecast(eventLocation);
 
@@ -222,6 +230,10 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
             eventLocation,
           );
           if (isSelectedAfterForecast) {
+            debugPrint(
+              'WeatherBloc fetch: requesting fresh weather for '
+              '"$eventLocation"',
+            );
             final WeatherDomain domainWeather = await _getWeatherByLocation(
               eventLocation,
             );
@@ -247,8 +259,16 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
                 updatedWeather,
               );
 
+              debugPrint(
+                'WeatherBloc fetch: requesting fresh outfit image for '
+                '"$eventLocation"',
+              );
               final OutfitImage outfitImage = await _outfitRepository
                   .getOutfitImage(weather);
+              debugPrint(
+                'WeatherBloc fetch: got outfit image from source: '
+                '${outfitImage.source}',
+              );
 
               // 2. Persist the new "Weather Bundle" for future swipes.
               await _localDataSource.cacheWeatherBundle(
@@ -260,6 +280,10 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
               );
 
               if (_isSelectedLocation(eventLocation)) {
+                debugPrint(
+                  'WeatherBloc fetch: emitting WeatherSuccess for '
+                  '"$eventLocation"',
+                );
                 emit(
                   WeatherSuccess(
                     locale: savedLocale,
@@ -273,7 +297,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
                 );
 
                 final WeatherFetchOrigin eventOrigin = event.origin;
-                if (!kIsWeb && eventOrigin.isNotWearable) {
+                if (_shouldUpdateHomeWidget(eventOrigin)) {
                   add(UpdateWeatherOnHomeWidgetEvent(eventOrigin));
                 }
               } else {
@@ -349,7 +373,12 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
       locationToRefresh = _localDataSource.getLastSavedLocation();
     }
 
+    debugPrint('WeatherBloc refresh: start for location "$locationToRefresh"');
+
     if (locationToRefresh.isEmpty) {
+      debugPrint(
+        'WeatherBloc refresh: no location to refresh, emitting WeatherInitial',
+      );
       // If we still have no location, we emit WeatherInitial as expected by
       // tests.
       emit(
@@ -433,7 +462,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           locale: savedLocale,
           weather: stateWeather,
           outfitRecommendation: stateOutfitRecommendation,
-          outfitImage: stateOutfitImage,
+          outfitImage: const OutfitImage.empty(),
           dailyForecast: state.dailyForecast,
           date: now,
           isFavourite: isFavourite,
@@ -491,7 +520,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
         );
 
         final WeatherFetchOrigin eventOrigin = event.origin;
-        if (!kIsWeb && eventOrigin.isNotWearable) {
+        if (_shouldUpdateHomeWidget(eventOrigin)) {
           add(UpdateWeatherOnHomeWidgetEvent(eventOrigin));
         }
       } on Exception catch (e) {
@@ -588,11 +617,18 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     Emitter<WeatherState> emit,
   ) async {
     final Weather eventWeather = event.weather;
-    if (eventWeather.isNoLocation) return;
+    if (eventWeather.isNoLocation) {
+      debugPrint('WeatherBloc outfit: skip because no location.');
+      return;
+    }
 
     final String savedLocale = _localDataSource.getLanguageIsoCode();
     final bool isFavourite = _localDataSource.isFavouriteLocation(
       eventWeather.location,
+    );
+
+    debugPrint(
+      'WeatherBloc outfit: start (location=${eventWeather.location}).',
     );
 
     emit(
@@ -606,11 +642,16 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
     );
 
     try {
+      debugPrint('WeatherBloc outfit: calculating recommendation.');
       final String outfitRecommendation = _outfitRepository
           .getOutfitRecommendation(eventWeather);
 
+      debugPrint('WeatherBloc outfit: requesting image from repository.');
       final OutfitImage outfitImage = await _outfitRepository.getOutfitImage(
         eventWeather,
+      );
+      debugPrint(
+        'WeatherBloc outfit: got image (source=${outfitImage.source}).',
       );
 
       emit(
@@ -771,5 +812,9 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
         ),
       );
     }
+  }
+
+  bool _shouldUpdateHomeWidget(WeatherFetchOrigin eventOrigin) {
+    return !kIsWeb && eventOrigin.isNotWearable && !type.isWearDevice;
   }
 }

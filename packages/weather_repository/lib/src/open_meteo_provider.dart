@@ -24,6 +24,14 @@ class OpenMeteoProvider implements WeatherProvider {
       description: weatherResponse.description,
       weatherCode: weatherResponse.code,
       locale: location.locale,
+      feelsLike: weatherResponse.apparentTemperature,
+      humidity: weatherResponse.relativeHumidity,
+      windSpeed: weatherResponse.windSpeed,
+      uvIndex: weatherResponse.uvIndex,
+      visibility: weatherResponse.visibility,
+      cloudCover: weatherResponse.cloudCover,
+      pressure: weatherResponse.pressure,
+      dewPoint: weatherResponse.dewPoint,
     );
   }
 
@@ -41,6 +49,14 @@ class OpenMeteoProvider implements WeatherProvider {
           time: dailyForecastResponse.hourly.time[i],
           temperature: dailyForecastResponse.hourly.temperature2m[i],
           weatherCode: dailyForecastResponse.hourly.weathercode[i],
+          feelsLike: dailyForecastResponse.hourly.apparentTemperature?[i],
+          humidity: dailyForecastResponse.hourly.relativeHumidity2m?[i],
+          windSpeed: dailyForecastResponse.hourly.windSpeed10m?[i],
+          uvIndex: dailyForecastResponse.hourly.uvIndex?[i],
+          visibility: dailyForecastResponse.hourly.visibility?[i],
+          cloudCover: dailyForecastResponse.hourly.cloudCover?[i],
+          pressure: dailyForecastResponse.hourly.pressureMSL?[i],
+          dewPoint: dailyForecastResponse.hourly.dewPoint2m?[i],
         ),
       );
     }

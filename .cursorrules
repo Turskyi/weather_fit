@@ -13,3 +13,8 @@
 - Create only one class per file, except:
     - Stateful widgets (where state is a separate class).
     - Enum-like classes (for example, Bloc state and event classes).
+
+- **Strict Coding Style:**
+    - Prefer empty strings (`''`) over `null` values where appropriate.
+    - Always use named parameters for functions/constructors with more than one argument.
+

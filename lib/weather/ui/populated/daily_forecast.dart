@@ -5,6 +5,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
+import 'package:weather_fit/services/forecast_aggregation_service.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 import 'package:weather_repository/weather_repository.dart';
 
@@ -154,20 +155,8 @@ class _DailyForecastState extends State<DailyForecast> {
                       final List<ForecastItemDomain> forecastItems =
                           dailyForecast.forecast;
 
-                      final DateTime now = DateTime.now();
-                      const List<int> desiredHours = <int>[8, 13, 19];
-
-                      final List<ForecastItemDomain> forecast = forecastItems
-                          .where((ForecastItemDomain item) {
-                            final DateTime? itemTime = DateTime.tryParse(
-                              item.time,
-                            );
-                            return itemTime != null &&
-                                itemTime.isAfter(now) &&
-                                desiredHours.contains(itemTime.hour);
-                          })
-                          .take(3)
-                          .toList();
+                      final List<ForecastItemDomain> forecast =
+                          aggregateForecastItems(forecastItems);
 
                       if (forecast.isEmpty) {
                         return Center(

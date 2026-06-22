@@ -14,9 +14,10 @@ final class CheckForUpdateEvent extends SettingsEvent {
 }
 
 final class BugReportPressedEvent extends SettingsEvent {
-  const BugReportPressedEvent(this.errorText);
+  const BugReportPressedEvent({required this.errorText, this.query = ''});
 
   final String errorText;
+  final String query;
 }
 
 final class SubmitFeedbackEvent extends SettingsEvent {

@@ -24,7 +24,7 @@ class UpdateServiceImpl implements UpdateService {
     if (!kIsWeb) {
       if (Platform.isAndroid) {
         await _checkAndroidUpdate();
-      } else if (Platform.isIOS) {
+      } else if (Platform.isIOS || Platform.isMacOS) {
         await _checkIosUpdate();
       }
     }

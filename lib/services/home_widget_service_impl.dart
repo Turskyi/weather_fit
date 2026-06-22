@@ -10,9 +10,11 @@ import 'package:weather_fit/data/repositories/outfit_repository.dart';
 import 'package:weather_fit/entities/enums/temperature_units.dart';
 import 'package:weather_fit/entities/models/temperature/temperature.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
+import 'package:weather_fit/extensions/build_context_extensions.dart' as type;
 import 'package:weather_fit/res/constants/constants.dart' as constants;
 import 'package:weather_fit/res/extensions/double_extension.dart';
 import 'package:weather_fit/res/home_widget_keys.dart';
+import 'package:weather_fit/services/forecast_aggregation_service.dart';
 import 'package:weather_fit/services/home_widget_service.dart';
 import 'package:weather_repository/weather_repository.dart';
 
@@ -20,48 +22,47 @@ class HomeWidgetServiceImpl implements HomeWidgetService {
   const HomeWidgetServiceImpl();
 
   static const MethodChannel _widgetChannel = MethodChannel(
-    'com.weatherfit.home_widget',
+    constants.kHomeWidgetMethodChannel,
   );
-  static const String _appGroupIdArgKey = 'appGroupId';
 
   @override
   Future<void> setAppGroupId(String appGroupId) {
-    if (kIsWeb) {
+    if (_isWidgetUnsupported) {
       return Future<void>.value();
-    }
-    if (Platform.isMacOS) {
+    } else if (Platform.isMacOS) {
       debugPrint(
         'HomeWidgetService setAppGroupId: macOS channel call '
         '(appGroupId=$appGroupId).',
       );
       return _widgetChannel.invokeMethod<void>(
-        'setAppGroupId',
-        <String, String>{_appGroupIdArgKey: appGroupId},
+        constants.kSetAppGroupIdMethod,
+        <String, String>{constants.kAppGroupIdArgKey: appGroupId},
       );
+    } else {
+      return HomeWidget.setAppGroupId(appGroupId);
     }
-    return HomeWidget.setAppGroupId(appGroupId);
   }
 
   @override
   Future<bool?> saveWidgetData<T>(String id, T? data) {
-    if (kIsWeb) {
+    if (_isWidgetUnsupported) {
       return Future<bool>.value(false);
-    }
-    if (Platform.isMacOS) {
+    } else if (Platform.isMacOS) {
       debugPrint(
         'HomeWidgetService saveWidgetData: macOS channel call '
         '(key=$id, type=${data.runtimeType}).',
       );
       return _widgetChannel.invokeMethod<bool>(
-        'saveWidgetData',
+        constants.kSaveWidgetDataMethod,
         <String, Object?>{
           'key': id,
           'value': data,
-          _appGroupIdArgKey: constants.kAppleAppGroupId,
+          constants.kAppGroupIdArgKey: constants.kAppleAppGroupId,
         },
       );
+    } else {
+      return HomeWidget.saveWidgetData<T>(id, data);
     }
-    return HomeWidget.saveWidgetData<T>(id, data);
   }
 
   @override
@@ -71,19 +72,19 @@ class HomeWidgetServiceImpl implements HomeWidgetService {
     String? iOSName,
     String? qualifiedAndroidName,
   }) {
-    if (kIsWeb) {
+    if (_isWidgetUnsupported) {
       return Future<bool>.value(false);
-    }
-    if (Platform.isMacOS) {
+    } else if (Platform.isMacOS) {
       debugPrint('HomeWidgetService updateWidget: macOS channel call.');
-      return _widgetChannel.invokeMethod<bool>('updateWidget');
+      return _widgetChannel.invokeMethod<bool>(constants.kUpdateWidgetMethod);
+    } else {
+      return HomeWidget.updateWidget(
+        name: name,
+        iOSName: iOSName,
+        androidName: androidName,
+        qualifiedAndroidName: qualifiedAndroidName,
+      );
     }
-    return HomeWidget.updateWidget(
-      name: name,
-      iOSName: iOSName,
-      androidName: androidName,
-      qualifiedAndroidName: qualifiedAndroidName,
-    );
   }
 
   @override
@@ -211,16 +212,18 @@ class HomeWidgetServiceImpl implements HomeWidgetService {
     String? androidName,
     String? qualifiedAndroidName,
   }) {
-    // macOS widgets in Notification Center don't have a "pin" mechanism.
-    // The user must add the widget manually from Notification Center settings.
-    if (kIsWeb || Platform.isMacOS) {
+    if (!kIsWeb && Platform.isAndroid && !type.isWearDevice) {
+      return HomeWidget.requestPinWidget(
+        name: name,
+        androidName: androidName,
+        qualifiedAndroidName: qualifiedAndroidName,
+      );
+    } else {
+      // macOS widgets in Notification Center don't have a "pin" mechanism.
+      // The user must add the widget manually from Notification Center
+      // settings.
       return Future<void>.value();
     }
-    return HomeWidget.requestPinWidget(
-      name: name,
-      androidName: androidName,
-      qualifiedAndroidName: qualifiedAndroidName,
-    );
   }
 
   /// Filters the full forecast list to a few essential time points for the
@@ -228,48 +231,8 @@ class HomeWidgetServiceImpl implements HomeWidgetService {
   List<ForecastItemDomain> _filterForecastForWidget(
     List<ForecastItemDomain> fullForecast,
   ) {
-    if (fullForecast.isNotEmpty) {
-      final DateTime now = DateTime.now();
-      // 1. Get all forecasts that are in the future.
-      final List<ForecastItemDomain> futureForecasts = fullForecast.where((
-        ForecastItemDomain item,
-      ) {
-        final DateTime? itemDate = DateTime.tryParse(item.time);
-        return itemDate != null && itemDate.isAfter(now);
-      }).toList();
-
-      // 2. Find the first available item for each time slot.
-      final ForecastItemDomain? morning = futureForecasts.firstWhereOrNull(
-        (ForecastItemDomain item) =>
-            DateTime.parse(item.time).hour >= 8 &&
-            DateTime.parse(item.time).hour <= 11,
-      );
-      final ForecastItemDomain? lunch = futureForecasts.firstWhereOrNull(
-        (ForecastItemDomain item) =>
-            DateTime.parse(item.time).hour >= 12 &&
-            DateTime.parse(item.time).hour <= 15,
-      );
-      final ForecastItemDomain? evening = futureForecasts.firstWhereOrNull(
-        (ForecastItemDomain item) =>
-            DateTime.parse(item.time).hour >= 17 &&
-            DateTime.parse(item.time).hour <= 20,
-      );
-
-      // 3. Build the result list, removing any nulls.
-      final List<ForecastItemDomain> result = <ForecastItemDomain?>[
-        morning,
-        lunch,
-        evening,
-      ].whereType<ForecastItemDomain>().toList();
-
-      // 4. Sort by time to ensure chronological order.
-      result.sort((ForecastItemDomain a, ForecastItemDomain b) {
-        return a.time.compareTo(b.time);
-      });
-
-      return result;
-    } else {
-      return <ForecastItemDomain>[];
-    }
+    return aggregateForecastItems(fullForecast);
   }
+
+  bool get _isWidgetUnsupported => kIsWeb || type.isWearDevice;
 }

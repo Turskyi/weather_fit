@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -23,7 +24,6 @@ import androidx.core.content.ContextCompat
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
-import es.antonborri.home_widget.HomeWidgetLaunchIntent
 import es.antonborri.home_widget.HomeWidgetPlugin
 import java.io.File
 import java.text.SimpleDateFormat
@@ -99,8 +99,18 @@ internal fun updateAppWidget(
     ).apply {
         // Common view setup
         // Open App on Widget Click.
-        val pendingIntent: PendingIntent = HomeWidgetLaunchIntent.getActivity(
-            context, MainActivity::class.java
+        val intent = Intent(context, MainActivity::class.java).apply {
+            action = "es.antonborri.home_widget.action.LAUNCH"
+        }
+        val pendingIntent = PendingIntent.getActivity(
+            context,
+            0,
+            intent,
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            } else {
+                PendingIntent.FLAG_UPDATE_CURRENT
+            }
         )
         setOnClickPendingIntent(
             R.id.widget_container,
@@ -706,10 +716,9 @@ private fun getTimeOfDay(
     val cal: Calendar = Calendar.getInstance()
     cal.time = date
     return when (cal.get(Calendar.HOUR_OF_DAY)) {
-        in 5..11 -> localizedContext.getString(R.string.morning)
-        in 12..16 -> localizedContext.getString(R.string.lunch)
-        in 17..21 -> localizedContext.getString(R.string.evening)
-        else -> localizedContext.getString(R.string.night)
+        in 0..9 -> localizedContext.getString(R.string.morning)
+        in 10..16 -> localizedContext.getString(R.string.day)
+        else -> localizedContext.getString(R.string.evening)
     }
 }
 
@@ -722,6 +731,6 @@ private fun getWeatherEmoji(code: Int): String = when {
     (code in 71..77) || (code in 600..699) -> "❄️"
     code in 80..82 -> "🌧"
     code in 85..86 -> "🌨"
-    code in 95..99 -> "⛈"
+    code in 95..99 -> "⛈\uFE0F"
     else -> ""
 }

@@ -63,8 +63,6 @@ class LocalDataSource {
     if (roundedTemp > 30) roundedTemp = 30;
     if (roundedTemp < -30) roundedTemp = -30;
 
-    const String precipitation = 'precipitation';
-
     // Handle unknowns early.
     if (condition.isUnknown) {
       return <String>[
@@ -72,7 +70,8 @@ class LocalDataSource {
             '${WeatherCondition.clear.name}_$roundedTemp.png',
         '${constants.kOutfitImagePath}'
             '${WeatherCondition.cloudy.name}_$roundedTemp.png',
-        '${constants.kOutfitImagePath}${precipitation}_$roundedTemp.png',
+        '${constants.kOutfitImagePath}${constants.kPrecipitation}_'
+            '$roundedTemp.png',
       ];
     }
 
@@ -80,7 +79,8 @@ class LocalDataSource {
     final String conditionName = switch (condition) {
       WeatherCondition.clear => condition.name,
       WeatherCondition.cloudy => condition.name,
-      WeatherCondition.rainy || WeatherCondition.snowy => precipitation,
+      WeatherCondition.rainy ||
+      WeatherCondition.snowy => constants.kPrecipitation,
       _ => WeatherCondition.unknown.name,
     };
 
@@ -98,14 +98,26 @@ class LocalDataSource {
     final TemperatureUnits units = weather.temperatureUnits;
 
     final Map<String, String> outfitEn = <String, String>{
-      'outfit.rainy': 'Take an umbrella',
-      'outfit.rainy_hot': 'Hot & rainy - light clothes + umbrella',
-      'outfit.snowy': 'Dress warmly, it\'s snowing!',
-      'outfit.cold': 'Wear a warm jacket',
-      'outfit.cool': 'Maybe bring a light jacket',
-      'outfit.warm': 'Light clothing should be fine',
-      'outfit.hot': 'It\'s hot! Dress lightly',
-      'outfit.moderate': 'Comfortable weather today',
+      'outfit.rainy':
+          'It\'s rainy! Consider wearing a waterproof jacket and boots.',
+      'outfit.rainy_hot':
+          'Rainy but hot! '
+          'Light, breathable clothes and an umbrella are your best bet.',
+      'outfit.snowy':
+          'It\'s snowy! '
+          'Dress warmly with a heavy coat, hat, gloves, and scarf.',
+      'outfit.cold':
+          'It\'s cold! '
+          'Wear a warm jacket, sweater, and consider a hat and gloves.',
+      'outfit.cool':
+          'It\'s cool. A light jacket or sweater should be comfortable.',
+      'outfit.warm':
+          'It\'s warm. Shorts, t-shirts, and light dresses are great options.',
+      'outfit.hot':
+          'It\'s hot! '
+          'Wear light, breathable clothing like tank tops and shorts.',
+      'outfit.moderate':
+          'The weather is moderate. You can wear a variety of outfits.',
     };
 
     final Map<String, String> outfitUk = <String, String>{
@@ -184,7 +196,9 @@ class LocalDataSource {
   /// returns the original [assetPath].
   Future<String> downloadAndSaveImage(String assetPath) async {
     // Check if the platform is web.
-    if (!kIsWeb) {
+    if (kIsWeb) {
+      return assetPath;
+    } else {
       try {
         // Load asset data as ByteData.
         final ByteData byteData = await rootBundle.load(assetPath);
@@ -224,8 +238,6 @@ class LocalDataSource {
           '${_translateError('error.save_asset_image_failed', locale)}: $e',
         );
       }
-    } else {
-      return assetPath;
     }
   }
 
@@ -428,7 +440,7 @@ class LocalDataSource {
     } else if (Platform.isIOS || Platform.isMacOS) {
       try {
         final String? sharedPath = await _channel.invokeMethod<String>(
-          'getSharedContainerPath',
+          constants.kGetSharedContainerPathMethod,
         );
 
         if (sharedPath != null && sharedPath.isNotEmpty) {

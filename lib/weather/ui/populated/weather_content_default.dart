@@ -11,6 +11,7 @@ import 'package:weather_fit/res/constants/constants.dart' as constants;
 import 'package:weather_fit/settings/bloc/settings_bloc.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 import 'package:weather_fit/weather/ui/populated/daily_forecast.dart';
+import 'package:weather_fit/weather/ui/populated/weather_details_section.dart';
 import 'package:weather_fit/weather/ui/widgets/text_shimmer.dart';
 import 'package:weather_fit/weather/ui/widgets/weather_icon.dart';
 import 'package:weather_fit/weather/ui/widgets/weather_shimmer.dart';
@@ -133,15 +134,11 @@ class WeatherContentDefault extends StatelessWidget {
                   height: 56,
                   child: Center(
                     child: weather.wasUpdated
-                        ? BlocBuilder<WeatherBloc, WeatherState>(
-                            builder: (BuildContext _, WeatherState state) {
-                              return Text(
-                                weather.formattedTemperature,
-                                style: textTheme.displaySmall?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              );
-                            },
+                        ? Text(
+                            weather.formattedTemperature,
+                            style: textTheme.displaySmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
                           )
                         : const TemperatureShimmer(),
                   ),
@@ -187,7 +184,7 @@ class WeatherContentDefault extends StatelessWidget {
 
             if (isWide) {
               return Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Expanded(
                     flex: 2,
@@ -200,6 +197,7 @@ class WeatherContentDefault extends StatelessWidget {
                           builder: (BuildContext _, WeatherState state) {
                             final bool isLocationMatch = weather.location
                                 .isSamePlaceAs(state.location);
+
                             if (isLocationMatch && state.forecast.isNotEmpty) {
                               return const DailyForecast();
                             } else {
@@ -211,11 +209,25 @@ class WeatherContentDefault extends StatelessWidget {
                         BlocBuilder<WeatherBloc, WeatherState>(
                           builder: (BuildContext _, WeatherState state) {
                             if (state.isNotLoading) {
-                              return ElevatedButton(
-                                onPressed: onRefresh,
-                                child: Text(
-                                  translate('weather.check_latest_button'),
-                                ),
+                              return Column(
+                                children: <Widget>[
+                                  ElevatedButton(
+                                    onPressed: onRefresh,
+                                    child: Text(
+                                      translate('weather.check_latest_button'),
+                                    ),
+                                  ),
+                                  if (weather.wasUpdated) ...<Widget>[
+                                    const SizedBox(height: 12),
+                                    WeatherDetailsSection(
+                                      key: ValueKey<String>(
+                                        '${weather.location.latitude}'
+                                        '${weather.location.longitude}',
+                                      ),
+                                      weather: weather,
+                                    ),
+                                  ],
+                                ],
                               );
                             } else {
                               return const SizedBox();
@@ -249,6 +261,7 @@ class WeatherContentDefault extends StatelessWidget {
                     builder: (BuildContext _, WeatherState state) {
                       final bool isLocationMatch = weather.location
                           .isSamePlaceAs(state.location);
+
                       if (isLocationMatch && state.forecast.isNotEmpty) {
                         return const DailyForecast();
                       } else {
@@ -260,9 +273,25 @@ class WeatherContentDefault extends StatelessWidget {
                   BlocBuilder<WeatherBloc, WeatherState>(
                     builder: (BuildContext _, WeatherState state) {
                       if (state.isNotLoading) {
-                        return ElevatedButton(
-                          onPressed: onRefresh,
-                          child: Text(translate('weather.check_latest_button')),
+                        return Column(
+                          children: <Widget>[
+                            ElevatedButton(
+                              onPressed: onRefresh,
+                              child: Text(
+                                translate('weather.check_latest_button'),
+                              ),
+                            ),
+                            if (weather.wasUpdated) ...<Widget>[
+                              const SizedBox(height: 12),
+                              WeatherDetailsSection(
+                                key: ValueKey<String>(
+                                  '${weather.location.latitude}'
+                                  '${weather.location.longitude}',
+                                ),
+                                weather: weather,
+                              ),
+                            ],
+                          ],
                         );
                       } else {
                         return const SizedBox();

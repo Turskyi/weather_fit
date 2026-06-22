@@ -144,9 +144,11 @@ android {
 
     applicationVariants.all { variant ->
         if (variant.buildType.name == "debug" && variant.flavorName == "phone") {
+            //noinspection GrDeprecatedAPIUsage
             def flutterApkDir = new File("$buildDir/outputs/flutter-apk")
             variant.assemble.doLast {
                 copy {
+                    //noinspection GrDeprecatedAPIUsage
                     from "$buildDir/outputs/apk/phone/debug/app-phone-debug.apk"
                     into flutterApkDir
                     rename { "app-debug.apk" }
@@ -155,9 +157,11 @@ android {
         }
 
         if (variant.buildType.name == "release" && variant.flavorName == "phone") {
+            //noinspection GrDeprecatedAPIUsage
             def flutterApkDir = new File("$buildDir/outputs/flutter-apk")
             variant.assemble.doLast {
                 copy {
+                    //noinspection GrDeprecatedAPIUsage
                     from "$buildDir/outputs/apk/phone/release/app-phone-release.apk"
                     into flutterApkDir
                     rename { "app-release.apk" }
@@ -172,10 +176,10 @@ flutter {
     source = "../.."
 }
 dependencies {
-    implementation 'com.google.firebase:firebase-crashlytics:20.0.4'
-    implementation 'com.google.firebase:firebase-analytics:23.0.0'
-    implementation 'com.google.code.gson:gson:2.13.2'
-    implementation "androidx.wear:wear-input:1.1.0"
+    implementation 'com.google.firebase:firebase-crashlytics:20.0.6'
+    implementation 'com.google.firebase:firebase-analytics:23.2.0'
+    implementation 'com.google.code.gson:gson:2.14.0'
+    implementation "androidx.wear:wear-input:1.2.0"
 }
 
 subprojects {

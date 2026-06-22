@@ -1,10 +1,12 @@
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart' as platform;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:weather_fit/entities/enums/language.dart';
+import 'package:weather_fit/extensions/build_context_extensions.dart' as type;
 import 'package:weather_fit/extensions/build_context_extensions.dart';
 import 'package:weather_fit/res/constants/constants.dart' as constant;
 import 'package:weather_fit/res/widgets/background.dart';
@@ -267,7 +269,9 @@ class SettingsPageDefaultLayout extends StatelessWidget {
                     );
                   },
                 ),
-                if (!kIsWeb && !context.isExtraSmallScreen) ...<Widget>[
+                if (!kIsWeb &&
+                    !context.isExtraSmallScreen &&
+                    !type.isWearDevice) ...<Widget>[
                   const SizedBox(height: 20),
                   // Home Widget Updates Card.
                   BlocBuilder<SettingsBloc, SettingsState>(
@@ -407,8 +411,8 @@ class SettingsPageDefaultLayout extends StatelessWidget {
                   ),
                 ],
                 if (!kIsWeb &&
-                    (defaultTargetPlatform ==
-                        TargetPlatform.android)) ...<Widget>[
+                    platform.defaultTargetPlatform == TargetPlatform.android &&
+                    !type.isWearDevice) ...<Widget>[
                   const SizedBox(height: 20),
                   Card(
                     elevation: 2.0,
@@ -424,7 +428,18 @@ class SettingsPageDefaultLayout extends StatelessWidget {
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       subtitle: Text(translate('settings.pin_widget_subtitle')),
-                      trailing: const Icon(Icons.push_pin_outlined),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          IconButton(
+                            icon: const Icon(Icons.info_outline),
+                            onPressed: () {
+                              _showPinWidgetInfoDialog(context);
+                            },
+                          ),
+                          const Icon(Icons.push_pin_outlined),
+                        ],
+                      ),
                       onTap: onPinWidgetTap,
                     ),
                   ),
@@ -611,6 +626,24 @@ class SettingsPageDefaultLayout extends StatelessWidget {
                 ? translate('settings.widget_info_content_android')
                 : translate('settings.widget_info_content_ios'),
           ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: Navigator.of(context).pop,
+              child: Text(translate('settings.ok')),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _showPinWidgetInfoDialog(BuildContext context) {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(translate('settings.pin_widget_instructions_title')),
+          content: Text(translate('settings.pin_widget_instructions_content')),
           actions: <Widget>[
             TextButton(
               onPressed: Navigator.of(context).pop,

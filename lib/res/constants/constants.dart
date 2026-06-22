@@ -42,6 +42,7 @@ const String kFeedbackTextProperty = 'feedback_text';
 const String kRatingProperty = 'rating';
 const String kScreenSizeProperty = 'screenSize';
 const String kSearchError = 'searchError';
+const String kPrecipitation = 'precipitation';
 
 /// Blur intensity constant.
 const double kBlurSigma = 8;
@@ -77,3 +78,11 @@ const String kWeatherFitScheme = 'weatherfit';
 const String kWeatherFitHost = 'open';
 const String kDebugWeatherProviderKey = 'debug_weather_provider_openweathermap';
 const String kOpenRemoteInputMethod = 'openRemoteInput';
+const String kGetSharedContainerPathMethod = 'getSharedContainerPath';
+const String kIsWearDeviceMethod = 'isWearDevice';
+
+const String kHomeWidgetMethodChannel = 'com.weatherfit.home_widget';
+const String kSetAppGroupIdMethod = 'setAppGroupId';
+const String kSaveWidgetDataMethod = 'saveWidgetData';
+const String kUpdateWidgetMethod = 'updateWidget';
+const String kAppGroupIdArgKey = 'appGroupId';

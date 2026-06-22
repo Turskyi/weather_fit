@@ -30,6 +30,14 @@ class WeatherRepository {
       description: weatherDomain.description,
       weatherCode: weatherDomain.weatherCode,
       locale: weatherDomain.locale,
+      feelsLike: weatherDomain.feelsLike,
+      humidity: weatherDomain.humidity,
+      windSpeed: weatherDomain.windSpeed,
+      uvIndex: weatherDomain.uvIndex,
+      visibility: weatherDomain.visibility,
+      cloudCover: weatherDomain.cloudCover,
+      pressure: weatherDomain.pressure,
+      dewPoint: weatherDomain.dewPoint,
     );
   }
 

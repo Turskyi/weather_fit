@@ -145,7 +145,9 @@
     "feedback_subtitle": "Daj nam znać, co myślisz i jakie masz sugestie. Możesz także zgłaszać wszelkie problemy z treścią aplikacji.",
     "support_subtitle": "Odwiedź naszą stronę wsparcia, aby uzyskać pomoc i odpowiedzi na najczęściej zadawane pytania.",
     "pin_widget": "Przypnij widżet",
-    "pin_widget_subtitle": "Dodaj widżet do ekranu głównego, aby szybko sprawdzać pogodę.",
+    "pin_widget_subtitle": "Dodaj widżet do ekranu głównego, aby szybko sprawdzać pogodę i sugestie dotyczące ubioru.",
+    "pin_widget_instructions_title": "Jak dodać widżet",
+    "pin_widget_instructions_content": "Możesz dodać widżet WeatherFit na dwa sposoby:\n\n1. Użyj przycisku „Przypnij widżet” poniżej (wymaga kompatybilnego launchera).\n2. Przytrzymaj palec na ekranie głównym, wybierz „Widżety”, znajdź WeatherFit i przeciągnij widżet na ekran.",
     "weather_background": "Tło pogodowe",
     "weather_background_subtitle": "Zmieniaj tło w zależności od aktualnej pogody.",
     "frequency_15m": "15 min",
@@ -176,7 +178,7 @@
     "use_current_location_dialog_title": "Użyć Twojej aktualnej lokalizacji?",
     "location_not_found_use_current_dialog_content": "Nie udało nam się znaleźć właściwej lokalizacji. Czy chcesz zamiast tego użyć swojej aktualnej lokalizacji?",
     "location_not_found_dialog_title": "Lokalizacja nie została znaleziona",
-    "location_not_found_suggestion_spell_check": "Nie znaleźliśmy tej lokalizacji. Możliwe, że nazwa jest wpisana z błędem — spróbuj też pobliskiego miasta lub kraju.",
+    "location_not_found_suggestion_spell_check": "Nie znaleźliśmy tej lokalizacji. Możliwe, że nazwa jest wpisana z błędem - spróbuj też pobliskiego miasta lub kraju.",
     "location_not_found_suggestion_use_gps": "Alternatywnie możesz pobrać pogodę dla swojej aktualnej lokalizacji za pomocą GPS.",
     "use_gps_button": "Użyj GPS",
     "quick_city_toronto": "Toronto",
@@ -260,6 +262,16 @@
   },
   "weather": {
     "check_latest_button": "Sprawdź najnowszą pogodę",
+    "details_button": "Szczegóły pogody",
+    "feels_like": "Odczuwalna",
+    "humidity": "Wilgotność",
+    "wind_speed": "Prędkość wiatru",
+    "uv_index": "Indeks UV",
+    "visibility": "Widoczność",
+    "cloud_cover": "Zachmurzenie",
+    "pressure": "Ciśnienie",
+    "dew_point": "Punkt rosy",
+    "hourly_forecast_title": "Prognoza godzinowa",
     "code_0": "Czyste niebo",
     "code_1": "Głównie bezchmurnie",
     "code_2": "Częściowe zachmurzenie",
@@ -297,9 +309,9 @@
     "today": "Dzisiaj",
     "tomorrow": "Jutro",
     "time_of_day": {
-      "morning": "Rano",
-      "lunch": "Obiad",
-      "evening": "Wieczór"
+      "morning": "Poranek (0–10)",
+      "day": "Dzień (10–17)",
+      "evening": "Wieczór (17–0)"
     }
   },
   "outfit": {

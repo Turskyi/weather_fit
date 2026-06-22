@@ -53,6 +53,7 @@ class WeatherPageDefaultLayout extends StatelessWidget {
   const WeatherPageDefaultLayout({
     required this.onSettingsPressed,
     required this.onRefresh,
+    required this.onOutfitRefresh,
     required this.onSearchPressed,
     required this.onReportPressed,
     this.weatherStateListener,
@@ -73,6 +74,8 @@ class WeatherPageDefaultLayout extends StatelessWidget {
   /// far enough to demonstrate that they want the app to refresh. The returned
   /// [Future] must complete when the refresh operation is finished.
   final RefreshCallback onRefresh;
+
+  final RefreshCallback onOutfitRefresh;
 
   /// The callback that is called when the button is tapped or otherwise
   /// activated.
@@ -137,7 +140,7 @@ class WeatherPageDefaultLayout extends StatelessWidget {
               outfitImageWidget = OutfitWidget(
                 outfitImage: state.outfitImage,
                 outfitRecommendation: stateOutfitRecommendation,
-                onRefresh: onRefresh,
+                onRefresh: onOutfitRefresh,
               );
             } else if (state is LoadingOutfitState) {
               final double screenWidth = MediaQuery.widthOf(context);
@@ -199,7 +202,7 @@ class WeatherPageDefaultLayout extends StatelessWidget {
                 child: OutfitWidget(
                   outfitImage: state.outfitImage,
                   outfitRecommendation: state.outfitRecommendation,
-                  onRefresh: onRefresh,
+                  onRefresh: onOutfitRefresh,
                 ),
               );
             }
@@ -212,7 +215,7 @@ class WeatherPageDefaultLayout extends StatelessWidget {
                 child: OutfitWidget(
                   outfitImage: state.outfitImage,
                   outfitRecommendation: state.outfitRecommendation,
-                  onRefresh: onRefresh,
+                  onRefresh: onOutfitRefresh,
                 ),
               );
             }

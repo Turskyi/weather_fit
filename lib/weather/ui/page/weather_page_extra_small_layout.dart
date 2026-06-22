@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
+import 'package:weather_fit/extensions/build_context_extensions.dart';
 import 'package:weather_fit/res/widgets/local_web_cors_error.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 import 'package:weather_fit/weather/ui/empty/weather_empty.dart';
@@ -52,6 +53,7 @@ class WeatherPageExtraSmallLayout extends StatefulWidget {
   const WeatherPageExtraSmallLayout({
     required this.onSettingsPressed,
     required this.onRefresh,
+    required this.onOutfitRefresh,
     required this.onSearchPressed,
     required this.onReportPressed,
     this.weatherStateListener,
@@ -72,6 +74,8 @@ class WeatherPageExtraSmallLayout extends StatefulWidget {
   /// far enough to demonstrate that they want the app to refresh. The returned
   /// [Future] must complete when the refresh operation is finished.
   final RefreshCallback onRefresh;
+
+  final RefreshCallback onOutfitRefresh;
 
   /// The callback that is called when the "Search" button is tapped or
   /// otherwise activated.
@@ -154,7 +158,7 @@ class _WeatherPageExtraSmallLayoutState
               outfitImageWidget = OutfitWidget(
                 outfitImage: state.outfitImage,
                 outfitRecommendation: stateOutfitRecommendation,
-                onRefresh: widget.onRefresh,
+                onRefresh: widget.onOutfitRefresh,
               );
             } else if (state is LoadingOutfitState) {
               final BorderRadius borderRadius = BorderRadius.circular(20.0);
@@ -218,7 +222,7 @@ class _WeatherPageExtraSmallLayoutState
                 child: OutfitWidget(
                   outfitImage: state.outfitImage,
                   outfitRecommendation: state.outfitRecommendation,
-                  onRefresh: widget.onRefresh,
+                  onRefresh: widget.onOutfitRefresh,
                 ),
               );
             }
@@ -231,7 +235,7 @@ class _WeatherPageExtraSmallLayoutState
                 child: OutfitWidget(
                   outfitImage: state.outfitImage,
                   outfitRecommendation: state.outfitRecommendation,
-                  onRefresh: widget.onRefresh,
+                  onRefresh: widget.onOutfitRefresh,
                 ),
               );
             }
@@ -283,16 +287,7 @@ class _WeatherPageExtraSmallLayoutState
         ),
       ),
       body: NotificationListener<ScrollNotification>(
-        onNotification: (ScrollNotification notification) {
-          final bool isAtBottom =
-              notification.metrics.atEdge && notification.metrics.pixels > 0;
-          if (isAtBottom != _isAtScrollBottom) {
-            setState(() {
-              _isAtScrollBottom = isAtBottom;
-            });
-          }
-          return false;
-        },
+        onNotification: _onScrollNotification,
         child: ColoredBox(
           color: Colors.black,
           child: Center(child: content),
@@ -321,18 +316,15 @@ class _WeatherPageExtraSmallLayoutState
         ..showSnackBar(
           SnackBar(
             behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.symmetric(horizontal: 40, vertical: 24),
-            duration: const Duration(seconds: 2),
-            content: Row(
-              children: <Widget>[
-                Expanded(child: SelectableText(state.message)),
-                TextButton(
-                  onPressed: () =>
-                      ScaffoldMessenger.of(context).hideCurrentSnackBar(),
-                  child: Text(translate('ok')),
-                ),
-              ],
+            shape: const StadiumBorder(),
+            margin: EdgeInsets.fromLTRB(
+              28,
+              0,
+              28,
+              context.wearBottomPadding + 8,
             ),
+            duration: const Duration(seconds: 3),
+            content: Text(state.message, textAlign: TextAlign.center),
             action: SnackBarAction(
               label: translate('try_again'),
               onPressed: widget.onRefresh,
@@ -341,5 +333,23 @@ class _WeatherPageExtraSmallLayoutState
         );
     }
     widget.weatherStateListener?.call(context, state);
+  }
+
+  bool _onScrollNotification(ScrollNotification notification) {
+    final bool isAtBottom =
+        notification.metrics.atEdge && notification.metrics.pixels > 0;
+    // Guard against redundant state updates and use `postFrameCallback` to
+    // avoid "Build scheduled during frame" errors if setState is triggered
+    // during layout.
+    if (isAtBottom != _isAtScrollBottom) {
+      WidgetsBinding.instance.addPostFrameCallback((Duration _) {
+        if (mounted) {
+          setState(() {
+            _isAtScrollBottom = isAtBottom;
+          });
+        }
+      });
+    }
+    return false;
   }
 }

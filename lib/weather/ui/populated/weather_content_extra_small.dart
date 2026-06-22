@@ -12,6 +12,7 @@ import 'package:weather_fit/res/widgets/wear_position_indicator.dart';
 import 'package:weather_fit/settings/bloc/settings_bloc.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 import 'package:weather_fit/weather/ui/populated/wear_forecast_section.dart';
+import 'package:weather_fit/weather/ui/populated/wear_info_chip.dart';
 import 'package:weather_fit/weather/ui/widgets/weather_icon.dart';
 
 class WeatherContentExtraSmall extends StatefulWidget {
@@ -37,13 +38,7 @@ class WeatherContentExtraSmall extends StatefulWidget {
 }
 
 class _WeatherContentExtraSmallState extends State<WeatherContentExtraSmall> {
-  late final ScrollController _scrollController;
-
-  @override
-  void initState() {
-    super.initState();
-    _scrollController = ScrollController();
-  }
+  final ScrollController _scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
@@ -90,14 +85,14 @@ class _WeatherContentExtraSmallState extends State<WeatherContentExtraSmall> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        _WearInfoChip(
+                        WearInfoChip(
                           size: infoBoxSize,
                           radius: infoBoxRadius,
                           color: iconChipColor,
                           child: WeatherIcon(condition: weather.condition),
                         ),
                         const SizedBox(width: 16),
-                        _WearInfoChip(
+                        WearInfoChip(
                           size: infoBoxSize,
                           radius: infoBoxRadius,
                           color: surfaceColor,
@@ -169,31 +164,7 @@ class _WeatherContentExtraSmallState extends State<WeatherContentExtraSmall> {
                             );
                           },
                         ),
-                        onPressed: () {
-                          final LocalDataSource localDataSource = context
-                              .read<LocalDataSource>();
-                          final bool isFavourite = localDataSource
-                              .isFavouriteLocation(weather.location);
-                          context.read<WeatherBloc>().add(
-                            ToggleFavouriteEvent(weather.location),
-                          );
-                          ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              behavior: SnackBarBehavior.floating,
-                              margin: const EdgeInsets.symmetric(
-                                horizontal: 40,
-                                vertical: 24,
-                              ),
-                              content: Text(
-                                isFavourite
-                                    ? translate('location_removed')
-                                    : translate('location_saved'),
-                              ),
-                              duration: const Duration(seconds: 2),
-                            ),
-                          );
-                        },
+                        onPressed: () => _onToggleFavouritePressed(weather),
                       ),
                     ],
                   ),
@@ -254,34 +225,33 @@ class _WeatherContentExtraSmallState extends State<WeatherContentExtraSmall> {
     );
   }
 
+  ScaffoldFeatureController<SnackBar, SnackBarClosedReason>
+  _onToggleFavouritePressed(Weather weather) {
+    final LocalDataSource localDataSource = context.read<LocalDataSource>();
+    final bool isFavourite = localDataSource.isFavouriteLocation(
+      weather.location,
+    );
+    context.read<WeatherBloc>().add(ToggleFavouriteEvent(weather.location));
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    return ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        shape: const StadiumBorder(),
+        margin: EdgeInsets.fromLTRB(32, 0, 32, context.wearBottomPadding + 8),
+        content: Text(
+          isFavourite
+              ? translate('location_removed')
+              : translate('location_saved'),
+          textAlign: TextAlign.center,
+        ),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
   @override
   void dispose() {
     _scrollController.dispose();
     super.dispose();
-  }
-}
-
-class _WearInfoChip extends StatelessWidget {
-  const _WearInfoChip({
-    required this.size,
-    required this.radius,
-    required this.color,
-    required this.child,
-  });
-
-  final double size;
-  final BorderRadius radius;
-  final Color color;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(color: color, borderRadius: radius),
-      child: child,
-    );
   }
 }

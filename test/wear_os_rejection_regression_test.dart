@@ -86,8 +86,10 @@ void main() {
       tester.view.resetDevicePixelRatio();
     });
 
-    testWidgets('Search button MUST be enabled even for empty queries to prove '
-        'functionality to reviewers', (WidgetTester tester) async {
+    testWidgets('Search button MUST be enabled even for empty queries on '
+        'watches to prove functionality to reviewers', (
+      WidgetTester tester,
+    ) async {
       final TextEditingController controller = TextEditingController(text: '');
       await tester.pumpWidget(buildSearchLayout(controller, tester));
       await tester.pump();

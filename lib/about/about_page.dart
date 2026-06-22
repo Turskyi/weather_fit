@@ -5,6 +5,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:weather_fit/extensions/build_context_extensions.dart' as type;
 import 'package:weather_fit/res/constants/constants.dart' as constants;
 import 'package:weather_fit/res/widgets/leading_widget.dart';
 import 'package:weather_fit/res/widgets/store_badge.dart';
@@ -13,9 +14,17 @@ import 'package:weather_fit/router/app_route.dart';
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
 
+  /// Returns `true` if the home widgets feature should be displayed in the
+  /// about page.
+  ///
+  /// The feature is shown on platforms that support home screen widgets:
+  /// Android, iOS, and macOS. It is not shown on web or Wear OS devices.
   bool get _showWidgetsFeature {
-    if (kIsWeb) return false;
-    return Platform.isAndroid || Platform.isIOS;
+    if (kIsWeb || type.isWearDevice) {
+      return false;
+    } else {
+      return Platform.isAndroid || Platform.isIOS || Platform.isMacOS;
+    }
   }
 
   // Helper to get the correct translation key for location support.

@@ -27,8 +27,9 @@
     <string name="no_recommendation">🤔 geen aanbeveling</string>
     <string name="today">Vandaag</string>
     <string name="tomorrow">Morgen</string>
-    <string name="morning">Ochtend</string>
-    <string name="lunch">Lunch</string>
-    <string name="evening">Avond</string>
+    <string name="morning">Ochtend (0–10)</string>
+    <string name="day">Dag (10–17)</string>
+    <string name="lunch">Dag (10–17)</string>
+    <string name="evening">Avond (17–0)</string>
     <string name="night">Nacht</string>
 </resources>

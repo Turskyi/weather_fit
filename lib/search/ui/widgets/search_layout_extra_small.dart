@@ -202,9 +202,12 @@ class _SearchPageExtraSmallLayoutState
     } else if (value.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: Text(translate('search.enter_location')),
+          behavior: SnackBarBehavior.floating,
+          shape: const StadiumBorder(),
+          margin: EdgeInsets.fromLTRB(24, 0, 24, context.wearBottomPadding + 8),
+          content: Text(
+            translate('search.enter_location'),
+            textAlign: TextAlign.center,
           ),
           duration: const Duration(seconds: 2),
         ),
