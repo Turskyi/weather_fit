@@ -19,7 +19,7 @@ school, or a party, _WeatherFit_ will show you the best outfit for any weather
 condition. Enter your location or use GPS, and **WeatherFit** will display
 the current weather and a full-height image of a person wearing a suitable
 outfit. You can customize the image according to your preferences
-(in development!), such as age, gender, skin tone, hair color, etc. This way,
+(in development!), such as age, gender, skin tone, hair colour, etc. This way,
 the image will be more personalized and relevant to you. You can also see the
 forecast for the next few days and get outfit recommendations for each day. You
 can choose from different styles and categories of outfits, such as casual,
@@ -69,33 +69,35 @@ follow these steps:
 - Fork this repository and clone it to your local machine.
 - Create a new branch for your feature or bug-fix.
 - Set up the necessary configuration and secret files (these are not versioned):
-  - Copy `.env.example` to `.env` in the root directory and fill in your API keys:
-    ```env
-    RESEND_API_KEY="your_resend_api_key_here"
-    OPEN_WEATHER_MAP_API_KEY="your_open_weather_map_api_key_here"
-    ```
-    (Get a free token from [resend.com](https://resend.com) and [openweathermap.org](https://openweathermap.org/api))
-  - Create `android/key.properties` with the following content:
-    ```properties
-    # dev debug environment variables
-    SIGNING_KEY_DEBUG_PATH=../keystore/weather_fit_debug.keystore
-    SIGNING_KEY_DEBUG_PASSWORD=...
-    SIGNING_KEY_DEBUG_KEY=weather_fit_debug
-    SIGNING_KEY_DEBUG_KEY_PASSWORD=...
-    # production release environment variables
-    SIGNING_KEY_RELEASE_PATH=../keystore/weather_fit_release.keystore
-    SIGNING_KEY_RELEASE_PASSWORD=...
-    SIGNING_KEY_RELEASE_KEY=weather_fit_release
-    SIGNING_KEY_RELEASE_KEY_PASSWORD=...
-    # suppress inspection "UnusedProperty"
-    FIREBASE_ANDROID_APP_ID=1:...
-    # suppress inspection "UnusedProperty"
-    FIREBASE_TOKEN=1//...
-    ```
-  - Place the following files in their respective locations:
-    - `android/keystore/weather_fit_debug.keystore`
-    - `android/keystore/weather_fit_release.keystore`
-    - `android/app/google-services.json`
+    - Copy `.env.example` to `.env` in the root directory and fill in your API
+      keys:
+      ```env
+      RESEND_API_KEY="your_resend_api_key_here"
+      OPEN_WEATHER_MAP_API_KEY="your_open_weather_map_api_key_here"
+      ```
+      (Get a free token from [resend.com](https://resend.com)
+      and [openweathermap.org](https://openweathermap.org/api))
+    - Create `android/key.properties` with the following content:
+      ```properties
+      # dev debug environment variables
+      SIGNING_KEY_DEBUG_PATH=../keystore/weather_fit_debug.keystore
+      SIGNING_KEY_DEBUG_PASSWORD=...
+      SIGNING_KEY_DEBUG_KEY=weather_fit_debug
+      SIGNING_KEY_DEBUG_KEY_PASSWORD=...
+      # production release environment variables
+      SIGNING_KEY_RELEASE_PATH=../keystore/weather_fit_release.keystore
+      SIGNING_KEY_RELEASE_PASSWORD=...
+      SIGNING_KEY_RELEASE_KEY=weather_fit_release
+      SIGNING_KEY_RELEASE_KEY_PASSWORD=...
+      # suppress inspection "UnusedProperty"
+      FIREBASE_ANDROID_APP_ID=1:...
+      # suppress inspection "UnusedProperty"
+      FIREBASE_TOKEN=1//...
+      ```
+    - Place the following files in their respective locations:
+        - `android/keystore/weather_fit_debug.keystore`
+        - `android/keystore/weather_fit_release.keystore`
+        - `android/app/google-services.json`
 - Generate the necessary files by running:
   ```bash
   dart run build_runner build --delete-conflicting-outputs
@@ -128,9 +130,9 @@ dart run build_runner clean
 dart run build_runner build --delete-conflicting-outputs
 ```
 
-## Android flavors (phone and Wear OS)
+## Android flavours (phone and Wear OS)
 
-This project uses two Android flavors:
+This project uses two Android flavours:
 
 - `phone` — default mobile build.
 - `wear` — Wear OS targeted build.
@@ -142,7 +144,7 @@ The build is configured to make debugging seamless:
 - **Default "main" run configuration works**: The build system is configured to
   only build the `phone` flavor for debug builds. This means you can run the
   standard debug configuration in Android Studio or use `flutter run` without
-  specifying a flavor. No setup required!
+  specifying a flavour. No setup required!
 - **For Wear OS testing**: Explicitly specify the `wear` flavor.
 
 CLI examples:
@@ -168,7 +170,7 @@ Android Studio:
 
 - **Phone debugging**: Just press Debug with the default "main" configuration.
 - **Wear OS debugging**: Create a new Flutter run configuration and set
-  **Build flavor** to `wear`.
+  **Build flavour** to `wear`.
 
 Manifest overlays:
 
@@ -220,7 +222,7 @@ Output:
    (supported form factors/devices).
 6. Save, review, and roll out.
 
-Tip: keep phone and wear releases as separate flavor artifacts. Do not manually
+Tip: keep phone and wear releases as separate flavour artifacts. Do not manually
 toggle manifest lines before each build.
 
 ### Release order and versioning rule
@@ -230,7 +232,7 @@ artifacts (same package name).
 
 Recommended workflow for this project:
 
-1. Build and publish the **Wear OS** flavor manually from a release branch:
+1. Build and publish the **Wear OS** flavour manually from a release branch:
 
 ```bash
 flutter build appbundle --release --flavor wear -t lib/main.dart
@@ -245,7 +247,7 @@ flutter build appbundle --flavor wear
 2. After the Wear OS release is published in Play Console, increment app
    version (`version:` in `pubspec.yaml`) to produce the next Android
    `versionCode`.
-3. Merge/push to `master` so CI/CD builds and publishes the **phone** flavor
+3. Merge/push to `master` so CI/CD builds and publishes the **phone** flavour
    with the incremented version number.
 
 This prevents Play Console conflicts where one form factor blocks publishing
@@ -285,7 +287,7 @@ The Application (core) is the heart of the architecture.
 It houses the business logic and domain objects, which are the kernel of value
 in the software.
 This core of the application should be designed as a set of interfaces or ports
-that define the behavior of the system, without any implementation details.
+that define the behaviour of the system, without any implementation details.
 It is independent of external systems and concerns.
 The core of the application is designed to work without either a UI or a
 database.
