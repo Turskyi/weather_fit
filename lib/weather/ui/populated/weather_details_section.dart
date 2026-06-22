@@ -53,31 +53,34 @@ class _WeatherDetailsSectionState extends State<WeatherDetailsSection>
           dewPoint: widget.weather.dewPoint ?? currentHour?.dewPoint,
         );
 
-        return Column(
-          children: <Widget>[
-            OutlinedButton(
-              onPressed: _toggleExpanded,
-              child: Text(translate('weather.details_button')),
-            ),
-            AnimatedSize(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-              child: _isExpanded
-                  ? Padding(
-                      padding: const EdgeInsets.only(top: 24.0),
-                      child: Column(
-                        children: <Widget>[
-                          _FeelsLikeCard(weather: weatherToUse),
-                          const SizedBox(height: 16),
-                          const _HourlyForecastSection(),
-                          const SizedBox(height: 16),
-                          _AdditionalMetricsGrid(weather: weatherToUse),
-                        ],
-                      ),
-                    )
-                  : const SizedBox.shrink(),
-            ),
-          ],
+        return Padding(
+          padding: const EdgeInsets.only(right: 8.0, bottom: 16.0),
+          child: Column(
+            children: <Widget>[
+              OutlinedButton(
+                onPressed: _toggleExpanded,
+                child: Text(translate('weather.details_button')),
+              ),
+              AnimatedSize(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                child: _isExpanded
+                    ? Padding(
+                        padding: const EdgeInsets.only(top: 24.0),
+                        child: Column(
+                          children: <Widget>[
+                            _FeelsLikeCard(weather: weatherToUse),
+                            const SizedBox(height: 16),
+                            const _HourlyForecastSection(),
+                            const SizedBox(height: 16),
+                            _AdditionalMetricsGrid(weather: weatherToUse),
+                          ],
+                        ),
+                      )
+                    : const SizedBox.shrink(),
+              ),
+            ],
+          ),
         );
       },
     );

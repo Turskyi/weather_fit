@@ -90,10 +90,9 @@ class OutfitWidget extends StatelessWidget {
                       ),
                       Expanded(
                         flex: 3,
-                        child: Container(
-                          padding: const EdgeInsets.all(4),
+                        child: Align(
                           alignment: Alignment.center,
-                          child: SelectableText(
+                          child: Text(
                             displayText,
                             style: theme.textTheme.bodyMedium?.copyWith(
                               fontWeight: FontWeight.w500,
