@@ -765,8 +765,21 @@ struct DateHelper {
     private static func parseDateTime(from string: String) -> Date? {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm"
-        return formatter.date(from: string)
+        
+        // Try multiple formats to be robust (OpenMeteo vs Dart toIso8601String)
+        let formats = [
+            "yyyy-MM-dd'T'HH:mm:ss.SSS",
+            "yyyy-MM-dd'T'HH:mm:ss",
+            "yyyy-MM-dd'T'HH:mm"
+        ]
+        
+        for format in formats {
+            formatter.dateFormat = format
+            if let date = formatter.date(from: string) {
+                return date
+            }
+        }
+        return nil
     }
 
     /// Returns a formatted date and time string, e.g. "Apr 12, 09:00"
