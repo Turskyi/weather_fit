@@ -13,6 +13,7 @@ import 'package:weather_fit/settings/bloc/settings_bloc.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 import 'package:weather_fit/weather/ui/populated/wear_forecast_section.dart';
 import 'package:weather_fit/weather/ui/populated/wear_info_chip.dart';
+import 'package:weather_fit/weather/ui/populated/weather_details_section.dart';
 import 'package:weather_fit/weather/ui/widgets/weather_icon.dart';
 
 class WeatherContentExtraSmall extends StatefulWidget {
@@ -200,6 +201,14 @@ class _WeatherContentExtraSmallState extends State<WeatherContentExtraSmall> {
             ),
             const SizedBox(height: 16),
             const WearForecastSection(),
+            if (weather.wasUpdated)
+              WeatherDetailsSection(
+                key: ValueKey<String>(
+                  '${weather.location.latitude}${weather.location.longitude}',
+                ),
+                weather: weather,
+                isStatic: true,
+              ),
             BlocBuilder<WeatherBloc, WeatherState>(
               builder: (BuildContext context, WeatherState state) {
                 if (state.isNotLoading) {

@@ -13,11 +13,13 @@ class WeatherDetailsSection extends StatefulWidget {
   const WeatherDetailsSection({
     required this.weather,
     this.onExpanded,
+    this.isStatic = false,
     super.key,
   });
 
   final Weather weather;
   final VoidCallback? onExpanded;
+  final bool isStatic;
 
   @override
   State<WeatherDetailsSection> createState() => _WeatherDetailsSectionState();
@@ -25,7 +27,13 @@ class WeatherDetailsSection extends StatefulWidget {
 
 class _WeatherDetailsSectionState extends State<WeatherDetailsSection>
     with SingleTickerProviderStateMixin {
-  bool _isExpanded = false;
+  late bool _isExpanded;
+
+  @override
+  void initState() {
+    super.initState();
+    _isExpanded = widget.isStatic;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,6 +59,23 @@ class _WeatherDetailsSectionState extends State<WeatherDetailsSection>
           dewPoint: widget.weather.dewPoint ?? currentHour?.dewPoint,
         );
 
+        final Widget detailsContent = Column(
+          children: <Widget>[
+            WeatherFeelsLikeCard(weather: weatherToUse),
+            const SizedBox(height: 16),
+            const WeatherHourlyForecastSection(),
+            const SizedBox(height: 16),
+            WeatherAdditionalMetricsGrid(weather: weatherToUse),
+          ],
+        );
+
+        if (widget.isStatic) {
+          return Padding(
+            padding: const EdgeInsets.only(right: 8.0, bottom: 16.0, top: 24.0),
+            child: detailsContent,
+          );
+        }
+
         return Padding(
           padding: const EdgeInsets.only(right: 8.0, bottom: 16.0),
           child: Column(
@@ -65,15 +90,7 @@ class _WeatherDetailsSectionState extends State<WeatherDetailsSection>
                 child: _isExpanded
                     ? Padding(
                         padding: const EdgeInsets.only(top: 24.0),
-                        child: Column(
-                          children: <Widget>[
-                            WeatherFeelsLikeCard(weather: weatherToUse),
-                            const SizedBox(height: 16),
-                            const WeatherHourlyForecastSection(),
-                            const SizedBox(height: 16),
-                            WeatherAdditionalMetricsGrid(weather: weatherToUse),
-                          ],
-                        ),
+                        child: detailsContent,
                       )
                     : const SizedBox.shrink(),
               ),

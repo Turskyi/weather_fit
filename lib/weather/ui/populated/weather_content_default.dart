@@ -235,6 +235,7 @@ class _WeatherContentDefaultState extends State<WeatherContentDefault> {
                                       ),
                                       weather: weather,
                                       onExpanded: _scrollToBottom,
+                                      isStatic: false,
                                     ),
                                   ],
                                 ],
@@ -295,13 +296,13 @@ class _WeatherContentDefaultState extends State<WeatherContentDefault> {
                               ),
                             ),
                             if (weather.wasUpdated) ...<Widget>[
-                              const SizedBox(height: 12),
                               WeatherDetailsSection(
                                 key: ValueKey<String>(
                                   '${weather.location.latitude}'
                                   '${weather.location.longitude}',
                                 ),
                                 weather: weather,
+                                isStatic: true,
                               ),
                             ],
                           ],
