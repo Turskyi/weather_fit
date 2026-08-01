@@ -88,18 +88,38 @@ class _WeatherContentDefaultState extends State<WeatherContentDefault> {
                       ),
                     const SizedBox(width: 8),
                     Flexible(
-                      child: FittedBox(
-                        child: SizedBox(
-                          height: 56,
+                      child: SizedBox(
+                        height: 56,
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
                           child: Center(
                             child: BlocListener<SettingsBloc, SettingsState>(
                               listenWhen: widget.listenSettingsStateWhen,
                               listener: widget.settingsStateListener,
-                              child: Text(
-                                weather.locationName,
-                                style: cityTextStyle?.copyWith(
-                                  fontWeight: FontWeight.w200,
-                                ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: <Widget>[
+                                  Text(
+                                    weather.locationName,
+                                    style: cityTextStyle?.copyWith(
+                                      fontWeight: FontWeight.w200,
+                                    ),
+                                  ),
+                                  if (weather.location.name.isNotEmpty)
+                                    Text(
+                                      weather.location.coordinatesDisplay,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .labelSmall
+                                          ?.copyWith(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurface
+                                                .withValues(alpha: 0.6),
+                                          ),
+                                    ),
+                                ],
                               ),
                             ),
                           ),

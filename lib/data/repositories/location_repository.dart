@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:nominatim_api/nominatim_api.dart';
 import 'package:open_meteo_api/open_meteo_api.dart';
 import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
@@ -30,39 +31,7 @@ class LocationRepository {
       final NominatimLocationResponse response = await _nominatimApiClient
           .locationSearch(query);
 
-      final List<String> parts = response.displayName
-          .split(',')
-          .map((String e) => e.trim())
-          .toList();
-
-      final String responseName = response.name;
-
-      final String countryName = response.isCountry
-          ? responseName
-          : parts.isNotEmpty
-          ? parts.last
-          : '';
-
-      // Try to get oblast or similar.
-      final String province = parts.reversed.firstWhere(
-        (String part) => part.toLowerCase().contains('область'),
-        orElse: () {
-          final int middleIndex = (parts.length / 2).floor();
-          return parts.length > 2 ? parts[middleIndex] : '';
-        },
-      );
-
-      final String countryCode = _countryNameToCode[countryName] ?? '';
-      return Location(
-        id: response.placeId,
-        name: responseName,
-        latitude: double.parse(response.lat),
-        longitude: double.parse(response.lon),
-        country: countryName,
-        province: province,
-        countryCode: countryCode,
-        locale: locale,
-      );
+      return _mapNominatimToLocation(response, locale);
     } else {
       final LocationResponse response = await _openMeteoApiClient
           .locationSearch(query);
@@ -78,6 +47,81 @@ class LocationRepository {
         locale: locale,
       );
     }
+  }
+
+  Future<Location> getLocationByCoordinates({
+    required double latitude,
+    required double longitude,
+  }) async {
+    final String locale = _localDataSource.getLanguageIsoCode();
+
+    try {
+      final NominatimLocationResponse response = await _nominatimApiClient
+          .reverseSearch(latitude: latitude, longitude: longitude);
+
+      return _mapNominatimToLocation(response, locale);
+    } catch (e) {
+      debugPrint('Error in getLocationByCoordinates: $e');
+      // Return a basic location with coordinates if reverse geocoding fails.
+      return Location(latitude: latitude, longitude: longitude, locale: locale);
+    }
+  }
+
+  Location _mapNominatimToLocation(
+    NominatimLocationResponse response,
+    String locale,
+  ) {
+    final List<String> parts = response.displayName
+        .split(',')
+        .map((String e) => e.trim())
+        .toList();
+
+    String responseName = response.name;
+
+    // For reverse geocoding, 'name' might be empty in the root.
+    // Try to get it from the address if it's empty.
+    if (responseName.isEmpty) {
+      final Map<String, Object?> addr = response.address;
+      responseName =
+          (addr['city'] ??
+                  addr['town'] ??
+                  addr['village'] ??
+                  addr['suburb'] ??
+                  addr['hamlet'] ??
+                  addr['road'] ??
+                  '')
+              .toString();
+    }
+
+    // If still empty, use the first part of display name.
+    if (responseName.isEmpty && parts.isNotEmpty) {
+      responseName = parts.first;
+    }
+
+    final String countryName = response.isCountry
+        ? responseName
+        : (parts.isNotEmpty ? parts.last : '');
+
+    // Try to get oblast or similar.
+    final String province = parts.reversed.firstWhere(
+      (String part) => part.toLowerCase().contains('область'),
+      orElse: () {
+        final int middleIndex = (parts.length / 2).floor();
+        return parts.length > 2 ? parts[middleIndex] : '';
+      },
+    );
+
+    final String countryCode = _countryNameToCode[countryName] ?? '';
+    return Location(
+      id: response.placeId,
+      name: responseName,
+      latitude: double.parse(response.lat),
+      longitude: double.parse(response.lon),
+      country: countryName,
+      province: province,
+      countryCode: countryCode,
+      locale: locale,
+    );
   }
 
   /// Use Nominatim if query contains Cyrillic characters.

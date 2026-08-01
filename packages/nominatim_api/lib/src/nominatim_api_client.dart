@@ -55,4 +55,36 @@ class NominatimApiClient {
     }
     throw NominatimLocationRequestFailure();
   }
+
+  /// Finds a [NominatimLocationResponse] using `/reverse?lat=(lat)&lon=(lon)`.
+  Future<NominatimLocationResponse> reverseSearch({
+    required double latitude,
+    required double longitude,
+  }) async {
+    final Uri requestUri = Uri.https(_baseUrl, '/reverse', <String, String>{
+      'lat': latitude.toString(),
+      'lon': longitude.toString(),
+      'format': 'json',
+      'accept-language': 'uk,en',
+    });
+
+    final http.Response response = await _httpClient.get(
+      requestUri,
+      headers: <String, String>{
+        'User-Agent': 'WeatherFitApp/1.0 (contact: support@weather-fit.com)',
+      },
+    );
+
+    if (response.statusCode != HttpStatus.ok) {
+      throw NominatimLocationRequestFailure();
+    }
+
+    final Object? body = jsonDecode(response.body);
+
+    if (body is Map<String, Object?>) {
+      return NominatimLocationResponse.fromJson(body);
+    }
+
+    throw NominatimLocationRequestFailure();
+  }
 }

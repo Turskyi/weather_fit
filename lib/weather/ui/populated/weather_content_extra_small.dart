@@ -139,10 +139,30 @@ class _WeatherContentExtraSmallState extends State<WeatherContentExtraSmall> {
                           child: BlocListener<SettingsBloc, SettingsState>(
                             listenWhen: widget.listenSettingsStateWhen,
                             listener: widget.settingsStateListener,
-                            child: Text(
-                              weather.locationName,
-                              textAlign: TextAlign.center,
-                              style: cityTextStyle,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                Text(
+                                  weather.locationName,
+                                  textAlign: TextAlign.center,
+                                  style: cityTextStyle,
+                                ),
+                                if (weather.location.name.isNotEmpty)
+                                  Text(
+                                    weather.location.coordinatesDisplay,
+                                    textAlign: TextAlign.center,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelSmall
+                                        ?.copyWith(
+                                          fontSize: 8,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface
+                                              .withValues(alpha: 0.6),
+                                        ),
+                                  ),
+                              ],
                             ),
                           ),
                         ),

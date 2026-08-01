@@ -103,6 +103,25 @@ class _PlannerResultState extends State<PlannerResult> {
         Column(
           spacing: 16,
           children: <Widget>[
+            Column(
+              children: <Widget>[
+                Text(
+                  widget.weather.locationName,
+                  style: textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                if (widget.weather.location.name.isNotEmpty)
+                  Text(
+                    widget.weather.location.coordinatesDisplay,
+                    style: textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+              ],
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
