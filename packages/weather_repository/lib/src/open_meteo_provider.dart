@@ -60,6 +60,22 @@ class OpenMeteoProvider implements WeatherProvider {
         ),
       );
     }
-    return DailyForecastDomain(forecast: forecastItems);
+
+    final List<ForecastDayDomain> dailyForecast = <ForecastDayDomain>[];
+    final Daily? daily = dailyForecastResponse.daily;
+    if (daily != null) {
+      for (int i = 0; i < daily.time.length; i++) {
+        dailyForecast.add(
+          ForecastDayDomain(
+            time: daily.time[i],
+            weatherCode: daily.weathercode[i],
+            maxTemp: daily.temperature2mMax[i],
+            minTemp: daily.temperature2mMin[i],
+          ),
+        );
+      }
+    }
+
+    return DailyForecastDomain(forecast: forecastItems, daily: dailyForecast);
   }
 }

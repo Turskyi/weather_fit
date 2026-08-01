@@ -26,6 +26,7 @@ void main() {
         expect(location.lon, '30.5241361');
         expect(location.displayName, 'Київ, Україна');
         expect(location.name, 'Київ');
+        expect(location.address['country'], 'Україна');
       });
     });
   });

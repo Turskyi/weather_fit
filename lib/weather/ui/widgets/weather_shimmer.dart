@@ -144,15 +144,18 @@ class WeatherIconShimmer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    return Shimmer.fromColors(
-      baseColor: colorScheme.surfaceContainerHighest,
-      highlightColor: colorScheme.surface.withValues(alpha: 0.5),
-      child: Container(
-        height: 75, // Matches WeatherIcon._iconSize
-        width: 75,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          shape: BoxShape.circle,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4.0),
+      child: Shimmer.fromColors(
+        baseColor: colorScheme.surfaceContainerHighest,
+        highlightColor: colorScheme.surface.withValues(alpha: 0.5),
+        child: Container(
+          height: 75, // Matches WeatherIcon._iconSize
+          width: 75,
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+          ),
         ),
       ),
     );

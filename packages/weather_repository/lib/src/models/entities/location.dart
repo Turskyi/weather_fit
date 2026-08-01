@@ -105,7 +105,9 @@ class Location extends Equatable {
 
   bool get isNotEmpty => !isEmpty;
 
-  String get locationName {
+  String get locationName => name.isEmpty ? coordinatesDisplay : name;
+
+  String get coordinatesDisplay {
     final String locationLocale = locale;
 
     final Map<String, String> latLabels = <String, String>{
@@ -128,10 +130,8 @@ class Location extends Equatable {
         ? locationLocale
         : Language.en.isoLanguageCode;
 
-    return name.isEmpty
-        ? '${latLabels[lang]}: ${latitude.toStringAsFixed(2)}, '
-              '${lonLabels[lang]}: ${longitude.toStringAsFixed(2)}'
-        : name;
+    return '${latLabels[lang]}: ${latitude.toStringAsFixed(2)}, '
+        '${lonLabels[lang]}: ${longitude.toStringAsFixed(2)}';
   }
 
   bool isSamePlaceAs(

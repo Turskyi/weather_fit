@@ -34,12 +34,6 @@ class _OutfitImageWidgetState extends State<OutfitImageWidget> {
   }
 
   @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final List<String> paths = widget.outfitImage.paths;

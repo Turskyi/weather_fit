@@ -3,6 +3,7 @@
 package com.turskyi.weather_fit
 
 import android.app.Activity
+import android.app.ActivityManager.TaskDescription
 import android.app.RemoteInput
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -60,6 +61,14 @@ class MainActivity : FlutterActivity() {
                 pendingResult?.success(null)
             }
             pendingResult = null
+        }
+    }
+
+    override fun setTaskDescription(taskDescription: TaskDescription?) {
+        try {
+            super.setTaskDescription(taskDescription)
+        } catch (e: Exception) {
+            // Silently catch to prevent the app from crashing on some devices.
         }
     }
 

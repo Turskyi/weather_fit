@@ -117,6 +117,7 @@ class OpenMeteoApiClient {
           'temperature_2m,weathercode,apparent_temperature,'
           'relative_humidity_2m,wind_speed_10m,uv_index,visibility,cloud_cover,'
           'pressure_msl,dew_point_2m',
+      'daily': 'weather_code,temperature_2m_max,temperature_2m_min',
       'timezone': 'auto',
     });
 

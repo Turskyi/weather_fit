@@ -13,6 +13,7 @@ import 'package:weather_fit/settings/bloc/settings_bloc.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 import 'package:weather_fit/weather/ui/populated/wear_forecast_section.dart';
 import 'package:weather_fit/weather/ui/populated/wear_info_chip.dart';
+import 'package:weather_fit/weather/ui/populated/weather_details_section.dart';
 import 'package:weather_fit/weather/ui/widgets/weather_icon.dart';
 
 class WeatherContentExtraSmall extends StatefulWidget {
@@ -138,10 +139,30 @@ class _WeatherContentExtraSmallState extends State<WeatherContentExtraSmall> {
                           child: BlocListener<SettingsBloc, SettingsState>(
                             listenWhen: widget.listenSettingsStateWhen,
                             listener: widget.settingsStateListener,
-                            child: Text(
-                              weather.locationName,
-                              textAlign: TextAlign.center,
-                              style: cityTextStyle,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                Text(
+                                  weather.locationName,
+                                  textAlign: TextAlign.center,
+                                  style: cityTextStyle,
+                                ),
+                                if (weather.location.name.isNotEmpty)
+                                  Text(
+                                    weather.location.coordinatesDisplay,
+                                    textAlign: TextAlign.center,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelSmall
+                                        ?.copyWith(
+                                          fontSize: 8,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface
+                                              .withValues(alpha: 0.6),
+                                        ),
+                                  ),
+                              ],
                             ),
                           ),
                         ),
@@ -200,6 +221,14 @@ class _WeatherContentExtraSmallState extends State<WeatherContentExtraSmall> {
             ),
             const SizedBox(height: 16),
             const WearForecastSection(),
+            if (weather.wasUpdated)
+              WeatherDetailsSection(
+                key: ValueKey<String>(
+                  '${weather.location.latitude}${weather.location.longitude}',
+                ),
+                weather: weather,
+                isStatic: true,
+              ),
             BlocBuilder<WeatherBloc, WeatherState>(
               builder: (BuildContext context, WeatherState state) {
                 if (state.isNotLoading) {
@@ -218,11 +247,17 @@ class _WeatherContentExtraSmallState extends State<WeatherContentExtraSmall> {
                 }
               },
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 48),
           ],
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   ScaffoldFeatureController<SnackBar, SnackBarClosedReason>
@@ -247,11 +282,5 @@ class _WeatherContentExtraSmallState extends State<WeatherContentExtraSmall> {
         duration: const Duration(seconds: 2),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
   }
 }

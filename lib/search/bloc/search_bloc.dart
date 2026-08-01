@@ -26,7 +26,6 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     required LocalDataSource localDataSource,
   }) : _weatherRepository = weatherRepository,
        _locationRepository = locationRepository,
-       _localDataSource = localDataSource,
        super(
          SearchInitial(
            quickCitiesSuggestions: <QuickCitySuggestion>[
@@ -62,7 +61,6 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
 
   final WeatherRepository _weatherRepository;
   final LocationRepository _locationRepository;
-  final LocalDataSource _localDataSource;
 
   List<QuickCitySuggestion> get _quickCitiesSuggestions =>
       state.quickCitiesSuggestions;
@@ -77,16 +75,15 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       await _requestLocationPermission();
 
       final Position position = await _getCurrentPosition();
-      final String languageIsoCode = _localDataSource.getLanguageIsoCode();
+
+      final Location location = await _locationRepository
+          .getLocationByCoordinates(
+            latitude: position.latitude,
+            longitude: position.longitude,
+          );
 
       final WeatherDomain domainWeather = await _weatherRepository
-          .getWeatherByLocation(
-            Location(
-              latitude: position.latitude,
-              longitude: position.longitude,
-              locale: languageIsoCode,
-            ),
-          );
+          .getWeatherByLocation(location);
       final Weather weather = Weather.fromRepository(domainWeather);
       emit(
         SearchWeatherLoaded(
@@ -155,14 +152,14 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
   ) async {
     emit(SearchLoading(quickCitiesSuggestions: _quickCitiesSuggestions));
     try {
-      final WeatherDomain weather = await _weatherRepository
-          .getWeatherByLocation(
-            Location(
-              latitude: event.latitude,
-              longitude: event.longitude,
-              locale: _localDataSource.getLanguageIsoCode(),
-            ),
+      final Location location = await _locationRepository
+          .getLocationByCoordinates(
+            latitude: event.latitude,
+            longitude: event.longitude,
           );
+
+      final WeatherDomain weather = await _weatherRepository
+          .getWeatherByLocation(location);
       emit(
         SearchWeatherLoaded(
           weather: Weather.fromRepository(weather),
@@ -269,16 +266,15 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       // When we reach here, permissions are granted and we can
       // continue accessing the position of the device.
       final Position position = await _getCurrentPosition();
-      final String languageIsoCode = _localDataSource.getLanguageIsoCode();
+
+      final Location location = await _locationRepository
+          .getLocationByCoordinates(
+            latitude: position.latitude,
+            longitude: position.longitude,
+          );
 
       final WeatherDomain domainWeather = await _weatherRepository
-          .getWeatherByLocation(
-            Location(
-              latitude: position.latitude,
-              longitude: position.longitude,
-              locale: languageIsoCode,
-            ),
-          );
+          .getWeatherByLocation(location);
       final Weather weather = Weather.fromRepository(domainWeather);
       emit(
         SearchWeatherLoaded(
@@ -547,10 +543,10 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       await _ensureLocationPermission();
 
       final geo.LocationData locationData = await location.getLocation();
-      final double? latitude = locationData.latitude;
-      final double? longitude = locationData.longitude;
+      final double latitude = locationData.latitude;
+      final double longitude = locationData.longitude;
 
-      if (latitude == null || longitude == null) {
+      if (latitude == 0.0 || longitude == 0.0) {
         throw Exception(translate('error.location_unavailable'));
       } else {
         return Position(

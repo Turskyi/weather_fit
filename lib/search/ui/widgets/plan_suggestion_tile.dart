@@ -54,6 +54,17 @@ class _PlanSuggestionTileState extends State<PlanSuggestionTile> {
                               : FontWeight.normal,
                         ),
                       ),
+                      if (widget.plan.weather?.location.name.isNotEmpty ??
+                          false)
+                        Text(
+                          widget.plan.weather!.location.coordinatesDisplay,
+                          style: Theme.of(context).textTheme.labelSmall
+                              ?.copyWith(
+                                color: colorScheme.onSurface.withValues(
+                                  alpha: 0.5,
+                                ),
+                              ),
+                        ),
                       Text(
                         '${date.day}.${date.month}.${date.year}',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(

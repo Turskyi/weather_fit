@@ -35,12 +35,6 @@ class _WearPositionIndicatorState extends State<WearPositionIndicator> {
     }
   }
 
-  @override
-  void dispose() {
-    widget.controller.removeListener(_handleScrollNotification);
-    super.dispose();
-  }
-
   void _handleScrollNotification() {
     if (mounted) setState(() {});
   }
@@ -61,6 +55,12 @@ class _WearPositionIndicatorState extends State<WearPositionIndicator> {
         ),
       ],
     );
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_handleScrollNotification);
+    super.dispose();
   }
 }
 

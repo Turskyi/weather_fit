@@ -4,12 +4,33 @@ part 'daily_forecast_response.g.dart';
 
 @JsonSerializable()
 class DailyForecastResponse {
-  const DailyForecastResponse({required this.hourly});
+  const DailyForecastResponse({required this.hourly, this.daily});
 
   factory DailyForecastResponse.fromJson(Map<String, Object?> json) =>
       _$DailyForecastResponseFromJson(json);
 
   final Hourly hourly;
+  final Daily? daily;
+}
+
+@JsonSerializable()
+class Daily {
+  const Daily({
+    required this.time,
+    required this.weathercode,
+    required this.temperature2mMax,
+    required this.temperature2mMin,
+  });
+
+  factory Daily.fromJson(Map<String, Object?> json) => _$DailyFromJson(json);
+
+  final List<String> time;
+  @JsonKey(name: 'weather_code')
+  final List<int> weathercode;
+  @JsonKey(name: 'temperature_2m_max')
+  final List<double> temperature2mMax;
+  @JsonKey(name: 'temperature_2m_min')
+  final List<double> temperature2mMin;
 }
 
 @JsonSerializable()

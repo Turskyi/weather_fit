@@ -118,5 +118,79 @@ void main() {
         expect(result.lon, '30.5241361');
       });
     });
+
+    group('reverseSearch', () {
+      const double lat = 50.45;
+      const double lon = 30.52;
+
+      test('makes correct HTTP request', () async {
+        final MockResponse response = MockResponse();
+        when(() => response.statusCode).thenReturn(200);
+        when(() => response.body).thenReturn('''
+          {
+            "place_id": 178260985,
+            "lat": "50.4500336",
+            "lon": "30.5241361",
+            "display_name": "Київ, Україна",
+            "address": {
+              "city": "Київ",
+              "country": "Україна",
+              "country_code": "uk"
+            }
+          }
+          ''');
+        when(
+          () => httpClient.get(any(), headers: any(named: 'headers')),
+        ).thenAnswer((_) async => response);
+
+        await apiClient.reverseSearch(latitude: lat, longitude: lon);
+
+        verify(
+          () => httpClient.get(
+            Uri.https(
+              'nominatim.openstreetmap.org',
+              '/reverse',
+              <String, String>{
+                'lat': lat.toString(),
+                'lon': lon.toString(),
+                'format': 'json',
+                'accept-language': 'uk,en',
+              },
+            ),
+            headers: any(named: 'headers'),
+          ),
+        ).called(1);
+      });
+
+      test('returns NominatimLocationResponse on valid response', () async {
+        final MockResponse response = MockResponse();
+        when(() => response.statusCode).thenReturn(200);
+        when(() => response.body).thenReturn('''
+{
+  "place_id": 178260985,
+  "lat": "50.4500336",
+  "lon": "30.5241361",
+  "display_name": "Київ, Україна",
+  "address": {
+    "city": "Київ",
+    "country": "Україна",
+    "country_code": "ua"
+  }
+}
+          ''');
+        when(
+          () => httpClient.get(any(), headers: any(named: 'headers')),
+        ).thenAnswer((_) async => response);
+
+        final NominatimLocationResponse result = await apiClient.reverseSearch(
+          latitude: lat,
+          longitude: lon,
+        );
+
+        expect(result, isA<NominatimLocationResponse>());
+        expect(result.displayName, contains('Київ'));
+        expect(result.address['city'], 'Київ');
+      });
+    });
   });
 }
