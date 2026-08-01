@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
+import 'package:weather_fit/extensions/build_context_extensions.dart';
 import 'package:weather_fit/weather/ui/populated/weather_details_container.dart';
 
 class WeatherFeelsLikeCard extends StatelessWidget {
@@ -13,6 +14,7 @@ class WeatherFeelsLikeCard extends StatelessWidget {
     final String? feelsLike = weather.formattedFeelsLike;
     if (feelsLike == null) return const SizedBox.shrink();
 
+    final bool isExtraSmall = context.isExtraSmallScreen;
     final ColorScheme colors = Theme.of(context).colorScheme;
     final TextTheme textTheme = Theme.of(context).textTheme;
 
@@ -21,17 +23,20 @@ class WeatherFeelsLikeCard extends StatelessWidget {
         children: <Widget>[
           Text(
             translate('weather.feels_like'),
-            style: textTheme.labelLarge?.copyWith(
-              color: colors.onSurface.withValues(alpha: 0.7),
-            ),
+            style: (isExtraSmall ? textTheme.labelSmall : textTheme.labelLarge)
+                ?.copyWith(color: colors.onSurface.withValues(alpha: 0.7)),
           ),
           const SizedBox(height: 4),
           Text(
             feelsLike,
-            style: textTheme.displayMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: colors.onSurface,
-            ),
+            style:
+                (isExtraSmall
+                        ? textTheme.displaySmall
+                        : textTheme.displayMedium)
+                    ?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: colors.onSurface,
+                    ),
           ),
         ],
       ),

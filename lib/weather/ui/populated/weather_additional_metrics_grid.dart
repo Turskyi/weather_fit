@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
+import 'package:weather_fit/extensions/build_context_extensions.dart';
 import 'package:weather_fit/weather/ui/populated/weather_metric_data.dart';
 import 'package:weather_fit/weather/ui/populated/weather_metric_item.dart';
 
@@ -58,17 +59,19 @@ class WeatherAdditionalMetricsGrid extends StatelessWidget {
 
     if (metrics.isEmpty) return const SizedBox.shrink();
 
+    final bool isExtraSmall = context.isExtraSmallScreen;
+
     return MediaQuery.removePadding(
       context: context,
       removeTop: true,
       child: GridView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: isExtraSmall ? 1 : 2,
           crossAxisSpacing: 12,
           mainAxisSpacing: 12,
-          childAspectRatio: 2,
+          childAspectRatio: isExtraSmall ? 3 : 2,
         ),
         itemCount: metrics.length,
         itemBuilder: (BuildContext context, int index) {
