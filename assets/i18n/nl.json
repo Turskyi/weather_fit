@@ -263,6 +263,10 @@
   },
   "weather": {
     "check_latest_button": "Controleer Laatste Weer",
+    "hourly_forecast_title": "Uurlijkse prognose",
+    "five_day_forecast_title": "5-daagse Verwachting",
+    "five_day_forecast_button": "5-daagse Verwachting",
+    "more_details": "Meer details",
     "code_0": "Heldere hemel",
     "code_1": "Overwegend helder",
     "code_2": "Gedeeltelijk bewolkt",

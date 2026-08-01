@@ -79,6 +79,10 @@ sealed class WeatherState extends Equatable {
       dailyForecast?.forecast ?? <ForecastItemDomain>[],
     );
   }
+
+  List<ForecastDayDomain> get fiveDayForecast {
+    return (dailyForecast?.daily ?? <ForecastDayDomain>[]).take(5).toList();
+  }
 }
 
 @JsonSerializable()

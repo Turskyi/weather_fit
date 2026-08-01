@@ -4,6 +4,7 @@ import 'package:flutter_translate/flutter_translate.dart';
 import 'package:weather_fit/entities/models/temperature/temperature.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
+import 'package:weather_fit/weather/ui/populated/five_day_forecast_section.dart';
 import 'package:weather_fit/weather/ui/populated/weather_additional_metrics_grid.dart';
 import 'package:weather_fit/weather/ui/populated/weather_feels_like_card.dart';
 import 'package:weather_fit/weather/ui/populated/weather_hourly_forecast_section.dart';
@@ -28,6 +29,7 @@ class WeatherDetailsSection extends StatefulWidget {
 class _WeatherDetailsSectionState extends State<WeatherDetailsSection>
     with SingleTickerProviderStateMixin {
   late bool _isExpanded;
+  bool _isFiveDayForecastExpanded = false;
 
   @override
   void initState() {
@@ -59,6 +61,10 @@ class _WeatherDetailsSectionState extends State<WeatherDetailsSection>
           dewPoint: widget.weather.dewPoint ?? currentHour?.dewPoint,
         );
 
+        final Widget fiveDayForecast = FiveDayForecastSection(
+          dailyForecast: state.fiveDayForecast,
+        );
+
         final Widget detailsContent = Column(
           children: <Widget>[
             WeatherFeelsLikeCard(weather: weatherToUse),
@@ -66,6 +72,30 @@ class _WeatherDetailsSectionState extends State<WeatherDetailsSection>
             const WeatherHourlyForecastSection(),
             const SizedBox(height: 16),
             WeatherAdditionalMetricsGrid(weather: weatherToUse),
+            const SizedBox(height: 16),
+            if (widget.isStatic)
+              fiveDayForecast
+            else ...<Widget>[
+              OutlinedButton.icon(
+                onPressed: _toggleFiveDayForecast,
+                icon: Icon(
+                  _isFiveDayForecastExpanded
+                      ? Icons.keyboard_arrow_up
+                      : Icons.keyboard_arrow_down,
+                ),
+                label: Text(translate('weather.five_day_forecast_button')),
+              ),
+              AnimatedSize(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                child: _isFiveDayForecastExpanded
+                    ? Padding(
+                        padding: const EdgeInsets.only(top: 16.0),
+                        child: fiveDayForecast,
+                      )
+                    : const SizedBox.shrink(),
+              ),
+            ],
           ],
         );
 
@@ -107,6 +137,17 @@ class _WeatherDetailsSectionState extends State<WeatherDetailsSection>
     });
 
     if (_isExpanded) {
+      widget.onExpanded?.call();
+    }
+  }
+
+  void _toggleFiveDayForecast() {
+    setState(() {
+      _isFiveDayForecastExpanded = !_isFiveDayForecastExpanded;
+    });
+
+    if (_isFiveDayForecastExpanded) {
+      // Re-trigger the scroll if we're in wide screen mode.
       widget.onExpanded?.call();
     }
   }

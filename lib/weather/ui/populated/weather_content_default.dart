@@ -240,14 +240,7 @@ class _WeatherContentDefaultState extends State<WeatherContentDefault> {
                             if (state.isNotLoading) {
                               return Column(
                                 children: <Widget>[
-                                  ElevatedButton(
-                                    onPressed: widget.onRefresh,
-                                    child: Text(
-                                      translate('weather.check_latest_button'),
-                                    ),
-                                  ),
                                   if (weather.wasUpdated) ...<Widget>[
-                                    const SizedBox(height: 12),
                                     WeatherDetailsSection(
                                       key: ValueKey<String>(
                                         '${weather.location.latitude}'
@@ -257,7 +250,15 @@ class _WeatherContentDefaultState extends State<WeatherContentDefault> {
                                       onExpanded: _scrollToBottom,
                                       isStatic: false,
                                     ),
+                                    const SizedBox(height: 16),
                                   ],
+                                  ElevatedButton(
+                                    onPressed: widget.onRefresh,
+                                    child: Text(
+                                      translate('weather.check_latest_button'),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 24),
                                 ],
                               );
                             } else {
@@ -309,12 +310,6 @@ class _WeatherContentDefaultState extends State<WeatherContentDefault> {
                       if (state.isNotLoading) {
                         return Column(
                           children: <Widget>[
-                            ElevatedButton(
-                              onPressed: widget.onRefresh,
-                              child: Text(
-                                translate('weather.check_latest_button'),
-                              ),
-                            ),
                             if (weather.wasUpdated) ...<Widget>[
                               WeatherDetailsSection(
                                 key: ValueKey<String>(
@@ -324,7 +319,14 @@ class _WeatherContentDefaultState extends State<WeatherContentDefault> {
                                 weather: weather,
                                 isStatic: true,
                               ),
+                              const SizedBox(height: 16),
                             ],
+                            ElevatedButton(
+                              onPressed: widget.onRefresh,
+                              child: Text(
+                                translate('weather.check_latest_button'),
+                              ),
+                            ),
                           ],
                         );
                       } else {

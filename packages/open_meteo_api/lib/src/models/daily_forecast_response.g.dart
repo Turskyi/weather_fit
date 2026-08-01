@@ -16,9 +16,44 @@ DailyForecastResponse _$DailyForecastResponseFromJson(
       'hourly',
       (v) => Hourly.fromJson(v as Map<String, dynamic>),
     ),
+    daily: $checkedConvert(
+      'daily',
+      (v) => v == null ? null : Daily.fromJson(v as Map<String, dynamic>),
+    ),
   );
   return val;
 });
+
+Daily _$DailyFromJson(Map<String, dynamic> json) => $checkedCreate(
+  'Daily',
+  json,
+  ($checkedConvert) {
+    final val = Daily(
+      time: $checkedConvert(
+        'time',
+        (v) => (v as List<dynamic>).map((e) => e as String).toList(),
+      ),
+      weathercode: $checkedConvert(
+        'weather_code',
+        (v) => (v as List<dynamic>).map((e) => (e as num).toInt()).toList(),
+      ),
+      temperature2mMax: $checkedConvert(
+        'temperature_2m_max',
+        (v) => (v as List<dynamic>).map((e) => (e as num).toDouble()).toList(),
+      ),
+      temperature2mMin: $checkedConvert(
+        'temperature_2m_min',
+        (v) => (v as List<dynamic>).map((e) => (e as num).toDouble()).toList(),
+      ),
+    );
+    return val;
+  },
+  fieldKeyMap: const {
+    'weathercode': 'weather_code',
+    'temperature2mMax': 'temperature_2m_max',
+    'temperature2mMin': 'temperature_2m_min',
+  },
+);
 
 Hourly _$HourlyFromJson(Map<String, dynamic> json) => $checkedCreate(
   'Hourly',

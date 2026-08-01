@@ -247,7 +247,7 @@ class _WeatherContentExtraSmallState extends State<WeatherContentExtraSmall> {
                 }
               },
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 48),
           ],
         ),
       ),

@@ -17,10 +17,21 @@ DailyForecastDomain _$DailyForecastDomainFromJson(Map<String, dynamic> json) =>
               )
               .toList(),
         ),
+        daily: $checkedConvert(
+          'daily',
+          (v) =>
+              (v as List<dynamic>?)
+                  ?.map(
+                    (e) =>
+                        ForecastDayDomain.fromJson(e as Map<String, dynamic>),
+                  )
+                  .toList() ??
+              const [],
+        ),
       );
       return val;
     });
 
 Map<String, dynamic> _$DailyForecastDomainToJson(
   DailyForecastDomain instance,
-) => <String, dynamic>{'forecast': instance.forecast};
+) => <String, dynamic>{'forecast': instance.forecast, 'daily': instance.daily};
