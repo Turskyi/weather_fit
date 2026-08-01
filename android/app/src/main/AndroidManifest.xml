@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--suppress AndroidUnknownAttribute -->
+<?xml version="1.0" encoding="utf-8"?><!--suppress AndroidUnknownAttribute -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.turskyi.weather_fit"
@@ -35,11 +34,6 @@
         android:label="@string/weatherfit"
         android:roundIcon="@mipmap/ic_launcher_round"
         tools:ignore="UnusedAttribute">
-
-        <activity
-            android:name="androidx.glance.appwidget.action.InvisibleActionTrampolineActivity"
-            android:exported="false"
-            tools:replace="android:exported" />
 
         <!--suppress AndroidDomInspection -->
         <receiver
