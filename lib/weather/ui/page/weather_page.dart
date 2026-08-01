@@ -68,134 +68,6 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
     });
   }
 
-  List<Location> _getSwipeList(LocalDataSource localDataSource) {
-    final Location lastSearched = localDataSource.getLastSearchedLocation();
-    final List<Location> favourites = localDataSource.getFavouriteLocations();
-
-    final List<Location> newList = <Location>[];
-
-    // 1. Last searched if not a favorite.
-    if (lastSearched.isNotEmpty) {
-      final bool isFavourite = favourites.any(
-        (Location l) => _isSameLocation(l, lastSearched),
-      );
-      if (!isFavourite) {
-        newList.add(lastSearched);
-      }
-    }
-
-    // 2. Favourites in stable order.
-    newList.addAll(favourites);
-
-    if (newList.isEmpty) {
-      newList.add(const Location.empty());
-    }
-    return newList;
-  }
-
-  bool _isSameLocation(Location l1, Location l2) {
-    return l1.isSamePlaceAs(l2);
-  }
-
-  void _updateLocations({bool resetToFirst = false}) {
-    final LocalDataSource localDataSource = context.read<LocalDataSource>();
-    final Location activeLocation = localDataSource.getLastSavedLocation();
-    final List<Location> previousLocations = _locations;
-    final int previousIndex = _getCurrentVisibleIndex();
-
-    final Location previousVisibleLocation;
-    if (previousLocations.isEmpty) {
-      previousVisibleLocation = const Location.empty();
-    } else {
-      final int safePreviousIndex = previousIndex.clamp(
-        0,
-        previousLocations.length - 1,
-      );
-      previousVisibleLocation = previousLocations[safePreviousIndex];
-    }
-
-    final List<Location> newList = _getSwipeList(localDataSource);
-
-    final bool lengthChanged = newList.length != _locations.length;
-    final bool contentChanged = !_areLocationListsSame(
-      previousLocations,
-      newList,
-    );
-    final bool shouldUpdateList = contentChanged || resetToFirst;
-
-    if (shouldUpdateList) {
-      setState(() {
-        _locations = newList;
-        _currentPageIndex = _currentPageIndex.clamp(0, _locations.length - 1);
-      });
-
-      if (!lengthChanged && contentChanged) {
-        debugPrint(
-          'WeatherPage updateLocations: content/order changed without '
-          'length change.',
-        );
-      }
-
-      bool jumpedToActiveLocation = false;
-      if (_pageController.hasClients) {
-        // On length change or explicit reset, jump to the active location
-        if (resetToFirst) {
-          _currentPageIndex = 0;
-          _pageController.jumpToPage(0);
-          return;
-        } else if (activeLocation.isNotEmpty) {
-          final int activeIndex = newList.indexWhere(
-            (Location l) => _isSameLocation(l, activeLocation),
-          );
-
-          if (activeIndex >= 0 && activeIndex != _currentPageIndex) {
-            _currentPageIndex = activeIndex;
-            _pageController.jumpToPage(activeIndex);
-            jumpedToActiveLocation = true;
-          }
-        }
-      }
-
-      if (jumpedToActiveLocation) {
-        return;
-      } else {
-        final int updatedVisibleIndex = _getCurrentVisibleIndex();
-        final Location updatedVisibleLocation = _locations[updatedVisibleIndex];
-        if (!_isSameLocation(previousVisibleLocation, updatedVisibleLocation)) {
-          _fetchWeatherForCurrentPageLocation();
-        }
-      }
-    } else {
-      final bool activeLocationMissingFromCurrent =
-          activeLocation.isNotEmpty &&
-          _locations.indexWhere(
-                (Location l) => _isSameLocation(l, activeLocation),
-              ) <
-              0;
-
-      if (activeLocationMissingFromCurrent) {
-        debugPrint(
-          'WeatherPage updateLocations: active location is missing in '
-          'current list while no update was needed '
-          '(active=$activeLocation, currentList=$_locations).',
-        );
-      }
-    }
-  }
-
-  bool _areLocationListsSame(List<Location> first, List<Location> second) {
-    if (first.length != second.length) {
-      return false;
-    } else {
-      for (int index = 0; index < first.length; index++) {
-        if (!_isSameLocation(first[index], second[index])) {
-          return false;
-        }
-      }
-      return true;
-    }
-  }
-
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     final AppLifecycleState? previousState = _lastLifecycleState;
@@ -398,6 +270,134 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
     _pageController.dispose();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  List<Location> _getSwipeList(LocalDataSource localDataSource) {
+    final Location lastSearched = localDataSource.getLastSearchedLocation();
+    final List<Location> favourites = localDataSource.getFavouriteLocations();
+
+    final List<Location> newList = <Location>[];
+
+    // 1. Last searched if not a favorite.
+    if (lastSearched.isNotEmpty) {
+      final bool isFavourite = favourites.any(
+        (Location l) => _isSameLocation(l, lastSearched),
+      );
+      if (!isFavourite) {
+        newList.add(lastSearched);
+      }
+    }
+
+    // 2. Favourites in stable order.
+    newList.addAll(favourites);
+
+    if (newList.isEmpty) {
+      newList.add(const Location.empty());
+    }
+    return newList;
+  }
+
+  bool _isSameLocation(Location l1, Location l2) {
+    return l1.isSamePlaceAs(l2);
+  }
+
+  void _updateLocations({bool resetToFirst = false}) {
+    final LocalDataSource localDataSource = context.read<LocalDataSource>();
+    final Location activeLocation = localDataSource.getLastSavedLocation();
+    final List<Location> previousLocations = _locations;
+    final int previousIndex = _getCurrentVisibleIndex();
+
+    final Location previousVisibleLocation;
+    if (previousLocations.isEmpty) {
+      previousVisibleLocation = const Location.empty();
+    } else {
+      final int safePreviousIndex = previousIndex.clamp(
+        0,
+        previousLocations.length - 1,
+      );
+      previousVisibleLocation = previousLocations[safePreviousIndex];
+    }
+
+    final List<Location> newList = _getSwipeList(localDataSource);
+
+    final bool lengthChanged = newList.length != _locations.length;
+    final bool contentChanged = !_areLocationListsSame(
+      previousLocations,
+      newList,
+    );
+    final bool shouldUpdateList = contentChanged || resetToFirst;
+
+    if (shouldUpdateList) {
+      setState(() {
+        _locations = newList;
+        _currentPageIndex = _currentPageIndex.clamp(0, _locations.length - 1);
+      });
+
+      if (!lengthChanged && contentChanged) {
+        debugPrint(
+          'WeatherPage updateLocations: content/order changed without '
+          'length change.',
+        );
+      }
+
+      bool jumpedToActiveLocation = false;
+      if (_pageController.hasClients) {
+        // On length change or explicit reset, jump to the active location
+        if (resetToFirst) {
+          _currentPageIndex = 0;
+          _pageController.jumpToPage(0);
+          return;
+        } else if (activeLocation.isNotEmpty) {
+          final int activeIndex = newList.indexWhere(
+            (Location l) => _isSameLocation(l, activeLocation),
+          );
+
+          if (activeIndex >= 0 && activeIndex != _currentPageIndex) {
+            _currentPageIndex = activeIndex;
+            _pageController.jumpToPage(activeIndex);
+            jumpedToActiveLocation = true;
+          }
+        }
+      }
+
+      if (jumpedToActiveLocation) {
+        return;
+      } else {
+        final int updatedVisibleIndex = _getCurrentVisibleIndex();
+        final Location updatedVisibleLocation = _locations[updatedVisibleIndex];
+        if (!_isSameLocation(previousVisibleLocation, updatedVisibleLocation)) {
+          _fetchWeatherForCurrentPageLocation();
+        }
+      }
+    } else {
+      final bool activeLocationMissingFromCurrent =
+          activeLocation.isNotEmpty &&
+          _locations.indexWhere(
+                (Location l) => _isSameLocation(l, activeLocation),
+              ) <
+              0;
+
+      if (activeLocationMissingFromCurrent) {
+        debugPrint(
+          'WeatherPage updateLocations: active location is missing in '
+          'current list while no update was needed '
+          '(active=$activeLocation, currentList=$_locations).',
+        );
+      }
+    }
+  }
+
+  bool _areLocationListsSame(List<Location> first, List<Location> second) {
+    if (first.length != second.length) {
+      return false;
+    } else {
+      for (int index = 0; index < first.length; index++) {
+        if (!_isSameLocation(first[index], second[index])) {
+          return false;
+        }
+      }
+      return true;
+    }
   }
 
   void _handleReportPressed() {

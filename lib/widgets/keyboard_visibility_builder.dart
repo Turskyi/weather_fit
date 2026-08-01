@@ -24,12 +24,6 @@ class _KeyboardVisibilityBuilderState extends State<KeyboardVisibilityBuilder>
   }
 
   @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  @override
   void didChangeMetrics() {
     final double bottomInset = View.of(context).viewInsets.bottom;
     final bool newValue = bottomInset > 0.0;
@@ -40,4 +34,10 @@ class _KeyboardVisibilityBuilderState extends State<KeyboardVisibilityBuilder>
 
   @override
   Widget build(BuildContext context) => widget.builder(_isKeyboardVisible);
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
 }

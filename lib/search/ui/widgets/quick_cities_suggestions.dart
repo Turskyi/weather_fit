@@ -58,12 +58,6 @@ class _QuickCitiesSuggestionsState extends State<QuickCitiesSuggestions>
   }
 
   @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     // Feature is temporarily limited to Web.
     if (!kIsWeb || widget.suggestions.isEmpty) {
@@ -100,6 +94,12 @@ class _QuickCitiesSuggestionsState extends State<QuickCitiesSuggestions>
         },
       );
     }
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
   }
 
   void _handleCityTap(String cityName) {

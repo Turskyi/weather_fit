@@ -225,6 +225,12 @@ class _WeatherContentExtraSmallState extends State<WeatherContentExtraSmall> {
     );
   }
 
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   ScaffoldFeatureController<SnackBar, SnackBarClosedReason>
   _onToggleFavouritePressed(Weather weather) {
     final LocalDataSource localDataSource = context.read<LocalDataSource>();
@@ -247,11 +253,5 @@ class _WeatherContentExtraSmallState extends State<WeatherContentExtraSmall> {
         duration: const Duration(seconds: 2),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
   }
 }

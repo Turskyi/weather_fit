@@ -142,6 +142,8 @@ page
 - No `// ignore:` or `// ignore_for_file:` — fix linter issues properly
 - Follow [Effective Dart](https://dart.dev/effective-dart/design): avoid classes
   with only static members; use top-level functions or constants instead.
+- `@override void dispose() { ... }` must always follow `Widget build(...)`.
+- Private methods/functions must be below their caller (read code like a book from top to bottom).
 
 **CRITICAL:** `flutter analyze .` output must be **completely clean** before
 completion.

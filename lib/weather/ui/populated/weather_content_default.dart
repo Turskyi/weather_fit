@@ -16,7 +16,7 @@ import 'package:weather_fit/weather/ui/widgets/text_shimmer.dart';
 import 'package:weather_fit/weather/ui/widgets/weather_icon.dart';
 import 'package:weather_fit/weather/ui/widgets/weather_shimmer.dart';
 
-class WeatherContentDefault extends StatelessWidget {
+class WeatherContentDefault extends StatefulWidget {
   const WeatherContentDefault({
     required this.weather,
     required this.listenSettingsStateWhen,
@@ -33,13 +33,22 @@ class WeatherContentDefault extends StatelessWidget {
   final RefreshCallback onRefresh;
 
   @override
+  State<WeatherContentDefault> createState() => _WeatherContentDefaultState();
+}
+
+class _WeatherContentDefaultState extends State<WeatherContentDefault> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
   Widget build(BuildContext context) {
+    final Weather weather = widget.weather;
     final String countryCode = weather.countryCode.toLowerCase();
     final ThemeData theme = Theme.of(context);
     final TextTheme textTheme = theme.textTheme;
     final TextStyle? cityTextStyle = textTheme.displayMedium;
 
     return SingleChildScrollView(
+      controller: _scrollController,
       physics: const AlwaysScrollableScrollPhysics(),
       clipBehavior: Clip.none,
       padding: EdgeInsets.only(
@@ -84,8 +93,8 @@ class WeatherContentDefault extends StatelessWidget {
                           height: 56,
                           child: Center(
                             child: BlocListener<SettingsBloc, SettingsState>(
-                              listenWhen: listenSettingsStateWhen,
-                              listener: settingsStateListener,
+                              listenWhen: widget.listenSettingsStateWhen,
+                              listener: widget.settingsStateListener,
                               child: Text(
                                 weather.locationName,
                                 style: cityTextStyle?.copyWith(
@@ -212,7 +221,7 @@ class WeatherContentDefault extends StatelessWidget {
                               return Column(
                                 children: <Widget>[
                                   ElevatedButton(
-                                    onPressed: onRefresh,
+                                    onPressed: widget.onRefresh,
                                     child: Text(
                                       translate('weather.check_latest_button'),
                                     ),
@@ -225,6 +234,7 @@ class WeatherContentDefault extends StatelessWidget {
                                         '${weather.location.longitude}',
                                       ),
                                       weather: weather,
+                                      onExpanded: _scrollToBottom,
                                     ),
                                   ],
                                 ],
@@ -244,7 +254,7 @@ class WeatherContentDefault extends StatelessWidget {
                         top: MediaQuery.paddingOf(context).top,
                       ),
                       height: MediaQuery.heightOf(context) * 0.8,
-                      child: child,
+                      child: widget.child,
                     ),
                   ),
                 ],
@@ -254,7 +264,10 @@ class WeatherContentDefault extends StatelessWidget {
                 children: <Widget>[
                   mainWeatherInfo,
                   const SizedBox(height: 24),
-                  if (weather.wasUpdated) child else const OutfitShimmer(),
+                  if (weather.wasUpdated)
+                    widget.child
+                  else
+                    const OutfitShimmer(),
                   const SizedBox(height: 24),
 
                   BlocBuilder<WeatherBloc, WeatherState>(
@@ -276,7 +289,7 @@ class WeatherContentDefault extends StatelessWidget {
                         return Column(
                           children: <Widget>[
                             ElevatedButton(
-                              onPressed: onRefresh,
+                              onPressed: widget.onRefresh,
                               child: Text(
                                 translate('weather.check_latest_button'),
                               ),
@@ -306,5 +319,38 @@ class WeatherContentDefault extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollToBottom() {
+    // The WeatherDetailsSection uses a 300ms AnimatedSize.
+    // We wait for the animation to be mostly done and for the layout to expand
+    // enough to capture the new maxScrollExtent.
+    Future<void>.delayed(const Duration(milliseconds: 200), () {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+
+    // Second pass after the animation is definitely finished to ensure
+    // we are at the VERY bottom.
+    Future<void>.delayed(const Duration(milliseconds: 400), () {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 150),
+          curve: Curves.easeOut,
+        );
+      }
+    });
   }
 }

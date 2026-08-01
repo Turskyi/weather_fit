@@ -10,9 +10,14 @@ import 'package:weather_fit/weather/ui/populated/weather_hourly_forecast_section
 import 'package:weather_repository/weather_repository.dart';
 
 class WeatherDetailsSection extends StatefulWidget {
-  const WeatherDetailsSection({required this.weather, super.key});
+  const WeatherDetailsSection({
+    required this.weather,
+    this.onExpanded,
+    super.key,
+  });
 
   final Weather weather;
+  final VoidCallback? onExpanded;
 
   @override
   State<WeatherDetailsSection> createState() => _WeatherDetailsSectionState();
@@ -21,12 +26,6 @@ class WeatherDetailsSection extends StatefulWidget {
 class _WeatherDetailsSectionState extends State<WeatherDetailsSection>
     with SingleTickerProviderStateMixin {
   bool _isExpanded = false;
-
-  void _toggleExpanded() {
-    setState(() {
-      _isExpanded = !_isExpanded;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,5 +82,15 @@ class _WeatherDetailsSectionState extends State<WeatherDetailsSection>
         );
       },
     );
+  }
+
+  void _toggleExpanded() {
+    setState(() {
+      _isExpanded = !_isExpanded;
+    });
+
+    if (_isExpanded) {
+      widget.onExpanded?.call();
+    }
   }
 }
