@@ -547,10 +547,10 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       await _ensureLocationPermission();
 
       final geo.LocationData locationData = await location.getLocation();
-      final double? latitude = locationData.latitude;
-      final double? longitude = locationData.longitude;
+      final double latitude = locationData.latitude;
+      final double longitude = locationData.longitude;
 
-      if (latitude == null || longitude == null) {
+      if (latitude == 0.0 || longitude == 0.0) {
         throw Exception(translate('error.location_unavailable'));
       } else {
         return Position(

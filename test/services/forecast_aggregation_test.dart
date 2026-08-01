@@ -188,7 +188,7 @@ void main() {
         final DateTime itemTime = DateTime.parse(item.time);
         if (itemTime.day == now.day) {
           // If it's today, it must be a future period
-          int endHour = itemTime.hour == 8
+          final int endHour = itemTime.hour == 8
               ? 10
               : (itemTime.hour == 13 ? 17 : 24);
           final DateTime periodEnd = DateTime(
