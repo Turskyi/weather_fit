@@ -489,6 +489,6 @@ Future<void> _initializeDateFormattingForLanguage(Language lang) async {
 
 bool get _supportsBackgroundWidgetUpdates {
   return !kIsWeb &&
-      (Platform.isAndroid || Platform.isIOS) &&
+      (Platform.isAndroid || Platform.isIOS || Platform.isMacOS) &&
       !type.isWearDevice;
 }
