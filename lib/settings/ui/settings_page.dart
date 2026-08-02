@@ -67,11 +67,16 @@ class _SettingsPageState extends State<SettingsPage> {
 
   void _handleFeedbackRequest() {
     final SettingsState state = context.read<SettingsBloc>().state;
-    final String errorMessage = state is SettingsError
+    final WeatherState weatherState = context.read<WeatherBloc>().state;
+
+    final String query = weatherState.weather.location.name;
+    final String errorMessage =
+        state is SettingsError && state.errorMessage.isNotEmpty
         ? state.errorMessage
-        : '';
+        : translate('feedback.app_feedback');
+
     context.read<SettingsBloc>().add(
-      BugReportPressedEvent(errorText: errorMessage),
+      BugReportPressedEvent(errorText: errorMessage, query: query),
     );
   }
 

@@ -321,21 +321,30 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     Emitter<SettingsState> emit,
   ) {
     String errorMessage = event.errorText;
+    String query = event.query;
 
     final SettingsState state = this.state;
     if (state is SettingsError) {
       errorMessage = state.errorMessage;
     } else if (state is FeedbackState) {
       errorMessage = state.errorMessage;
+      if (query.isEmpty) {
+        query = state.query;
+      }
     }
     emit(
       FeedbackState(
         language: state.language,
         errorMessage: errorMessage,
+        query: query,
         appVersion: state.appVersion,
         widgetUpdateFrequency: state.widgetUpdateFrequency,
         dayStartHour: state.dayStartHour,
         nightStartHour: state.nightStartHour,
+        debugWeatherProviderOpenWeatherMap:
+            state.debugWeatherProviderOpenWeatherMap,
+        debugForceNight: state.debugForceNight,
+        isWeatherBackgroundEnabled: state.isWeatherBackgroundEnabled,
       ),
     );
   }

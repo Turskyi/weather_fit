@@ -95,7 +95,7 @@ class _SettingsStateListenerContentState
           'Smart Watch user report\n'
           'Device: Smart Watch (detected extra small)\n'
           'Error: $errorText\n'
-          '${query.isNotEmpty ? 'Query: $query\n' : ''}'
+          'Query: ${query.isEmpty ? '(empty)' : query}\n'
           'Timestamp: ${DateTime.now().toIso8601String()}';
 
       if (mounted) {

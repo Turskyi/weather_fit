@@ -16,7 +16,7 @@ again. 🌤️👕👖👞"
 
 publish_to: 'none'
 
-version: 0.5.7+57
+version: 0.5.8+58
 
 environment:
   sdk: '>=3.9.2 <4.0.0'
@@ -68,7 +68,7 @@ dependencies:
   url_launcher: ^6.3.2
   weather_repository:
     path: packages/weather_repository
-  workmanager: ^0.9.1+1
+  workmanager: ^0.10.0
 
 dev_dependencies:
   bloc_test: ^10.0.0

@@ -101,7 +101,7 @@ final class FeedbackState extends SettingsState {
   const FeedbackState({
     required this.errorMessage,
     required super.language,
-    this.query = '',
+    required this.query,
     super.appVersion,
     super.widgetUpdateFrequency,
     super.dayStartHour,

@@ -112,6 +112,32 @@ void main() {
       },
     );
   });
+
+  group('SettingsBloc feedback', () {
+    test('BugReportPressedEvent propagates query to FeedbackState', () async {
+      final SettingsBloc bloc = SettingsBloc(
+        localDataSource,
+        updateService,
+        feedbackService,
+      );
+      await _waitForInitialLoad(bloc);
+
+      const String testError = 'Test Error';
+      const String testQuery = 'London';
+
+      bloc.add(
+        const BugReportPressedEvent(errorText: testError, query: testQuery),
+      );
+      await _flushEvents();
+
+      expect(bloc.state, isA<FeedbackState>());
+      final FeedbackState feedbackState = bloc.state as FeedbackState;
+      expect(feedbackState.errorMessage, testError);
+      expect(feedbackState.query, testQuery);
+
+      await bloc.close();
+    });
+  });
 }
 
 Future<void> _waitForInitialLoad(SettingsBloc bloc) async {

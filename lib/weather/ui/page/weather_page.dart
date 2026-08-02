@@ -402,10 +402,13 @@ class _WeatherPageState extends State<WeatherPage> with WidgetsBindingObserver {
 
   void _handleReportPressed() {
     final WeatherState state = context.read<WeatherBloc>().state;
+    final String query = state.weather.location.name;
+    final String errorText = state.message.isNotEmpty
+        ? state.message
+        : translate('error.unexpected_error');
+
     context.read<SettingsBloc>().add(
-      BugReportPressedEvent(
-        errorText: state is WeatherFailure ? state.message : '',
-      ),
+      BugReportPressedEvent(errorText: errorText, query: query),
     );
   }
 
