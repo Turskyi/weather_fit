@@ -47,17 +47,26 @@ class WeatherTileService : androidx.wear.tiles.TileService() {
     }
 
     private fun createTileLayout(weather: WeatherTileData): androidx.wear.protolayout.LayoutElementBuilders.LayoutElement {
-        // High visibility red background to rule out rendering issues.
-        val bgColor = if (weather.hasWeather) weather.backgroundColor else Color.RED
+        val primaryColor = if (weather.hasWeather) weather.backgroundColor else Color.YELLOW
 
         return androidx.wear.protolayout.LayoutElementBuilders.Box.Builder()
             .setWidth(androidx.wear.protolayout.DimensionBuilders.expand())
             .setHeight(androidx.wear.protolayout.DimensionBuilders.expand())
             .setModifiers(
                 androidx.wear.protolayout.ModifiersBuilders.Modifiers.Builder()
-                    .setBackground(
-                        androidx.wear.protolayout.ModifiersBuilders.Background.Builder()
-                            .setColor(androidx.wear.protolayout.ColorBuilders.argb(bgColor))
+                    .setClickable(
+                        androidx.wear.protolayout.ModifiersBuilders.Clickable.Builder()
+                            .setId("open_app")
+                            .setOnClick(
+                                androidx.wear.protolayout.ActionBuilders.LaunchAction.Builder()
+                                    .setAndroidActivity(
+                                        androidx.wear.protolayout.ActionBuilders.AndroidActivity.Builder()
+                                            .setPackageName(this.packageName)
+                                            .setClassName("com.turskyi.weather_fit.MainActivity")
+                                            .build()
+                                    )
+                                    .build()
+                            )
                             .build()
                     )
                     .build()
@@ -72,7 +81,7 @@ class WeatherTileService : androidx.wear.tiles.TileService() {
                             .setFontStyle(
                                 androidx.wear.protolayout.LayoutElementBuilders.FontStyle.Builder()
                                     .setSize(androidx.wear.protolayout.DimensionBuilders.sp(16f))
-                                    .setColor(androidx.wear.protolayout.ColorBuilders.argb(Color.WHITE))
+                                    .setColor(androidx.wear.protolayout.ColorBuilders.argb(Color.LTGRAY))
                                     .setWeight(androidx.wear.protolayout.LayoutElementBuilders.FONT_WEIGHT_BOLD)
                                     .build()
                             )
@@ -80,11 +89,21 @@ class WeatherTileService : androidx.wear.tiles.TileService() {
                     )
                     .addContent(
                         androidx.wear.protolayout.LayoutElementBuilders.Text.Builder()
-                            .setText(if (weather.hasWeather) "${weather.emoji} ${weather.temperature}" else "Syncing...")
+                            .setText(if (weather.hasWeather) weather.emoji else "☀️")
+                            .setFontStyle(
+                                androidx.wear.protolayout.LayoutElementBuilders.FontStyle.Builder()
+                                    .setSize(androidx.wear.protolayout.DimensionBuilders.sp(48f))
+                                    .build()
+                            )
+                            .build()
+                    )
+                    .addContent(
+                        androidx.wear.protolayout.LayoutElementBuilders.Text.Builder()
+                            .setText(if (weather.hasWeather) weather.temperature else "Syncing...")
                             .setFontStyle(
                                 androidx.wear.protolayout.LayoutElementBuilders.FontStyle.Builder()
                                     .setSize(androidx.wear.protolayout.DimensionBuilders.sp(24f))
-                                    .setColor(androidx.wear.protolayout.ColorBuilders.argb(Color.WHITE))
+                                    .setColor(androidx.wear.protolayout.ColorBuilders.argb(primaryColor))
                                     .build()
                             )
                             .build()
