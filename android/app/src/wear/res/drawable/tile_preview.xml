@@ -3,13 +3,28 @@
     android:height="200dp"
     android:viewportWidth="200"
     android:viewportHeight="200">
-    <!-- Background Circle -->
+    <!-- Pure Black Background Circle (Policy Compliant) -->
     <path
-        android:fillColor="#FF6200EE"
+        android:fillColor="#FF000000"
         android:pathData="M100,100m-90,0a90,90 0,1 1,180 0a90,90 0,1 1,-180 0" />
 
-    <!-- Sun Placeholder -->
+    <!-- Simulated "Location" text at the top -->
+    <path
+        android:fillColor="#FFB0BEC5"
+        android:pathData="M70,50h60v4h-60z" />
+
+    <!-- Large Yellow Sun in the center -->
+    <path
+        android:fillColor="#FFFFC107"
+        android:pathData="M100,100m-25,0a25,25 0,1 1,50 0a25,25 0,1 1,-50 0" />
+
+    <!-- Rays -->
+    <path
+        android:fillColor="#FFFFC107"
+        android:pathData="M98.5,57h3v8h-3z M98.5,135h3v8h-3z M135,98.5h8v3h-8z M57,98.5h8v3h-8z M125,72.9l5.6,-5.6l2.1,2.1l-5.6,5.6z M67.3,130.6l5.6,-5.6l2.1,2.1l-5.6,5.6z M125,125l5.6,5.6l-2.1,2.1l-5.6,-5.6z M67.3,67.3l5.6,5.6l-2.1,2.1l-5.6,-5.6z" />
+
+    <!-- Simulated "23°C" text at the bottom -->
     <path
         android:fillColor="#FFFFFFFF"
-        android:pathData="M100,80m-20,0a20,20 0,1 1,40 0a20,20 0,1 1,-40 0" />
+        android:pathData="M75,145h50v8h-50z" />
 </vector>
