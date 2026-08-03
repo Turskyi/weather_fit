@@ -86,3 +86,5 @@ const String kSetAppGroupIdMethod = 'setAppGroupId';
 const String kSaveWidgetDataMethod = 'saveWidgetData';
 const String kUpdateWidgetMethod = 'updateWidget';
 const String kAppGroupIdArgKey = 'appGroupId';
+
+const bool kDefaultWeatherBackgroundEnabled = true;

@@ -368,6 +368,10 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         widgetUpdateFrequency: state.widgetUpdateFrequency,
         dayStartHour: state.dayStartHour,
         nightStartHour: state.nightStartHour,
+        debugWeatherProviderOpenWeatherMap:
+            state.debugWeatherProviderOpenWeatherMap,
+        debugForceNight: state.debugForceNight,
+        isWeatherBackgroundEnabled: state.isWeatherBackgroundEnabled,
       ),
     );
   }
@@ -395,6 +399,10 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
               widgetUpdateFrequency: state.widgetUpdateFrequency,
               dayStartHour: state.dayStartHour,
               nightStartHour: state.nightStartHour,
+              debugWeatherProviderOpenWeatherMap:
+                  state.debugWeatherProviderOpenWeatherMap,
+              debugForceNight: state.debugForceNight,
+              isWeatherBackgroundEnabled: state.isWeatherBackgroundEnabled,
             ),
           );
         }

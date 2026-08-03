@@ -609,7 +609,8 @@ class LocalDataSource {
   }
 
   bool isWeatherBackgroundEnabled() {
-    return _preferences.getBool(Settings.weatherBackground.key) ?? false;
+    return _preferences.getBool(Settings.weatherBackground.key) ??
+        constants.kDefaultWeatherBackgroundEnabled;
   }
 
   String _translateError(String key, String locale) {

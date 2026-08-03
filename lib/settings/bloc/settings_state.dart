@@ -10,7 +10,8 @@ sealed class SettingsState {
     this.nightStartHour = WeatherCondition.defaultNightStartHour,
     this.debugWeatherProviderOpenWeatherMap = false,
     this.debugForceNight = false,
-    this.isWeatherBackgroundEnabled = false,
+    this.isWeatherBackgroundEnabled =
+        constants.kDefaultWeatherBackgroundEnabled,
   });
 
   final Language language;
