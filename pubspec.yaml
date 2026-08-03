@@ -68,7 +68,7 @@ dependencies:
   url_launcher: ^6.3.2
   weather_repository:
     path: packages/weather_repository
-  workmanager: ^0.10.0
+  workmanager: ^0.10.1
 
 dev_dependencies:
   bloc_test: ^10.0.0
