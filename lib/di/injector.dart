@@ -19,7 +19,6 @@ import 'package:weather_fit/di/dependencies.dart';
 import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/env/env.dart';
-import 'package:weather_fit/extensions/build_context_extensions.dart' as type;
 import 'package:weather_fit/localization/localization_delegate_getter.dart'
     as locale;
 import 'package:weather_fit/res/constants/constants.dart' as constants;
@@ -488,7 +487,5 @@ Future<void> _initializeDateFormattingForLanguage(Language lang) async {
 }
 
 bool get _supportsBackgroundWidgetUpdates {
-  return !kIsWeb &&
-      (Platform.isAndroid || Platform.isIOS || Platform.isMacOS) &&
-      !type.isWearDevice;
+  return !kIsWeb && (Platform.isAndroid || Platform.isIOS || Platform.isMacOS);
 }

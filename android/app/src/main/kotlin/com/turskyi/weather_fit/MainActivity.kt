@@ -2,7 +2,6 @@
 
 package com.turskyi.weather_fit
 
-import android.app.Activity
 import android.app.ActivityManager.TaskDescription
 import android.app.RemoteInput
 import android.content.Intent
@@ -34,14 +33,24 @@ class MainActivity : FlutterActivity() {
                 OPEN_REMOTE_INPUT_METHOD -> {
                     pendingResult = result
                     val label = call.argument<String>("label") ?: "Search..."
-                    val remoteInputs = listOf<RemoteInput>(
+                    val remoteInputs = listOf(
                         RemoteInput.Builder(INPUT_RESULT_KEY)
                             .setLabel(label)
                             .build(),
                     )
-                    val intent = RemoteInputIntentHelper.createActionRemoteInputIntent()
-                    RemoteInputIntentHelper.putRemoteInputsExtra(intent, remoteInputs)
+                    val intent =
+                        RemoteInputIntentHelper.createActionRemoteInputIntent()
+                    RemoteInputIntentHelper.putRemoteInputsExtra(
+                        intent,
+                        remoteInputs
+                    )
                     startActivityForResult(intent, REMOTE_INPUT_REQUEST_CODE)
+                }
+
+                UPDATE_TILE_METHOD -> {
+                    androidx.wear.tiles.TileService.getUpdater(this)
+                        .requestUpdate(com.turskyi.weather_fit.glance.WeatherTileService::class.java)
+                    result.success(null)
                 }
 
                 else -> result.notImplemented()
@@ -50,10 +59,14 @@ class MainActivity : FlutterActivity() {
     }
 
     @Deprecated("Deprecated in Java")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    override fun onActivityResult(
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REMOTE_INPUT_REQUEST_CODE) {
-            if (resultCode == Activity.RESULT_OK && data != null) {
+            if (resultCode == RESULT_OK && data != null) {
                 val results = RemoteInput.getResultsFromIntent(data)
                 val text = results?.getCharSequence(INPUT_RESULT_KEY)
                 pendingResult?.success(text?.toString())
@@ -76,6 +89,7 @@ class MainActivity : FlutterActivity() {
         private const val DEVICE_CHANNEL = "com.turskyi.weather_fit/device"
         private const val IS_WEAR_DEVICE_METHOD = "isWearDevice"
         private const val OPEN_REMOTE_INPUT_METHOD = "openRemoteInput"
+        private const val UPDATE_TILE_METHOD = "updateTile"
         private const val INPUT_RESULT_KEY = "search_query"
         private const val REMOTE_INPUT_REQUEST_CODE = 1001
     }

@@ -1428,42 +1428,50 @@ packages:
     dependency: "direct main"
     description:
       name: workmanager
-      sha256: "7b8f4d750b986aa582bf03e02ea45b774dc5e6cd0c171ed05605cc8fdd4ea78d"
+      sha256: "8fe26677fbb304a7c68164286716e36abcfa6c5fd12b11e6149916e2be977ac4"
       url: "https://pub.dev"
     source: hosted
-    version: "0.10.1"
+    version: "0.10.4"
   workmanager_android:
     dependency: transitive
     description:
       name: workmanager_android
-      sha256: b5b466fa84fedf0e53403289ed258e289adcd5ced9395f9c05e790b41cc1b183
+      sha256: b76d68a4ff615f7604025a80cdb8eda709bc0b368c83636ab0501c33ba0d270e
       url: "https://pub.dev"
     source: hosted
-    version: "0.10.0+1"
+    version: "0.10.3"
   workmanager_apple:
     dependency: transitive
     description:
       name: workmanager_apple
-      sha256: f51604eb780a06c6259cf1fa755296fe30d452bf7b5d3cbbb35c8594185c6fb7
+      sha256: "0516856e2c640ca98673c53a1dd07f164d55d51e02d065d4637df73bdf38191e"
       url: "https://pub.dev"
     source: hosted
-    version: "0.9.6+2"
+    version: "0.9.9"
+  workmanager_linux:
+    dependency: transitive
+    description:
+      name: workmanager_linux
+      sha256: "25cbb4e4cc48cf6973aa5535a01bc13af198489c68359b7c3dac599b5b834bc5"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.1"
   workmanager_platform_interface:
     dependency: transitive
     description:
       name: workmanager_platform_interface
-      sha256: "532f7673177f72bdb1003fe38347949f61789c9dfbeaca74733e17f7693f8abc"
+      sha256: ae73bd543d5f090bba20219e948d85da2d678a811c2d083240320b9d01c87142
       url: "https://pub.dev"
     source: hosted
-    version: "0.10.0+1"
+    version: "0.10.3"
   workmanager_web:
     dependency: transitive
     description:
       name: workmanager_web
-      sha256: c7e8197699f7bb308acd91cd347f772396496dd5c3fe51347e18518dd821eef5
+      sha256: f1a2fd9f1275fe85c9bbddc3ba4616cc49ae7e8716ba37b6919b0da0b0d5db71
       url: "https://pub.dev"
     source: hosted
-    version: "0.1.1"
+    version: "0.1.3"
   xdg_directories:
     dependency: transitive
     description:

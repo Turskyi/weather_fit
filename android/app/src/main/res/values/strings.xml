@@ -7,6 +7,9 @@
     </string>
     <string name="outfit_image">Outfit image</string>
     <string name="weatherfit">WeatherFit</string>
+    <string name="weatherfit_tile_label">WeatherFit Tile</string>
+    <string name="weatherfit_tile_description">Your WeatherFit forecast at a glance</string>
+    <string name="weatherfit_tile_empty_message">Open WeatherFit to sync your weather.</string>
     <string name="oops_no_outfit_suggestion_available">
         👕 Oops! No outfit suggestion available.
     </string>

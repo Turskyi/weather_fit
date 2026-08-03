@@ -80,6 +80,7 @@ const String kDebugWeatherProviderKey = 'debug_weather_provider_openweathermap';
 const String kOpenRemoteInputMethod = 'openRemoteInput';
 const String kGetSharedContainerPathMethod = 'getSharedContainerPath';
 const String kIsWearDeviceMethod = 'isWearDevice';
+const String kUpdateTileMethod = 'updateTile';
 
 const String kHomeWidgetMethodChannel = 'com.weatherfit.home_widget';
 const String kSetAppGroupIdMethod = 'setAppGroupId';

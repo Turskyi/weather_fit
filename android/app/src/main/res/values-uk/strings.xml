@@ -5,6 +5,13 @@
     <string name="app_widget_description">Це опис віджета програми</string>
     <string name="outfit_image">Зображення вбрання</string>
     <string name="weatherfit">WeatherFit</string>
+    <string name="weatherfit_tile_label">Віджет WeatherFit</string>
+    <string name="weatherfit_tile_description">
+        Ваш прогноз WeatherFit з першого погляду
+    </string>
+    <string name="weatherfit_tile_empty_message">
+        Відкрийте WeatherFit, щоб синхронізувати погоду.
+    </string>
     <string name="oops_no_outfit_suggestion_available">
         👕 Ой! Немає пропозицій щодо вбрання.
     </string>

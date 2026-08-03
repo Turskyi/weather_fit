@@ -25,6 +25,10 @@ class HomeWidgetServiceImpl implements HomeWidgetService {
     constants.kHomeWidgetMethodChannel,
   );
 
+  static const MethodChannel _deviceChannel = MethodChannel(
+    constants.kDeviceMethodChannel,
+  );
+
   @override
   Future<void> setAppGroupId(String appGroupId) {
     if (_isWidgetUnsupported) {
@@ -115,8 +119,12 @@ class HomeWidgetServiceImpl implements HomeWidgetService {
     final String outfitRecommendation = outfitRepository
         .getOutfitRecommendation(updatedWeather);
 
-    final List<String> outfitFilePaths = await outfitRepository
-        .downloadAndSaveImages(weather);
+    final List<String> outfitFilePaths;
+    if (type.isWearDevice) {
+      outfitFilePaths = <String>[];
+    } else {
+      outfitFilePaths = await outfitRepository.downloadAndSaveImages(weather);
+    }
 
     // Set app group ID.
     await setAppGroupId(constants.kAppleAppGroupId);
@@ -197,11 +205,15 @@ class HomeWidgetServiceImpl implements HomeWidgetService {
     );
 
     // Update the widget.
-    await updateWidget(
-      iOSName: constants.kIosWidgetName,
-      androidName: constants.kAndroidWidgetName,
-      qualifiedAndroidName: constants.kQualifiedAndroidWidgetName,
-    );
+    if (type.isWearDevice) {
+      await _deviceChannel.invokeMethod<void>(constants.kUpdateTileMethod);
+    } else {
+      await updateWidget(
+        iOSName: constants.kIosWidgetName,
+        androidName: constants.kAndroidWidgetName,
+        qualifiedAndroidName: constants.kQualifiedAndroidWidgetName,
+      );
+    }
 
     debugPrint('HomeWidgetService updateHomeWidget: completed.');
   }
@@ -234,5 +246,5 @@ class HomeWidgetServiceImpl implements HomeWidgetService {
     return aggregateForecastItems(fullForecast);
   }
 
-  bool get _isWidgetUnsupported => kIsWeb || type.isWearDevice;
+  bool get _isWidgetUnsupported => kIsWeb;
 }

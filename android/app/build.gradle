@@ -1,6 +1,7 @@
 //noinspection GrUnresolvedAccess
 plugins {
     id "com.android.application"
+    id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
     id 'com.google.gms.google-services'
     id 'com.google.firebase.crashlytics'
@@ -46,9 +47,8 @@ android {
 
     defaultConfig {
         applicationId = rootProject.application_id
-        // We use 25 because androidx.wear:wear-input requires it.
-        // Standard flutter.minSdkVersion (usually 21 or 24) would cause manifest merger errors.
-        minSdkVersion 25
+        // We use 26 because androidx.glance:glance-wear-tiles requires it.
+        minSdkVersion 26
         targetSdk 37
         versionCode = flutter.versionCode
         versionName = flutter.versionName
@@ -183,6 +183,14 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics:23.2.0'
     implementation 'com.google.code.gson:gson:2.14.0'
     implementation "androidx.wear:wear-input:1.2.0"
+
+    // Native Wear OS Tile API. This is kept separate from HomeWidget's
+    // AppWidget implementation but reads the same shared preferences.
+    implementation "androidx.wear.tiles:tiles:1.6.2"
+    implementation "androidx.wear:wear:1.4.0"
+    implementation "androidx.wear.protolayout:protolayout:1.4.2"
+    implementation "androidx.wear.protolayout:protolayout-material:1.4.2"
+    implementation "androidx.wear.protolayout:protolayout-expression:1.4.2"
 }
 
 subprojects {

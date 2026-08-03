@@ -5,6 +5,13 @@
     <string name="app_widget_description">To jest opis widżetu aplikacji</string>
     <string name="outfit_image">Zdjęcie stroju</string>
     <string name="weatherfit">WeatherFit</string>
+    <string name="weatherfit_tile_label">Kafel WeatherFit</string>
+    <string name="weatherfit_tile_description">
+        Prognoza WeatherFit na pierwszy rzut oka
+    </string>
+    <string name="weatherfit_tile_empty_message">
+        Otwórz WeatherFit, aby zsynchronizować pogodę.
+    </string>
     <string name="oops_no_outfit_suggestion_available">
         👕 Ups! Brak dostępnych propozycji strojów.
     </string>
