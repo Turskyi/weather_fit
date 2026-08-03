@@ -15,7 +15,7 @@ class WeatherMetricItem extends StatelessWidget {
     final TextTheme textTheme = Theme.of(context).textTheme;
 
     return WeatherDetailsContainer(
-      padding: EdgeInsets.all(isExtraSmall ? 8 : 12),
+      padding: EdgeInsets.all(isExtraSmall ? 6 : 12),
       child: Row(
         children: <Widget>[
           Icon(
