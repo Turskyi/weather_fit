@@ -59,8 +59,24 @@ class WeatherTileService : androidx.wear.tiles.TileService() {
             if (file.exists()) {
                 val b = BitmapFactory.decodeFile(file.absolutePath)
                 if (b != null) {
-                    val scaledBitmap = Bitmap.createScaledBitmap(b, 100, 100, true)
-                    val rgb565Bitmap = scaledBitmap.copy(Bitmap.Config.RGB_565, false)
+                    // Increase resolution to 200x200 for better quality
+                    val scaledBitmap = Bitmap.createScaledBitmap(b, 200, 200, true)
+                    
+                    // Create a rounded bitmap manually for the watch
+                    val output = Bitmap.createBitmap(200, 200, Bitmap.Config.ARGB_8888)
+                    val canvas = android.graphics.Canvas(output)
+                    val paint = android.graphics.Paint()
+                    val rect = android.graphics.Rect(0, 0, 200, 200)
+                    val rectF = android.graphics.RectF(rect)
+                    val roundPx = 30f // ~15dp at 2x density
+
+                    paint.isAntiAlias = true
+                    canvas.drawARGB(0, 0, 0, 0)
+                    canvas.drawRoundRect(rectF, roundPx, roundPx, paint)
+                    paint.setXfermode(android.graphics.PorterDuffXfermode(android.graphics.PorterDuff.Mode.SRC_IN))
+                    canvas.drawBitmap(scaledBitmap, rect, rect, paint)
+                    
+                    val rgb565Bitmap = output.copy(Bitmap.Config.RGB_565, false)
                     val byteBuffer = java.nio.ByteBuffer.allocate(rgb565Bitmap.byteCount)
                     rgb565Bitmap.copyPixelsToBuffer(byteBuffer)
                     val bytes = byteBuffer.array()
@@ -71,14 +87,16 @@ class WeatherTileService : androidx.wear.tiles.TileService() {
                             .setInlineResource(
                                 androidx.wear.protolayout.ResourceBuilders.InlineImageResource.Builder()
                                     .setData(bytes)
-                                    .setWidthPx(100)
-                                    .setHeightPx(100)
+                                    .setWidthPx(200)
+                                    .setHeightPx(200)
                                     .setFormat(androidx.wear.protolayout.ResourceBuilders.IMAGE_FORMAT_RGB_565)
                                     .build()
                             )
                             .build()
                     )
-                    if (rgb565Bitmap != scaledBitmap) rgb565Bitmap.recycle()
+                    
+                    if (rgb565Bitmap != output) rgb565Bitmap.recycle()
+                    output.recycle()
                     if (scaledBitmap != b) scaledBitmap.recycle()
                     b.recycle()
                 }
@@ -142,16 +160,8 @@ class WeatherTileService : androidx.wear.tiles.TileService() {
                         if (weather.hasImage) {
                             androidx.wear.protolayout.LayoutElementBuilders.Image.Builder()
                                 .setResourceId("outfit_image")
-                                .setWidth(
-                                    androidx.wear.protolayout.DimensionBuilders.dp(
-                                        80f
-                                    )
-                                )
-                                .setHeight(
-                                    androidx.wear.protolayout.DimensionBuilders.dp(
-                                        80f
-                                    )
-                                )
+                                .setWidth(androidx.wear.protolayout.DimensionBuilders.dp(80f))
+                                .setHeight(androidx.wear.protolayout.DimensionBuilders.dp(80f))
                                 .build()
                         } else {
                             androidx.wear.protolayout.LayoutElementBuilders.Text.Builder()
