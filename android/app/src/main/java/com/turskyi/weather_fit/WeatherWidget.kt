@@ -68,6 +68,10 @@ class WeatherWidget : AppWidgetProvider() {
         appWidgetManager: AppWidgetManager,
         appWidgetIds: IntArray
     ) {
+        // Trigger Wear OS Tile update even if no standard widgets are placed.
+        // This is important for Wear OS devices which use Tiles instead of Widgets.
+        androidx.wear.tiles.TileService.getUpdater(context)
+            .requestUpdate(com.turskyi.weather_fit.glance.WeatherTileService::class.java)
 
         // There may be multiple widgets active, so update all of them.
         for (appWidgetId: Int in appWidgetIds) {
@@ -331,6 +335,10 @@ internal fun updateAppWidget(
 
     try {
         appWidgetManager.updateAppWidget(appWidgetId, views)
+        // Trigger Wear OS Tile update whenever the home widget updates.
+        // This ensures the Tile stays in sync even when updated from a background task.
+        androidx.wear.tiles.TileService.getUpdater(context)
+            .requestUpdate(com.turskyi.weather_fit.glance.WeatherTileService::class.java)
     } catch (exception: IllegalArgumentException) {
         val isBitmapLimitException: Boolean =
             exception.message?.contains("exceeds maximum bitmap memory usage") == true

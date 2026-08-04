@@ -119,12 +119,8 @@ class HomeWidgetServiceImpl implements HomeWidgetService {
     final String outfitRecommendation = outfitRepository
         .getOutfitRecommendation(updatedWeather);
 
-    final List<String> outfitFilePaths;
-    if (type.isWearDevice) {
-      outfitFilePaths = <String>[];
-    } else {
-      outfitFilePaths = await outfitRepository.downloadAndSaveImages(weather);
-    }
+    final List<String> outfitFilePaths =
+        await outfitRepository.downloadAndSaveImages(weather);
 
     // Set app group ID.
     await setAppGroupId(constants.kAppleAppGroupId);
@@ -205,15 +201,11 @@ class HomeWidgetServiceImpl implements HomeWidgetService {
     );
 
     // Update the widget.
-    if (type.isWearDevice) {
-      await _deviceChannel.invokeMethod<void>(constants.kUpdateTileMethod);
-    } else {
-      await updateWidget(
-        iOSName: constants.kIosWidgetName,
-        androidName: constants.kAndroidWidgetName,
-        qualifiedAndroidName: constants.kQualifiedAndroidWidgetName,
-      );
-    }
+    await updateWidget(
+      iOSName: constants.kIosWidgetName,
+      androidName: constants.kAndroidWidgetName,
+      qualifiedAndroidName: constants.kQualifiedAndroidWidgetName,
+    );
 
     debugPrint('HomeWidgetService updateHomeWidget: completed.');
   }
