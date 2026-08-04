@@ -25,10 +25,6 @@ class HomeWidgetServiceImpl implements HomeWidgetService {
     constants.kHomeWidgetMethodChannel,
   );
 
-  static const MethodChannel _deviceChannel = MethodChannel(
-    constants.kDeviceMethodChannel,
-  );
-
   @override
   Future<void> setAppGroupId(String appGroupId) {
     if (_isWidgetUnsupported) {
@@ -119,8 +115,8 @@ class HomeWidgetServiceImpl implements HomeWidgetService {
     final String outfitRecommendation = outfitRepository
         .getOutfitRecommendation(updatedWeather);
 
-    final List<String> outfitFilePaths =
-        await outfitRepository.downloadAndSaveImages(weather);
+    final List<String> outfitFilePaths = await outfitRepository
+        .downloadAndSaveImages(weather);
 
     // Set app group ID.
     await setAppGroupId(constants.kAppleAppGroupId);
