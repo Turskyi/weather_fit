@@ -5,7 +5,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:weather_fit/extensions/build_context_extensions.dart' as type;
 import 'package:weather_fit/res/constants/constants.dart' as constants;
 import 'package:weather_fit/res/widgets/leading_widget.dart';
 import 'package:weather_fit/res/widgets/store_badge.dart';
@@ -15,13 +14,14 @@ import 'package:weather_repository/weather_repository.dart';
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
 
-  /// Returns `true` if the home widgets feature should be displayed in the
-  /// about page.
+  /// Returns `true` if the home widgets or watch tiles feature should be
+  /// displayed in the about page.
   ///
-  /// The feature is shown on platforms that support home screen widgets:
-  /// Android, iOS, and macOS. It is not shown on web or Wear OS devices.
+  /// The feature is shown on platforms that support home screen widgets or
+  /// tiles: Android (including Wear OS), iOS, and macOS. It is not shown on
+  /// web.
   bool get _showWidgetsFeature {
-    if (kIsWeb || type.isWearDevice) {
+    if (kIsWeb) {
       return false;
     } else {
       return Platform.isAndroid || Platform.isIOS || Platform.isMacOS;

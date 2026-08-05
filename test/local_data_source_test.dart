@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -373,6 +374,48 @@ void main() {
       final Directory result = await localDataSource.getAppDirectory();
 
       expect(result.path, isNotEmpty);
+    });
+  });
+
+  group('getWidgetUpdateFrequency default values', () {
+    tearDown(() {
+      debugDefaultTargetPlatformOverride = null;
+    });
+
+    test('returns 180 minutes on macOS by default', () {
+      debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
+      when(
+        () => mockSharedPreferences.getInt(Settings.widgetUpdateFrequency.key),
+      ).thenReturn(null);
+
+      expect(
+        localDataSource.getWidgetUpdateFrequency(),
+        constants.kIosDefaultMinutesFrequency,
+      );
+    });
+
+    test('returns 180 minutes on iOS by default', () {
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+      when(
+        () => mockSharedPreferences.getInt(Settings.widgetUpdateFrequency.key),
+      ).thenReturn(null);
+
+      expect(
+        localDataSource.getWidgetUpdateFrequency(),
+        constants.kIosDefaultMinutesFrequency,
+      );
+    });
+
+    test('returns 120 minutes on Android by default', () {
+      debugDefaultTargetPlatformOverride = TargetPlatform.android;
+      when(
+        () => mockSharedPreferences.getInt(Settings.widgetUpdateFrequency.key),
+      ).thenReturn(null);
+
+      expect(
+        localDataSource.getWidgetUpdateFrequency(),
+        constants.kAndroidDefaultMinutesFrequency,
+      );
     });
   });
 }

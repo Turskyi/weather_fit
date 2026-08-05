@@ -36,6 +36,7 @@ class _SettingsPageState extends State<SettingsPage> {
             onFeedbackTap: _handleFeedbackRequest,
             onSupportTap: _navigateToSupport,
             onPinWidgetTap: _requestPinWidget,
+            onUpdateFrequencyChanged: _changeUpdateFrequency,
             onSearchPressed: _handleLocationSearchAndFetchWeather,
           )
         : SettingsPageDefaultLayout(
@@ -50,6 +51,7 @@ class _SettingsPageState extends State<SettingsPage> {
             onFeedbackTap: _handleFeedbackRequest,
             onSupportTap: _navigateToSupport,
             onPinWidgetTap: _requestPinWidget,
+            onUpdateFrequencyChanged: _changeUpdateFrequency,
           );
   }
 
@@ -94,6 +96,10 @@ class _SettingsPageState extends State<SettingsPage> {
       androidName: constants.kAndroidWidgetName,
       qualifiedAndroidName: constants.kQualifiedAndroidWidgetName,
     );
+  }
+
+  void _changeUpdateFrequency(int value) {
+    context.read<SettingsBloc>().add(ChangeWidgetUpdateFrequencyEvent(value));
   }
 
   bool _isUnitsChanged(WeatherState previous, WeatherState current) {

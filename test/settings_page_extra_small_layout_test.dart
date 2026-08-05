@@ -72,6 +72,7 @@ void main() {
             onFeedbackTap: () {},
             onSupportTap: () {},
             onPinWidgetTap: () {},
+            onUpdateFrequencyChanged: (_) {},
             onSearchPressed: () {},
           ),
           localizationDelegate,

@@ -509,7 +509,8 @@ class LocalDataSource {
 
   int getWidgetUpdateFrequency() {
     return _preferences.getInt(Settings.widgetUpdateFrequency.key) ??
-        (defaultTargetPlatform == TargetPlatform.iOS
+        (defaultTargetPlatform == TargetPlatform.iOS ||
+                defaultTargetPlatform == TargetPlatform.macOS
             ? constants.kIosDefaultMinutesFrequency
             : constants.kAndroidDefaultMinutesFrequency);
   }
