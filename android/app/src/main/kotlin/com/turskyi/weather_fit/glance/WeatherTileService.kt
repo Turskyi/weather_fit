@@ -4,6 +4,8 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
+import androidx.core.graphics.createBitmap
+import androidx.core.graphics.scale
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import es.antonborri.home_widget.HomeWidgetPlugin
@@ -66,29 +68,40 @@ class WeatherTileService : androidx.wear.tiles.TileService() {
                     val ratio = targetSize.toFloat() / maxDim.toFloat()
                     val scaledWidth = (bWidth * ratio).toInt()
                     val scaledHeight = (bHeight * ratio).toInt()
-                    
+
                     // Create aspect-preserved scaled bitmap
-                    val scaledBitmap = Bitmap.createScaledBitmap(b, scaledWidth, scaledHeight, true)
-                    
+                    val scaledBitmap = b.scale(scaledWidth, scaledHeight)
+
                     // Create a square 200x200 output with rounded corners
-                    val output = Bitmap.createBitmap(targetSize, targetSize, Bitmap.Config.ARGB_8888)
+                    val output = createBitmap(targetSize, targetSize)
                     val canvas = android.graphics.Canvas(output)
                     val paint = android.graphics.Paint()
-                    val rectF = android.graphics.RectF(0f, 0f, targetSize.toFloat(), targetSize.toFloat())
+
+                    // Center the scaled image inside the 200x200 canvas with rounded corners
+                    val left = (targetSize - scaledWidth) / 2f
+                    val top = (targetSize - scaledHeight) / 2f
+                    val imageRectF = android.graphics.RectF(
+                        left,
+                        top,
+                        left + scaledWidth,
+                        top + scaledHeight
+                    )
                     val roundPx = 30f // ~15dp at 2x density
 
                     paint.isAntiAlias = true
                     canvas.drawARGB(0, 0, 0, 0)
-                    canvas.drawRoundRect(rectF, roundPx, roundPx, paint)
-                    paint.setXfermode(android.graphics.PorterDuffXfermode(android.graphics.PorterDuff.Mode.SRC_IN))
-                    
-                    // Center the scaled image inside the 200x200 canvas
-                    val left = (targetSize - scaledWidth) / 2f
-                    val top = (targetSize - scaledHeight) / 2f
+                    // Draw the rounded mask for the specific image area
+                    canvas.drawRoundRect(imageRectF, roundPx, roundPx, paint)
+                    // Mask the next draw call to stay within the rounded rectangle
+                    paint.xfermode = android.graphics.PorterDuffXfermode(
+                        android.graphics.PorterDuff.Mode.SRC_IN
+                    )
+
                     canvas.drawBitmap(scaledBitmap, left, top, paint)
-                    
+
                     val rgb565Bitmap = output.copy(Bitmap.Config.RGB_565, false)
-                    val byteBuffer = java.nio.ByteBuffer.allocate(rgb565Bitmap.byteCount)
+                    val byteBuffer =
+                        java.nio.ByteBuffer.allocate(rgb565Bitmap.byteCount)
                     rgb565Bitmap.copyPixelsToBuffer(byteBuffer)
                     val bytes = byteBuffer.array()
 
@@ -105,7 +118,7 @@ class WeatherTileService : androidx.wear.tiles.TileService() {
                             )
                             .build()
                     )
-                    
+
                     if (rgb565Bitmap != output) rgb565Bitmap.recycle()
                     output.recycle()
                     if (scaledBitmap != b) scaledBitmap.recycle()
@@ -171,8 +184,16 @@ class WeatherTileService : androidx.wear.tiles.TileService() {
                         if (weather.hasImage) {
                             androidx.wear.protolayout.LayoutElementBuilders.Image.Builder()
                                 .setResourceId("outfit_image")
-                                .setWidth(androidx.wear.protolayout.DimensionBuilders.dp(80f))
-                                .setHeight(androidx.wear.protolayout.DimensionBuilders.dp(80f))
+                                .setWidth(
+                                    androidx.wear.protolayout.DimensionBuilders.dp(
+                                        80f
+                                    )
+                                )
+                                .setHeight(
+                                    androidx.wear.protolayout.DimensionBuilders.dp(
+                                        80f
+                                    )
+                                )
                                 .build()
                         } else {
                             androidx.wear.protolayout.LayoutElementBuilders.Text.Builder()
@@ -269,7 +290,7 @@ private data class WeatherTileData(
 private fun isNight(): Boolean {
     val hour =
         java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY)
-    return hour < 6 || hour >= 21
+    return hour !in 6..<21
 }
 
 private fun weatherBackgroundColor(code: Int, isNight: Boolean): Int {
