@@ -59,22 +59,33 @@ class WeatherTileService : androidx.wear.tiles.TileService() {
             if (file.exists()) {
                 val b = BitmapFactory.decodeFile(file.absolutePath)
                 if (b != null) {
-                    // Increase resolution to 200x200 for better quality
-                    val scaledBitmap = Bitmap.createScaledBitmap(b, 200, 200, true)
+                    val targetSize = 200
+                    val bWidth = b.width
+                    val bHeight = b.height
+                    val maxDim = if (bWidth > bHeight) bWidth else bHeight
+                    val ratio = targetSize.toFloat() / maxDim.toFloat()
+                    val scaledWidth = (bWidth * ratio).toInt()
+                    val scaledHeight = (bHeight * ratio).toInt()
                     
-                    // Create a rounded bitmap manually for the watch
-                    val output = Bitmap.createBitmap(200, 200, Bitmap.Config.ARGB_8888)
+                    // Create aspect-preserved scaled bitmap
+                    val scaledBitmap = Bitmap.createScaledBitmap(b, scaledWidth, scaledHeight, true)
+                    
+                    // Create a square 200x200 output with rounded corners
+                    val output = Bitmap.createBitmap(targetSize, targetSize, Bitmap.Config.ARGB_8888)
                     val canvas = android.graphics.Canvas(output)
                     val paint = android.graphics.Paint()
-                    val rect = android.graphics.Rect(0, 0, 200, 200)
-                    val rectF = android.graphics.RectF(rect)
+                    val rectF = android.graphics.RectF(0f, 0f, targetSize.toFloat(), targetSize.toFloat())
                     val roundPx = 30f // ~15dp at 2x density
 
                     paint.isAntiAlias = true
                     canvas.drawARGB(0, 0, 0, 0)
                     canvas.drawRoundRect(rectF, roundPx, roundPx, paint)
                     paint.setXfermode(android.graphics.PorterDuffXfermode(android.graphics.PorterDuff.Mode.SRC_IN))
-                    canvas.drawBitmap(scaledBitmap, rect, rect, paint)
+                    
+                    // Center the scaled image inside the 200x200 canvas
+                    val left = (targetSize - scaledWidth) / 2f
+                    val top = (targetSize - scaledHeight) / 2f
+                    canvas.drawBitmap(scaledBitmap, left, top, paint)
                     
                     val rgb565Bitmap = output.copy(Bitmap.Config.RGB_565, false)
                     val byteBuffer = java.nio.ByteBuffer.allocate(rgb565Bitmap.byteCount)

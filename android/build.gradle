@@ -32,16 +32,18 @@ rootProject.layout.buildDirectory = '../build'
 
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
-    project.evaluationDependsOn(':app')
 
-    // Fix for `workmanager_android` (and potentially other plugins) that skip
-    // applying the `kotlin-android` plugin on AGP 9+ even when built-in Kotlin
-    // support is disabled via `android.builtInKotlin=false`.
-    // This ensures the `kotlin` extension is available for their build scripts.
-    if (name == "workmanager_android") {
-        plugins.withId("com.android.library") {
-            if (rootProject.findProperty("android.builtInKotlin") == "false") {
-                apply plugin: "kotlin-android"
+    afterEvaluate {
+        // Fix for `minSdkVersion` in plugins that might have it lower than
+        // the app's requirement.
+        if (project.name.contains("geocoding_android") ||
+                project.name.contains("flutter_email_sender") ||
+                project.name.contains("home_widget")) {
+            android {
+                defaultConfig {
+                    //noinspection GrUnresolvedAccess
+                    minSdkVersion 26
+                }
             }
         }
     }
