@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:nominatim_api/nominatim_api.dart';
 import 'package:open_meteo_api/open_meteo_api.dart';
 import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
-import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_repository/weather_repository.dart';
 
 class LocationRepository {

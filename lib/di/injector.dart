@@ -16,7 +16,6 @@ import 'package:weather_fit/data/data_sources/remote/remote_data_source.dart';
 import 'package:weather_fit/data/repositories/location_repository.dart';
 import 'package:weather_fit/data/repositories/outfit_repository.dart';
 import 'package:weather_fit/di/dependencies.dart';
-import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/env/env.dart';
 import 'package:weather_fit/localization/localization_delegate_getter.dart'

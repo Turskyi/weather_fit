@@ -7,7 +7,6 @@ import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
 import 'package:weather_fit/data/data_sources/remote/remote_data_source.dart';
 import 'package:weather_fit/data/repositories/location_repository.dart';
 import 'package:weather_fit/data/repositories/outfit_repository.dart';
-import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/router/app_route.dart';
 import 'package:weather_fit/services/feedback_service.dart';
 import 'package:weather_fit/services/home_widget_service.dart';

@@ -13,7 +13,6 @@ import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
 import 'package:weather_fit/entities/enums/feedback_rating.dart';
 import 'package:weather_fit/entities/enums/feedback_submission_type.dart';
 import 'package:weather_fit/entities/enums/feedback_type.dart';
-import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/entities/models/exceptions/email_launch_exception.dart';
 import 'package:weather_fit/extensions/build_context_extensions.dart' as type;
 import 'package:weather_fit/res/constants/constants.dart' as constants;

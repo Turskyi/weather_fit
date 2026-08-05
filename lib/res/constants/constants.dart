@@ -30,6 +30,9 @@ const String kCountryFlagsBaseUrl =
     'https://open-meteo.com/images/country-flags/';
 const String kArtistInstagramUrl = 'https://www.instagram.com/anartistart/';
 const String kTelegramUrl = 'https://t.me/+J3nrwxVrxVE2MDdi';
+const String kFacebookPlUrl =
+    'https://www.facebook.com/profile.php?id=61591820151796';
+const String kInstagramPlUrl = 'https://www.instagram.com/weather_fitcom/';
 const String kDeveloperSupportUrl = '$kDeveloperUrl/#/support';
 const String kMailToScheme = 'mailto';
 const String kSubjectParameter = 'subject';

@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/extensions/build_context_extensions.dart';
 import 'package:weather_fit/res/constants/constants.dart' as constants;
@@ -12,6 +11,7 @@ import 'package:weather_fit/settings/bloc/settings_bloc.dart';
 import 'package:weather_fit/settings/ui/widgets/settings_page_default_layout.dart';
 import 'package:weather_fit/settings/ui/widgets/settings_page_extra_small_layout.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
+import 'package:weather_repository/weather_repository.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});

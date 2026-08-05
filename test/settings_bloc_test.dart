@@ -3,10 +3,10 @@ import 'package:flutter_translate/flutter_translate.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
-import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/services/feedback_service.dart';
 import 'package:weather_fit/services/update_service.dart';
 import 'package:weather_fit/settings/bloc/settings_bloc.dart';
+import 'package:weather_repository/weather_repository.dart';
 
 import 'helpers/flutter_translate_test_utils.dart';
 

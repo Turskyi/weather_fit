@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/extensions/build_context_extensions.dart';
 import 'package:weather_fit/settings/bloc/settings_bloc.dart';
 import 'package:weather_fit/weather/ui/empty/weather_empty_default_layout.dart';
 import 'package:weather_fit/weather/ui/empty/weather_empty_extra_small_layout.dart';
+import 'package:weather_repository/weather_repository.dart';
 
 class WeatherEmpty extends StatefulWidget {
   const WeatherEmpty({super.key});

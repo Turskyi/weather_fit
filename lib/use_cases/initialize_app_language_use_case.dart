@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:intl/intl.dart';
 import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
-import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/router/app_route.dart';
+import 'package:weather_repository/weather_repository.dart';
 
 /// Use case for initializing the application's language during startup.
 ///
