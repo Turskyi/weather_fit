@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.turskyi.weather_fit"
-    android:versionCode="57"
-    android:versionName="0.5.7">
+    android:versionCode="59"
+    android:versionName="0.5.9">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- Grants approximate location access using Wi-Fi and mobile networks.
@@ -93,6 +93,11 @@
                     android:scheme="https" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name="androidx.glance.appwidget.action.InvisibleActionTrampolineActivity"
+            android:exported="false"
+            tools:replace="android:exported" />
 
         <!-- Used for Background Work -->
         <!--suppress AndroidDomInspection, DeprecatedClassUsageInspection -->

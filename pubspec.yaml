@@ -85,6 +85,14 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
+  config:
+    enable-swift-package-manager: false
+    # Temporary workaround for:
+    # "LLDB is taking longer than expected to start debugging the app"
+    # Remove this once the LLDB startup warning no longer appears
+    # (or when Flutter/Xcode fixes the underlying issue).
+    enable-lldb-debugging: false
+
   assets:
     - assets/i18n/
     - assets/images/
@@ -104,9 +112,3 @@ flutter:
       fonts:
         - asset: assets/fonts/NotoSans-Regular.ttf
 
-  # Temporary workaround for:
-  # "LLDB is taking longer than expected to start debugging the app"
-  # Remove this once the LLDB startup warning no longer appears
-  # (or when Flutter/Xcode fixes the underlying issue).
-  config:
-    enable-lldb-debugging: false
