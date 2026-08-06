@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/res/constants/constants.dart' as constant;
 import 'package:weather_fit/res/widgets/leading_widget.dart';
 import 'package:weather_fit/res/widgets/wear_position_indicator.dart';
@@ -28,6 +27,7 @@ class SettingsPageExtraSmallLayout extends StatefulWidget {
     required this.onFeedbackTap,
     required this.onSupportTap,
     required this.onPinWidgetTap,
+    required this.onUpdateFrequencyChanged,
     required this.onSearchPressed,
     super.key,
   });
@@ -43,6 +43,7 @@ class SettingsPageExtraSmallLayout extends StatefulWidget {
   final GestureTapCallback onFeedbackTap;
   final GestureTapCallback onSupportTap;
   final GestureTapCallback onPinWidgetTap;
+  final ValueChanged<int> onUpdateFrequencyChanged;
 
   /// The callback that is called when the "Search" button is tapped or
   /// otherwise activated.
@@ -180,6 +181,38 @@ class _SettingsPageExtraSmallLayoutState
                           }
                         },
                       ),
+                      if (!kIsWeb) ...<Widget>[
+                        const SizedBox(height: 8),
+                        SettingDropdown(
+                          label: translate('settings.widget_updates_title'),
+                          value: state.widgetUpdateFrequency,
+                          options: const <int>[
+                            15,
+                            30,
+                            60,
+                            120,
+                            180,
+                            360,
+                            720,
+                            1440,
+                          ],
+                          optionLabels: <int, String>{
+                            15: translate('settings.frequency_15m'),
+                            30: translate('settings.frequency_30m'),
+                            60: translate('settings.frequency_1h'),
+                            120: translate('settings.frequency_2h'),
+                            180: translate('settings.frequency_3h'),
+                            360: translate('settings.frequency_6h'),
+                            720: translate('settings.frequency_12h'),
+                            1440: translate('settings.frequency_24h'),
+                          },
+                          onChanged: (int? value) {
+                            if (value != null) {
+                              widget.onUpdateFrequencyChanged(value);
+                            }
+                          },
+                        ),
+                      ],
                       if (kDebugMode) ...<Widget>[
                         const SizedBox(height: 8),
                         SettingSegmentedToggle(

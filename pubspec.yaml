@@ -16,7 +16,7 @@ again. 🌤️👕👖👞"
 
 publish_to: 'none'
 
-version: 0.5.7+57
+version: 0.5.9+59
 
 environment:
   sdk: '>=3.9.2 <4.0.0'
@@ -68,7 +68,7 @@ dependencies:
   url_launcher: ^6.3.2
   weather_repository:
     path: packages/weather_repository
-  workmanager: ^0.9.1+1
+  workmanager: ^0.10.7
 
 dev_dependencies:
   bloc_test: ^10.0.0
@@ -84,6 +84,14 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  config:
+    enable-swift-package-manager: false
+    # Temporary workaround for:
+    # "LLDB is taking longer than expected to start debugging the app"
+    # Remove this once the LLDB startup warning no longer appears
+    # (or when Flutter/Xcode fixes the underlying issue).
+    enable-lldb-debugging: false
 
   assets:
     - assets/i18n/
@@ -104,9 +112,3 @@ flutter:
       fonts:
         - asset: assets/fonts/NotoSans-Regular.ttf
 
-  # Temporary workaround for:
-  # "LLDB is taking longer than expected to start debugging the app"
-  # Remove this once the LLDB startup warning no longer appears
-  # (or when Flutter/Xcode fixes the underlying issue).
-  config:
-    enable-lldb-debugging: false

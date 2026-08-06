@@ -9,6 +9,46 @@
         <meta-data
             android:name="com.google.android.wearable.standalone"
             android:value="true" />
+        <meta-data
+            android:name="com.google.android.wearable.capabilities"
+            android:resource="@array/android_wear_capabilities" />
+
+        <service
+            android:name="com.turskyi.weather_fit.glance.WeatherTileService"
+            android:description="@string/weatherfit_tile_description"
+            android:directBootAware="true"
+            android:enabled="true"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_foreground"
+            android:label="@string/weatherfit_tile_label"
+            android:permission="com.google.android.wearable.permission.BIND_TILE_PROVIDER">
+            <intent-filter>
+                <action android:name="androidx.wear.tiles.action.BIND_TILE_ENDPOINT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="androidx.wear.tiles.action.BIND_TILE_PROVIDER" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.google.android.wearable.tiles.BIND_TILE_PROVIDER" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
+            <!-- Metadata for Tile Preview in the selector -->
+            <meta-data
+                android:name="androidx.wear.tiles.PREVIEW"
+                android:resource="@drawable/tile_preview" />
+            <meta-data
+                android:name="androidx.wear.protolayout.PREVIEW"
+                android:resource="@drawable/tile_preview" />
+            <meta-data
+                android:name="com.google.android.wearable.tiles.PREVIEW"
+                android:resource="@drawable/tile_preview" />
+            <meta-data
+                android:name="com.google.android.clockwork.tiles.PREVIEW"
+                android:resource="@drawable/tile_preview" />
+        </service>
     </application>
 
 </manifest>

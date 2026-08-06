@@ -8,7 +8,6 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart' as path;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/entities/enums/temperature_units.dart';
 import 'package:weather_fit/entities/models/outfit/outfit_image.dart';
 import 'package:weather_fit/entities/models/search/saved_plan.dart';
@@ -510,7 +509,8 @@ class LocalDataSource {
 
   int getWidgetUpdateFrequency() {
     return _preferences.getInt(Settings.widgetUpdateFrequency.key) ??
-        (defaultTargetPlatform == TargetPlatform.iOS
+        (defaultTargetPlatform == TargetPlatform.iOS ||
+                defaultTargetPlatform == TargetPlatform.macOS
             ? constants.kIosDefaultMinutesFrequency
             : constants.kAndroidDefaultMinutesFrequency);
   }
@@ -609,7 +609,8 @@ class LocalDataSource {
   }
 
   bool isWeatherBackgroundEnabled() {
-    return _preferences.getBool(Settings.weatherBackground.key) ?? false;
+    return _preferences.getBool(Settings.weatherBackground.key) ??
+        constants.kDefaultWeatherBackgroundEnabled;
   }
 
   String _translateError(String key, String locale) {

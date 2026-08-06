@@ -1,21 +1,15 @@
 PODS:
   - FlutterMacOS (1.0.0)
-  - location (0.0.1):
-    - FlutterMacOS
 
 DEPENDENCIES:
   - FlutterMacOS (from `Flutter/ephemeral`)
-  - location (from `Flutter/ephemeral/.symlinks/plugins/location/macos`)
 
 EXTERNAL SOURCES:
   FlutterMacOS:
     :path: Flutter/ephemeral
-  location:
-    :path: Flutter/ephemeral/.symlinks/plugins/location/macos
 
 SPEC CHECKSUMS:
   FlutterMacOS: d0db08ddef1a9af05a5ec4b724367152bb0500b1
-  location: 7cdb0665bd6577d382b0a343acdadbcb7f964775
 
 PODFILE CHECKSUM: ac03ee0be6bbec6149bd1d3125dc91666016b64b
 

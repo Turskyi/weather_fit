@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:weather_fit/res/constants/constants.dart' as constants;
 import 'package:weather_fit/res/widgets/leading_widget.dart';
 import 'package:weather_fit/widgets/language_selector.dart';
+import 'package:weather_repository/weather_repository.dart';
 
 class SupportPage extends StatefulWidget {
   const SupportPage({super.key});
@@ -18,6 +19,10 @@ class _SupportPageState extends State<SupportPage> {
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final TextTheme textTheme = theme.textTheme;
+
+    final bool isPolish =
+        Localizations.localeOf(context).languageCode ==
+        Language.pl.isoLanguageCode;
 
     return Scaffold(
       appBar: AppBar(
@@ -122,6 +127,26 @@ class _SupportPageState extends State<SupportPage> {
                 icon: const Icon(Icons.chat),
                 label: Text(translate('support.join_telegram_support_button')),
               ),
+              if (isPolish) ...<Widget>[
+                const SizedBox(height: 8),
+                ElevatedButton.icon(
+                  onPressed: () => launchUrl(
+                    Uri.parse(constants.kFacebookPlUrl),
+                    mode: LaunchMode.externalApplication,
+                  ),
+                  icon: const Icon(Icons.facebook),
+                  label: Text(translate('facebook_page')),
+                ),
+                const SizedBox(height: 8),
+                ElevatedButton.icon(
+                  onPressed: () => launchUrl(
+                    Uri.parse(constants.kInstagramPlUrl),
+                    mode: LaunchMode.externalApplication,
+                  ),
+                  icon: const Icon(Icons.camera_alt),
+                  label: Text(translate('instagram_page')),
+                ),
+              ],
               const SizedBox(height: 8),
               ElevatedButton.icon(
                 onPressed: () => launchUrl(

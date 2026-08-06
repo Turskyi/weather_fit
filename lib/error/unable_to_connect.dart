@@ -48,10 +48,13 @@ class UnableToConnect extends StatelessWidget {
 
   void _handleReportActionAndPop(BuildContext context) {
     final Object? args = ModalRoute.of(context)?.settings.arguments;
+    final String query = args is SearchError ? args.query : '';
+    final String errorText = args is SearchError && args.errorMessage.isNotEmpty
+        ? args.errorMessage
+        : translate('error.unable_to_connect_short');
+
     context.read<SettingsBloc>().add(
-      BugReportPressedEvent(
-        errorText: args is SearchError ? args.errorMessage : '',
-      ),
+      BugReportPressedEvent(errorText: errorText, query: query),
     );
     Navigator.of(context).pop();
   }

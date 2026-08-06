@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/res/resources.dart';
 import 'package:weather_fit/res/values/dimens.dart';
 import 'package:weather_fit/settings/bloc/settings_bloc.dart';
+import 'package:weather_repository/weather_repository.dart';
 
 /// A widget that builds the language selector dropdown.
 class LanguageSelector extends StatelessWidget {

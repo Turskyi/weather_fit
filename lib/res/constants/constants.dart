@@ -30,6 +30,9 @@ const String kCountryFlagsBaseUrl =
     'https://open-meteo.com/images/country-flags/';
 const String kArtistInstagramUrl = 'https://www.instagram.com/anartistart/';
 const String kTelegramUrl = 'https://t.me/+J3nrwxVrxVE2MDdi';
+const String kFacebookPlUrl =
+    'https://www.facebook.com/profile.php?id=61591820151796';
+const String kInstagramPlUrl = 'https://www.instagram.com/weather_fitcom/';
 const String kDeveloperSupportUrl = '$kDeveloperUrl/#/support';
 const String kMailToScheme = 'mailto';
 const String kSubjectParameter = 'subject';
@@ -80,9 +83,12 @@ const String kDebugWeatherProviderKey = 'debug_weather_provider_openweathermap';
 const String kOpenRemoteInputMethod = 'openRemoteInput';
 const String kGetSharedContainerPathMethod = 'getSharedContainerPath';
 const String kIsWearDeviceMethod = 'isWearDevice';
+const String kUpdateTileMethod = 'updateTile';
 
 const String kHomeWidgetMethodChannel = 'com.weatherfit.home_widget';
 const String kSetAppGroupIdMethod = 'setAppGroupId';
 const String kSaveWidgetDataMethod = 'saveWidgetData';
 const String kUpdateWidgetMethod = 'updateWidget';
 const String kAppGroupIdArgKey = 'appGroupId';
+
+const bool kDefaultWeatherBackgroundEnabled = true;

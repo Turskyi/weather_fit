@@ -5,7 +5,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/extensions/build_context_extensions.dart' as type;
 import 'package:weather_fit/extensions/build_context_extensions.dart';
 import 'package:weather_fit/res/constants/constants.dart' as constant;
@@ -28,6 +27,7 @@ class SettingsPageDefaultLayout extends StatelessWidget {
     required this.onFeedbackTap,
     required this.onSupportTap,
     required this.onPinWidgetTap,
+    required this.onUpdateFrequencyChanged,
     super.key,
   });
 
@@ -59,6 +59,8 @@ class SettingsPageDefaultLayout extends StatelessWidget {
 
   /// Called when the user taps "Pin Widget" list tile.
   final GestureTapCallback onPinWidgetTap;
+
+  final ValueChanged<int> onUpdateFrequencyChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -269,9 +271,7 @@ class SettingsPageDefaultLayout extends StatelessWidget {
                     );
                   },
                 ),
-                if (!kIsWeb &&
-                    !context.isExtraSmallScreen &&
-                    !type.isWearDevice) ...<Widget>[
+                if (!kIsWeb) ...<Widget>[
                   const SizedBox(height: 20),
                   // Home Widget Updates Card.
                   BlocBuilder<SettingsBloc, SettingsState>(
@@ -369,10 +369,9 @@ class SettingsPageDefaultLayout extends StatelessWidget {
                                             );
                                           }).toList(),
                                           onChanged: (int? value) {
-                                            _onWidgetUpdateFrequencyChanged(
-                                              value: value,
-                                              context: context,
-                                            );
+                                            if (value != null) {
+                                              onUpdateFrequencyChanged(value);
+                                            }
                                           },
                                         );
                                       }
@@ -394,11 +393,7 @@ class SettingsPageDefaultLayout extends StatelessWidget {
                                           state.widgetUpdateFrequency,
                                         },
                                         onSelectionChanged: (Set<int> value) {
-                                          context.read<SettingsBloc>().add(
-                                            ChangeWidgetUpdateFrequencyEvent(
-                                              value.first,
-                                            ),
-                                          );
+                                          onUpdateFrequencyChanged(value.first);
                                         },
                                       );
                                     },
@@ -587,15 +582,6 @@ class SettingsPageDefaultLayout extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  void _onWidgetUpdateFrequencyChanged({
-    required BuildContext context,
-    required int? value,
-  }) {
-    if (value != null) {
-      context.read<SettingsBloc>().add(ChangeWidgetUpdateFrequencyEvent(value));
-    }
   }
 
   void _onLanguageSelected(Set<Language> newSelection) {

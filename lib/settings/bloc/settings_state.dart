@@ -10,7 +10,8 @@ sealed class SettingsState {
     this.nightStartHour = WeatherCondition.defaultNightStartHour,
     this.debugWeatherProviderOpenWeatherMap = false,
     this.debugForceNight = false,
-    this.isWeatherBackgroundEnabled = false,
+    this.isWeatherBackgroundEnabled =
+        constants.kDefaultWeatherBackgroundEnabled,
   });
 
   final Language language;
@@ -101,7 +102,7 @@ final class FeedbackState extends SettingsState {
   const FeedbackState({
     required this.errorMessage,
     required super.language,
-    this.query = '',
+    required this.query,
     super.appVersion,
     super.widgetUpdateFrequency,
     super.dayStartHour,

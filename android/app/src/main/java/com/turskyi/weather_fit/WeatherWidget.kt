@@ -59,6 +59,8 @@ class WeatherWidget : AppWidgetProvider() {
         const val KEY_TEXT_LAST_UPDATED = "weatherfit_text_last_updated"
         const val KEY_TEXT_RECOMMENDATION = "weatherfit_text_recommendation"
         const val KEY_IS_WEATHER_BACKGROUND_ENABLED = "weatherfit_is_weather_background_enabled"
+        const val KEY_SELECTED_LANGUAGE = "selected_language"
+        const val DEFAULT_LANGUAGE = "en"
     }
 
     override fun onUpdate(
@@ -66,6 +68,10 @@ class WeatherWidget : AppWidgetProvider() {
         appWidgetManager: AppWidgetManager,
         appWidgetIds: IntArray
     ) {
+        // Trigger Wear OS Tile update even if no standard widgets are placed.
+        // This is important for Wear OS devices which use Tiles instead of Widgets.
+        androidx.wear.tiles.TileService.getUpdater(context)
+            .requestUpdate(com.turskyi.weather_fit.glance.WeatherTileService::class.java)
 
         // There may be multiple widgets active, so update all of them.
         for (appWidgetId: Int in appWidgetIds) {
@@ -157,7 +163,7 @@ internal fun updateAppWidget(
         if (weatherCode != -1) {
             val isWeatherBackgroundEnabled = widgetData.getBoolean(
                 WeatherWidget.KEY_IS_WEATHER_BACKGROUND_ENABLED,
-                false
+                true
             )
             val widgetSizePx: Pair<Int, Int> = getWidgetSizePx(
                 context,
@@ -255,9 +261,9 @@ internal fun updateAppWidget(
 
         // Retrieve selected language for localization (saved from Flutter)
         val languageCode: String = widgetData.getString(
-            "selected_language",
-            "en",
-        ) ?: "en"
+            WeatherWidget.KEY_SELECTED_LANGUAGE,
+            WeatherWidget.DEFAULT_LANGUAGE,
+        ) ?: WeatherWidget.DEFAULT_LANGUAGE
 
         if (forecastJson != null) {
             val gson = Gson()
@@ -329,6 +335,10 @@ internal fun updateAppWidget(
 
     try {
         appWidgetManager.updateAppWidget(appWidgetId, views)
+        // Trigger Wear OS Tile update whenever the home widget updates.
+        // This ensures the Tile stays in sync even when updated from a background task.
+        androidx.wear.tiles.TileService.getUpdater(context)
+            .requestUpdate(com.turskyi.weather_fit.glance.WeatherTileService::class.java)
     } catch (exception: IllegalArgumentException) {
         val isBitmapLimitException: Boolean =
             exception.message?.contains("exceeds maximum bitmap memory usage") == true

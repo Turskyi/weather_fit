@@ -5,6 +5,13 @@
     <string name="app_widget_description">Dit is een widgetbeschrijving van de app</string>
     <string name="outfit_image">Outfit afbeelding</string>
     <string name="weatherfit">WeatherFit</string>
+    <string name="weatherfit_tile_label">WeatherFit Tegel</string>
+    <string name="weatherfit_tile_description">
+        Je WeatherFit-voorspelling in één oogopslag
+    </string>
+    <string name="weatherfit_tile_empty_message">
+        Open WeatherFit om je weer te synchroniseren.
+    </string>
     <string name="oops_no_outfit_suggestion_available">
         👕 Oeps! Geen outfit suggestie beschikbaar.
     </string>

@@ -5,22 +5,23 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:weather_fit/extensions/build_context_extensions.dart' as type;
 import 'package:weather_fit/res/constants/constants.dart' as constants;
 import 'package:weather_fit/res/widgets/leading_widget.dart';
 import 'package:weather_fit/res/widgets/store_badge.dart';
 import 'package:weather_fit/router/app_route.dart';
+import 'package:weather_repository/weather_repository.dart';
 
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
 
-  /// Returns `true` if the home widgets feature should be displayed in the
-  /// about page.
+  /// Returns `true` if the home widgets or watch tiles feature should be
+  /// displayed in the about page.
   ///
-  /// The feature is shown on platforms that support home screen widgets:
-  /// Android, iOS, and macOS. It is not shown on web or Wear OS devices.
+  /// The feature is shown on platforms that support home screen widgets or
+  /// tiles: Android (including Wear OS), iOS, and macOS. It is not shown on
+  /// web.
   bool get _showWidgetsFeature {
-    if (kIsWeb || type.isWearDevice) {
+    if (kIsWeb) {
       return false;
     } else {
       return Platform.isAndroid || Platform.isIOS || Platform.isMacOS;
@@ -53,6 +54,10 @@ class AboutPage extends StatelessWidget {
     if (_showWidgetsFeature) {
       features.add(translate('about.feature_home_widgets'));
     }
+
+    final bool isPolish =
+        Localizations.localeOf(context).languageCode ==
+        Language.pl.isoLanguageCode;
 
     return Scaffold(
       appBar: AppBar(
@@ -184,6 +189,21 @@ class AboutPage extends StatelessWidget {
               label: Text(translate('telegram_group')),
               onPressed: () => launchUrl(Uri.parse(constants.kTelegramUrl)),
             ),
+            if (isPolish) ...<Widget>[
+              const SizedBox(height: 4),
+              TextButton.icon(
+                icon: const Icon(Icons.facebook),
+                label: Text(translate('facebook_page')),
+                onPressed: () => launchUrl(Uri.parse(constants.kFacebookPlUrl)),
+              ),
+              const SizedBox(height: 4),
+              TextButton.icon(
+                icon: const Icon(Icons.camera_alt),
+                label: Text(translate('instagram_page')),
+                onPressed: () =>
+                    launchUrl(Uri.parse(constants.kInstagramPlUrl)),
+              ),
+            ],
             const SizedBox(height: 4),
             TextButton.icon(
               icon: const Icon(Icons.email_outlined),

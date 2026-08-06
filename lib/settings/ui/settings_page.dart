@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/extensions/build_context_extensions.dart';
 import 'package:weather_fit/res/constants/constants.dart' as constants;
@@ -12,6 +11,7 @@ import 'package:weather_fit/settings/bloc/settings_bloc.dart';
 import 'package:weather_fit/settings/ui/widgets/settings_page_default_layout.dart';
 import 'package:weather_fit/settings/ui/widgets/settings_page_extra_small_layout.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
+import 'package:weather_repository/weather_repository.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -36,6 +36,7 @@ class _SettingsPageState extends State<SettingsPage> {
             onFeedbackTap: _handleFeedbackRequest,
             onSupportTap: _navigateToSupport,
             onPinWidgetTap: _requestPinWidget,
+            onUpdateFrequencyChanged: _changeUpdateFrequency,
             onSearchPressed: _handleLocationSearchAndFetchWeather,
           )
         : SettingsPageDefaultLayout(
@@ -50,6 +51,7 @@ class _SettingsPageState extends State<SettingsPage> {
             onFeedbackTap: _handleFeedbackRequest,
             onSupportTap: _navigateToSupport,
             onPinWidgetTap: _requestPinWidget,
+            onUpdateFrequencyChanged: _changeUpdateFrequency,
           );
   }
 
@@ -67,11 +69,16 @@ class _SettingsPageState extends State<SettingsPage> {
 
   void _handleFeedbackRequest() {
     final SettingsState state = context.read<SettingsBloc>().state;
-    final String errorMessage = state is SettingsError
+    final WeatherState weatherState = context.read<WeatherBloc>().state;
+
+    final String query = weatherState.weather.location.name;
+    final String errorMessage =
+        state is SettingsError && state.errorMessage.isNotEmpty
         ? state.errorMessage
-        : '';
+        : translate('feedback.app_feedback');
+
     context.read<SettingsBloc>().add(
-      BugReportPressedEvent(errorText: errorMessage),
+      BugReportPressedEvent(errorText: errorMessage, query: query),
     );
   }
 
@@ -89,6 +96,10 @@ class _SettingsPageState extends State<SettingsPage> {
       androidName: constants.kAndroidWidgetName,
       qualifiedAndroidName: constants.kQualifiedAndroidWidgetName,
     );
+  }
+
+  void _changeUpdateFrequency(int value) {
+    context.read<SettingsBloc>().add(ChangeWidgetUpdateFrequencyEvent(value));
   }
 
   bool _isUnitsChanged(WeatherState previous, WeatherState current) {

@@ -13,7 +13,6 @@ import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
 import 'package:weather_fit/entities/enums/feedback_rating.dart';
 import 'package:weather_fit/entities/enums/feedback_submission_type.dart';
 import 'package:weather_fit/entities/enums/feedback_type.dart';
-import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/entities/models/exceptions/email_launch_exception.dart';
 import 'package:weather_fit/extensions/build_context_extensions.dart' as type;
 import 'package:weather_fit/res/constants/constants.dart' as constants;
@@ -321,21 +320,30 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     Emitter<SettingsState> emit,
   ) {
     String errorMessage = event.errorText;
+    String query = event.query;
 
     final SettingsState state = this.state;
     if (state is SettingsError) {
       errorMessage = state.errorMessage;
     } else if (state is FeedbackState) {
       errorMessage = state.errorMessage;
+      if (query.isEmpty) {
+        query = state.query;
+      }
     }
     emit(
       FeedbackState(
         language: state.language,
         errorMessage: errorMessage,
+        query: query,
         appVersion: state.appVersion,
         widgetUpdateFrequency: state.widgetUpdateFrequency,
         dayStartHour: state.dayStartHour,
         nightStartHour: state.nightStartHour,
+        debugWeatherProviderOpenWeatherMap:
+            state.debugWeatherProviderOpenWeatherMap,
+        debugForceNight: state.debugForceNight,
+        isWeatherBackgroundEnabled: state.isWeatherBackgroundEnabled,
       ),
     );
   }
@@ -359,6 +367,10 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         widgetUpdateFrequency: state.widgetUpdateFrequency,
         dayStartHour: state.dayStartHour,
         nightStartHour: state.nightStartHour,
+        debugWeatherProviderOpenWeatherMap:
+            state.debugWeatherProviderOpenWeatherMap,
+        debugForceNight: state.debugForceNight,
+        isWeatherBackgroundEnabled: state.isWeatherBackgroundEnabled,
       ),
     );
   }
@@ -386,6 +398,10 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
               widgetUpdateFrequency: state.widgetUpdateFrequency,
               dayStartHour: state.dayStartHour,
               nightStartHour: state.nightStartHour,
+              debugWeatherProviderOpenWeatherMap:
+                  state.debugWeatherProviderOpenWeatherMap,
+              debugForceNight: state.debugForceNight,
+              isWeatherBackgroundEnabled: state.isWeatherBackgroundEnabled,
             ),
           );
         }

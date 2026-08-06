@@ -1,0 +1,30 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+    <!-- Pure Black Background Circle (Policy Compliant) -->
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M100,100m-90,0a90,90 0,1 1,180 0a90,90 0,1 1,-180 0" />
+
+    <!-- Simulated "Location" text at the top -->
+    <path
+        android:fillColor="#FFB0BEC5"
+        android:pathData="M70,50h60v4h-60z" />
+
+    <!-- Large Yellow Sun in the center -->
+    <path
+        android:fillColor="#FFFFC107"
+        android:pathData="M100,100m-25,0a25,25 0,1 1,50 0a25,25 0,1 1,-50 0" />
+    <!-- Rays -->
+    <path
+        android:pathData="M100,65v-8 M100,135v8 M135,100h8 M65,100h-8 M125,75l6,-6 M75,125l-6,6 M125,125l6,6 M75,75l-6,-6"
+        android:strokeWidth="3"
+        android:strokeColor="#FFFFC107" />
+
+    <!-- Simulated "23°C" text at the bottom -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M75,145h50v8h-50z" />
+</vector>

@@ -14,7 +14,7 @@ final class CheckForUpdateEvent extends SettingsEvent {
 }
 
 final class BugReportPressedEvent extends SettingsEvent {
-  const BugReportPressedEvent({required this.errorText, this.query = ''});
+  const BugReportPressedEvent({required this.errorText, required this.query});
 
   final String errorText;
   final String query;

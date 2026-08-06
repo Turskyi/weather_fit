@@ -10,14 +10,12 @@ import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
 import 'package:weather_fit/data/repositories/outfit_repository.dart';
-import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/entities/enums/temperature_units.dart';
 import 'package:weather_fit/entities/enums/weather_fetch_origin.dart';
 import 'package:weather_fit/entities/models/outfit/outfit_image.dart';
 import 'package:weather_fit/entities/models/temperature/temperature.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/extensions/build_context_extensions.dart' as type;
-import 'package:weather_fit/extensions/build_context_extensions.dart';
 import 'package:weather_fit/extensions/date_time_extension.dart';
 import 'package:weather_fit/res/extensions/double_extension.dart';
 import 'package:weather_fit/services/forecast_aggregation_service.dart';
@@ -68,7 +66,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
   final HomeWidgetService _homeWidgetService;
 
   void _scheduleInitialHomeWidgetSync() {
-    if (kIsWeb || isWearDevice) {
+    if (kIsWeb) {
       return;
     } else {
       final DailyForecastDomain? dailyForecast = state.dailyForecast;
@@ -815,6 +813,12 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
   }
 
   bool _shouldUpdateHomeWidget(WeatherFetchOrigin eventOrigin) {
-    return !kIsWeb && eventOrigin.isNotWearable && !type.isWearDevice;
+    if (kIsWeb) {
+      return false;
+    } else if (type.isWearDevice) {
+      return true;
+    } else {
+      return eventOrigin.isNotWearable;
+    }
   }
 }

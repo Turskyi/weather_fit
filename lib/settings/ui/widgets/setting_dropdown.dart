@@ -8,6 +8,7 @@ class SettingDropdown extends StatelessWidget {
     required this.value,
     required this.options,
     required this.onChanged,
+    this.optionLabels,
     super.key,
   });
 
@@ -15,6 +16,7 @@ class SettingDropdown extends StatelessWidget {
   final int value;
   final List<int> options;
   final ValueChanged<int?> onChanged;
+  final Map<int, String>? optionLabels;
 
   void _showWearSelectionDialog(BuildContext context) {
     showDialog<void>(
@@ -31,9 +33,12 @@ class SettingDropdown extends StatelessWidget {
               itemBuilder: (BuildContext context, int index) {
                 final int option = options[index];
                 final bool isSelected = option == value;
+                final String label =
+                    optionLabels?[option] ??
+                    '${option.toString().padLeft(2, '0')}:00';
                 return ListTile(
                   title: Text(
-                    '${option.toString().padLeft(2, '0')}:00',
+                    label,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: isSelected
@@ -70,6 +75,9 @@ class SettingDropdown extends StatelessWidget {
       textAlign: TextAlign.center,
     );
 
+    final String displayValue =
+        optionLabels?[value] ?? '${value.toString().padLeft(2, '0')}:00';
+
     if (isWear) {
       return Column(
         children: <Widget>[
@@ -90,7 +98,7 @@ class SettingDropdown extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   Text(
-                    '${value.toString().padLeft(2, '0')}:00',
+                    displayValue,
                     style: TextStyle(color: watchForegroundColor),
                   ),
                   Icon(
@@ -123,11 +131,11 @@ class SettingDropdown extends StatelessWidget {
             underline: const SizedBox.shrink(),
             dropdownColor: Theme.of(context).scaffoldBackgroundColor,
             style: TextStyle(color: watchForegroundColor),
-            items: options.map((int hour) {
-              return DropdownMenuItem<int>(
-                value: hour,
-                child: Text('${hour.toString().padLeft(2, '0')}:00'),
-              );
+            items: options.map((int option) {
+              final String label =
+                  optionLabels?[option] ??
+                  '${option.toString().padLeft(2, '0')}:00';
+              return DropdownMenuItem<int>(value: option, child: Text(label));
             }).toList(),
             onChanged: onChanged,
           ),

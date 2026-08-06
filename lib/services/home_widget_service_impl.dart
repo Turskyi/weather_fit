@@ -234,5 +234,5 @@ class HomeWidgetServiceImpl implements HomeWidgetService {
     return aggregateForecastItems(fullForecast);
   }
 
-  bool get _isWidgetUnsupported => kIsWeb || type.isWearDevice;
+  bool get _isWidgetUnsupported => kIsWeb;
 }

@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:weather_fit/entities/enums/language.dart';
 import 'package:weather_fit/settings/bloc/settings_bloc.dart';
 import 'package:weather_fit/settings/ui/widgets/settings_page_extra_small_layout.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
@@ -73,6 +72,7 @@ void main() {
             onFeedbackTap: () {},
             onSupportTap: () {},
             onPinWidgetTap: () {},
+            onUpdateFrequencyChanged: (_) {},
             onSearchPressed: () {},
           ),
           localizationDelegate,

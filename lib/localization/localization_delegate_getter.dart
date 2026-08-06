@@ -1,5 +1,5 @@
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:weather_fit/entities/enums/language.dart';
+import 'package:weather_repository/weather_repository.dart';
 
 Future<LocalizationDelegate> getLocalizationDelegate(
   Language savedLanguage,
