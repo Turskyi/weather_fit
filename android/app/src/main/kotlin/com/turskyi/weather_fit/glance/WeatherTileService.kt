@@ -132,7 +132,110 @@ class WeatherTileService : androidx.wear.tiles.TileService() {
 
     private fun createTileLayout(weather: WeatherTileData): androidx.wear.protolayout.LayoutElementBuilders.LayoutElement {
         val primaryColor =
-            if (weather.hasWeather) weather.backgroundColor else Color.YELLOW
+            if (weather.hasWeather) Color.WHITE else Color.YELLOW
+
+        val temperatureText = if (weather.hasWeather) weather.temperature else "Syncing..."
+        val lastUpdatedText = if (weather.hasWeather && weather.lastUpdated.isNotBlank()) {
+            weather.lastUpdated
+        } else {
+            ""
+        }
+
+        val column = androidx.wear.protolayout.LayoutElementBuilders.Column.Builder()
+            .setWidth(androidx.wear.protolayout.DimensionBuilders.expand())
+            .setHorizontalAlignment(androidx.wear.protolayout.LayoutElementBuilders.HORIZONTAL_ALIGN_CENTER)
+            .addContent(
+                androidx.wear.protolayout.LayoutElementBuilders.Text.Builder()
+                    .setText(if (weather.hasWeather) weather.location else "WeatherFit")
+                    .setFontStyle(
+                        androidx.wear.protolayout.LayoutElementBuilders.FontStyle.Builder()
+                            .setSize(
+                                androidx.wear.protolayout.DimensionBuilders.sp(
+                                    16f
+                                )
+                            )
+                            .setColor(
+                                androidx.wear.protolayout.ColorBuilders.argb(
+                                    Color.LTGRAY
+                                )
+                            )
+                            .setWeight(androidx.wear.protolayout.LayoutElementBuilders.FONT_WEIGHT_BOLD)
+                            .build()
+                    )
+                    .build()
+            )
+            .addContent(
+                if (weather.hasImage) {
+                    androidx.wear.protolayout.LayoutElementBuilders.Image.Builder()
+                        .setResourceId("outfit_image")
+                        .setWidth(
+                            androidx.wear.protolayout.DimensionBuilders.dp(
+                                80f
+                            )
+                        )
+                        .setHeight(
+                            androidx.wear.protolayout.DimensionBuilders.dp(
+                                80f
+                            )
+                        )
+                        .build()
+                } else {
+                    androidx.wear.protolayout.LayoutElementBuilders.Text.Builder()
+                        .setText(if (weather.hasWeather) weather.emoji else "☀️")
+                        .setFontStyle(
+                            androidx.wear.protolayout.LayoutElementBuilders.FontStyle.Builder()
+                                .setSize(
+                                    androidx.wear.protolayout.DimensionBuilders.sp(
+                                        48f
+                                    )
+                                )
+                                .build()
+                        )
+                        .build()
+                }
+            )
+            .addContent(
+                androidx.wear.protolayout.LayoutElementBuilders.Text.Builder()
+                    .setText(temperatureText)
+                    .setFontStyle(
+                        androidx.wear.protolayout.LayoutElementBuilders.FontStyle.Builder()
+                            .setSize(
+                                androidx.wear.protolayout.DimensionBuilders.sp(
+                                    30f
+                                )
+                            )
+                            .setColor(
+                                androidx.wear.protolayout.ColorBuilders.argb(
+                                    primaryColor
+                                )
+                            )
+                            .setWeight(androidx.wear.protolayout.LayoutElementBuilders.FONT_WEIGHT_BOLD)
+                            .build()
+                    )
+                    .build()
+            )
+
+        if (lastUpdatedText.isNotBlank()) {
+            column.addContent(
+                androidx.wear.protolayout.LayoutElementBuilders.Text.Builder()
+                    .setText(lastUpdatedText)
+                    .setFontStyle(
+                        androidx.wear.protolayout.LayoutElementBuilders.FontStyle.Builder()
+                            .setSize(
+                                androidx.wear.protolayout.DimensionBuilders.sp(
+                                    9f
+                                )
+                            )
+                            .setColor(
+                                androidx.wear.protolayout.ColorBuilders.argb(
+                                    Color.LTGRAY
+                                )
+                            )
+                            .build()
+                    )
+                    .build()
+            )
+        }
 
         return androidx.wear.protolayout.LayoutElementBuilders.Box.Builder()
             .setWidth(androidx.wear.protolayout.DimensionBuilders.expand())
@@ -156,81 +259,7 @@ class WeatherTileService : androidx.wear.tiles.TileService() {
                     )
                     .build()
             )
-            .addContent(
-                androidx.wear.protolayout.LayoutElementBuilders.Column.Builder()
-                    .setWidth(androidx.wear.protolayout.DimensionBuilders.expand())
-                    .setHorizontalAlignment(androidx.wear.protolayout.LayoutElementBuilders.HORIZONTAL_ALIGN_CENTER)
-                    .addContent(
-                        androidx.wear.protolayout.LayoutElementBuilders.Text.Builder()
-                            .setText(if (weather.hasWeather) weather.location else "WeatherFit")
-                            .setFontStyle(
-                                androidx.wear.protolayout.LayoutElementBuilders.FontStyle.Builder()
-                                    .setSize(
-                                        androidx.wear.protolayout.DimensionBuilders.sp(
-                                            16f
-                                        )
-                                    )
-                                    .setColor(
-                                        androidx.wear.protolayout.ColorBuilders.argb(
-                                            Color.LTGRAY
-                                        )
-                                    )
-                                    .setWeight(androidx.wear.protolayout.LayoutElementBuilders.FONT_WEIGHT_BOLD)
-                                    .build()
-                            )
-                            .build()
-                    )
-                    .addContent(
-                        if (weather.hasImage) {
-                            androidx.wear.protolayout.LayoutElementBuilders.Image.Builder()
-                                .setResourceId("outfit_image")
-                                .setWidth(
-                                    androidx.wear.protolayout.DimensionBuilders.dp(
-                                        80f
-                                    )
-                                )
-                                .setHeight(
-                                    androidx.wear.protolayout.DimensionBuilders.dp(
-                                        80f
-                                    )
-                                )
-                                .build()
-                        } else {
-                            androidx.wear.protolayout.LayoutElementBuilders.Text.Builder()
-                                .setText(if (weather.hasWeather) weather.emoji else "☀️")
-                                .setFontStyle(
-                                    androidx.wear.protolayout.LayoutElementBuilders.FontStyle.Builder()
-                                        .setSize(
-                                            androidx.wear.protolayout.DimensionBuilders.sp(
-                                                48f
-                                            )
-                                        )
-                                        .build()
-                                )
-                                .build()
-                        }
-                    )
-                    .addContent(
-                        androidx.wear.protolayout.LayoutElementBuilders.Text.Builder()
-                            .setText(if (weather.hasWeather) weather.temperature else "Syncing...")
-                            .setFontStyle(
-                                androidx.wear.protolayout.LayoutElementBuilders.FontStyle.Builder()
-                                    .setSize(
-                                        androidx.wear.protolayout.DimensionBuilders.sp(
-                                            24f
-                                        )
-                                    )
-                                    .setColor(
-                                        androidx.wear.protolayout.ColorBuilders.argb(
-                                            primaryColor
-                                        )
-                                    )
-                                    .build()
-                            )
-                            .build()
-                    )
-                    .build()
-            )
+            .addContent(column.build())
             .build()
     }
 }
@@ -243,6 +272,7 @@ private data class WeatherTileData(
     val weatherCode: Int,
     val isWeatherBackgroundEnabled: Boolean,
     val imagePath: String,
+    val lastUpdated: String,
 ) {
     val hasWeather: Boolean
         get() = location.isNotBlank() && temperature.isNotBlank()
@@ -257,34 +287,36 @@ private data class WeatherTileData(
     companion object {
         fun from(context: Context): WeatherTileData {
             val prefs = HomeWidgetPlugin.getData(context)
-            return WeatherTileData(
-                location = prefs.getString("text_location", "").orEmpty(),
-                emoji = prefs.getString("weatherfit_text_emoji", "☀️")
-                    .orEmpty(),
-                temperature = prefs.getString("text_temperature", "").orEmpty(),
-                recommendation = prefs.getString(
-                    "weatherfit_text_recommendation",
-                    ""
-                ).orEmpty(),
-                weatherCode = prefs.getInt("weather_code", -1),
-                isWeatherBackgroundEnabled = prefs.getBoolean(
-                    "weatherfit_is_weather_background_enabled",
-                    true
-                ),
-                imagePath = prefs.getString("image_weather", "").orEmpty()
-            )
-        }
+           return WeatherTileData(
+               location = prefs.getString("text_location", "").orEmpty(),
+               emoji = prefs.getString("weatherfit_text_emoji", "☀️")
+                   .orEmpty(),
+               temperature = prefs.getString("text_temperature", "").orEmpty(),
+               recommendation = prefs.getString(
+                   "weatherfit_text_recommendation",
+                   ""
+               ).orEmpty(),
+               weatherCode = prefs.getInt("weather_code", -1),
+               isWeatherBackgroundEnabled = prefs.getBoolean(
+                   "weatherfit_is_weather_background_enabled",
+                   true
+               ),
+               imagePath = prefs.getString("image_weather", "").orEmpty(),
+               lastUpdated = prefs.getString("weatherfit_text_last_updated", "").orEmpty(),
+           )
+       }
 
-        fun empty(): WeatherTileData = WeatherTileData(
-            location = "",
-            emoji = "☀️",
-            temperature = "",
-            recommendation = "",
-            weatherCode = -1,
-            isWeatherBackgroundEnabled = true,
-            imagePath = ""
-        )
-    }
+       fun empty(): WeatherTileData = WeatherTileData(
+           location = "",
+           emoji = "☀️",
+           temperature = "",
+           recommendation = "",
+           weatherCode = -1,
+           isWeatherBackgroundEnabled = true,
+           imagePath = "",
+           lastUpdated = "",
+       )
+   }
 }
 
 private fun isNight(): Boolean {
