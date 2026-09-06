@@ -116,14 +116,12 @@ class _ForecastDayRow extends StatelessWidget {
       Localizations.localeOf(context).languageCode,
     ).format(dateTime);
 
-    final double minTemp =
-        temperatureUnits.isFahrenheit
-            ? day.minTemp.toFahrenheit()
-            : day.minTemp;
-    final double maxTemp =
-        temperatureUnits.isFahrenheit
-            ? day.maxTemp.toFahrenheit()
-            : day.maxTemp;
+    final double minTemp = temperatureUnits.isFahrenheit
+        ? day.minTemp.toFahrenheit()
+        : day.minTemp;
+    final double maxTemp = temperatureUnits.isFahrenheit
+        ? day.maxTemp.toFahrenheit()
+        : day.maxTemp;
 
     return Padding(
       padding: EdgeInsets.symmetric(

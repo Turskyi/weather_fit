@@ -56,24 +56,21 @@ class Weather extends Equatable {
       now.minute,
     );
 
-    final double temperatureValue =
-        units.isFahrenheit
-            ? weatherDomain.temperature.toFahrenheit()
-            : weatherDomain.temperature;
+    final double temperatureValue = units.isFahrenheit
+        ? weatherDomain.temperature.toFahrenheit()
+        : weatherDomain.temperature;
 
-    final double? feelsLikeValue =
-        weatherDomain.feelsLike != null
-            ? (units.isFahrenheit
-                ? weatherDomain.feelsLike!.toFahrenheit()
-                : weatherDomain.feelsLike!)
-            : null;
+    final double? feelsLikeValue = weatherDomain.feelsLike != null
+        ? (units.isFahrenheit
+              ? weatherDomain.feelsLike!.toFahrenheit()
+              : weatherDomain.feelsLike!)
+        : null;
 
-    final double? dewPointValue =
-        weatherDomain.dewPoint != null
-            ? (units.isFahrenheit
-                ? weatherDomain.dewPoint!.toFahrenheit()
-                : weatherDomain.dewPoint!)
-            : null;
+    final double? dewPointValue = weatherDomain.dewPoint != null
+        ? (units.isFahrenheit
+              ? weatherDomain.dewPoint!.toFahrenheit()
+              : weatherDomain.dewPoint!)
+        : null;
 
     return Weather(
       condition: weatherDomain.condition,
@@ -85,8 +82,9 @@ class Weather extends Equatable {
       description: weatherDomain.description,
       code: weatherDomain.weatherCode,
       locale: weatherDomain.locale,
-      feelsLike:
-          feelsLikeValue != null ? Temperature(value: feelsLikeValue) : null,
+      feelsLike: feelsLikeValue != null
+          ? Temperature(value: feelsLikeValue)
+          : null,
       humidity: weatherDomain.humidity,
       windSpeed: weatherDomain.windSpeed,
       uvIndex: weatherDomain.uvIndex,
@@ -203,21 +201,21 @@ class Weather extends Equatable {
 
     final double? feelsLikeValue = feelsLike != null
         ? (units.isFahrenheit
-            ? feelsLike!.value.toFahrenheit()
-            : feelsLike!.value.toCelsius())
+              ? feelsLike!.value.toFahrenheit()
+              : feelsLike!.value.toCelsius())
         : null;
 
-    final double? dewPointValue =
-        dewPoint != null
-            ? (units.isFahrenheit
-                ? dewPoint!.toFahrenheit()
-                : dewPoint!.toCelsius())
-            : null;
+    final double? dewPointValue = dewPoint != null
+        ? (units.isFahrenheit
+              ? dewPoint!.toFahrenheit()
+              : dewPoint!.toCelsius())
+        : null;
 
     return copyWith(
       temperature: Temperature(value: temperatureValue),
-      feelsLike:
-          feelsLikeValue != null ? Temperature(value: feelsLikeValue) : null,
+      feelsLike: feelsLikeValue != null
+          ? Temperature(value: feelsLikeValue)
+          : null,
       dewPoint: dewPointValue,
       temperatureUnits: units,
     );

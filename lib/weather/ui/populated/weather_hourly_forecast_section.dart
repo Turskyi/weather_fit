@@ -65,10 +65,9 @@ class WeatherHourlyForecastSection extends StatelessWidget {
                       context.read<SettingsBloc>().state.locale,
                     ).format(time);
 
-                    final double tempValue =
-                        state.temperatureUnits.isFahrenheit
-                            ? item.temperature.toFahrenheit()
-                            : item.temperature;
+                    final double tempValue = state.temperatureUnits.isFahrenheit
+                        ? item.temperature.toFahrenheit()
+                        : item.temperature;
 
                     return Padding(
                       padding: EdgeInsets.only(

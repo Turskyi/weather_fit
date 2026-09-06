@@ -102,8 +102,8 @@ class HomeWidgetServiceImpl implements HomeWidgetService {
 
     final TemperatureUnits units = weather.temperatureUnits;
 
-    final String outfitRecommendation =
-        outfitRepository.getOutfitRecommendation(weather);
+    final String outfitRecommendation = outfitRepository
+        .getOutfitRecommendation(weather);
 
     final List<String> outfitFilePaths = await outfitRepository
         .downloadAndSaveImages(weather);
@@ -182,10 +182,9 @@ class HomeWidgetServiceImpl implements HomeWidgetService {
     // Convert forecast temperatures to the correct unit.
     final List<ForecastItemDomain> convertedForecastItems =
         filteredForecastItems.map((ForecastItemDomain item) {
-          final double convertedTemp =
-              units.isFahrenheit
-                  ? item.temperature.toFahrenheit()
-                  : item.temperature;
+          final double convertedTemp = units.isFahrenheit
+              ? item.temperature.toFahrenheit()
+              : item.temperature;
 
           return ForecastItemDomain(
             time: item.time,
