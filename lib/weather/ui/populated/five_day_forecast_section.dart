@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:intl/intl.dart';
+import 'package:weather_fit/entities/enums/temperature_units.dart';
 import 'package:weather_fit/extensions/build_context_extensions.dart';
+import 'package:weather_fit/res/extensions/double_extension.dart';
 import 'package:weather_fit/weather/ui/populated/weather_details_container.dart';
 import 'package:weather_repository/weather_repository.dart';
 
 class FiveDayForecastSection extends StatelessWidget {
-  const FiveDayForecastSection({required this.dailyForecast, super.key});
+  const FiveDayForecastSection({
+    required this.dailyForecast,
+    required this.temperatureUnits,
+    super.key,
+  });
 
   final List<ForecastDayDomain> dailyForecast;
+  final TemperatureUnits temperatureUnits;
 
   @override
   Widget build(BuildContext context) {
@@ -60,6 +67,7 @@ class FiveDayForecastSection extends StatelessWidget {
               for (int i = 0; i < dailyForecast.length; i++) ...<Widget>[
                 _ForecastDayRow(
                   day: dailyForecast[i],
+                  temperatureUnits: temperatureUnits,
                   isLast: i == dailyForecast.length - 1,
                   isExtraSmall: isExtraSmall,
                   globalMin: globalMin,
@@ -86,6 +94,7 @@ class FiveDayForecastSection extends StatelessWidget {
 class _ForecastDayRow extends StatelessWidget {
   const _ForecastDayRow({
     required this.day,
+    required this.temperatureUnits,
     required this.isLast,
     required this.isExtraSmall,
     required this.globalMin,
@@ -93,6 +102,7 @@ class _ForecastDayRow extends StatelessWidget {
   });
 
   final ForecastDayDomain day;
+  final TemperatureUnits temperatureUnits;
   final bool isLast;
   final bool isExtraSmall;
   final double globalMin;
@@ -105,6 +115,15 @@ class _ForecastDayRow extends StatelessWidget {
     final String dayName = DateFormat.E(
       Localizations.localeOf(context).languageCode,
     ).format(dateTime);
+
+    final double minTemp =
+        temperatureUnits.isFahrenheit
+            ? day.minTemp.toFahrenheit()
+            : day.minTemp;
+    final double maxTemp =
+        temperatureUnits.isFahrenheit
+            ? day.maxTemp.toFahrenheit()
+            : day.maxTemp;
 
     return Padding(
       padding: EdgeInsets.symmetric(
@@ -138,7 +157,7 @@ class _ForecastDayRow extends StatelessWidget {
               fit: BoxFit.scaleDown,
               alignment: Alignment.centerRight,
               child: Text(
-                '${day.minTemp.round()}°',
+                '${minTemp.round()}°',
                 textAlign: TextAlign.right,
                 style:
                     (isExtraSmall ? textTheme.labelSmall : textTheme.bodyLarge)
@@ -167,7 +186,7 @@ class _ForecastDayRow extends StatelessWidget {
               fit: BoxFit.scaleDown,
               alignment: Alignment.centerLeft,
               child: Text(
-                '${day.maxTemp.round()}°',
+                '${maxTemp.round()}°',
                 textAlign: TextAlign.left,
                 style:
                     (isExtraSmall ? textTheme.labelSmall : textTheme.bodyLarge)

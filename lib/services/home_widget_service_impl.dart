@@ -8,7 +8,6 @@ import 'package:home_widget/home_widget.dart';
 import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
 import 'package:weather_fit/data/repositories/outfit_repository.dart';
 import 'package:weather_fit/entities/enums/temperature_units.dart';
-import 'package:weather_fit/entities/models/temperature/temperature.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/extensions/build_context_extensions.dart' as type;
 import 'package:weather_fit/res/constants/constants.dart' as constants;
@@ -103,17 +102,8 @@ class HomeWidgetServiceImpl implements HomeWidgetService {
 
     final TemperatureUnits units = weather.temperatureUnits;
 
-    final double temperatureValue = units.isFahrenheit
-        ? weather.temperature.value.toFahrenheit()
-        : weather.temperature.value;
-
-    final Weather updatedWeather = weather.copyWith(
-      temperature: Temperature(value: temperatureValue),
-      temperatureUnits: units,
-    );
-
-    final String outfitRecommendation = outfitRepository
-        .getOutfitRecommendation(updatedWeather);
+    final String outfitRecommendation =
+        outfitRepository.getOutfitRecommendation(weather);
 
     final List<String> outfitFilePaths = await outfitRepository
         .downloadAndSaveImages(weather);
@@ -186,8 +176,34 @@ class HomeWidgetServiceImpl implements HomeWidgetService {
     );
 
     // Filter the forecast to send only the data the widget needs.
+    final List<ForecastItemDomain> filteredForecastItems =
+        _filterForecastForWidget(forecast.forecast);
+
+    // Convert forecast temperatures to the correct unit.
+    final List<ForecastItemDomain> convertedForecastItems =
+        filteredForecastItems.map((ForecastItemDomain item) {
+          final double convertedTemp =
+              units.isFahrenheit
+                  ? item.temperature.toFahrenheit()
+                  : item.temperature;
+
+          return ForecastItemDomain(
+            time: item.time,
+            temperature: convertedTemp,
+            weatherCode: item.weatherCode,
+            feelsLike: item.feelsLike,
+            humidity: item.humidity,
+            windSpeed: item.windSpeed,
+            uvIndex: item.uvIndex,
+            visibility: item.visibility,
+            cloudCover: item.cloudCover,
+            pressure: item.pressure,
+            dewPoint: item.dewPoint,
+          );
+        }).toList();
+
     final DailyForecastDomain filteredForecast = DailyForecastDomain(
-      forecast: _filterForecastForWidget(forecast.forecast),
+      forecast: convertedForecastItems,
     );
     final String forecastData = convert.jsonEncode(filteredForecast.toJson());
 

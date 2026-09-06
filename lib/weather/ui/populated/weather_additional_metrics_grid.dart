@@ -52,7 +52,9 @@ class WeatherAdditionalMetricsGrid extends StatelessWidget {
       if (weather.dewPoint != null)
         WeatherMetricData(
           label: translate('weather.dew_point'),
-          value: '${weather.dewPoint!.round()}°',
+          value:
+              '${weather.dewPoint!.round()}°'
+              '${weather.temperatureUnits.unitSymbol}',
           icon: Icons.device_thermostat_outlined,
         ),
     ];

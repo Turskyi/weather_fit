@@ -63,6 +63,7 @@ class _WeatherDetailsSectionState extends State<WeatherDetailsSection>
 
         final Widget fiveDayForecast = FiveDayForecastSection(
           dailyForecast: state.fiveDayForecast,
+          temperatureUnits: state.temperatureUnits,
         );
 
         final Widget detailsContent = Column(

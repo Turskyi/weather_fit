@@ -177,7 +177,8 @@ internal fun updateAppWidget(
                 width = widgetSizePx.first,
                 height = widgetSizePx.second,
                 weatherCode = weatherCode,
-                isNight = isNight
+                isNight = isNight,
+                useConstrained = useConstrainedImage,
             )
             setImageViewBitmap(R.id.image_background, gradientBitmap)
 
@@ -188,7 +189,8 @@ internal fun updateAppWidget(
                     width = widgetSizePx.first,
                     height = widgetSizePx.second,
                     emoji = emoji,
-                    isNight = isNight
+                    isNight = isNight,
+                    useConstrained = useConstrainedImage,
                 )
                 setImageViewBitmap(R.id.image_pattern, patternBitmap)
                 setViewVisibility(R.id.image_pattern, View.VISIBLE)
@@ -496,9 +498,11 @@ private fun generateGradientBitmap(
     width: Int,
     height: Int,
     weatherCode: Int,
-    isNight: Boolean
+    isNight: Boolean,
+    useConstrained: Boolean = false,
 ): Bitmap {
-    val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+    val config = if (useConstrained) Bitmap.Config.RGB_565 else Bitmap.Config.ARGB_8888
+    val bitmap = Bitmap.createBitmap(width, height, config)
     val canvas = Canvas(bitmap)
 
     val colors = getGradientColors(weatherCode, isNight)
@@ -514,7 +518,13 @@ private fun generateGradientBitmap(
     }
 
     canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paint)
-    return bitmap
+
+    return if (useConstrained) {
+        // Ensure the generated bitmap respects the byte budget for constrained mode.
+        downscaleToByteLimit(bitmap, MAX_CONSTRAINED_WIDGET_BITMAP_BYTES)
+    } else {
+        bitmap
+    }
 }
 
 private fun getGradientColors(code: Int, isNight: Boolean): IntArray {
@@ -611,9 +621,11 @@ private fun generatePatternBitmap(
     width: Int,
     height: Int,
     emoji: String,
-    isNight: Boolean
+    isNight: Boolean,
+    useConstrained: Boolean = false,
 ): Bitmap {
-    val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+    val config = if (useConstrained) Bitmap.Config.RGB_565 else Bitmap.Config.ARGB_8888
+    val bitmap = Bitmap.createBitmap(width, height, config)
     val canvas = Canvas(bitmap)
     val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         textSize = 60f
@@ -636,7 +648,11 @@ private fun generatePatternBitmap(
         }
     }
 
-    return bitmap
+    return if (useConstrained) {
+        downscaleToByteLimit(bitmap, MAX_CONSTRAINED_WIDGET_BITMAP_BYTES)
+    } else {
+        bitmap
+    }
 }
 
 private fun getBackgroundResource(code: Int): Int {

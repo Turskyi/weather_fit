@@ -113,7 +113,7 @@ class _ForecastOutfitPreviewState extends State<ForecastOutfitPreview>
       lastUpdatedDateTime: null,
       location: widget.baseWeather.location,
       temperature: Temperature(value: widget.item.temperature),
-      temperatureUnits: widget.temperatureUnits,
+      temperatureUnits: TemperatureUnits.celsius,
       countryCode: widget.baseWeather.countryCode,
       description: widget.baseWeather.description,
       code: widget.item.weatherCode,

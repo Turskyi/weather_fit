@@ -53,7 +53,7 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral/.symlinks/plugins/workmanager_apple/macos
 
 SPEC CHECKSUMS:
-  flutter_email_sender_method_channel: b2aa4716ee576355285c26b7fb06654c569b8830
+  flutter_email_sender_method_channel: 278f739671ba92ee58c3e9074d2de52e8f46f639
   FlutterMacOS: c232990155153907050900a2e175c7773903ba4e
   geocoding_darwin: 6b25f60c5c0855c2061f097ca17c937a827b8a76
   geolocator_apple: 66b711889fd333205763b83c9dcf0a57a28c7afd
