@@ -13,11 +13,9 @@ import 'package:weather_fit/data/repositories/outfit_repository.dart';
 import 'package:weather_fit/entities/enums/temperature_units.dart';
 import 'package:weather_fit/entities/enums/weather_fetch_origin.dart';
 import 'package:weather_fit/entities/models/outfit/outfit_image.dart';
-import 'package:weather_fit/entities/models/temperature/temperature.dart';
 import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/extensions/build_context_extensions.dart' as type;
 import 'package:weather_fit/extensions/date_time_extension.dart';
-import 'package:weather_fit/res/extensions/double_extension.dart';
 import 'package:weather_fit/services/forecast_aggregation_service.dart';
 import 'package:weather_fit/services/home_widget_service.dart';
 import 'package:weather_repository/weather_repository.dart';
@@ -148,14 +146,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           final Weather updatedCachedWeather;
 
           if (cachedWeather.temperatureUnits != units) {
-            final double value = units.isFahrenheit
-                ? cachedWeather.temperature.value.toFahrenheit()
-                : cachedWeather.temperature.value.toCelsius();
-
-            updatedCachedWeather = cachedWeather.copyWith(
-              temperature: Temperature(value: value),
-              temperatureUnits: units,
-            );
+            updatedCachedWeather = cachedWeather.toUnits(units);
           } else {
             updatedCachedWeather = cachedWeather;
           }
@@ -240,21 +231,14 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
               eventLocation,
             );
             if (isSelectedAfterWeather) {
-              final Weather weather = Weather.fromRepository(domainWeather);
-
               final TemperatureUnits units = state.temperatureUnits;
-
-              final double value = units.isFahrenheit
-                  ? weather.temperature.value.toFahrenheit()
-                  : weather.temperature.value;
-
-              final Weather updatedWeather = weather.copyWith(
-                temperature: Temperature(value: value),
-                temperatureUnits: units,
+              final Weather weather = Weather.fromRepository(
+                domainWeather,
+                units: units,
               );
 
               final String outfitRecommendation = _getOutfitRecommendation(
-                updatedWeather,
+                weather,
               );
 
               debugPrint(
@@ -271,7 +255,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
               // 2. Persist the new "Weather Bundle" for future swipes.
               await _localDataSource.cacheWeatherBundle(
                 location: eventLocation,
-                weather: updatedWeather,
+                weather: weather,
                 dailyForecast: dailyForecast,
                 outfitRecommendation: outfitRecommendation,
                 outfitImage: outfitImage,
@@ -285,7 +269,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
                 emit(
                   WeatherSuccess(
                     locale: savedLocale,
-                    weather: updatedWeather,
+                    weather: weather,
                     outfitRecommendation: outfitRecommendation,
                     outfitImage: outfitImage,
                     dailyForecast: dailyForecast,
@@ -473,16 +457,15 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
           stateLocation,
         );
 
-        final Weather weather = Weather.fromRepository(updatedWeather);
+        final TemperatureUnits units = stateWeather.temperatureUnits;
+
+        final Weather weather = Weather.fromRepository(
+          updatedWeather,
+          units: units,
+        );
 
         final DailyForecastDomain dailyForecast = await _weatherRepository
             .getDailyForecast(stateLocation);
-
-        final TemperatureUnits units = stateWeather.temperatureUnits;
-
-        final double temperatureValue = units.isFahrenheit
-            ? weather.temperature.value.toFahrenheit()
-            : weather.temperature.value;
 
         final String updatedOutfitRecommendation = _getOutfitRecommendation(
           weather,
@@ -491,15 +474,10 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
         final OutfitImage updatedOutfitImage = await _outfitRepository
             .getOutfitImage(weather);
 
-        final Weather updatedWeatherWithUnits = weather.copyWith(
-          temperature: Temperature(value: temperatureValue),
-          temperatureUnits: units,
-        );
-
         // Update cache on refresh too.
         await _localDataSource.cacheWeatherBundle(
           location: stateLocation,
-          weather: updatedWeatherWithUnits,
+          weather: weather,
           dailyForecast: dailyForecast,
           outfitRecommendation: updatedOutfitRecommendation,
           outfitImage: updatedOutfitImage,
@@ -508,7 +486,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
         emit(
           WeatherSuccess(
             locale: savedLocale,
-            weather: updatedWeatherWithUnits,
+            weather: weather,
             outfitRecommendation: updatedOutfitRecommendation,
             outfitImage: updatedOutfitImage,
             dailyForecast: dailyForecast,
@@ -570,14 +548,7 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
 
     await _localDataSource.saveTemperatureUnits(units);
 
-    final double value = units.isFahrenheit
-        ? stateWeather.temperature.value.toFahrenheit()
-        : stateWeather.temperature.value.toCelsius();
-
-    final Weather updatedWeather = stateWeather.copyWith(
-      temperature: Temperature(value: value),
-      temperatureUnits: units,
-    );
+    final Weather updatedWeather = stateWeather.toUnits(units);
 
     if (state is WeatherSuccess) {
       emit(
@@ -608,6 +579,8 @@ class WeatherBloc extends HydratedBloc<WeatherEvent, WeatherState> {
         ),
       );
     }
+
+    add(const UpdateWeatherOnHomeWidgetEvent(WeatherFetchOrigin.defaultDevice));
   }
 
   FutureOr<void> _onOutfitRecommendationRequested(

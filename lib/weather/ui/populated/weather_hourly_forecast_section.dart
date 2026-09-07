@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:intl/intl.dart';
 import 'package:weather_fit/extensions/build_context_extensions.dart';
+import 'package:weather_fit/res/extensions/double_extension.dart';
 import 'package:weather_fit/settings/bloc/settings_bloc.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 import 'package:weather_fit/weather/ui/populated/weather_details_container.dart';
@@ -64,6 +65,10 @@ class WeatherHourlyForecastSection extends StatelessWidget {
                       context.read<SettingsBloc>().state.locale,
                     ).format(time);
 
+                    final double tempValue = state.temperatureUnits.isFahrenheit
+                        ? item.temperature.toFahrenheit()
+                        : item.temperature;
+
                     return Padding(
                       padding: EdgeInsets.only(
                         right: isExtraSmall ? 16.0 : 24.0,
@@ -88,7 +93,7 @@ class WeatherHourlyForecastSection extends StatelessWidget {
                           ),
                           SizedBox(height: isExtraSmall ? 2 : 4),
                           Text(
-                            '${item.temperature.round()}°',
+                            '${tempValue.round()}°',
                             style:
                                 (isExtraSmall
                                         ? textTheme.labelMedium

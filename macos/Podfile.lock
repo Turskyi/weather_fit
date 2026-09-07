@@ -1,16 +1,68 @@
 PODS:
+  - flutter_email_sender_method_channel (0.0.1):
+    - FlutterMacOS
   - FlutterMacOS (1.0.0)
+  - geocoding_darwin (0.0.1):
+    - Flutter
+    - FlutterMacOS
+  - geolocator_apple (1.2.0):
+    - Flutter
+    - FlutterMacOS
+  - location (8.0.1):
+    - Flutter
+    - FlutterMacOS
+  - package_info_plus (0.0.1):
+    - FlutterMacOS
+  - shared_preferences_foundation (0.0.1):
+    - Flutter
+    - FlutterMacOS
+  - url_launcher_macos (0.0.1):
+    - FlutterMacOS
+  - workmanager_apple (0.0.1):
+    - FlutterMacOS
 
 DEPENDENCIES:
+  - flutter_email_sender_method_channel (from `Flutter/ephemeral/.symlinks/plugins/flutter_email_sender_method_channel/macos`)
   - FlutterMacOS (from `Flutter/ephemeral`)
+  - geocoding_darwin (from `Flutter/ephemeral/.symlinks/plugins/geocoding_darwin/darwin`)
+  - geolocator_apple (from `Flutter/ephemeral/.symlinks/plugins/geolocator_apple/darwin`)
+  - location (from `Flutter/ephemeral/.symlinks/plugins/location/darwin`)
+  - package_info_plus (from `Flutter/ephemeral/.symlinks/plugins/package_info_plus/macos`)
+  - shared_preferences_foundation (from `Flutter/ephemeral/.symlinks/plugins/shared_preferences_foundation/darwin`)
+  - url_launcher_macos (from `Flutter/ephemeral/.symlinks/plugins/url_launcher_macos/macos`)
+  - workmanager_apple (from `Flutter/ephemeral/.symlinks/plugins/workmanager_apple/macos`)
 
 EXTERNAL SOURCES:
+  flutter_email_sender_method_channel:
+    :path: Flutter/ephemeral/.symlinks/plugins/flutter_email_sender_method_channel/macos
   FlutterMacOS:
     :path: Flutter/ephemeral
+  geocoding_darwin:
+    :path: Flutter/ephemeral/.symlinks/plugins/geocoding_darwin/darwin
+  geolocator_apple:
+    :path: Flutter/ephemeral/.symlinks/plugins/geolocator_apple/darwin
+  location:
+    :path: Flutter/ephemeral/.symlinks/plugins/location/darwin
+  package_info_plus:
+    :path: Flutter/ephemeral/.symlinks/plugins/package_info_plus/macos
+  shared_preferences_foundation:
+    :path: Flutter/ephemeral/.symlinks/plugins/shared_preferences_foundation/darwin
+  url_launcher_macos:
+    :path: Flutter/ephemeral/.symlinks/plugins/url_launcher_macos/macos
+  workmanager_apple:
+    :path: Flutter/ephemeral/.symlinks/plugins/workmanager_apple/macos
 
 SPEC CHECKSUMS:
-  FlutterMacOS: d0db08ddef1a9af05a5ec4b724367152bb0500b1
+  flutter_email_sender_method_channel: 278f739671ba92ee58c3e9074d2de52e8f46f639
+  FlutterMacOS: c232990155153907050900a2e175c7773903ba4e
+  geocoding_darwin: 6b25f60c5c0855c2061f097ca17c937a827b8a76
+  geolocator_apple: 66b711889fd333205763b83c9dcf0a57a28c7afd
+  location: 9f67e4ad86d2d6effb1dfa255565c38506295377
+  package_info_plus: 12f1c5c2cfe8727ca46cbd0b26677728972d9a5b
+  shared_preferences_foundation: 5086985c1d43c5ba4d5e69a4e8083a389e2909e6
+  url_launcher_macos: 175a54c831f4375a6cf895875f716ee5af3888ce
+  workmanager_apple: 06d28603f6f03c74954532deea7d445900d4909e
 
-PODFILE CHECKSUM: ac03ee0be6bbec6149bd1d3125dc91666016b64b
+PODFILE CHECKSUM: 3930353289687480f1b27abe7124e3080fb64052
 
 COCOAPODS: 1.16.2

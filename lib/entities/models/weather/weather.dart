@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:weather_fit/entities/enums/temperature_units.dart';
 import 'package:weather_fit/entities/models/temperature/temperature.dart';
+import 'package:weather_fit/res/extensions/double_extension.dart';
 import 'package:weather_repository/weather_repository.dart';
 
 part 'weather.g.dart';
@@ -35,11 +36,17 @@ class Weather extends Equatable {
     return _$WeatherFromJson(json);
   }
 
-  factory Weather.fromDomain(WeatherDomain weatherDomain) {
-    return Weather.fromRepository(weatherDomain);
+  factory Weather.fromDomain(
+    WeatherDomain weatherDomain, {
+    TemperatureUnits units = TemperatureUnits.celsius,
+  }) {
+    return Weather.fromRepository(weatherDomain, units: units);
   }
 
-  factory Weather.fromRepository(WeatherDomain weatherDomain) {
+  factory Weather.fromRepository(
+    WeatherDomain weatherDomain, {
+    TemperatureUnits units = TemperatureUnits.celsius,
+  }) {
     final DateTime now = DateTime.now();
     final DateTime parsedDateTime = DateTime(
       now.year,
@@ -49,18 +56,34 @@ class Weather extends Equatable {
       now.minute,
     );
 
+    final double temperatureValue = units.isFahrenheit
+        ? weatherDomain.temperature.toFahrenheit()
+        : weatherDomain.temperature;
+
+    final double? feelsLikeValue = weatherDomain.feelsLike != null
+        ? (units.isFahrenheit
+              ? weatherDomain.feelsLike!.toFahrenheit()
+              : weatherDomain.feelsLike!)
+        : null;
+
+    final double? dewPointValue = weatherDomain.dewPoint != null
+        ? (units.isFahrenheit
+              ? weatherDomain.dewPoint!.toFahrenheit()
+              : weatherDomain.dewPoint!)
+        : null;
+
     return Weather(
       condition: weatherDomain.condition,
       lastUpdatedDateTime: parsedDateTime,
       location: weatherDomain.location,
-      temperature: Temperature(value: weatherDomain.temperature),
-      temperatureUnits: TemperatureUnits.celsius,
+      temperature: Temperature(value: temperatureValue),
+      temperatureUnits: units,
       countryCode: weatherDomain.countryCode,
       description: weatherDomain.description,
       code: weatherDomain.weatherCode,
       locale: weatherDomain.locale,
-      feelsLike: weatherDomain.feelsLike != null
-          ? Temperature(value: weatherDomain.feelsLike!)
+      feelsLike: feelsLikeValue != null
+          ? Temperature(value: feelsLikeValue)
           : null,
       humidity: weatherDomain.humidity,
       windSpeed: weatherDomain.windSpeed,
@@ -68,7 +91,7 @@ class Weather extends Equatable {
       visibility: weatherDomain.visibility,
       cloudCover: weatherDomain.cloudCover,
       pressure: weatherDomain.pressure,
-      dewPoint: weatherDomain.dewPoint,
+      dewPoint: dewPointValue,
     );
   }
 
@@ -166,6 +189,35 @@ class Weather extends Equatable {
       cloudCover: cloudCover ?? this.cloudCover,
       pressure: pressure ?? this.pressure,
       dewPoint: dewPoint ?? this.dewPoint,
+    );
+  }
+
+  Weather toUnits(TemperatureUnits units) {
+    if (temperatureUnits == units) return this;
+
+    final double temperatureValue = units.isFahrenheit
+        ? temperature.value.toFahrenheit()
+        : temperature.value.toCelsius();
+
+    final double? feelsLikeValue = feelsLike != null
+        ? (units.isFahrenheit
+              ? feelsLike!.value.toFahrenheit()
+              : feelsLike!.value.toCelsius())
+        : null;
+
+    final double? dewPointValue = dewPoint != null
+        ? (units.isFahrenheit
+              ? dewPoint!.toFahrenheit()
+              : dewPoint!.toCelsius())
+        : null;
+
+    return copyWith(
+      temperature: Temperature(value: temperatureValue),
+      feelsLike: feelsLikeValue != null
+          ? Temperature(value: feelsLikeValue)
+          : null,
+      dewPoint: dewPointValue,
+      temperatureUnits: units,
     );
   }
 

@@ -79,3 +79,4 @@ coverage/lcov.info
 /coverage/
 /ios/Podfile.lock
 android/app/.cxx
+/android/.kotlin/sessions/
