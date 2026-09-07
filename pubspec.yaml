@@ -16,7 +16,7 @@ again. 🌤️👕👖👞"
 
 publish_to: 'none'
 
-version: 0.6.1+61
+version: 0.6.2+62
 
 environment:
   sdk: '>=3.9.2 <4.0.0'
@@ -25,7 +25,7 @@ dependencies:
   bloc: ^9.2.1
   collection: ^1.19.1
   dio: ^5.11.1
-  # envied 1.3.6 has a bug
+
   envied: ^1.3.8
   equatable: ^2.1.0
   feedback: ^3.2.0
@@ -67,7 +67,7 @@ dependencies:
   url_launcher: ^6.3.2
   weather_repository:
     path: packages/weather_repository
-  workmanager: ^0.10.9
+  workmanager: ^0.10.10
 
 dev_dependencies:
   bloc_test: ^10.0.0
