@@ -55,6 +55,9 @@ bundle to **Google Play** after every merge (push) to **master** branch;
 [Firebase App Distribution](https://firebase.google.com/docs/app-distribution),
 [iOS TestFlight](https://testflight.apple.com/join/u5k9mzjN);
 
+• **Wear OS Support:** Includes a custom **Tile** for quick weather and outfit
+  previews.
+
 **Code Readability:** code is easily readable with no unnecessary blank lines,
 no unused variables or methods, and no commented-out code, all variables,
 methods, and resource IDs are descriptively named such that another developer

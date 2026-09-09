@@ -4,7 +4,7 @@
   "app_id": "App id",
   "app_version": "App version",
   "build_number": "Build number",
-  "app_description": "«WeatherFit» helps you dress for the weather with carefully crafted outfit suggestions. Just enter a location, and the app will show you the current forecast along with a visual and text-based recommendation on what to wear.",
+  "app_description": "«WeatherFit» helps you dress for the weather with carefully crafted outfit suggestions. Just enter a location, and the app will show you the current forecast along with a visual and text-based recommendation on what to wear. Access your forecast and outfit recommendations directly from your Wear OS watch face using the custom Tile.",
   "features": "Features",
   "artwork": "Artwork",
   "anna_turska": "Anna Turska",

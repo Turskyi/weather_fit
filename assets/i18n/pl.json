@@ -4,7 +4,7 @@
   "app_id": "Identyfikator aplikacji",
   "app_version": "Wersja aplikacji",
   "build_number": "Numer kompilacji",
-  "app_description": "«WeatherFit» pomaga ubrać się odpowiednio do pogody dzięki starannie dobranym sugestiom strojów. Po prostu wpisz lokalizację, a aplikacja pokaże aktualną prognozę wraz z wizualną i tekstową rekomendacją, co ubrać.",
+  "app_description": "«WeatherFit» pomaga ubrać się odpowiednio do pogody dzięki starannie dobranym sugestiom strojów. Po prostu wpisz lokalizację, a aplikacja pokaże aktualną prognozę wraz z wizualną i tekstową rekomendacją, co ubrać. Uzyskaj dostęp do prognozy i rekomendacji strojów bezpośrednio z tarczy zegarka Wear OS za pomocą dedykowanego kafelka (Tile).",
   "features": "Funkcje",
   "artwork": "Grafika",
   "anna_turska": "Anna Turska",
