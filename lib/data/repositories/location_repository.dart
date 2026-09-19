@@ -28,23 +28,30 @@ class LocationRepository {
 
     if (_shouldUseNominatim(query)) {
       final NominatimLocationResponse response = await _nominatimApiClient
-          .locationSearch(query);
+          .locationSearch(query, acceptLanguage: locale);
 
       return _mapNominatimToLocation(response, locale);
     } else {
-      final LocationResponse response = await _openMeteoApiClient
-          .locationSearch(query);
+      try {
+        final LocationResponse response = await _openMeteoApiClient
+            .locationSearch(query);
 
-      return Location(
-        id: response.id,
-        name: response.name,
-        latitude: response.latitude,
-        longitude: response.longitude,
-        countryCode: response.countryCode,
-        country: response.country,
-        province: response.admin1,
-        locale: locale,
-      );
+        return Location(
+          id: response.id,
+          name: response.name,
+          latitude: response.latitude,
+          longitude: response.longitude,
+          countryCode: response.countryCode,
+          country: response.country,
+          province: response.admin1,
+          locale: locale,
+        );
+      } catch (e) {
+        final NominatimLocationResponse response = await _nominatimApiClient
+            .locationSearch(query, acceptLanguage: locale);
+
+        return _mapNominatimToLocation(response, locale);
+      }
     }
   }
 
@@ -56,7 +63,11 @@ class LocationRepository {
 
     try {
       final NominatimLocationResponse response = await _nominatimApiClient
-          .reverseSearch(latitude: latitude, longitude: longitude);
+          .reverseSearch(
+            latitude: latitude,
+            longitude: longitude,
+            acceptLanguage: locale,
+          );
 
       return _mapNominatimToLocation(response, locale);
     } catch (e) {

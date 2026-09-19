@@ -20,12 +20,15 @@ class NominatimApiClient {
   final http.Client _httpClient;
 
   /// Finds a [NominatimLocationResponse] using `/search?q=(query)`.
-  Future<NominatimLocationResponse> locationSearch(String query) async {
+  Future<NominatimLocationResponse> locationSearch(
+    String query, {
+    String? acceptLanguage,
+  }) async {
     final Uri requestUri = Uri.https(_baseUrl, '/search', <String, String>{
       'q': query,
       'format': 'json',
       'limit': '1',
-      'accept-language': 'uk,en',
+      'accept-language': acceptLanguage ?? 'uk,en',
     });
 
     final http.Response response = await _httpClient.get(
@@ -60,12 +63,13 @@ class NominatimApiClient {
   Future<NominatimLocationResponse> reverseSearch({
     required double latitude,
     required double longitude,
+    String? acceptLanguage,
   }) async {
     final Uri requestUri = Uri.https(_baseUrl, '/reverse', <String, String>{
       'lat': latitude.toString(),
       'lon': longitude.toString(),
       'format': 'json',
-      'accept-language': 'uk,en',
+      'accept-language': acceptLanguage ?? 'uk,en',
     });
 
     final http.Response response = await _httpClient.get(
