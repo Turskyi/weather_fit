@@ -219,7 +219,6 @@ class _WeatherContentExtraSmallState extends State<WeatherContentExtraSmall> {
                 ],
               ),
             ),
-            const SizedBox(height: 16),
             const WearForecastSection(),
             if (weather.wasUpdated)
               WeatherDetailsSection(

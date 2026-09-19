@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_translate/flutter_translate.dart';
-import 'package:weather_fit/extensions/build_context_extensions.dart';
 import 'package:weather_fit/services/forecast_aggregation_service.dart';
 import 'package:weather_fit/weather/bloc/weather_bloc.dart';
 import 'package:weather_fit/weather/ui/populated/wear_forecast_row.dart';
@@ -15,7 +13,6 @@ class WearForecastSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    final Color watchForegroundColor = context.watchForegroundColor;
 
     return BlocBuilder<WeatherBloc, WeatherState>(
       builder: (BuildContext context, WeatherState state) {
@@ -25,7 +22,7 @@ class WearForecastSection extends StatelessWidget {
 
         return Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.only(left: 12, right: 12, bottom: 12),
           decoration: BoxDecoration(
             color: _watchForecastCardBackground,
             borderRadius: BorderRadius.circular(18),
@@ -34,13 +31,7 @@ class WearForecastSection extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               if (forecast.isEmpty)
-                Text(
-                  translate('weather.forecast_unavailable'),
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: watchForegroundColor,
-                  ),
-                )
+                const SizedBox()
               else
                 for (
                   int index = 0;

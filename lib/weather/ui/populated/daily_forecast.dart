@@ -159,11 +159,7 @@ class _DailyForecastState extends State<DailyForecast> {
                           aggregateForecastItems(forecastItems);
 
                       if (forecast.isEmpty) {
-                        return Center(
-                          child: Text(
-                            translate('weather.forecast_unavailable'),
-                          ),
-                        );
+                        return const SizedBox();
                       }
 
                       // Prepare keys for each item so we can compute positions.
