@@ -80,3 +80,5 @@ coverage/lcov.info
 /ios/Podfile.lock
 android/app/.cxx
 /android/.kotlin/sessions/
+# Widget Preview related
+.widget_preview/

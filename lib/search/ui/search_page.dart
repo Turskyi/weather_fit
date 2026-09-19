@@ -149,7 +149,7 @@ class _SearchPageState extends State<SearchPage> {
               )
             : AlertDialog(
                 title: Text(translate('search.confirm_location_dialog_title')),
-                content: Text(displayLocation),
+                content: SelectableText(displayLocation),
                 actions: <Widget>[
                   TextButton(
                     onPressed: _handleLocationConfirmationNo,
