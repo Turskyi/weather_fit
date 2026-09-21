@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:weather_fit/entities/enums/temperature_units.dart';
 import 'package:weather_fit/extensions/build_context_extensions.dart';
 import 'package:weather_fit/res/extensions/double_extension.dart';
+import 'package:weather_fit/weather/ui/populated/temperature_range_bar.dart';
 import 'package:weather_fit/weather/ui/populated/weather_details_container.dart';
 import 'package:weather_repository/weather_repository.dart';
 
@@ -170,7 +171,7 @@ class _ForecastDayRow extends StatelessWidget {
           const SizedBox(width: 4),
           Expanded(
             flex: isExtraSmall ? 2 : 4,
-            child: _TemperatureRangeBar(
+            child: TemperatureRangeBar(
               min: day.minTemp,
               max: day.maxTemp,
               globalMin: globalMin,
@@ -193,47 +194,6 @@ class _ForecastDayRow extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _TemperatureRangeBar extends StatelessWidget {
-  const _TemperatureRangeBar({
-    required this.min,
-    required this.max,
-    required this.globalMin,
-    required this.globalMax,
-  });
-
-  final double min;
-  final double max;
-  final double globalMin;
-  final double globalMax;
-
-  @override
-  Widget build(BuildContext context) {
-    final double range = globalMax - globalMin;
-    final double start = (min - globalMin) / range;
-    final double end = (max - globalMin) / range;
-
-    return Container(
-      height: 4,
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(2),
-      ),
-      child: FractionallySizedBox(
-        widthFactor: (end - start).clamp(0.05, 1.0),
-        alignment: Alignment(start * 2 - 1, 0),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(2),
-            gradient: const LinearGradient(
-              colors: <Color>[Colors.blue, Colors.orange],
-            ),
-          ),
-        ),
       ),
     );
   }
