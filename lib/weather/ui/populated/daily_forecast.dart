@@ -25,99 +25,10 @@ class _DailyForecastState extends State<DailyForecast> {
   int? _visibleIndex;
   final List<GlobalKey> _itemKeys = <GlobalKey>[];
 
-  bool get _isTouchInteraction =>
-      defaultTargetPlatform == TargetPlatform.iOS ||
-      defaultTargetPlatform == TargetPlatform.macOS ||
-      defaultTargetPlatform == TargetPlatform.android;
-
-  void _showPreview({
-    required BuildContext context,
-    required int index,
-    required ForecastItemDomain item,
-    required WeatherState state,
-  }) {
-    // Ensure only one preview is visible.
-    _hidePreview();
-
-    final RenderBox? renderBox =
-        _itemKeys[index].currentContext?.findRenderObject() as RenderBox?;
-    if (renderBox == null) return;
-
-    final Size size = renderBox.size;
-    final Offset offset = renderBox.localToGlobal(Offset.zero);
-
-    final double itemLeft = offset.dx;
-    final double top = offset.dy;
-
-    // Preview card is approximately 156px wide (140 image + 16 padding)
-    const double previewWidth = 156.0;
-    final double screenWidth = MediaQuery.of(context).size.width;
-
-    // Center the preview on the item
-    double left = itemLeft + (size.width / 2) - (previewWidth / 2);
-
-    // Keep preview within screen bounds with 8px padding
-    const double screenPadding = 8.0;
-    if (left < screenPadding) {
-      left = screenPadding;
-    } else if (left + previewWidth > screenWidth - screenPadding) {
-      left = screenWidth - previewWidth - screenPadding;
-    }
-
-    _overlayEntry = OverlayEntry(
-      builder: (BuildContext context) {
-        return Positioned(
-          left: left,
-          top: top - (size.height * 0.9),
-          child: IgnorePointer(
-            ignoring: true,
-            child: Material(
-              color: Colors.transparent,
-              child: ForecastOutfitPreview(
-                item: item,
-                baseWeather: state.weather,
-                temperatureUnits: state.temperatureUnits,
-              ),
-            ),
-          ),
-        );
-      },
-    );
-
-    Overlay.of(context).insert(_overlayEntry!);
-
-    // On mobile (app or web), add a dismissible backdrop to allow tapping
-    // outside to close.
-    if (_isTouchInteraction) {
-      final OverlayEntry backdropEntry = OverlayEntry(
-        builder: (BuildContext context) {
-          return GestureDetector(
-            behavior: HitTestBehavior.translucent,
-            onTap: _hidePreview,
-            child: const ColoredBox(color: Colors.transparent),
-          );
-        },
-      );
-      Overlay.of(context).insert(backdropEntry);
-      // Store backdrop reference to remove it later.
-      _backdropEntry = backdropEntry;
-    }
-
-    setState(() {
-      _visibleIndex = index;
-    });
-  }
-
-  void _hidePreview() {
-    _overlayEntry?.remove();
-    _overlayEntry = null;
-    _backdropEntry?.remove();
-    _backdropEntry = null;
-    if (mounted) {
-      setState(() {
-        _visibleIndex = null;
-      });
-    }
+  bool get _isTouchInteraction {
+    return defaultTargetPlatform == TargetPlatform.iOS ||
+        defaultTargetPlatform == TargetPlatform.macOS ||
+        defaultTargetPlatform == TargetPlatform.android;
   }
 
   @override
@@ -241,5 +152,95 @@ class _DailyForecastState extends State<DailyForecast> {
         ),
       ),
     );
+  }
+
+  void _hidePreview() {
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+    _backdropEntry?.remove();
+    _backdropEntry = null;
+    if (mounted) {
+      setState(() {
+        _visibleIndex = null;
+      });
+    }
+  }
+
+  void _showPreview({
+    required BuildContext context,
+    required int index,
+    required ForecastItemDomain item,
+    required WeatherState state,
+  }) {
+    // Ensure only one preview is visible.
+    _hidePreview();
+
+    final RenderBox? renderBox =
+        _itemKeys[index].currentContext?.findRenderObject() as RenderBox?;
+    if (renderBox == null) return;
+
+    final Size size = renderBox.size;
+    final Offset offset = renderBox.localToGlobal(Offset.zero);
+
+    final double itemLeft = offset.dx;
+    final double top = offset.dy;
+
+    // Preview card is approximately 156px wide (140 image + 16 padding)
+    const double previewWidth = 156.0;
+    final double screenWidth = MediaQuery.of(context).size.width;
+
+    // Center the preview on the item
+    double left = itemLeft + (size.width / 2) - (previewWidth / 2);
+
+    // Keep preview within screen bounds with 8px padding
+    const double screenPadding = 8.0;
+    if (left < screenPadding) {
+      left = screenPadding;
+    } else if (left + previewWidth > screenWidth - screenPadding) {
+      left = screenWidth - previewWidth - screenPadding;
+    }
+
+    _overlayEntry = OverlayEntry(
+      builder: (BuildContext context) {
+        return Positioned(
+          left: left,
+          top: top - (size.height * 0.9),
+          child: IgnorePointer(
+            ignoring: true,
+            child: Material(
+              color: Colors.transparent,
+              child: ForecastOutfitPreview(
+                item: item,
+                baseWeather: state.weather,
+                temperatureUnits: state.temperatureUnits,
+              ),
+            ),
+          ),
+        );
+      },
+    );
+
+    Overlay.of(context).insert(_overlayEntry!);
+
+    // On mobile (app or web), add a dismissible backdrop to allow tapping
+    // outside to close.
+    if (_isTouchInteraction) {
+      final OverlayEntry backdropEntry = OverlayEntry(
+        builder: (BuildContext context) {
+          return GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTap: _hidePreview,
+            child: const ColoredBox(color: Colors.transparent),
+          );
+        },
+      );
+      Overlay.of(context).insert(backdropEntry);
+      // Store backdrop reference to remove it later.
+      _backdropEntry = backdropEntry;
+    }
+
+    setState(() {
+      _visibleIndex = index;
+    });
   }
 }
