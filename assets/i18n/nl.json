@@ -268,6 +268,8 @@
     "hourly_forecast_title": "Uurlijkse prognose",
     "five_day_forecast_title": "5-daagse Verwachting",
     "five_day_forecast_button": "5-daagse Verwachting",
+    "temperature_bar_info_title": "Hoe de temperatuurbalk te lezen",
+    "temperature_bar_info_description": "De volledige grijze balk vertegenwoordigt de laagste en hoogste temperatuur voor de hele 5-daagse periode.\n\nHet gekleurde segment toont het temperatuurbereik voor die specifieke dag, van koud (blauw) naar warm (oranje).",
     "more_details": "Meer details",
     "code_0": "Heldere hemel",
     "code_1": "Overwegend helder",

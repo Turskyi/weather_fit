@@ -276,6 +276,8 @@
     "hourly_forecast_title": "Prognoza godzinowa",
     "five_day_forecast_title": "5-dniowa prognoza pogody",
     "five_day_forecast_button": "5-dniowa prognoza",
+    "temperature_bar_info_title": "Jak czytać pasek temperatury",
+    "temperature_bar_info_description": "Cały szary pasek reprezentuje najniższą i najwyższą temperaturę w całym 5-dniowym okresie.\n\nKolorowy odcinek pokazuje zakres temperatur dla danego dnia — od chłodnej (niebieski) do ciepłej (pomarańczowy).",
     "more_details": "Więcej szczegółów",
     "code_0": "Czyste niebo",
     "code_1": "Głównie bezchmurnie",
