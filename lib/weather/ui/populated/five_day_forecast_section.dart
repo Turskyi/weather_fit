@@ -50,11 +50,15 @@ class FiveDayForecastSection extends StatelessWidget {
                 ).colorScheme.onSurface.withValues(alpha: 0.7),
               ),
               const SizedBox(width: 8),
-              SelectableText(
-                translate('weather.five_day_forecast_title'),
-                style: isExtraSmall
-                    ? textTheme.labelLarge
-                    : textTheme.titleMedium,
+              Flexible(
+                child: Text(
+                  translate('weather.five_day_forecast_title'),
+                  style: isExtraSmall
+                      ? textTheme.labelLarge
+                      : textTheme.titleMedium,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
               const SizedBox(width: 4),
               IconButton(

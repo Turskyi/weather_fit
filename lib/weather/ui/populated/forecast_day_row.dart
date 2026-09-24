@@ -38,13 +38,13 @@ class ForecastDayRow extends StatelessWidget {
 
     return Padding(
       padding: EdgeInsets.symmetric(
-        horizontal: isExtraSmall ? 8 : 16,
-        vertical: isExtraSmall ? 8 : 12,
+        horizontal: isExtraSmall ? 4 : 16,
+        vertical: isExtraSmall ? 6 : 12,
       ),
       child: Row(
         children: <Widget>[
           SizedBox(
-            width: isExtraSmall ? 32 : 44,
+            width: isExtraSmall ? 26 : 44,
             child: FittedBox(
               fit: BoxFit.scaleDown,
               alignment: Alignment.centerLeft,
@@ -56,14 +56,14 @@ class ForecastDayRow extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(width: isExtraSmall ? 4 : 8),
+          SizedBox(width: isExtraSmall ? 2 : 8),
           Text(
             day.toCondition().toEmoji,
-            style: TextStyle(fontSize: isExtraSmall ? 18 : 24),
+            style: TextStyle(fontSize: isExtraSmall ? 16 : 24),
           ),
           const Spacer(),
           SizedBox(
-            width: isExtraSmall ? 28 : 40,
+            width: isExtraSmall ? 22 : 40,
             child: FittedBox(
               fit: BoxFit.scaleDown,
               alignment: Alignment.centerRight,
@@ -80,7 +80,7 @@ class ForecastDayRow extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(width: 4),
+          SizedBox(width: isExtraSmall ? 2 : 4),
           Expanded(
             flex: isExtraSmall ? 2 : 4,
             child: TemperatureRangeBar(
@@ -90,9 +90,9 @@ class ForecastDayRow extends StatelessWidget {
               globalMax: globalMax,
             ),
           ),
-          const SizedBox(width: 4),
+          SizedBox(width: isExtraSmall ? 2 : 4),
           SizedBox(
-            width: isExtraSmall ? 28 : 40,
+            width: isExtraSmall ? 22 : 40,
             child: FittedBox(
               fit: BoxFit.scaleDown,
               alignment: Alignment.centerLeft,

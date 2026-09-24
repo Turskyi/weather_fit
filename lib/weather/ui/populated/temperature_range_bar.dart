@@ -61,7 +61,12 @@ class TemperatureRangeBar extends StatelessWidget {
     }
 
     final double widthFactor = (end - start).clamp(0.05, 1.0);
-    final double alignmentX = start * 2 - 1;
+    final double alignmentX;
+    if (widthFactor < 1.0) {
+      alignmentX = ((2.0 * start / (1.0 - widthFactor)) - 1.0).clamp(-1.0, 1.0);
+    } else {
+      alignmentX = -1.0;
+    }
 
     return Container(
       height: 4,
