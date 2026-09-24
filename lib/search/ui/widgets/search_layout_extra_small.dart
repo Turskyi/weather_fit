@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:weather_fit/extensions/build_context_extensions.dart';
 import 'package:weather_fit/res/widgets/background.dart';
-import 'package:weather_fit/res/widgets/leading_widget.dart';
 import 'package:weather_fit/res/widgets/wear_position_indicator.dart';
 import 'package:weather_fit/search/bloc/search_bloc.dart';
 import 'package:weather_fit/search/ui/widgets/search_buttons.dart';
@@ -54,23 +53,13 @@ class _SearchPageExtraSmallLayoutState
   Widget build(BuildContext context) {
     final EdgeInsets contentPadding = EdgeInsets.fromLTRB(
       context.wearHorizontalPadding,
-      math.max(MediaQuery.paddingOf(context).top, 52),
+      math.max(MediaQuery.paddingOf(context).top + 12, 28),
       context.wearHorizontalPadding,
-      0,
+      context.wearBottomPadding + 8,
     );
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        forceMaterialTransparency: true,
-        title: const Padding(
-          padding: EdgeInsets.only(top: 8.0),
-          child: LeadingWidget(),
-        ),
-        centerTitle: true,
-        automaticallyImplyLeading: false,
-      ),
       body: Stack(
         children: <Widget>[
           const Background(),
@@ -98,7 +87,7 @@ class _SearchPageExtraSmallLayoutState
                         ),
                         child: Center(
                           child: ConstrainedBox(
-                            constraints: const BoxConstraints(maxWidth: 180),
+                            constraints: const BoxConstraints(maxWidth: 200),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[

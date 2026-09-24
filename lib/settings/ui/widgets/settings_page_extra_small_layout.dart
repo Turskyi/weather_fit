@@ -1,11 +1,7 @@
-import 'dart:ui';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:weather_fit/res/constants/constants.dart' as constant;
-import 'package:weather_fit/res/widgets/leading_widget.dart';
 import 'package:weather_fit/res/widgets/wear_position_indicator.dart';
 import 'package:weather_fit/settings/bloc/settings_bloc.dart';
 import 'package:weather_fit/settings/ui/widgets/blurred_fab_with_border.dart';
@@ -68,34 +64,14 @@ class _SettingsPageExtraSmallLayoutState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: true,
       backgroundColor: Colors.black,
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        title: const Padding(
-          padding: EdgeInsets.only(top: 8.0, bottom: 8.0),
-          child: LeadingWidget(),
-        ),
-        centerTitle: true,
-        automaticallyImplyLeading: false,
-        flexibleSpace: ClipRect(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(
-              sigmaX: constant.kBlurSigmaSmall,
-              sigmaY: constant.kBlurSigmaSmall,
-            ),
-            child: Container(color: Colors.transparent),
-          ),
-        ),
-      ),
       body: WearPositionIndicator(
         controller: _scrollController,
         child: Padding(
-          padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+          padding: const EdgeInsets.symmetric(horizontal: 12.0),
           child: ListView(
             controller: _scrollController,
-            padding: const EdgeInsets.only(bottom: 60, top: kToolbarHeight),
+            padding: const EdgeInsets.only(bottom: 60, top: 24),
             children: <Widget>[
               // Language toggle.
               BlocBuilder<SettingsBloc, SettingsState>(

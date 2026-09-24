@@ -54,13 +54,17 @@ class SearchButtons extends StatelessWidget {
                   width: progressIndicatorSize,
                   child: CircularProgressIndicator(),
                 )
-              : Text(
-                  context.isExtraSmallScreen
-                      ? translate('search.label')
-                      : translate('submit'),
-                  semanticsLabel: context.isExtraSmallScreen
-                      ? translate('search.label')
-                      : translate('submit'),
+              : FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    context.isExtraSmallScreen
+                        ? translate('search.label')
+                        : translate('submit'),
+                    semanticsLabel: context.isExtraSmallScreen
+                        ? translate('search.label')
+                        : translate('submit'),
+                    maxLines: 1,
+                  ),
                 ),
         ),
         if (showGpsButton)

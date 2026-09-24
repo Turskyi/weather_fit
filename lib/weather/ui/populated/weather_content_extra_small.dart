@@ -23,6 +23,7 @@ class WeatherContentExtraSmall extends StatefulWidget {
     required this.settingsStateListener,
     required this.child,
     required this.onRefresh,
+    this.onSettingsPressed,
     super.key,
   });
 
@@ -31,6 +32,7 @@ class WeatherContentExtraSmall extends StatefulWidget {
   final BlocWidgetListener<SettingsState> settingsStateListener;
   final Widget child;
   final RefreshCallback onRefresh;
+  final VoidCallback? onSettingsPressed;
 
   @override
   State<WeatherContentExtraSmall> createState() {
@@ -58,7 +60,7 @@ class _WeatherContentExtraSmallState extends State<WeatherContentExtraSmall> {
     final BorderRadius infoBoxRadius = BorderRadius.circular(14.0);
     final EdgeInsets contentPadding = EdgeInsets.fromLTRB(
       context.wearHorizontalPadding,
-      math.max(MediaQuery.paddingOf(context).top + 4, 14),
+      math.max(MediaQuery.paddingOf(context).top + 8, 20),
       context.wearHorizontalPadding,
       context.wearBottomPadding + 12,
     );
@@ -72,17 +74,40 @@ class _WeatherContentExtraSmallState extends State<WeatherContentExtraSmall> {
         padding: contentPadding,
         child: Column(
           children: <Widget>[
+            if (widget.onSettingsPressed != null)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: Tooltip(
+                  message: translate('settings.title'),
+                  child: Material(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
+                    shape: const CircleBorder(),
+                    clipBehavior: Clip.antiAlias,
+                    child: SizedBox.square(
+                      dimension: 30.0,
+                      child: InkWell(
+                        onTap: widget.onSettingsPressed,
+                        child: Icon(
+                          Icons.settings,
+                          color: theme.colorScheme.onSurface,
+                          size: 18.0,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             Center(child: widget.child),
             const SizedBox(height: 10),
             if (weather.wasUpdated)
               Padding(
                 padding: EdgeInsets.symmetric(
-                  horizontal: context.wearHorizontalPadding * 0.6,
+                  horizontal: context.wearHorizontalPadding * 0.4,
                 ),
                 child: Align(
                   alignment: Alignment.center,
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 132),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
@@ -92,7 +117,7 @@ class _WeatherContentExtraSmallState extends State<WeatherContentExtraSmall> {
                           color: iconChipColor,
                           child: WeatherIcon(condition: weather.condition),
                         ),
-                        const SizedBox(width: 16),
+                        const SizedBox(width: 12),
                         WearInfoChip(
                           size: infoBoxSize,
                           radius: infoBoxRadius,
@@ -103,6 +128,7 @@ class _WeatherContentExtraSmallState extends State<WeatherContentExtraSmall> {
                               color: temperatureTextColor,
                               fontWeight: FontWeight.bold,
                             ),
+                            maxLines: 1,
                           ),
                         ),
                       ],
@@ -112,7 +138,7 @@ class _WeatherContentExtraSmallState extends State<WeatherContentExtraSmall> {
               ),
             const SizedBox(height: 12),
             ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 170),
+              constraints: const BoxConstraints(maxWidth: 180),
               child: Column(
                 children: <Widget>[
                   Row(
@@ -199,21 +225,27 @@ class _WeatherContentExtraSmallState extends State<WeatherContentExtraSmall> {
                           : '${translate('last_updated_on_label')}\n'
                                 '$lastUpdatedDateTime';
 
-                      return Text(
-                        label,
-                        textAlign: TextAlign.center,
-                        style: textTheme.bodySmall?.copyWith(
-                          color: watchForegroundColor,
+                      return FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          label,
+                          textAlign: TextAlign.center,
+                          style: textTheme.bodySmall?.copyWith(
+                            color: watchForegroundColor,
+                          ),
                         ),
                       );
                     },
                   ),
                   const SizedBox(height: 4),
-                  Text(
-                    weather.translatedWeatherDescription,
-                    textAlign: TextAlign.center,
-                    style: textTheme.bodySmall?.copyWith(
-                      color: watchForegroundColor,
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      weather.translatedWeatherDescription,
+                      textAlign: TextAlign.center,
+                      style: textTheme.bodySmall?.copyWith(
+                        color: watchForegroundColor,
+                      ),
                     ),
                   ),
                 ],

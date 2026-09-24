@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:weather_fit/entities/enums/temperature_units.dart';
 import 'package:weather_fit/extensions/build_context_extensions.dart';
+import 'package:weather_fit/search/ui/widgets/wear_dialog.dart';
 import 'package:weather_fit/weather/ui/populated/forecast_day_row.dart';
 import 'package:weather_fit/weather/ui/populated/weather_details_container.dart';
 import 'package:weather_repository/weather_repository.dart';
@@ -50,14 +51,17 @@ class FiveDayForecastSection extends StatelessWidget {
                 ).colorScheme.onSurface.withValues(alpha: 0.7),
               ),
               const SizedBox(width: 8),
-              Flexible(
-                child: Text(
-                  translate('weather.five_day_forecast_title'),
-                  style: isExtraSmall
-                      ? textTheme.labelLarge
-                      : textTheme.titleMedium,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+              Expanded(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    translate('weather.five_day_forecast_title'),
+                    style: isExtraSmall
+                        ? textTheme.labelLarge
+                        : textTheme.titleMedium,
+                    maxLines: 1,
+                  ),
                 ),
               ),
               const SizedBox(width: 4),
@@ -108,13 +112,40 @@ class FiveDayForecastSection extends StatelessWidget {
   Future<void> _showTemperatureBarInfoDialog(BuildContext context) {
     return showDialog<void>(
       context: context,
-      builder: (BuildContext context) {
+      builder: (BuildContext dialogContext) {
+        if (context.isExtraSmallScreen) {
+          return WearDialog(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Text(
+                  translate('weather.temperature_bar_info_title'),
+                  textAlign: TextAlign.center,
+                  style: Theme.of(
+                    dialogContext,
+                  ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  translate('weather.temperature_bar_info_description'),
+                  textAlign: TextAlign.center,
+                  style: Theme.of(dialogContext).textTheme.bodySmall,
+                ),
+                const SizedBox(height: 12),
+                FilledButton.tonal(
+                  onPressed: Navigator.of(dialogContext).pop,
+                  child: Text(translate('ok')),
+                ),
+              ],
+            ),
+          );
+        }
         return AlertDialog(
           title: Text(translate('weather.temperature_bar_info_title')),
           content: Text(translate('weather.temperature_bar_info_description')),
           actions: <Widget>[
             TextButton(
-              onPressed: Navigator.of(context).pop,
+              onPressed: Navigator.of(dialogContext).pop,
               child: Text(translate('ok')),
             ),
           ],

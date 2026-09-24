@@ -29,28 +29,36 @@ class WeatherMetricItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Text(
-                  metric.label,
-                  style:
-                      (isExtraSmall
-                              ? textTheme.labelSmall?.copyWith(fontSize: 10)
-                              : textTheme.labelSmall)
-                          ?.copyWith(
-                            color: colors.onSurface.withValues(alpha: 0.6),
-                          ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                Flexible(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      metric.label,
+                      style:
+                          (isExtraSmall
+                                  ? textTheme.labelSmall?.copyWith(fontSize: 10)
+                                  : textTheme.labelSmall)
+                              ?.copyWith(
+                                color: colors.onSurface.withValues(alpha: 0.6),
+                              ),
+                      maxLines: 1,
+                    ),
+                  ),
                 ),
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    metric.value,
-                    style:
-                        (isExtraSmall
-                                ? textTheme.titleSmall
-                                : textTheme.titleMedium)
-                            ?.copyWith(fontWeight: FontWeight.bold),
+                Flexible(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      metric.value,
+                      style:
+                          (isExtraSmall
+                                  ? textTheme.titleSmall
+                                  : textTheme.titleMedium)
+                              ?.copyWith(fontWeight: FontWeight.bold),
+                      maxLines: 1,
+                    ),
                   ),
                 ),
               ],

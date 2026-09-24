@@ -35,32 +35,47 @@ class WearForecastRow extends StatelessWidget {
             item.weatherCode.toWeatherEmoji,
             style: theme.textTheme.titleLarge,
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 8),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text(
-                  _getDay(itemDate),
-                  style: theme.textTheme.labelMedium?.copyWith(
-                    color: watchForegroundColor,
-                    fontWeight: FontWeight.w700,
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    _getDay(itemDate),
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: watchForegroundColor,
+                      fontWeight: FontWeight.w700,
+                    ),
+                    maxLines: 1,
                   ),
                 ),
-                Text(
-                  _getTimeOfDay(itemDate.hour),
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: watchForegroundColor,
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    _getTimeOfDay(itemDate.hour),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: watchForegroundColor,
+                    ),
+                    maxLines: 1,
                   ),
                 ),
               ],
             ),
           ),
-          Text(
-            '${displayTemperature.round()}°$unit',
-            style: theme.textTheme.labelMedium?.copyWith(
-              color: watchForegroundColor,
-              fontWeight: FontWeight.w700,
+          const SizedBox(width: 6),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              '${displayTemperature.round()}°$unit',
+              style: theme.textTheme.labelMedium?.copyWith(
+                color: watchForegroundColor,
+                fontWeight: FontWeight.w700,
+              ),
+              maxLines: 1,
             ),
           ),
         ],
@@ -88,12 +103,15 @@ class WearForecastRow extends StatelessWidget {
   }
 
   String _getTimeOfDay(int hour) {
+    String label;
     if (hour >= 0 && hour < 10) {
-      return translate('weather.time_of_day.morning');
+      label = translate('weather.time_of_day.morning');
+    } else if (hour >= 10 && hour < 17) {
+      label = translate('weather.time_of_day.day');
+    } else {
+      label = translate('weather.time_of_day.evening');
     }
-    if (hour >= 10 && hour < 17) {
-      return translate('weather.time_of_day.day');
-    }
-    return translate('weather.time_of_day.evening');
+    // Remove the hour range suffix e.g. " (0–10)" for extra small screen.
+    return label.replaceAll(RegExp(r'\s*\([^)]*\)'), '');
   }
 }

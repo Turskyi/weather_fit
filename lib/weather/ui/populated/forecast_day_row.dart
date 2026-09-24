@@ -44,7 +44,7 @@ class ForecastDayRow extends StatelessWidget {
       child: Row(
         children: <Widget>[
           SizedBox(
-            width: isExtraSmall ? 26 : 44,
+            width: isExtraSmall ? 30 : 44,
             child: FittedBox(
               fit: BoxFit.scaleDown,
               alignment: Alignment.centerLeft,
@@ -53,6 +53,7 @@ class ForecastDayRow extends StatelessWidget {
                 style:
                     (isExtraSmall ? textTheme.labelSmall : textTheme.bodyLarge)
                         ?.copyWith(fontWeight: FontWeight.bold),
+                maxLines: 1,
               ),
             ),
           ),
@@ -63,7 +64,7 @@ class ForecastDayRow extends StatelessWidget {
           ),
           const Spacer(),
           SizedBox(
-            width: isExtraSmall ? 22 : 40,
+            width: isExtraSmall ? 26 : 40,
             child: FittedBox(
               fit: BoxFit.scaleDown,
               alignment: Alignment.centerRight,
@@ -77,6 +78,7 @@ class ForecastDayRow extends StatelessWidget {
                             context,
                           ).colorScheme.onSurface.withValues(alpha: 0.7),
                         ),
+                maxLines: 1,
               ),
             ),
           ),
@@ -92,7 +94,7 @@ class ForecastDayRow extends StatelessWidget {
           ),
           SizedBox(width: isExtraSmall ? 2 : 4),
           SizedBox(
-            width: isExtraSmall ? 22 : 40,
+            width: isExtraSmall ? 26 : 40,
             child: FittedBox(
               fit: BoxFit.scaleDown,
               alignment: Alignment.centerLeft,
@@ -102,6 +104,7 @@ class ForecastDayRow extends StatelessWidget {
                 style:
                     (isExtraSmall ? textTheme.labelSmall : textTheme.bodyLarge)
                         ?.copyWith(fontWeight: FontWeight.bold),
+                maxLines: 1,
               ),
             ),
           ),

@@ -17,11 +17,11 @@ class WearInfoChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: size,
-      height: size,
+      constraints: BoxConstraints(minWidth: size, minHeight: size),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       alignment: Alignment.center,
       decoration: BoxDecoration(color: color, borderRadius: radius),
-      child: child,
+      child: FittedBox(fit: BoxFit.scaleDown, child: child),
     );
   }
 }

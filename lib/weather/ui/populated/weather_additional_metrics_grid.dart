@@ -73,7 +73,7 @@ class WeatherAdditionalMetricsGrid extends StatelessWidget {
           crossAxisCount: isExtraSmall ? 1 : 2,
           crossAxisSpacing: 12,
           mainAxisSpacing: 12,
-          childAspectRatio: isExtraSmall ? 2.5 : 2,
+          childAspectRatio: isExtraSmall ? 2.2 : 2,
         ),
         itemCount: metrics.length,
         itemBuilder: (BuildContext context, int index) {

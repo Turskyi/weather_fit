@@ -48,8 +48,8 @@ extension ResponsiveChecks on BuildContext {
 
   double get wearHorizontalPadding {
     if (isExtraSmallScreen) {
-      final double proportionalPadding = shortestSide * 0.12;
-      return proportionalPadding.clamp(14.0, 22.0);
+      final double proportionalPadding = shortestSide * 0.14;
+      return proportionalPadding.clamp(18.0, 28.0);
     } else {
       return 16.0;
     }
@@ -57,8 +57,8 @@ extension ResponsiveChecks on BuildContext {
 
   double get wearBottomPadding {
     if (isExtraSmallScreen) {
-      final double proportionalPadding = shortestSide * 0.1;
-      return proportionalPadding.clamp(18.0, 28.0);
+      final double proportionalPadding = shortestSide * 0.12;
+      return proportionalPadding.clamp(20.0, 32.0);
     } else {
       return 24.0;
     }

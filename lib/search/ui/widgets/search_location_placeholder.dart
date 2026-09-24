@@ -15,15 +15,23 @@ class SearchLocationPlaceholder extends StatelessWidget {
     return ValueListenableBuilder<TextEditingValue>(
       valueListenable: textEditingController,
       builder: (BuildContext context, TextEditingValue value, Widget? _) {
-        return Text(
-          value.text.isEmpty ? translate('search.enter_location') : value.text,
-          style: textTheme.labelSmall?.copyWith(
-            color: value.text.isEmpty
-                ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)
-                : null,
+        return FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.centerLeft,
+          child: Text(
+            value.text.isEmpty
+                ? translate('search.enter_location')
+                : value.text,
+            style: textTheme.labelSmall?.copyWith(
+              color: value.text.isEmpty
+                  ? Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.6)
+                  : null,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
         );
       },
     );
