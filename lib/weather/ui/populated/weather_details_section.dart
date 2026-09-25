@@ -73,7 +73,7 @@ class _WeatherDetailsSectionState extends State<WeatherDetailsSection>
             const WeatherHourlyForecastSection(),
             const SizedBox(height: 16),
             WeatherAdditionalMetricsGrid(weather: weatherToUse),
-            const SizedBox(height: 16),
+            const SizedBox(height: 4),
             if (widget.isStatic)
               fiveDayForecast
             else ...<Widget>[

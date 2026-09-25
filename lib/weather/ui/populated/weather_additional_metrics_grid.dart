@@ -66,6 +66,7 @@ class WeatherAdditionalMetricsGrid extends StatelessWidget {
     return MediaQuery.removePadding(
       context: context,
       removeTop: true,
+      removeBottom: true,
       child: GridView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),

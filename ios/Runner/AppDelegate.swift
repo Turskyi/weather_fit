@@ -10,6 +10,8 @@ private let appGroupId = "group.dmytrowidget"
 @main
 @objc class AppDelegate: FlutterAppDelegate {
     
+    private var isMethodChannelSetup = false
+
     override func application(
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
@@ -17,24 +19,7 @@ private let appGroupId = "group.dmytrowidget"
         
         GeneratedPluginRegistrant.register(with: self)
 
-        let controller : FlutterViewController = window?.rootViewController as! FlutterViewController
-        let channel = FlutterMethodChannel(name: "com.turskyi.weather_fit/shared_container",
-                                          binaryMessenger: controller.binaryMessenger)
-        
-        channel.setMethodCallHandler({
-            (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
-            if call.method == "getSharedContainerPath" {
-                if let url = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupId) {
-                    result(url.path)
-                } else {
-                    result(FlutterError(code: "UNAVAILABLE",
-                                        message: "Shared container for \(appGroupId) not found",
-                                        details: nil))
-                }
-            } else {
-                result(FlutterMethodNotImplemented)
-            }
-        })
+        setupMethodChannelIfNeeded()
         
         // This ensures that plugins used in background task are properly registered.
         WorkmanagerPlugin.setPluginRegistrantCallback { registry in
@@ -57,5 +42,46 @@ private let appGroupId = "group.dmytrowidget"
         }
         
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+    }
+
+    // MARK: UISceneSession Lifecycle
+
+    override func application(
+        _ application: UIApplication,
+        configurationForConnecting connectingSceneSession: UISceneSession,
+        options: UIScene.ConnectionOptions
+    ) -> UISceneConfiguration {
+        return UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
+    }
+
+    override func application(
+        _ application: UIApplication,
+        didDiscardSceneSessions sceneSessions: Set<UISceneSession>
+    ) {
+    }
+
+    func setupMethodChannelIfNeeded() {
+        guard !isMethodChannelSetup else { return }
+        guard let controller = window?.rootViewController as? FlutterViewController else { return }
+        
+        let channel = FlutterMethodChannel(name: "com.turskyi.weather_fit/shared_container",
+                                          binaryMessenger: controller.binaryMessenger)
+        
+        channel.setMethodCallHandler({
+            (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
+            if call.method == "getSharedContainerPath" {
+                if let url = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupId) {
+                    result(url.path)
+                } else {
+                    result(FlutterError(code: "UNAVAILABLE",
+                                        message: "Shared container for \(appGroupId) not found",
+                                        details: nil))
+                }
+            } else {
+                result(FlutterMethodNotImplemented)
+            }
+        })
+        
+        isMethodChannelSetup = true
     }
 }
