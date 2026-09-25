@@ -22,12 +22,15 @@ class SettingSegmentedToggle extends StatelessWidget {
 
     return Column(
       children: <Widget>[
-        Text(
-          label,
-          style: Theme.of(
-            context,
-          ).textTheme.bodyMedium?.copyWith(color: watchForegroundColor),
-          textAlign: TextAlign.center,
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            label,
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: watchForegroundColor),
+            textAlign: TextAlign.center,
+          ),
         ),
         const SizedBox(height: 4),
         Container(
@@ -50,14 +53,18 @@ class SettingSegmentedToggle extends StatelessWidget {
                           : Colors.transparent,
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    child: Text(
-                      options[index],
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: isSelected
-                            ? colorScheme.onPrimary
-                            : watchForegroundColor,
-                        fontWeight: FontWeight.bold,
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        options[index],
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: isSelected
+                              ? colorScheme.onPrimary
+                              : watchForegroundColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        maxLines: 1,
                       ),
                     ),
                   ),

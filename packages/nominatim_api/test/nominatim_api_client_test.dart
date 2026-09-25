@@ -49,7 +49,7 @@ void main() {
           () => httpClient.get(any(), headers: any(named: 'headers')),
         ).thenAnswer((_) async => response);
 
-        await apiClient.locationSearch(query);
+        await apiClient.locationSearch(query, acceptLanguage: 'en');
 
         verify(
           () => httpClient.get(
@@ -60,7 +60,7 @@ void main() {
                 'q': query,
                 'format': 'json',
                 'limit': '1',
-                'accept-language': 'uk,en',
+                'accept-language': 'en',
               },
             ),
             headers: any(named: 'headers'),
@@ -143,7 +143,11 @@ void main() {
           () => httpClient.get(any(), headers: any(named: 'headers')),
         ).thenAnswer((_) async => response);
 
-        await apiClient.reverseSearch(latitude: lat, longitude: lon);
+        await apiClient.reverseSearch(
+          latitude: lat,
+          longitude: lon,
+          acceptLanguage: 'en',
+        );
 
         verify(
           () => httpClient.get(
@@ -154,7 +158,7 @@ void main() {
                 'lat': lat.toString(),
                 'lon': lon.toString(),
                 'format': 'json',
-                'accept-language': 'uk,en',
+                'accept-language': 'en',
               },
             ),
             headers: any(named: 'headers'),

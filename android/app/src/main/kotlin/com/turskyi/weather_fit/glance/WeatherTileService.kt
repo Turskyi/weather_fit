@@ -136,7 +136,22 @@ class WeatherTileService : androidx.wear.tiles.TileService() {
 
         val temperatureText = if (weather.hasWeather) weather.temperature else "Syncing..."
         val lastUpdatedText = if (weather.hasWeather && weather.lastUpdated.isNotBlank()) {
-            weather.lastUpdated
+            val raw = weather.lastUpdated
+            when {
+                raw.contains(",") && raw.contains(" - ") -> {
+                    val datePart = raw.substringBefore(",").trim()
+                    val timePart = raw.substringAfter(" - ").trim()
+                    "$datePart, $timePart"
+                }
+                raw.contains(",") && raw.contains(" at ") -> {
+                    val datePart = raw.substringBefore(",").trim()
+                    val timePart = raw.substringAfter(" at ").trim()
+                    "$datePart, $timePart"
+                }
+                raw.contains(" - ") -> raw.substringAfter(" - ").trim()
+                raw.contains(" at ") -> raw.substringAfter(" at ").trim()
+                else -> raw
+            }
         } else {
             ""
         }
@@ -147,11 +162,13 @@ class WeatherTileService : androidx.wear.tiles.TileService() {
             .addContent(
                 androidx.wear.protolayout.LayoutElementBuilders.Text.Builder()
                     .setText(if (weather.hasWeather) weather.location else "WeatherFit")
+                    .setMaxLines(1)
+                    .setOverflow(androidx.wear.protolayout.LayoutElementBuilders.TEXT_OVERFLOW_ELLIPSIZE)
                     .setFontStyle(
                         androidx.wear.protolayout.LayoutElementBuilders.FontStyle.Builder()
                             .setSize(
                                 androidx.wear.protolayout.DimensionBuilders.sp(
-                                    16f
+                                    14f
                                 )
                             )
                             .setColor(
@@ -170,12 +187,12 @@ class WeatherTileService : androidx.wear.tiles.TileService() {
                         .setResourceId("outfit_image")
                         .setWidth(
                             androidx.wear.protolayout.DimensionBuilders.dp(
-                                80f
+                                68f
                             )
                         )
                         .setHeight(
                             androidx.wear.protolayout.DimensionBuilders.dp(
-                                80f
+                                68f
                             )
                         )
                         .build()
@@ -186,7 +203,7 @@ class WeatherTileService : androidx.wear.tiles.TileService() {
                             androidx.wear.protolayout.LayoutElementBuilders.FontStyle.Builder()
                                 .setSize(
                                     androidx.wear.protolayout.DimensionBuilders.sp(
-                                        48f
+                                        40f
                                     )
                                 )
                                 .build()
@@ -197,11 +214,12 @@ class WeatherTileService : androidx.wear.tiles.TileService() {
             .addContent(
                 androidx.wear.protolayout.LayoutElementBuilders.Text.Builder()
                     .setText(temperatureText)
+                    .setMaxLines(1)
                     .setFontStyle(
                         androidx.wear.protolayout.LayoutElementBuilders.FontStyle.Builder()
                             .setSize(
                                 androidx.wear.protolayout.DimensionBuilders.sp(
-                                    30f
+                                    26f
                                 )
                             )
                             .setColor(
@@ -219,11 +237,12 @@ class WeatherTileService : androidx.wear.tiles.TileService() {
             column.addContent(
                 androidx.wear.protolayout.LayoutElementBuilders.Text.Builder()
                     .setText(lastUpdatedText)
+                    .setMaxLines(1)
                     .setFontStyle(
                         androidx.wear.protolayout.LayoutElementBuilders.FontStyle.Builder()
                             .setSize(
                                 androidx.wear.protolayout.DimensionBuilders.sp(
-                                    9f
+                                    10f
                                 )
                             )
                             .setColor(
@@ -237,28 +256,36 @@ class WeatherTileService : androidx.wear.tiles.TileService() {
             )
         }
 
-        return androidx.wear.protolayout.LayoutElementBuilders.Box.Builder()
-            .setWidth(androidx.wear.protolayout.DimensionBuilders.expand())
-            .setHeight(androidx.wear.protolayout.DimensionBuilders.expand())
-            .setModifiers(
-                androidx.wear.protolayout.ModifiersBuilders.Modifiers.Builder()
-                    .setClickable(
-                        androidx.wear.protolayout.ModifiersBuilders.Clickable.Builder()
-                            .setId("open_app")
-                            .setOnClick(
-                                androidx.wear.protolayout.ActionBuilders.LaunchAction.Builder()
-                                    .setAndroidActivity(
-                                        androidx.wear.protolayout.ActionBuilders.AndroidActivity.Builder()
-                                            .setPackageName(this.packageName)
-                                            .setClassName("com.turskyi.weather_fit.MainActivity")
-                                            .build()
-                                    )
+        val padding = androidx.wear.protolayout.ModifiersBuilders.Padding.Builder()
+            .setTop(androidx.wear.protolayout.DimensionBuilders.dp(10f))
+            .setBottom(androidx.wear.protolayout.DimensionBuilders.dp(10f))
+            .setStart(androidx.wear.protolayout.DimensionBuilders.dp(12f))
+            .setEnd(androidx.wear.protolayout.DimensionBuilders.dp(12f))
+            .build()
+
+        val modifiers = androidx.wear.protolayout.ModifiersBuilders.Modifiers.Builder()
+            .setPadding(padding)
+            .setClickable(
+                androidx.wear.protolayout.ModifiersBuilders.Clickable.Builder()
+                    .setId("open_app")
+                    .setOnClick(
+                        androidx.wear.protolayout.ActionBuilders.LaunchAction.Builder()
+                            .setAndroidActivity(
+                                androidx.wear.protolayout.ActionBuilders.AndroidActivity.Builder()
+                                    .setPackageName(this.packageName)
+                                    .setClassName("com.turskyi.weather_fit.MainActivity")
                                     .build()
                             )
                             .build()
                     )
                     .build()
             )
+            .build()
+
+        return androidx.wear.protolayout.LayoutElementBuilders.Box.Builder()
+            .setWidth(androidx.wear.protolayout.DimensionBuilders.expand())
+            .setHeight(androidx.wear.protolayout.DimensionBuilders.expand())
+            .setModifiers(modifiers)
             .addContent(column.build())
             .build()
     }

@@ -276,6 +276,8 @@
     "hourly_forecast_title": "Hourly Forecast",
     "five_day_forecast_title": "5-Day Forecast",
     "five_day_forecast_button": "5-Day Forecast",
+    "temperature_bar_info_title": "How to read the temperature bar",
+    "temperature_bar_info_description": "The full grey bar represents the lowest and highest temperature expected across the entire 5-day forecast.\n\nThe colored segment shows the temperature range for that specific day, transitioning from cold (blue) to warm (orange).",
     "more_details": "More details",
     "code_0": "Clear sky",
     "code_1": "Mainly clear",

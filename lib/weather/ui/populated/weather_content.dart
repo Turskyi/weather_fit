@@ -12,12 +12,14 @@ class WeatherContent extends StatefulWidget {
     required this.weather,
     required this.child,
     required this.onRefresh,
+    this.onSettingsPressed,
     super.key,
   });
 
   final Weather weather;
   final Widget child;
   final RefreshCallback onRefresh;
+  final VoidCallback? onSettingsPressed;
 
   @override
   State<WeatherContent> createState() => _WeatherContentState();
@@ -31,6 +33,7 @@ class _WeatherContentState extends State<WeatherContent> {
         ? WeatherContentExtraSmall(
             weather: weather,
             onRefresh: widget.onRefresh,
+            onSettingsPressed: widget.onSettingsPressed,
             listenSettingsStateWhen: _shouldRebuildOnLanguageChange,
             settingsStateListener: _settingsStateListener,
             child: widget.child,

@@ -67,12 +67,15 @@ class SettingDropdown extends StatelessWidget {
     final Color watchForegroundColor = context.watchForegroundColor;
     final bool isWear = context.isExtraSmallScreen;
 
-    final Widget labelWidget = Text(
-      label,
-      style: Theme.of(
-        context,
-      ).textTheme.bodyMedium?.copyWith(color: watchForegroundColor),
-      textAlign: TextAlign.center,
+    final Widget labelWidget = FittedBox(
+      fit: BoxFit.scaleDown,
+      child: Text(
+        label,
+        style: Theme.of(
+          context,
+        ).textTheme.bodyMedium?.copyWith(color: watchForegroundColor),
+        textAlign: TextAlign.center,
+      ),
     );
 
     final String displayValue =
@@ -97,9 +100,16 @@ class SettingDropdown extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  Text(
-                    displayValue,
-                    style: TextStyle(color: watchForegroundColor),
+                  Expanded(
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        displayValue,
+                        style: TextStyle(color: watchForegroundColor),
+                        maxLines: 1,
+                      ),
+                    ),
                   ),
                   Icon(
                     Icons.arrow_drop_down,

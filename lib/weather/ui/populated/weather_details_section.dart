@@ -73,7 +73,7 @@ class _WeatherDetailsSectionState extends State<WeatherDetailsSection>
             const WeatherHourlyForecastSection(),
             const SizedBox(height: 16),
             WeatherAdditionalMetricsGrid(weather: weatherToUse),
-            const SizedBox(height: 16),
+            const SizedBox(height: 4),
             if (widget.isStatic)
               fiveDayForecast
             else ...<Widget>[
@@ -102,32 +102,32 @@ class _WeatherDetailsSectionState extends State<WeatherDetailsSection>
 
         if (widget.isStatic) {
           return Padding(
-            padding: const EdgeInsets.only(right: 8.0, bottom: 16.0, top: 24.0),
+            padding: const EdgeInsets.only(right: 8.0, bottom: 16.0, top: 8.0),
             child: detailsContent,
           );
+        } else {
+          return Padding(
+            padding: const EdgeInsets.only(right: 8.0, bottom: 16.0),
+            child: Column(
+              children: <Widget>[
+                OutlinedButton(
+                  onPressed: _toggleExpanded,
+                  child: Text(translate('weather.details_button')),
+                ),
+                AnimatedSize(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                  child: _isExpanded
+                      ? Padding(
+                          padding: const EdgeInsets.only(top: 24.0),
+                          child: detailsContent,
+                        )
+                      : const SizedBox.shrink(),
+                ),
+              ],
+            ),
+          );
         }
-
-        return Padding(
-          padding: const EdgeInsets.only(right: 8.0, bottom: 16.0),
-          child: Column(
-            children: <Widget>[
-              OutlinedButton(
-                onPressed: _toggleExpanded,
-                child: Text(translate('weather.details_button')),
-              ),
-              AnimatedSize(
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
-                child: _isExpanded
-                    ? Padding(
-                        padding: const EdgeInsets.only(top: 24.0),
-                        child: detailsContent,
-                      )
-                    : const SizedBox.shrink(),
-              ),
-            ],
-          ),
-        );
       },
     );
   }

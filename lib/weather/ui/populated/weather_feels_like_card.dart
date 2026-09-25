@@ -21,22 +21,31 @@ class WeatherFeelsLikeCard extends StatelessWidget {
     return WeatherDetailsContainer(
       child: Column(
         children: <Widget>[
-          Text(
-            translate('weather.feels_like'),
-            style: (isExtraSmall ? textTheme.labelSmall : textTheme.labelLarge)
-                ?.copyWith(color: colors.onSurface.withValues(alpha: 0.7)),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              translate('weather.feels_like'),
+              style:
+                  (isExtraSmall ? textTheme.labelSmall : textTheme.labelLarge)
+                      ?.copyWith(
+                        color: colors.onSurface.withValues(alpha: 0.7),
+                      ),
+            ),
           ),
           const SizedBox(height: 4),
-          Text(
-            feelsLike,
-            style:
-                (isExtraSmall
-                        ? textTheme.displaySmall
-                        : textTheme.displayMedium)
-                    ?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: colors.onSurface,
-                    ),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              feelsLike,
+              style:
+                  (isExtraSmall
+                          ? textTheme.headlineMedium
+                          : textTheme.displayMedium)
+                      ?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: colors.onSurface,
+                      ),
+            ),
           ),
         ],
       ),

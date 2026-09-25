@@ -304,7 +304,7 @@ class _WeatherContentDefaultState extends State<WeatherContentDefault> {
                       }
                     },
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 8.0),
                   BlocBuilder<WeatherBloc, WeatherState>(
                     builder: (BuildContext _, WeatherState state) {
                       if (state.isNotLoading) {

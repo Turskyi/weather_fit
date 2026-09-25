@@ -7,12 +7,14 @@ class WeatherPopulated extends StatelessWidget {
   const WeatherPopulated({
     required this.weather,
     required this.onRefresh,
+    this.onSettingsPressed,
     this.child = const SizedBox(),
     super.key,
   });
 
   final Weather weather;
   final RefreshCallback onRefresh;
+  final VoidCallback? onSettingsPressed;
   final Widget child;
 
   @override
@@ -25,6 +27,7 @@ class WeatherPopulated extends StatelessWidget {
           child: WeatherContent(
             weather: weather,
             onRefresh: onRefresh,
+            onSettingsPressed: onSettingsPressed,
             child: child,
           ),
         ),

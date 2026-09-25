@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart' as cupertino;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -94,7 +93,7 @@ class WeatherPageExtraSmallLayout extends StatefulWidget {
 
 class _WeatherPageExtraSmallLayoutState
     extends State<WeatherPageExtraSmallLayout> {
-  static const Size _wearableOutfitPlaceholderSize = Size(148, 194);
+  static const Size _wearableOutfitPlaceholderSize = Size(152, 216);
   bool _isAtScrollBottom = false;
 
   @override
@@ -125,6 +124,7 @@ class _WeatherPageExtraSmallLayoutState
           return WeatherPopulated(
             weather: Weather.empty.copyWith(location: widget.location),
             onRefresh: widget.onRefresh,
+            onSettingsPressed: widget.onSettingsPressed,
             child: const WeatherLoadingWidget(isShimmer: true),
           );
         }
@@ -145,6 +145,7 @@ class _WeatherPageExtraSmallLayoutState
               return WeatherPopulated(
                 weather: stateWeather,
                 onRefresh: widget.onRefresh,
+                onSettingsPressed: widget.onSettingsPressed,
                 child: const WeatherLoadingWidget(isShimmer: true),
               );
             }
@@ -199,6 +200,7 @@ class _WeatherPageExtraSmallLayoutState
             return WeatherPopulated(
               weather: stateWeather,
               onRefresh: widget.onRefresh,
+              onSettingsPressed: widget.onSettingsPressed,
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   boxShadow: <BoxShadow>[
@@ -219,6 +221,7 @@ class _WeatherPageExtraSmallLayoutState
               return WeatherPopulated(
                 weather: stateWeather,
                 onRefresh: widget.onRefresh,
+                onSettingsPressed: widget.onSettingsPressed,
                 child: OutfitWidget(
                   outfitImage: state.outfitImage,
                   outfitRecommendation: state.outfitRecommendation,
@@ -232,6 +235,7 @@ class _WeatherPageExtraSmallLayoutState
               return WeatherPopulated(
                 weather: stateWeather,
                 onRefresh: widget.onRefresh,
+                onSettingsPressed: widget.onSettingsPressed,
                 child: OutfitWidget(
                   outfitImage: state.outfitImage,
                   outfitRecommendation: state.outfitRecommendation,
@@ -251,41 +255,7 @@ class _WeatherPageExtraSmallLayoutState
     if (widget.isEmbedded) return content;
 
     return Scaffold(
-      extendBodyBehindAppBar: true,
       backgroundColor: Colors.black,
-      appBar: AppBar(
-        centerTitle: true,
-        toolbarHeight: cupertino
-            .kCupertinoButtonMinSize[cupertino.CupertinoButtonSize.medium],
-        forceMaterialTransparency: true,
-        title: Tooltip(
-          message: translate('settings.title'),
-          child: Material(
-            color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
-            shape: const CircleBorder(),
-            clipBehavior: Clip.antiAlias,
-            child: SizedBox.square(
-              dimension: 30.0,
-              child: InkResponse(
-                onTap: widget.onSettingsPressed,
-                containedInkWell: true,
-                customBorder: const CircleBorder(),
-                highlightShape: BoxShape.circle,
-                radius: 8,
-                splashColor: theme.colorScheme.onSurface.withValues(alpha: 0.1),
-                highlightColor: theme.colorScheme.onSurface.withValues(
-                  alpha: 0.05,
-                ),
-                child: Icon(
-                  Icons.settings,
-                  color: colorScheme.surface,
-                  size: cupertino.kCupertinoButtonDefaultIconSize,
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
       body: NotificationListener<ScrollNotification>(
         onNotification: _onScrollNotification,
         child: ColoredBox(

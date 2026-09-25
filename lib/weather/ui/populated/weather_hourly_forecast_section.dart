@@ -51,7 +51,7 @@ class WeatherHourlyForecastSection extends StatelessWidget {
             WeatherDetailsContainer(
               padding: EdgeInsets.zero,
               child: SizedBox(
-                height: isExtraSmall ? 80 : 100,
+                height: isExtraSmall ? 100 : 120,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   padding: EdgeInsets.symmetric(
@@ -72,8 +72,6 @@ class WeatherHourlyForecastSection extends StatelessWidget {
                     return Padding(
                       padding: EdgeInsets.only(
                         right: isExtraSmall ? 16.0 : 24.0,
-                        top: isExtraSmall ? 8 : 12,
-                        bottom: isExtraSmall ? 8 : 12,
                       ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,

@@ -16,7 +16,7 @@ again. 🌤️👕👖👞"
 
 publish_to: 'none'
 
-version: 0.6.2+62
+version: 0.6.5+65
 
 environment:
   sdk: '>=3.9.2 <4.0.0'
@@ -26,8 +26,8 @@ dependencies:
   collection: ^1.19.1
   dio: ^5.11.1
 
-  envied: ^1.3.8
-  equatable: ^2.1.0
+  envied: ^1.3.9
+  equatable: any
   feedback: ^3.2.0
   flutter:
     sdk: flutter
@@ -44,7 +44,7 @@ dependencies:
     sdk: flutter
   geocoding: ^5.0.0
   geolocator: ^14.0.3
-  home_widget: ^0.9.4
+  home_widget: ^0.10.0
   http: ^1.6.0
   hydrated_bloc: ^11.0.0
   in_app_update: ^5.0.0
@@ -73,11 +73,11 @@ dev_dependencies:
   bloc_test: ^10.0.0
   build_runner: ^2.16.1
 
-  envied_generator: ^1.3.8
+  envied_generator: any
   flutter_lints: ^6.0.0
   flutter_test:
     sdk: flutter
-  json_serializable: ^6.14.1
+  json_serializable: any
   mocktail: ^1.0.5
   retrofit_generator: ^10.2.11
 

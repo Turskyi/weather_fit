@@ -89,16 +89,30 @@ class OutfitWidget extends StatelessWidget {
                         ),
                       ),
                       Expanded(
-                        flex: 3,
-                        child: Align(
+                        flex: context.isExtraSmallScreen ? 4 : 3,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 4,
+                          ),
                           alignment: Alignment.center,
-                          child: Text(
-                            displayText,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w500,
-                              height: 1.3,
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: SizedBox(
+                              width: outfitSize.width - 12,
+                              child: Text(
+                                displayText,
+                                style:
+                                    (context.isExtraSmallScreen
+                                            ? theme.textTheme.bodySmall
+                                            : theme.textTheme.bodyMedium)
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.w500,
+                                          height: 1.2,
+                                        ),
+                                textAlign: TextAlign.center,
+                              ),
                             ),
-                            textAlign: TextAlign.center,
                           ),
                         ),
                       ),
@@ -142,7 +156,7 @@ class OutfitWidget extends StatelessWidget {
 
   Size _getOutfitImageSize(BuildContext context) {
     if (context.isExtraSmallScreen) {
-      return const Size(148, 194);
+      return const Size(152, 216);
     } else if (context.isNarrowScreen) {
       return const Size(400, 520);
     } else {
