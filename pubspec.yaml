@@ -16,7 +16,7 @@ again. 🌤️👕👖👞"
 
 publish_to: 'none'
 
-version: 0.6.5+65
+version: 0.6.6+66
 
 environment:
   sdk: '>=3.9.2 <4.0.0'
@@ -26,60 +26,60 @@ dependencies:
   collection: ^1.19.1
   dio: ^5.11.1
 
-  envied: ^1.3.9
-  equatable: any
+  envied: ^1.3.10
+  equatable: ^3.0.0
   feedback: ^3.2.0
   flutter:
     sdk: flutter
   flutter_bloc: ^9.1.1
-  flutter_email_sender: ^10.0.1
+  flutter_email_sender: ^11.2.0
   flutter_localizations:
     sdk: flutter
-  flutter_svg: ^2.3.0
+  flutter_svg: ^2.3.2
   flutter_translate:
     git:
       url: https://github.com/Javernaver/flutter_translate.git
       ref: master
   flutter_web_plugins:
     sdk: flutter
-  geocoding: ^5.0.0
-  geolocator: ^14.0.3
+  geocoding: ^5.0.1
+  geolocator: ^14.1.2
   home_widget: ^0.10.0
   http: ^1.6.0
   hydrated_bloc: ^11.0.0
   in_app_update: ^5.0.0
   intl: ^0.20.3
   json_annotation: ^4.12.0
-  location: ^10.0.2
+  location: ^10.1.0
   meta: ^1.19.0
   nested: ^1.0.0
   nominatim_api:
     path: packages/nominatim_api
   open_meteo_api:
     path: packages/open_meteo_api
-  package_info_plus: ^10.2.1
+  package_info_plus: ^10.2.2
   path_provider: ^2.1.6
   permission_handler: ^13.0.2
   resend: ^1.0.0
   retrofit: ^4.10.0
-  shared_preferences: ^2.5.5
+  shared_preferences: ^2.5.6
   shimmer: ^4.0.0
-  url_launcher: ^6.3.2
+  url_launcher: ^6.3.3
   weather_repository:
     path: packages/weather_repository
   workmanager: ^0.10.10
 
 dev_dependencies:
   bloc_test: ^10.0.0
-  build_runner: ^2.16.1
+  build_runner: any
 
-  envied_generator: any
+  envied_generator: ^1.3.10
   flutter_lints: ^6.0.0
   flutter_test:
     sdk: flutter
-  json_serializable: any
+  json_serializable: ^6.15.2
   mocktail: ^1.0.5
-  retrofit_generator: ^10.2.11
+  retrofit_generator: ^10.3.3
 
 flutter:
   uses-material-design: true

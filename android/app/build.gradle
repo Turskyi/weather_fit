@@ -181,9 +181,9 @@ flutter {
     source = "../.."
 }
 dependencies {
-    implementation 'com.google.firebase:firebase-crashlytics:20.1.1'
-    implementation 'com.google.firebase:firebase-analytics:23.2.0'
-    implementation 'com.google.code.gson:gson:2.14.0'
+    implementation 'com.google.firebase:firebase-crashlytics:21.0.1'
+    implementation 'com.google.firebase:firebase-analytics:24.0.0'
+    implementation 'com.google.code.gson:gson:2.15.0'
     implementation "androidx.wear:wear-input:1.2.0"
 
     // Native Wear OS Tile API. This is kept separate from HomeWidget's
