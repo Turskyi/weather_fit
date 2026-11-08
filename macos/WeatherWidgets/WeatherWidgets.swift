@@ -489,9 +489,12 @@ struct ForecastItemView: View {
 
     var body: some View {
         VStack(spacing: 2) {
-            // Show full date and time on macOS
-            Text(DateHelper.getDateAndTimeString(from: item.time, locale: locale ?? "en"))
-                .font(.system(size: 9, weight: .bold))
+            Text(DateHelper.getDay(from: item.time, locale: locale ?? "en"))
+                .font(.system(size: 8, weight: .bold))
+            Text(
+                DateHelper.getTimeOfDay(from: item.time, locale: locale ?? "en")
+            )
+            .font(.system(size: 8))
             Text(WeatherHelper.getWeatherEmoji(for: item.weatherCode))
                 .font(.title3)
             Text("\(Int(item.temperature.rounded()))°")
