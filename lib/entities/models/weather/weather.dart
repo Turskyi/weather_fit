@@ -30,6 +30,7 @@ class Weather extends Equatable {
     this.cloudCover,
     this.pressure,
     this.dewPoint,
+    this.isDay,
   });
 
   factory Weather.fromJson(Map<String, Object?> json) {
@@ -92,6 +93,7 @@ class Weather extends Equatable {
       cloudCover: weatherDomain.cloudCover,
       pressure: weatherDomain.pressure,
       dewPoint: dewPointValue,
+      isDay: weatherDomain.isDay,
     );
   }
 
@@ -112,6 +114,7 @@ class Weather extends Equatable {
   final double? cloudCover;
   final double? pressure;
   final double? dewPoint;
+  final bool? isDay;
 
   static const Weather empty = Weather(
     condition: WeatherCondition.unknown,
@@ -143,6 +146,7 @@ class Weather extends Equatable {
     cloudCover,
     pressure,
     dewPoint,
+    isDay,
   ];
 
   @override
@@ -170,6 +174,7 @@ class Weather extends Equatable {
     double? cloudCover,
     double? pressure,
     double? dewPoint,
+    bool? isDay,
   }) {
     return Weather(
       condition: condition ?? this.condition,
@@ -189,6 +194,7 @@ class Weather extends Equatable {
       cloudCover: cloudCover ?? this.cloudCover,
       pressure: pressure ?? this.pressure,
       dewPoint: dewPoint ?? this.dewPoint,
+      isDay: isDay ?? this.isDay,
     );
   }
 
@@ -233,7 +239,7 @@ class Weather extends Equatable {
     return '$value°${temperatureUnits.unitSymbol}';
   }
 
-  String get emoji => condition.toEmoji;
+  String get emoji => condition.getEmoji(isDay: isDay);
 
   bool get isNoLocation {
     return location.isEmpty;

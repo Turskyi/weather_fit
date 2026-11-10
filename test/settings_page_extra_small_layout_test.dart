@@ -63,8 +63,6 @@ void main() {
           SettingsPageExtraSmallLayout(
             rebuildSettingsWhen: (_, _) => false,
             onLanguageChanged: (_) {},
-            onDayStartHourChanged: (_) {},
-            onNightStartHourChanged: (_) {},
             rebuildUnitsWhen: (_, _) => false,
             onUnitsChanged: (_) {},
             onAboutTap: () {},

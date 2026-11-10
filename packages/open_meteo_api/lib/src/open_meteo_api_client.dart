@@ -70,7 +70,7 @@ class OpenMeteoApiClient {
           'current':
               'temperature_2m,weather_code,apparent_temperature,'
               'relative_humidity_2m,wind_speed_10m,uv_index,visibility,'
-              'cloud_cover,pressure_msl,dew_point_2m',
+              'cloud_cover,pressure_msl,dew_point_2m,is_day',
         });
 
     final http.Response weatherResponse = await _httpClient.get(weatherRequest);

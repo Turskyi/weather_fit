@@ -391,6 +391,42 @@ void main() {
 
       group('toggleUnits', () {
         blocTest<WeatherBloc, WeatherState>(
+          'preserves isDay == false (night mode) when toggling units',
+          build: () => weatherBloc,
+          seed: () => WeatherSuccess(
+            locale: dummy_constants.dummyLocale,
+            dailyForecast: const DailyForecastDomain(
+              forecast: <ForecastItemDomain>[],
+            ),
+            weather: Weather(
+              location: dummy_constants.dummyLocation,
+              temperature: const Temperature(
+                value: dummy_constants.dummyWeatherTemperature,
+              ),
+              lastUpdatedDateTime: DateTime(2025),
+              condition: WeatherCondition.clear,
+              temperatureUnits: TemperatureUnits.fahrenheit,
+              countryCode: dummy_constants.dummyCountryCode,
+              description: '',
+              code: 0,
+              locale: 'en',
+              isDay: false,
+            ),
+            date: DateTime.now(),
+          ),
+          act: (WeatherBloc bloc) => bloc.add(const ToggleUnits()),
+          expect: () => <Matcher>[
+            isA<WeatherSuccess>()
+                .having((WeatherSuccess s) => s.weather.isDay, 'isDay', false)
+                .having(
+                  (WeatherSuccess s) => s.weather.temperatureUnits,
+                  'units',
+                  TemperatureUnits.celsius,
+                ),
+          ],
+        );
+
+        blocTest<WeatherBloc, WeatherState>(
           'emits updated units when status is not success',
           build: () => weatherBloc,
           seed: () {

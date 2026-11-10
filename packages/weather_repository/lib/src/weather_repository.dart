@@ -38,6 +38,7 @@ class WeatherRepository {
       cloudCover: weatherDomain.cloudCover,
       pressure: weatherDomain.pressure,
       dewPoint: weatherDomain.dewPoint,
+      isDay: weatherDomain.isDay,
     );
   }
 

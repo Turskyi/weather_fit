@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/extensions/build_context_extensions.dart';
 import 'package:weather_fit/res/extensions/color_extensions.dart';
 import 'package:weather_fit/res/widgets/weather_pattern.dart';
@@ -17,9 +18,11 @@ class Background extends StatelessWidget {
     if (context.isExtraSmallScreen) {
       return const SizedBox.expand(child: ColoredBox(color: Colors.black));
     } else {
+      final Weather weather = context.select(
+        (WeatherBloc bloc) => bloc.state.weather,
+      );
       final WeatherCondition effectiveCondition =
-          condition ??
-          context.select((WeatherBloc bloc) => bloc.state.weather.condition);
+          condition ?? weather.condition;
 
       final bool isWeatherBackgroundEnabled = context.select(
         (SettingsBloc bloc) => bloc.state.isWeatherBackgroundEnabled,
@@ -29,11 +32,7 @@ class Background extends StatelessWidget {
         (SettingsBloc bloc) => bloc.state.debugForceNight,
       );
 
-      final int hour = DateTime.now().hour;
-      final bool isNight =
-          debugForceNight ||
-          hour < WeatherCondition.dayStartHour ||
-          hour >= WeatherCondition.nightStartHour;
+      final bool isNight = debugForceNight || (weather.isDay == false);
 
       return SizedBox.expand(
         child: DecoratedBox(

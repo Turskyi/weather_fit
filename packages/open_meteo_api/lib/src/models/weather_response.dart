@@ -15,6 +15,7 @@ class WeatherResponse {
     this.cloudCover,
     this.pressure,
     this.dewPoint,
+    this.isDay,
   });
 
   factory WeatherResponse.fromJson(Map<String, Object?> json) {
@@ -39,6 +40,8 @@ class WeatherResponse {
   final double? pressure;
   @JsonKey(name: 'dew_point_2m')
   final double? dewPoint;
+  @JsonKey(name: 'is_day')
+  final int? isDay;
 
   String get description => weatherCode.toInt().toDescription;
 

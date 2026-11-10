@@ -9,6 +9,7 @@ import 'package:weather_fit/app/settings_state_listener_content.dart';
 import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
 import 'package:weather_fit/data/repositories/location_repository.dart';
 import 'package:weather_fit/data/repositories/outfit_repository.dart';
+import 'package:weather_fit/entities/models/weather/weather.dart';
 import 'package:weather_fit/env/env.dart';
 import 'package:weather_fit/extensions/build_context_extensions.dart';
 import 'package:weather_fit/feedback/feedback_form.dart';
@@ -94,15 +95,12 @@ class WeatherFitApp extends StatelessWidget {
         ],
         child: BlocBuilder<ThemeCubit, Color>(
           builder: (BuildContext context, Color color) {
+            final Weather weather = context.watch<WeatherBloc>().state.weather;
             final SettingsState settingsState = context
                 .watch<SettingsBloc>()
                 .state;
-            final DateTime now = DateTime.now();
-            final int hour = now.hour;
             final bool completeDarkness =
-                settingsState.debugForceNight ||
-                hour < settingsState.dayStartHour ||
-                hour >= settingsState.nightStartHour;
+                settingsState.debugForceNight || (weather.isDay == false);
             final LocalizationDelegate localizationDelegate = LocalizedApp.of(
               context,
             ).delegate;

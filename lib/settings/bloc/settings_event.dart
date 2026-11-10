@@ -52,18 +52,6 @@ class ChangeWidgetUpdateFrequencyEvent extends SettingsEvent {
   final int minutes;
 }
 
-class ChangeDayStartHourEvent extends SettingsEvent {
-  const ChangeDayStartHourEvent(this.hour);
-
-  final int hour;
-}
-
-class ChangeNightStartHourEvent extends SettingsEvent {
-  const ChangeNightStartHourEvent(this.hour);
-
-  final int hour;
-}
-
 class ToggleDebugWeatherProviderEvent extends SettingsEvent {
   const ToggleDebugWeatherProviderEvent(this.enabled);
   final bool enabled;

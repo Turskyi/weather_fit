@@ -12,39 +12,134 @@ class OpenWeatherMapProvider implements WeatherProvider {
   final String apiKey;
   final http.Client _httpClient;
 
+  static const String _baseUrl = 'api.openweathermap.org';
+  static const String _weatherEndpoint = '/data/2.5/weather';
+  static const String _forecastEndpoint = '/data/2.5/forecast';
+
+  static const String _latParam = 'lat';
+  static const String _lonParam = 'lon';
+  static const String _appidParam = 'appid';
+  static const String _unitsParam = 'units';
+  static const String _metricUnits = 'metric';
+
+  static const String _mainKey = 'main';
+  static const String _tempKey = 'temp';
+  static const String _feelsLikeKey = 'feels_like';
+  static const String _humidityKey = 'humidity';
+  static const String _pressureKey = 'pressure';
+  static const String _windKey = 'wind';
+  static const String _speedKey = 'speed';
+  static const String _visibilityKey = 'visibility';
+  static const String _cloudsKey = 'clouds';
+  static const String _allKey = 'all';
+  static const String _weatherKey = 'weather';
+  static const String _idKey = 'id';
+  static const String _descriptionKey = 'description';
+  static const String _sysKey = 'sys';
+  static const String _sunriseKey = 'sunrise';
+  static const String _sunsetKey = 'sunset';
+  static const String _dtKey = 'dt';
+  static const String _listKey = 'list';
+  static const String _dtTxtKey = 'dt_txt';
+
   @override
   Future<WeatherDomain> getCurrentWeather(Location location) async {
-    final Uri url = Uri.https(
-      'api.openweathermap.org',
-      '/data/2.5/weather',
-      <String, String>{
-        'lat': location.latitude.toString(),
-        'lon': location.longitude.toString(),
-        'appid': apiKey,
-        'units': 'metric',
-      },
-    );
+    final Uri url = Uri.https(_baseUrl, _weatherEndpoint, <String, String>{
+      _latParam: location.latitude.toString(),
+      _lonParam: location.longitude.toString(),
+      _appidParam: apiKey,
+      _unitsParam: _metricUnits,
+    });
     final http.Response response = await _httpClient.get(url);
     if (response.statusCode != 200) {
       throw Exception('OpenWeatherMap error: ${response.statusCode}');
     }
-    final Map<String, dynamic> data =
-        jsonDecode(response.body) as Map<String, dynamic>;
-    final double temp = (data['main']['temp'] as num).toDouble();
-    final double? feelsLike = (data['main']['feels_like'] as num?)?.toDouble();
-    final double? humidity = (data['main']['humidity'] as num?)?.toDouble();
-    final double? pressure = (data['main']['pressure'] as num?)?.toDouble();
-    final double? windSpeed = (data['wind']['speed'] as num?)?.toDouble();
-    final double? visibility = (data['visibility'] as num?)?.toDouble();
-    final double? cloudCover = (data['clouds']['all'] as num?)?.toDouble();
 
-    final int rawCode = (data['weather'] as List<dynamic>).isNotEmpty
-        ? (data['weather'][0]['id'] as int)
-        : 0;
+    final Object? jsonBody = jsonDecode(response.body);
+    if (jsonBody is! Map<String, Object?>) {
+      throw Exception('Invalid OpenWeatherMap response format');
+    }
+    final Map<String, Object?> data = jsonBody;
+
+    final Object? mainObj = data[_mainKey];
+    final double temp = switch (mainObj) {
+      Map<String, Object?> mainMap when mainMap[_tempKey] is num =>
+        (mainMap[_tempKey] as num).toDouble(),
+      _ => 0.0,
+    };
+    final double? feelsLike = switch (mainObj) {
+      Map<String, Object?> mainMap when mainMap[_feelsLikeKey] is num =>
+        (mainMap[_feelsLikeKey] as num).toDouble(),
+      _ => null,
+    };
+    final double? humidity = switch (mainObj) {
+      Map<String, Object?> mainMap when mainMap[_humidityKey] is num =>
+        (mainMap[_humidityKey] as num).toDouble(),
+      _ => null,
+    };
+    final double? pressure = switch (mainObj) {
+      Map<String, Object?> mainMap when mainMap[_pressureKey] is num =>
+        (mainMap[_pressureKey] as num).toDouble(),
+      _ => null,
+    };
+
+    final Object? windObj = data[_windKey];
+    final double? windSpeed = switch (windObj) {
+      Map<String, Object?> windMap when windMap[_speedKey] is num =>
+        (windMap[_speedKey] as num).toDouble(),
+      _ => null,
+    };
+
+    final double? visibility = data[_visibilityKey] is num
+        ? (data[_visibilityKey] as num).toDouble()
+        : null;
+
+    final Object? cloudsObj = data[_cloudsKey];
+    final double? cloudCover = switch (cloudsObj) {
+      Map<String, Object?> cloudsMap when cloudsMap[_allKey] is num =>
+        (cloudsMap[_allKey] as num).toDouble(),
+      _ => null,
+    };
+
+    final Object? weatherListObj = data[_weatherKey];
+    int rawCode = 0;
+    String desc = '';
+    if (weatherListObj is List<Object?> && weatherListObj.isNotEmpty) {
+      final Object? firstWeather = weatherListObj.first;
+      if (firstWeather is Map<String, Object?>) {
+        if (firstWeather[_idKey] is int) {
+          rawCode = firstWeather[_idKey] as int;
+        } else if (firstWeather[_idKey] is num) {
+          rawCode = (firstWeather[_idKey] as num).toInt();
+        }
+        if (firstWeather[_descriptionKey] is String) {
+          desc = firstWeather[_descriptionKey] as String;
+        }
+      }
+    }
     final int wmoCode = _mapOwmToWmo(rawCode);
-    final String desc = (data['weather'] as List<dynamic>).isNotEmpty
-        ? (data['weather'][0]['description'] as String)
-        : '';
+
+    final Object? sysObj = data[_sysKey];
+    final Map<String, Object?>? sys = sysObj is Map<String, Object?>
+        ? sysObj
+        : null;
+    final int? sunrise = sys?[_sunriseKey] is num
+        ? (sys![_sunriseKey] as num).toInt()
+        : null;
+    final int? sunset = sys?[_sunsetKey] is num
+        ? (sys![_sunsetKey] as num).toInt()
+        : null;
+    final int? dt = data[_dtKey] is num ? (data[_dtKey] as num).toInt() : null;
+
+    bool? isDay;
+    if (sunrise != null && sunset != null && dt != null) {
+      isDay = dt >= sunrise && dt < sunset;
+    } else if (sunrise != null && sunset != null) {
+      final int nowEpochSeconds =
+          DateTime.now().toUtc().millisecondsSinceEpoch ~/ 1000;
+      isDay = nowEpochSeconds >= sunrise && nowEpochSeconds < sunset;
+    }
+
     return WeatherDomain(
       temperature: temp,
       location: location,
@@ -59,41 +154,96 @@ class OpenWeatherMapProvider implements WeatherProvider {
       pressure: pressure,
       visibility: visibility,
       cloudCover: cloudCover,
+      isDay: isDay,
     );
   }
 
   @override
   Future<DailyForecastDomain> getForecast(Location location) async {
-    final Uri url = Uri.https(
-      'api.openweathermap.org',
-      '/data/2.5/forecast',
-      <String, String>{
-        'lat': location.latitude.toString(),
-        'lon': location.longitude.toString(),
-        'appid': apiKey,
-        'units': 'metric',
-      },
-    );
+    final Uri url = Uri.https(_baseUrl, _forecastEndpoint, <String, String>{
+      _latParam: location.latitude.toString(),
+      _lonParam: location.longitude.toString(),
+      _appidParam: apiKey,
+      _unitsParam: _metricUnits,
+    });
     final http.Response response = await _httpClient.get(url);
     if (response.statusCode != 200) {
       throw Exception('OpenWeatherMap forecast error: ${response.statusCode}');
     }
-    final List<dynamic> data =
-        jsonDecode(response.body)['list'] as List<dynamic>;
-    final List<ForecastItemDomain> forecastItems = data.map((dynamic item) {
-      final String dtTxt = item['dt_txt'] as String;
-      final double temp = (item['main']['temp'] as num).toDouble();
-      final double? feelsLike = (item['main']['feels_like'] as num?)
-          ?.toDouble();
-      final double? humidity = (item['main']['humidity'] as num?)?.toDouble();
-      final double? pressure = (item['main']['pressure'] as num?)?.toDouble();
-      final double? windSpeed = (item['wind']['speed'] as num?)?.toDouble();
-      final double? visibility = (item['visibility'] as num?)?.toDouble();
-      final double? cloudCover = (item['clouds']['all'] as num?)?.toDouble();
 
-      final int rawCode = (item['weather'] as List<dynamic>).isNotEmpty
-          ? (item['weather'][0]['id'] as int)
-          : 0;
+    final Object? jsonBody = jsonDecode(response.body);
+    if (jsonBody is! Map<String, Object?>) {
+      throw Exception('Invalid OpenWeatherMap forecast response format');
+    }
+    final Object? listObj = jsonBody[_listKey];
+    if (listObj is! List<Object?>) {
+      throw Exception('Invalid OpenWeatherMap forecast list format');
+    }
+
+    final List<ForecastItemDomain> forecastItems = listObj.map((Object? item) {
+      if (item is! Map<String, Object?>) {
+        return const ForecastItemDomain(
+          time: '',
+          temperature: 0,
+          weatherCode: 0,
+        );
+      }
+      final String dtTxt = item[_dtTxtKey] is String
+          ? item[_dtTxtKey] as String
+          : '';
+      final Object? mainObj = item[_mainKey];
+      final double temp = switch (mainObj) {
+        Map<String, Object?> mainMap when mainMap[_tempKey] is num =>
+          (mainMap[_tempKey] as num).toDouble(),
+        _ => 0.0,
+      };
+      final double? feelsLike = switch (mainObj) {
+        Map<String, Object?> mainMap when mainMap[_feelsLikeKey] is num =>
+          (mainMap[_feelsLikeKey] as num).toDouble(),
+        _ => null,
+      };
+      final double? humidity = switch (mainObj) {
+        Map<String, Object?> mainMap when mainMap[_humidityKey] is num =>
+          (mainMap[_humidityKey] as num).toDouble(),
+        _ => null,
+      };
+      final double? pressure = switch (mainObj) {
+        Map<String, Object?> mainMap when mainMap[_pressureKey] is num =>
+          (mainMap[_pressureKey] as num).toDouble(),
+        _ => null,
+      };
+
+      final Object? windObj = item[_windKey];
+      final double? windSpeed = switch (windObj) {
+        Map<String, Object?> windMap when windMap[_speedKey] is num =>
+          (windMap[_speedKey] as num).toDouble(),
+        _ => null,
+      };
+
+      final double? visibility = item[_visibilityKey] is num
+          ? (item[_visibilityKey] as num).toDouble()
+          : null;
+
+      final Object? cloudsObj = item[_cloudsKey];
+      final double? cloudCover = switch (cloudsObj) {
+        Map<String, Object?> cloudsMap when cloudsMap[_allKey] is num =>
+          (cloudsMap[_allKey] as num).toDouble(),
+        _ => null,
+      };
+
+      final Object? weatherListObj = item[_weatherKey];
+      int rawCode = 0;
+      if (weatherListObj is List<Object?> && weatherListObj.isNotEmpty) {
+        final Object? firstWeather = weatherListObj.first;
+        if (firstWeather is Map<String, Object?>) {
+          if (firstWeather[_idKey] is int) {
+            rawCode = firstWeather[_idKey] as int;
+          } else if (firstWeather[_idKey] is num) {
+            rawCode = (firstWeather[_idKey] as num).toInt();
+          }
+        }
+      }
+
       return ForecastItemDomain(
         time: dtTxt,
         temperature: temp,
@@ -106,6 +256,7 @@ class OpenWeatherMapProvider implements WeatherProvider {
         cloudCover: cloudCover,
       );
     }).toList();
+
     return DailyForecastDomain(forecast: forecastItems);
   }
 

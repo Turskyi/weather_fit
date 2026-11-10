@@ -53,10 +53,11 @@ enum WeatherCondition {
     }
   }
 
-  String get toEmoji {
+  String getEmoji({bool? isDay}) {
     final DateTime now = DateTime.now();
     final int hour = now.hour;
-    final bool isDaytime = hour >= _dayStartHour && hour < _nightStartHour;
+    final bool isDaytime =
+        isDay ?? (hour >= defaultDayStartHour && hour < defaultNightStartHour);
     switch (this) {
       case WeatherCondition.clear:
         // Sun during day, moon at night.
@@ -72,6 +73,8 @@ enum WeatherCondition {
         return '❓';
     }
   }
+
+  String get toEmoji => getEmoji();
 
   bool get isClear => this == WeatherCondition.clear;
 

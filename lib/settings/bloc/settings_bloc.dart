@@ -33,8 +33,6 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         SettingsInitial(
           language: _localDataSource.getSavedLanguage(),
           widgetUpdateFrequency: _localDataSource.getWidgetUpdateFrequency(),
-          dayStartHour: _localDataSource.getDayStartHour(),
-          nightStartHour: _localDataSource.getNightStartHour(),
           debugWeatherProviderOpenWeatherMap: _localDataSource
               .getDebugWeatherProviderOpenWeatherMap(),
           isWeatherBackgroundEnabled: _localDataSource
@@ -57,20 +55,11 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
 
     on<ChangeWidgetUpdateFrequencyEvent>(_onChangeWidgetUpdateFrequency);
 
-    on<ChangeDayStartHourEvent>(_onChangeDayStartHour);
-
-    on<ChangeNightStartHourEvent>(_onChangeNightStartHour);
-
     on<ToggleDebugWeatherProviderEvent>(_onToggleDebugWeatherProvider);
 
     on<ToggleDebugForceNightEvent>(_onToggleDebugForceNight);
 
     on<ToggleWeatherBackgroundEvent>(_onToggleWeatherBackground);
-
-    _applyDayNightConfiguration(
-      dayStartHour: state.dayStartHour,
-      nightStartHour: state.nightStartHour,
-    );
 
     add(const LoadSettingsEvent());
     add(const CheckForUpdateEvent());
@@ -91,15 +80,9 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
           language: state.language,
           appVersion: '${packageInfo.version} (${packageInfo.buildNumber})',
           widgetUpdateFrequency: _localDataSource.getWidgetUpdateFrequency(),
-          dayStartHour: _localDataSource.getDayStartHour(),
-          nightStartHour: _localDataSource.getNightStartHour(),
           isWeatherBackgroundEnabled: _localDataSource
               .isWeatherBackgroundEnabled(),
         ),
-      );
-      _applyDayNightConfiguration(
-        dayStartHour: state.dayStartHour,
-        nightStartHour: state.nightStartHour,
       );
     } catch (e, stackTrace) {
       debugPrint('SettingsErrorEvent:$e\nStackTrace: $stackTrace');
@@ -127,8 +110,6 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         language: state.language,
         appVersion: state.appVersion,
         widgetUpdateFrequency: state.widgetUpdateFrequency,
-        dayStartHour: state.dayStartHour,
-        nightStartHour: state.nightStartHour,
         debugWeatherProviderOpenWeatherMap:
             state.debugWeatherProviderOpenWeatherMap,
         debugForceNight: state.debugForceNight,
@@ -147,8 +128,6 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
           language: state.language,
           appVersion: state.appVersion,
           widgetUpdateFrequency: state.widgetUpdateFrequency,
-          dayStartHour: state.dayStartHour,
-          nightStartHour: state.nightStartHour,
           debugWeatherProviderOpenWeatherMap:
               state.debugWeatherProviderOpenWeatherMap,
           debugForceNight: state.debugForceNight,
@@ -184,7 +163,6 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         final bool isFeedbackType = type is FeedbackType;
         final bool isFeedbackRating = rating is FeedbackRating;
 
-        // Construct the feedback text with details from `extra'.
         final StringBuffer feedbackBody = StringBuffer()
           ..writeln(
             '${isFeedbackType ? translate('feedback.type') : ''}:'
@@ -252,8 +230,6 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
                 language: state.language,
                 appVersion: state.appVersion,
                 widgetUpdateFrequency: state.widgetUpdateFrequency,
-                dayStartHour: state.dayStartHour,
-                nightStartHour: state.nightStartHour,
                 debugWeatherProviderOpenWeatherMap:
                     state.debugWeatherProviderOpenWeatherMap,
                 debugForceNight: state.debugForceNight,
@@ -287,8 +263,6 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
             language: state.language,
             appVersion: state.appVersion,
             widgetUpdateFrequency: state.widgetUpdateFrequency,
-            dayStartHour: state.dayStartHour,
-            nightStartHour: state.nightStartHour,
             debugWeatherProviderOpenWeatherMap:
                 state.debugWeatherProviderOpenWeatherMap,
             debugForceNight: state.debugForceNight,
@@ -303,8 +277,6 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
             language: state.language,
             appVersion: state.appVersion,
             widgetUpdateFrequency: state.widgetUpdateFrequency,
-            dayStartHour: state.dayStartHour,
-            nightStartHour: state.nightStartHour,
             debugWeatherProviderOpenWeatherMap:
                 state.debugWeatherProviderOpenWeatherMap,
             debugForceNight: state.debugForceNight,
@@ -338,8 +310,6 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         query: query,
         appVersion: state.appVersion,
         widgetUpdateFrequency: state.widgetUpdateFrequency,
-        dayStartHour: state.dayStartHour,
-        nightStartHour: state.nightStartHour,
         debugWeatherProviderOpenWeatherMap:
             state.debugWeatherProviderOpenWeatherMap,
         debugForceNight: state.debugForceNight,
@@ -365,8 +335,6 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         language: state.language,
         appVersion: state.appVersion,
         widgetUpdateFrequency: state.widgetUpdateFrequency,
-        dayStartHour: state.dayStartHour,
-        nightStartHour: state.nightStartHour,
         debugWeatherProviderOpenWeatherMap:
             state.debugWeatherProviderOpenWeatherMap,
         debugForceNight: state.debugForceNight,
@@ -396,8 +364,6 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
               language: language,
               appVersion: state.appVersion,
               widgetUpdateFrequency: state.widgetUpdateFrequency,
-              dayStartHour: state.dayStartHour,
-              nightStartHour: state.nightStartHour,
               debugWeatherProviderOpenWeatherMap:
                   state.debugWeatherProviderOpenWeatherMap,
               debugForceNight: state.debugForceNight,
@@ -415,8 +381,6 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
             language: state.language,
             appVersion: state.appVersion,
             widgetUpdateFrequency: state.widgetUpdateFrequency,
-            dayStartHour: state.dayStartHour,
-            nightStartHour: state.nightStartHour,
             debugWeatherProviderOpenWeatherMap:
                 state.debugWeatherProviderOpenWeatherMap,
             debugForceNight: state.debugForceNight,
@@ -460,72 +424,6 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
           language: state.language,
           appVersion: state.appVersion,
           widgetUpdateFrequency: state.widgetUpdateFrequency,
-          dayStartHour: state.dayStartHour,
-          nightStartHour: state.nightStartHour,
-          debugWeatherProviderOpenWeatherMap:
-              state.debugWeatherProviderOpenWeatherMap,
-          debugForceNight: state.debugForceNight,
-          isWeatherBackgroundEnabled: state.isWeatherBackgroundEnabled,
-        ),
-      );
-    }
-  }
-
-  FutureOr<void> _onChangeDayStartHour(
-    ChangeDayStartHourEvent event,
-    Emitter<SettingsState> emit,
-  ) async {
-    final int dayStartHour = event.hour;
-    final bool isSaved = await _localDataSource.saveDayStartHour(dayStartHour);
-
-    if (isSaved) {
-      emit(state.copyWith(dayStartHour: dayStartHour));
-      _applyDayNightConfiguration(
-        dayStartHour: dayStartHour,
-        nightStartHour: state.nightStartHour,
-      );
-    } else {
-      emit(
-        SettingsError(
-          errorMessage: translate('error.unexpected_error'),
-          language: state.language,
-          appVersion: state.appVersion,
-          widgetUpdateFrequency: state.widgetUpdateFrequency,
-          dayStartHour: state.dayStartHour,
-          nightStartHour: state.nightStartHour,
-          debugWeatherProviderOpenWeatherMap:
-              state.debugWeatherProviderOpenWeatherMap,
-          debugForceNight: state.debugForceNight,
-          isWeatherBackgroundEnabled: state.isWeatherBackgroundEnabled,
-        ),
-      );
-    }
-  }
-
-  FutureOr<void> _onChangeNightStartHour(
-    ChangeNightStartHourEvent event,
-    Emitter<SettingsState> emit,
-  ) async {
-    final int nightStartHour = event.hour;
-    final bool isSaved = await _localDataSource.saveNightStartHour(
-      nightStartHour,
-    );
-
-    if (isSaved) {
-      emit(state.copyWith(nightStartHour: nightStartHour));
-      _applyDayNightConfiguration(
-        dayStartHour: state.dayStartHour,
-        nightStartHour: nightStartHour,
-      );
-    } else {
-      emit(
-        SettingsError(
-          errorMessage: translate('error.unexpected_error'),
-          language: state.language,
-          appVersion: state.appVersion,
-          widgetUpdateFrequency: state.widgetUpdateFrequency,
-          dayStartHour: state.dayStartHour,
-          nightStartHour: state.nightStartHour,
           debugWeatherProviderOpenWeatherMap:
               state.debugWeatherProviderOpenWeatherMap,
           debugForceNight: state.debugForceNight,
@@ -556,15 +454,5 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   ) async {
     await _localDataSource.saveWeatherBackgroundEnabled(event.enabled);
     emit(state.copyWith(isWeatherBackgroundEnabled: event.enabled));
-  }
-
-  void _applyDayNightConfiguration({
-    required int dayStartHour,
-    required int nightStartHour,
-  }) {
-    WeatherCondition.configureDayNightHours(
-      dayStartHour: dayStartHour,
-      nightStartHour: nightStartHour,
-    );
   }
 }

@@ -14,8 +14,6 @@ class SettingsPageExtraSmallLayout extends StatefulWidget {
   const SettingsPageExtraSmallLayout({
     required this.rebuildSettingsWhen,
     required this.onLanguageChanged,
-    required this.onDayStartHourChanged,
-    required this.onNightStartHourChanged,
     required this.rebuildUnitsWhen,
     required this.onUnitsChanged,
     required this.onAboutTap,
@@ -30,8 +28,6 @@ class SettingsPageExtraSmallLayout extends StatefulWidget {
 
   final BlocBuilderCondition<SettingsState> rebuildSettingsWhen;
   final ValueChanged<Language> onLanguageChanged;
-  final ValueChanged<int> onDayStartHourChanged;
-  final ValueChanged<int> onNightStartHourChanged;
   final BlocBuilderCondition<WeatherState> rebuildUnitsWhen;
   final ValueChanged<bool> onUnitsChanged;
   final GestureTapCallback onAboutTap;
@@ -113,52 +109,13 @@ class _SettingsPageExtraSmallLayoutState
               ),
               const SizedBox(height: 8),
 
-              // Day/night interval selectors.
+              // Widget updates frequency selectors.
               BlocBuilder<SettingsBloc, SettingsState>(
                 buildWhen: widget.rebuildSettingsWhen,
                 builder: (BuildContext context, SettingsState state) {
-                  final List<int> dayOptions = List<int>.generate(
-                    WeatherCondition.maxDayStartHour -
-                        WeatherCondition.minDayStartHour +
-                        1,
-                    (int index) {
-                      return WeatherCondition.minDayStartHour + index;
-                    },
-                  );
-                  final List<int> nightOptions = List<int>.generate(
-                    WeatherCondition.maxNightStartHour -
-                        WeatherCondition.minNightStartHour +
-                        1,
-                    (int index) {
-                      return WeatherCondition.minNightStartHour + index;
-                    },
-                  );
-
                   return Column(
                     children: <Widget>[
-                      SettingDropdown(
-                        label: translate('settings.day_starts'),
-                        value: state.dayStartHour,
-                        options: dayOptions,
-                        onChanged: (int? value) {
-                          if (value != null) {
-                            widget.onDayStartHourChanged(value);
-                          }
-                        },
-                      ),
-                      const SizedBox(height: 8),
-                      SettingDropdown(
-                        label: translate('settings.night_starts'),
-                        value: state.nightStartHour,
-                        options: nightOptions,
-                        onChanged: (int? value) {
-                          if (value != null) {
-                            widget.onNightStartHourChanged(value);
-                          }
-                        },
-                      ),
                       if (!kIsWeb) ...<Widget>[
-                        const SizedBox(height: 8),
                         SettingDropdown(
                           label: translate('settings.widget_updates_title'),
                           value: state.widgetUpdateFrequency,

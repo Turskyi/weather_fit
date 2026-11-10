@@ -6,8 +6,6 @@ sealed class SettingsState {
     required this.language,
     this.appVersion,
     this.widgetUpdateFrequency = 120,
-    this.dayStartHour = WeatherCondition.defaultDayStartHour,
-    this.nightStartHour = WeatherCondition.defaultNightStartHour,
     this.debugWeatherProviderOpenWeatherMap = false,
     this.debugForceNight = false,
     this.isWeatherBackgroundEnabled =
@@ -17,8 +15,6 @@ sealed class SettingsState {
   final Language language;
   final String? appVersion;
   final int widgetUpdateFrequency;
-  final int dayStartHour;
-  final int nightStartHour;
   final bool debugWeatherProviderOpenWeatherMap;
   final bool debugForceNight;
   final bool isWeatherBackgroundEnabled;
@@ -35,8 +31,6 @@ sealed class SettingsState {
     Language? language,
     String? appVersion,
     int? widgetUpdateFrequency,
-    int? dayStartHour,
-    int? nightStartHour,
     bool? debugWeatherProviderOpenWeatherMap,
     bool? debugForceNight,
     bool? isWeatherBackgroundEnabled,
@@ -48,8 +42,6 @@ final class SettingsInitial extends SettingsState {
     required super.language,
     super.appVersion,
     super.widgetUpdateFrequency,
-    super.dayStartHour,
-    super.nightStartHour,
     super.debugWeatherProviderOpenWeatherMap,
     super.debugForceNight,
     super.isWeatherBackgroundEnabled,
@@ -60,8 +52,6 @@ final class SettingsInitial extends SettingsState {
     Language? language,
     String? appVersion,
     int? widgetUpdateFrequency,
-    int? dayStartHour,
-    int? nightStartHour,
     bool? debugWeatherProviderOpenWeatherMap,
     bool? debugForceNight,
     bool? isWeatherBackgroundEnabled,
@@ -71,8 +61,6 @@ final class SettingsInitial extends SettingsState {
       appVersion: appVersion ?? this.appVersion,
       widgetUpdateFrequency:
           widgetUpdateFrequency ?? this.widgetUpdateFrequency,
-      dayStartHour: dayStartHour ?? this.dayStartHour,
-      nightStartHour: nightStartHour ?? this.nightStartHour,
       debugWeatherProviderOpenWeatherMap:
           debugWeatherProviderOpenWeatherMap ??
           this.debugWeatherProviderOpenWeatherMap,
@@ -88,8 +76,6 @@ final class SettingsInitial extends SettingsState {
         '  language: $language,'
         '  appVersion: $appVersion,'
         '  widgetUpdateFrequency: $widgetUpdateFrequency,'
-        '  dayStartHour: $dayStartHour,'
-        '  nightStartHour: $nightStartHour,'
         '  debugWeatherProviderOpenWeatherMap: '
         '$debugWeatherProviderOpenWeatherMap,'
         '  debugForceNight: $debugForceNight,'
@@ -105,8 +91,6 @@ final class FeedbackState extends SettingsState {
     required this.query,
     super.appVersion,
     super.widgetUpdateFrequency,
-    super.dayStartHour,
-    super.nightStartHour,
     super.debugWeatherProviderOpenWeatherMap,
     super.debugForceNight,
     super.isWeatherBackgroundEnabled,
@@ -123,8 +107,6 @@ final class FeedbackState extends SettingsState {
         '  language: $language,'
         '  appVersion: $appVersion,'
         '  widgetUpdateFrequency: $widgetUpdateFrequency,'
-        '  dayStartHour: $dayStartHour,'
-        '  nightStartHour: $nightStartHour,'
         '  debugWeatherProviderOpenWeatherMap: '
         '$debugWeatherProviderOpenWeatherMap,'
         '  debugForceNight: $debugForceNight,'
@@ -139,8 +121,6 @@ final class FeedbackState extends SettingsState {
     Language? language,
     String? appVersion,
     int? widgetUpdateFrequency,
-    int? dayStartHour,
-    int? nightStartHour,
     bool? debugWeatherProviderOpenWeatherMap,
     bool? debugForceNight,
     bool? isWeatherBackgroundEnabled,
@@ -152,8 +132,6 @@ final class FeedbackState extends SettingsState {
       appVersion: appVersion ?? this.appVersion,
       widgetUpdateFrequency:
           widgetUpdateFrequency ?? this.widgetUpdateFrequency,
-      dayStartHour: dayStartHour ?? this.dayStartHour,
-      nightStartHour: nightStartHour ?? this.nightStartHour,
       debugWeatherProviderOpenWeatherMap:
           debugWeatherProviderOpenWeatherMap ??
           this.debugWeatherProviderOpenWeatherMap,
@@ -169,8 +147,6 @@ final class FeedbackSent extends SettingsState {
     required super.language,
     super.appVersion,
     super.widgetUpdateFrequency,
-    super.dayStartHour,
-    super.nightStartHour,
     super.debugWeatherProviderOpenWeatherMap,
     super.debugForceNight,
     super.isWeatherBackgroundEnabled,
@@ -182,8 +158,6 @@ final class FeedbackSent extends SettingsState {
         '  language: $language,'
         '  appVersion: $appVersion,'
         '  widgetUpdateFrequency: $widgetUpdateFrequency,'
-        '  dayStartHour: $dayStartHour,'
-        '  nightStartHour: $nightStartHour,'
         '  debugWeatherProviderOpenWeatherMap: '
         '$debugWeatherProviderOpenWeatherMap,'
         '  debugForceNight: $debugForceNight,'
@@ -196,8 +170,6 @@ final class FeedbackSent extends SettingsState {
     Language? language,
     String? appVersion,
     int? widgetUpdateFrequency,
-    int? dayStartHour,
-    int? nightStartHour,
     bool? debugWeatherProviderOpenWeatherMap,
     bool? debugForceNight,
     bool? isWeatherBackgroundEnabled,
@@ -207,8 +179,6 @@ final class FeedbackSent extends SettingsState {
       appVersion: appVersion ?? this.appVersion,
       widgetUpdateFrequency:
           widgetUpdateFrequency ?? this.widgetUpdateFrequency,
-      dayStartHour: dayStartHour ?? this.dayStartHour,
-      nightStartHour: nightStartHour ?? this.nightStartHour,
       debugWeatherProviderOpenWeatherMap:
           debugWeatherProviderOpenWeatherMap ??
           this.debugWeatherProviderOpenWeatherMap,
@@ -224,8 +194,6 @@ final class LoadingSettingsState extends SettingsState {
     required super.language,
     super.appVersion,
     super.widgetUpdateFrequency,
-    super.dayStartHour,
-    super.nightStartHour,
     super.debugWeatherProviderOpenWeatherMap,
     super.debugForceNight,
     super.isWeatherBackgroundEnabled,
@@ -236,8 +204,6 @@ final class LoadingSettingsState extends SettingsState {
     Language? language,
     String? appVersion,
     int? widgetUpdateFrequency,
-    int? dayStartHour,
-    int? nightStartHour,
     bool? debugWeatherProviderOpenWeatherMap,
     bool? debugForceNight,
     bool? isWeatherBackgroundEnabled,
@@ -247,8 +213,6 @@ final class LoadingSettingsState extends SettingsState {
       appVersion: appVersion ?? this.appVersion,
       widgetUpdateFrequency:
           widgetUpdateFrequency ?? this.widgetUpdateFrequency,
-      dayStartHour: dayStartHour ?? this.dayStartHour,
-      nightStartHour: nightStartHour ?? this.nightStartHour,
       debugWeatherProviderOpenWeatherMap:
           debugWeatherProviderOpenWeatherMap ??
           this.debugWeatherProviderOpenWeatherMap,
@@ -264,8 +228,6 @@ final class LoadingSettingsState extends SettingsState {
         '  language: $language,'
         '  appVersion: $appVersion,'
         '  widgetUpdateFrequency: $widgetUpdateFrequency,'
-        '  dayStartHour: $dayStartHour,'
-        '  nightStartHour: $nightStartHour,'
         '  debugWeatherProviderOpenWeatherMap: '
         '$debugWeatherProviderOpenWeatherMap,'
         '  debugForceNight: $debugForceNight,'
@@ -280,8 +242,6 @@ final class SettingsError extends SettingsState {
     required super.language,
     super.appVersion,
     super.widgetUpdateFrequency,
-    super.dayStartHour,
-    super.nightStartHour,
     super.debugWeatherProviderOpenWeatherMap,
     super.debugForceNight,
     super.isWeatherBackgroundEnabled,
@@ -295,8 +255,6 @@ final class SettingsError extends SettingsState {
     Language? language,
     String? appVersion,
     int? widgetUpdateFrequency,
-    int? dayStartHour,
-    int? nightStartHour,
     bool? debugWeatherProviderOpenWeatherMap,
     bool? debugForceNight,
     bool? isWeatherBackgroundEnabled,
@@ -307,8 +265,6 @@ final class SettingsError extends SettingsState {
       appVersion: appVersion ?? this.appVersion,
       widgetUpdateFrequency:
           widgetUpdateFrequency ?? this.widgetUpdateFrequency,
-      dayStartHour: dayStartHour ?? this.dayStartHour,
-      nightStartHour: nightStartHour ?? this.nightStartHour,
       debugWeatherProviderOpenWeatherMap:
           debugWeatherProviderOpenWeatherMap ??
           this.debugWeatherProviderOpenWeatherMap,
@@ -327,8 +283,6 @@ final class SettingsError extends SettingsState {
         other.language == language &&
         other.appVersion == appVersion &&
         other.widgetUpdateFrequency == widgetUpdateFrequency &&
-        other.dayStartHour == dayStartHour &&
-        other.nightStartHour == nightStartHour &&
         other.debugWeatherProviderOpenWeatherMap ==
             debugWeatherProviderOpenWeatherMap &&
         other.debugForceNight == debugForceNight &&
@@ -341,8 +295,6 @@ final class SettingsError extends SettingsState {
       language.hashCode ^
       appVersion.hashCode ^
       widgetUpdateFrequency.hashCode ^
-      dayStartHour.hashCode ^
-      nightStartHour.hashCode ^
       debugWeatherProviderOpenWeatherMap.hashCode ^
       debugForceNight.hashCode ^
       isWeatherBackgroundEnabled.hashCode;
@@ -354,8 +306,6 @@ final class SettingsError extends SettingsState {
         '  appVersion: $appVersion,'
         '  errorMessage: $errorMessage,'
         '  widgetUpdateFrequency: $widgetUpdateFrequency,'
-        '  dayStartHour: $dayStartHour,'
-        '  nightStartHour: $nightStartHour,'
         '  debugWeatherProviderOpenWeatherMap: '
         '$debugWeatherProviderOpenWeatherMap,'
         '  debugForceNight: $debugForceNight,'

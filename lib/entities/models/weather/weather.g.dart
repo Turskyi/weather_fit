@@ -50,6 +50,7 @@ Weather _$WeatherFromJson(Map<String, dynamic> json) => $checkedCreate(
       ),
       pressure: $checkedConvert('pressure', (v) => (v as num?)?.toDouble()),
       dewPoint: $checkedConvert('dew_point', (v) => (v as num?)?.toDouble()),
+      isDay: $checkedConvert('is_day', (v) => v as bool?),
     );
     return val;
   },
@@ -62,6 +63,7 @@ Weather _$WeatherFromJson(Map<String, dynamic> json) => $checkedCreate(
     'uvIndex': 'uv_index',
     'cloudCover': 'cloud_cover',
     'dewPoint': 'dew_point',
+    'isDay': 'is_day',
   },
 );
 
@@ -83,6 +85,7 @@ Map<String, dynamic> _$WeatherToJson(Weather instance) => <String, dynamic>{
   'cloud_cover': instance.cloudCover,
   'pressure': instance.pressure,
   'dew_point': instance.dewPoint,
+  'is_day': instance.isDay,
 };
 
 const _$WeatherConditionEnumMap = {

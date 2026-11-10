@@ -32,6 +32,7 @@ class OpenMeteoProvider implements WeatherProvider {
       cloudCover: weatherResponse.cloudCover,
       pressure: weatherResponse.pressure,
       dewPoint: weatherResponse.dewPoint,
+      isDay: weatherResponse.isDay == 1,
     );
   }
 

@@ -7,6 +7,7 @@ import 'package:weather_fit/data/data_sources/local/local_data_source.dart';
 import 'package:weather_fit/data/data_sources/remote/remote_data_source.dart';
 import 'package:weather_fit/data/repositories/location_repository.dart';
 import 'package:weather_fit/data/repositories/outfit_repository.dart';
+import 'package:weather_fit/entities/enums/temperature_units.dart';
 import 'package:weather_fit/router/app_route.dart';
 import 'package:weather_fit/services/feedback_service.dart';
 import 'package:weather_fit/services/home_widget_service.dart';
@@ -56,9 +57,11 @@ void main() {
     );
 
     when(() => mockLocalDataSource.getSavedLanguage()).thenReturn(Language.en);
+    when(() => mockLocalDataSource.getLanguageIsoCode()).thenReturn('en');
     when(() => mockLocalDataSource.getWidgetUpdateFrequency()).thenReturn(120);
-    when(() => mockLocalDataSource.getDayStartHour()).thenReturn(6);
-    when(() => mockLocalDataSource.getNightStartHour()).thenReturn(20);
+    when(
+      () => mockLocalDataSource.getTemperatureUnits(),
+    ).thenReturn(TemperatureUnits.celsius);
     when(
       () => mockLocalDataSource.getDebugWeatherProviderOpenWeatherMap(),
     ).thenReturn(false);

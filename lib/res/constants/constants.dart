@@ -46,6 +46,7 @@ const String kRatingProperty = 'rating';
 const String kScreenSizeProperty = 'screenSize';
 const String kSearchError = 'searchError';
 const String kPrecipitation = 'precipitation';
+const String kAppNameArg = 'appName';
 
 /// Blur intensity constant.
 const double kBlurSigma = 8;

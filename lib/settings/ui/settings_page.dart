@@ -27,8 +27,6 @@ class _SettingsPageState extends State<SettingsPage> {
         ? SettingsPageExtraSmallLayout(
             rebuildSettingsWhen: _isSettingsChanged,
             onLanguageChanged: _changeLanguage,
-            onDayStartHourChanged: _changeDayStartHour,
-            onNightStartHourChanged: _changeNightStartHour,
             rebuildUnitsWhen: _isUnitsChanged,
             onUnitsChanged: _changeUnits,
             onAboutTap: _navigateToAbout,
@@ -42,8 +40,6 @@ class _SettingsPageState extends State<SettingsPage> {
         : SettingsPageDefaultLayout(
             rebuildSettingsWhen: _isSettingsChanged,
             onLanguageChanged: _changeLanguage,
-            onDayStartHourChanged: _changeDayStartHour,
-            onNightStartHourChanged: _changeNightStartHour,
             rebuildUnitsWhen: _isUnitsChanged,
             onUnitsChanged: _changeUnits,
             onAboutTap: _navigateToAbout,
@@ -110,8 +106,6 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _isSettingsChanged(SettingsState previous, SettingsState current) {
     return previous.language != current.language ||
         previous.widgetUpdateFrequency != current.widgetUpdateFrequency ||
-        previous.dayStartHour != current.dayStartHour ||
-        previous.nightStartHour != current.nightStartHour ||
         previous.debugWeatherProviderOpenWeatherMap !=
             current.debugWeatherProviderOpenWeatherMap ||
         previous.debugForceNight != current.debugForceNight ||
@@ -127,14 +121,6 @@ class _SettingsPageState extends State<SettingsPage> {
         context.read<SettingsBloc>().add(ChangeLanguageEvent(language));
       }
     });
-  }
-
-  void _changeDayStartHour(int hour) {
-    context.read<SettingsBloc>().add(ChangeDayStartHourEvent(hour));
-  }
-
-  void _changeNightStartHour(int hour) {
-    context.read<SettingsBloc>().add(ChangeNightStartHourEvent(hour));
   }
 
   Future<void> _handleLocationSearchAndFetchWeather() async {

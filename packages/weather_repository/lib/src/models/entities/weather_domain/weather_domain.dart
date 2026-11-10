@@ -24,6 +24,7 @@ class WeatherDomain extends Equatable {
     this.cloudCover,
     this.pressure,
     this.dewPoint,
+    this.isDay,
   });
 
   factory WeatherDomain.fromJson(Map<String, Object?> json) {
@@ -49,6 +50,7 @@ class WeatherDomain extends Equatable {
   final double? cloudCover;
   final double? pressure;
   final double? dewPoint;
+  final bool? isDay;
 
   String get locationName => location.locationName;
 
@@ -63,5 +65,6 @@ class WeatherDomain extends Equatable {
     locale,
     maxTemperature,
     minTemperature,
+    isDay,
   ];
 }
